@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="PhucNguyenResort/PhucNguyenResort.csproj" />
+  <Project Path="PhucNguyenResort.BLL/PhucNguyenResort.BLL.csproj" Id="3ca12a35-623d-4504-8593-ca4a62121f20" />
+  <Project Path="PhucNguyenResort.DAL/PhucNguyenResort.DAL.csproj" Id="da2ec782-22de-43cb-b362-140819df2ef3" />
+  <Project Path="PhucNguyenResort/PhucNguyenResort.Web.csproj" />
 </Solution>
