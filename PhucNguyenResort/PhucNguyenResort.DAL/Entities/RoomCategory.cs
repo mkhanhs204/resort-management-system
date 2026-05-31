@@ -1,0 +1,26 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using PhucNguyenResort.DAL.Enums;
+
+namespace PhucNguyenResort.DAL.Entities;
+
+public class RoomCategory
+{
+    public int CategoryId { get; set; }
+
+    [StringLength(100)]
+    public string? CategoryName { get; set; }
+
+    public string? Description { get; set; }
+
+    [Range(1, 20)]
+    public int? Capacity { get; set; }
+
+    [Range(0, 999999999)]
+    public decimal? PricePerNight { get; set; }
+
+    [StringLength(255)]
+    public string? ImageUrl { get; set; }
+
+    public ICollection<Room> Rooms { get; set; } = new List<Room>();
+}
