@@ -10,4 +10,9 @@
     <ProjectReference Include="..\PhucNguyenResort.DAL\PhucNguyenResort.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interface\" />
+    <Folder Include="Service\" />
+  </ItemGroup>
+
 </Project>
