@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using PhucNguyenResort.Models;
+using PhucNguyenResort.ViewModels;
 using System.Diagnostics;
 
 namespace PhucNguyenResort.Controllers

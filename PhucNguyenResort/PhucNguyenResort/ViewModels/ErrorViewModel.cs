@@ -1,4 +1,4 @@
-namespace PhucNguyenResort.Models
+namespace PhucNguyenResort.ViewModels
 {
     public class ErrorViewModel
     {
