@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using PhucNguyenResort.DAL.Data;
+using PhucNguyenResort.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
