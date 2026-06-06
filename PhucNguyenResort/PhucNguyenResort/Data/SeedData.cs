@@ -9,26 +9,15 @@ public static class SeedData
     public static void Apply(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Role>().HasData(
-            new Role { RoleId = 1, RoleName = @"Guest" },
-            new Role { RoleId = 2, RoleName = @"Receptionist" },
-            new Role { RoleId = 3, RoleName = @"BusinessManager" },
-            new Role { RoleId = 4, RoleName = @"SystemAdmin" },
-            new Role { RoleId = 5, RoleName = @"HousekeepingStaff" },
-            new Role { RoleId = 6, RoleName = @"KitchenStaff" },
-            new Role { RoleId = 7, RoleName = @"TourGuide" },
-            new Role { RoleId = 8, RoleName = @"Accountant" },
-            new Role { RoleId = 9, RoleName = @"RestaurantStaff" },
-            new Role { RoleId = 10, RoleName = @"MaintenanceStaff" },
-            new Role { RoleId = 11, RoleName = @"SpaStaff" },
-            new Role { RoleId = 12, RoleName = @"SecurityStaff" },
-            new Role { RoleId = 13, RoleName = @"MarketingStaff" },
-            new Role { RoleId = 14, RoleName = @"HRStaff" },
-            new Role { RoleId = 15, RoleName = @"InventoryStaff" },
-            new Role { RoleId = 16, RoleName = @"SalesStaff" },
-            new Role { RoleId = 17, RoleName = @"CustomerSupport" },
-            new Role { RoleId = 18, RoleName = @"EventCoordinator" },
-            new Role { RoleId = 19, RoleName = @"TransportStaff" },
-            new Role { RoleId = 20, RoleName = @"Auditor" }
+            new Role { RoleId = 1, RoleName = @"System Admin" },
+            new Role { RoleId = 2, RoleName = @"Business Manager" },
+            new Role { RoleId = 3, RoleName = @"Customer" },
+            new Role { RoleId = 4, RoleName = @"Receptionist" },
+            new Role { RoleId = 5, RoleName = @"F&B Staff" },
+            new Role { RoleId = 6, RoleName = @"Kitchen Staff" },
+            new Role { RoleId = 7, RoleName = @"Tour Guide" },
+            new Role { RoleId = 8, RoleName = @"Housekeeping Staff" },
+            new Role { RoleId = 9, RoleName = @"Maintenance Staff" }
         );
 
         modelBuilder.Entity<User>().HasData(
@@ -41,17 +30,17 @@ public static class SeedData
             new User { UserId = 7, FullName = @"Dang Ngoc Linh", Email = @"user07@phucnguyenresort.test", PasswordHash = @"hashed-password-07", PhoneNumber = @"0900000007", RoleId = 7, IsActive = true, CreatedAt = new DateTime(2026, 2, 7, 8, 30, 0) },
             new User { UserId = 8, FullName = @"Bui Gia Minh", Email = @"user08@phucnguyenresort.test", PasswordHash = @"hashed-password-08", PhoneNumber = @"0900000008", RoleId = 8, IsActive = true, CreatedAt = new DateTime(2026, 2, 8, 8, 30, 0) },
             new User { UserId = 9, FullName = @"Do Phuong Nam", Email = @"user09@phucnguyenresort.test", PasswordHash = @"hashed-password-09", PhoneNumber = @"0900000009", RoleId = 9, IsActive = false, CreatedAt = new DateTime(2026, 3, 9, 8, 30, 0) },
-            new User { UserId = 10, FullName = @"Ngo Thanh Oanh", Email = @"user10@phucnguyenresort.test", PasswordHash = @"hashed-password-10", PhoneNumber = @"0900000010", RoleId = 10, IsActive = true, CreatedAt = new DateTime(2026, 3, 10, 8, 30, 0) },
-            new User { UserId = 11, FullName = @"Huynh Duc Phat", Email = @"user11@phucnguyenresort.test", PasswordHash = @"hashed-password-11", PhoneNumber = @"0900000011", RoleId = 11, IsActive = true, CreatedAt = new DateTime(2026, 3, 11, 8, 30, 0) },
-            new User { UserId = 12, FullName = @"Phan My Quyen", Email = @"user12@phucnguyenresort.test", PasswordHash = @"hashed-password-12", PhoneNumber = @"0900000012", RoleId = 12, IsActive = true, CreatedAt = new DateTime(2026, 3, 12, 8, 30, 0) },
-            new User { UserId = 13, FullName = @"Vu Khanh Son", Email = @"user13@phucnguyenresort.test", PasswordHash = @"hashed-password-13", PhoneNumber = @"0900000013", RoleId = 13, IsActive = true, CreatedAt = new DateTime(2026, 4, 13, 8, 30, 0) },
-            new User { UserId = 14, FullName = @"Truong Hai Tam", Email = @"user14@phucnguyenresort.test", PasswordHash = @"hashed-password-14", PhoneNumber = @"0900000014", RoleId = 14, IsActive = true, CreatedAt = new DateTime(2026, 4, 14, 8, 30, 0) },
-            new User { UserId = 15, FullName = @"Ly Bao Uyen", Email = @"user15@phucnguyenresort.test", PasswordHash = @"hashed-password-15", PhoneNumber = @"0900000015", RoleId = 15, IsActive = true, CreatedAt = new DateTime(2026, 4, 15, 8, 30, 0) },
-            new User { UserId = 16, FullName = @"Mai Hoai Viet", Email = @"user16@phucnguyenresort.test", PasswordHash = @"hashed-password-16", PhoneNumber = @"0900000016", RoleId = 16, IsActive = true, CreatedAt = new DateTime(2026, 4, 16, 8, 30, 0) },
-            new User { UserId = 17, FullName = @"Dinh Nhat Vy", Email = @"user17@phucnguyenresort.test", PasswordHash = @"hashed-password-17", PhoneNumber = @"0900000017", RoleId = 17, IsActive = true, CreatedAt = new DateTime(2026, 5, 17, 8, 30, 0) },
-            new User { UserId = 18, FullName = @"Cao Tien Dat", Email = @"user18@phucnguyenresort.test", PasswordHash = @"hashed-password-18", PhoneNumber = @"0900000018", RoleId = 18, IsActive = false, CreatedAt = new DateTime(2026, 5, 18, 8, 30, 0) },
-            new User { UserId = 19, FullName = @"Ta Minh Anh", Email = @"user19@phucnguyenresort.test", PasswordHash = @"hashed-password-19", PhoneNumber = @"0900000019", RoleId = 19, IsActive = true, CreatedAt = new DateTime(2026, 5, 19, 8, 30, 0) },
-            new User { UserId = 20, FullName = @"Lam Gia Bao", Email = @"user20@phucnguyenresort.test", PasswordHash = @"hashed-password-20", PhoneNumber = @"0900000020", RoleId = 20, IsActive = true, CreatedAt = new DateTime(2026, 5, 20, 8, 30, 0) }
+            new User { UserId = 10, FullName = @"Ngo Thanh Oanh", Email = @"user10@phucnguyenresort.test", PasswordHash = @"hashed-password-10", PhoneNumber = @"0900000010", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 10, 8, 30, 0) },
+            new User { UserId = 11, FullName = @"Huynh Duc Phat", Email = @"user11@phucnguyenresort.test", PasswordHash = @"hashed-password-11", PhoneNumber = @"0900000011", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 11, 8, 30, 0) },
+            new User { UserId = 12, FullName = @"Phan My Quyen", Email = @"user12@phucnguyenresort.test", PasswordHash = @"hashed-password-12", PhoneNumber = @"0900000012", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 12, 8, 30, 0) },
+            new User { UserId = 13, FullName = @"Vu Khanh Son", Email = @"user13@phucnguyenresort.test", PasswordHash = @"hashed-password-13", PhoneNumber = @"0900000013", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 13, 8, 30, 0) },
+            new User { UserId = 14, FullName = @"Truong Hai Tam", Email = @"user14@phucnguyenresort.test", PasswordHash = @"hashed-password-14", PhoneNumber = @"0900000014", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 14, 8, 30, 0) },
+            new User { UserId = 15, FullName = @"Ly Bao Uyen", Email = @"user15@phucnguyenresort.test", PasswordHash = @"hashed-password-15", PhoneNumber = @"0900000015", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 15, 8, 30, 0) },
+            new User { UserId = 16, FullName = @"Mai Hoai Viet", Email = @"user16@phucnguyenresort.test", PasswordHash = @"hashed-password-16", PhoneNumber = @"0900000016", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 16, 8, 30, 0) },
+            new User { UserId = 17, FullName = @"Dinh Nhat Vy", Email = @"user17@phucnguyenresort.test", PasswordHash = @"hashed-password-17", PhoneNumber = @"0900000017", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 5, 17, 8, 30, 0) },
+            new User { UserId = 18, FullName = @"Cao Tien Dat", Email = @"user18@phucnguyenresort.test", PasswordHash = @"hashed-password-18", PhoneNumber = @"0900000018", RoleId = 3, IsActive = false, CreatedAt = new DateTime(2026, 5, 18, 8, 30, 0) },
+            new User { UserId = 19, FullName = @"Ta Minh Anh", Email = @"user19@phucnguyenresort.test", PasswordHash = @"hashed-password-19", PhoneNumber = @"0900000019", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 5, 19, 8, 30, 0) },
+            new User { UserId = 20, FullName = @"Lam Gia Bao", Email = @"user20@phucnguyenresort.test", PasswordHash = @"hashed-password-20", PhoneNumber = @"0900000020", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 5, 20, 8, 30, 0) }
         );
 
         modelBuilder.Entity<UserProfile>().HasData(

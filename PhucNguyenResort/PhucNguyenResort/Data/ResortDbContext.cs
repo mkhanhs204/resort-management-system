@@ -13,6 +13,7 @@ public class ResortDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<RoomCategory> RoomCategories => Set<RoomCategory>();
+    public DbSet<RoomCategoryImage> RoomCategoryImages => Set<RoomCategoryImage>();
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<BookingGuest> BookingGuests => Set<BookingGuest>();
