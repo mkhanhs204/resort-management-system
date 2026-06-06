@@ -23,4 +23,5 @@ public class RoomCategory
     public string? ImageUrl { get; set; }
 
     public ICollection<Room> Rooms { get; set; } = new List<Room>();
+    public ICollection<RoomCategoryImage> Images { get; set; } = new List<RoomCategoryImage>();
 }
