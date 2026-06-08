@@ -2028,10 +2028,14 @@ namespace PhucNguyenResort.Web.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
                     b.Property<string>("CategoryName")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("CategoryId");
+
+                    b.HasIndex("CategoryName")
+                        .IsUnique();
 
                     b.ToTable("MenuCategories", (string)null);
 
@@ -2162,10 +2166,11 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasDefaultValue(true);
 
                     b.Property<string>("ItemName")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -2173,7 +2178,10 @@ namespace PhucNguyenResort.Web.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("MenuItems", (string)null);
+                    b.ToTable("MenuItems", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_MenuItems_AvailableRequiresCategory", "[IsAvailable] = 0 OR [CategoryId] IS NOT NULL");
+                        });
 
                     b.HasData(
                         new
