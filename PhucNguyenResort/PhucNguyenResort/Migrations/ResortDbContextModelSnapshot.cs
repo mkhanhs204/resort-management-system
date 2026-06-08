@@ -3323,102 +3323,47 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             RoleId = 1,
-                            RoleName = "Guest"
+                            RoleName = "System Admin"
                         },
                         new
                         {
                             RoleId = 2,
-                            RoleName = "Receptionist"
+                            RoleName = "Business Manager"
                         },
                         new
                         {
                             RoleId = 3,
-                            RoleName = "BusinessManager"
+                            RoleName = "Customer"
                         },
                         new
                         {
                             RoleId = 4,
-                            RoleName = "SystemAdmin"
+                            RoleName = "Receptionist"
                         },
                         new
                         {
                             RoleId = 5,
-                            RoleName = "HousekeepingStaff"
+                            RoleName = "F&B Staff"
                         },
                         new
                         {
                             RoleId = 6,
-                            RoleName = "KitchenStaff"
+                            RoleName = "Kitchen Staff"
                         },
                         new
                         {
                             RoleId = 7,
-                            RoleName = "TourGuide"
+                            RoleName = "Tour Guide"
                         },
                         new
                         {
                             RoleId = 8,
-                            RoleName = "Accountant"
+                            RoleName = "Housekeeping Staff"
                         },
                         new
                         {
                             RoleId = 9,
-                            RoleName = "RestaurantStaff"
-                        },
-                        new
-                        {
-                            RoleId = 10,
-                            RoleName = "MaintenanceStaff"
-                        },
-                        new
-                        {
-                            RoleId = 11,
-                            RoleName = "SpaStaff"
-                        },
-                        new
-                        {
-                            RoleId = 12,
-                            RoleName = "SecurityStaff"
-                        },
-                        new
-                        {
-                            RoleId = 13,
-                            RoleName = "MarketingStaff"
-                        },
-                        new
-                        {
-                            RoleId = 14,
-                            RoleName = "HRStaff"
-                        },
-                        new
-                        {
-                            RoleId = 15,
-                            RoleName = "InventoryStaff"
-                        },
-                        new
-                        {
-                            RoleId = 16,
-                            RoleName = "SalesStaff"
-                        },
-                        new
-                        {
-                            RoleId = 17,
-                            RoleName = "CustomerSupport"
-                        },
-                        new
-                        {
-                            RoleId = 18,
-                            RoleName = "EventCoordinator"
-                        },
-                        new
-                        {
-                            RoleId = 19,
-                            RoleName = "TransportStaff"
-                        },
-                        new
-                        {
-                            RoleId = 20,
-                            RoleName = "Auditor"
+                            RoleName = "Maintenance Staff"
                         });
                 });
 
@@ -3831,6 +3776,29 @@ namespace PhucNguyenResort.Web.Migrations
                             ImageUrl = "/images/rooms/category-20.jpg",
                             PricePerNight = 4500000.00m
                         });
+                });
+
+            modelBuilder.Entity("PhucNguyenResort.Models.RoomCategoryImage", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("ImageId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("RoomCategoryImages");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.TableReservation", b =>
@@ -4925,7 +4893,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-10",
                             PhoneNumber = "0900000010",
-                            RoleId = 10
+                            RoleId = 3
                         },
                         new
                         {
@@ -4936,7 +4904,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-11",
                             PhoneNumber = "0900000011",
-                            RoleId = 11
+                            RoleId = 3
                         },
                         new
                         {
@@ -4947,7 +4915,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-12",
                             PhoneNumber = "0900000012",
-                            RoleId = 12
+                            RoleId = 3
                         },
                         new
                         {
@@ -4958,7 +4926,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-13",
                             PhoneNumber = "0900000013",
-                            RoleId = 13
+                            RoleId = 3
                         },
                         new
                         {
@@ -4969,7 +4937,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-14",
                             PhoneNumber = "0900000014",
-                            RoleId = 14
+                            RoleId = 3
                         },
                         new
                         {
@@ -4980,7 +4948,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-15",
                             PhoneNumber = "0900000015",
-                            RoleId = 15
+                            RoleId = 3
                         },
                         new
                         {
@@ -4991,7 +4959,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-16",
                             PhoneNumber = "0900000016",
-                            RoleId = 16
+                            RoleId = 3
                         },
                         new
                         {
@@ -5002,7 +4970,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-17",
                             PhoneNumber = "0900000017",
-                            RoleId = 17
+                            RoleId = 3
                         },
                         new
                         {
@@ -5013,7 +4981,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = false,
                             PasswordHash = "hashed-password-18",
                             PhoneNumber = "0900000018",
-                            RoleId = 18
+                            RoleId = 3
                         },
                         new
                         {
@@ -5024,7 +4992,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-19",
                             PhoneNumber = "0900000019",
-                            RoleId = 19
+                            RoleId = 3
                         },
                         new
                         {
@@ -5035,7 +5003,7 @@ namespace PhucNguyenResort.Web.Migrations
                             IsActive = true,
                             PasswordHash = "hashed-password-20",
                             PhoneNumber = "0900000020",
-                            RoleId = 20
+                            RoleId = 3
                         });
                 });
 
@@ -5505,6 +5473,17 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("PhucNguyenResort.Models.RoomCategoryImage", b =>
+                {
+                    b.HasOne("PhucNguyenResort.Models.RoomCategory", "Category")
+                        .WithMany("Images")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("PhucNguyenResort.Models.TableReservation", b =>
                 {
                     b.HasOne("PhucNguyenResort.Models.DiningTable", "Table")
@@ -5644,6 +5623,8 @@ namespace PhucNguyenResort.Web.Migrations
 
             modelBuilder.Entity("PhucNguyenResort.Models.RoomCategory", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Rooms");
                 });
 
