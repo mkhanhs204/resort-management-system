@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using PhucNguyenResort.DAL.Data;
+using PhucNguyenResort.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +12,11 @@ builder.Services.AddDbContext<ResortDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// Services
+builder.Services.AddScoped<PhucNguyenResort.Services.Rooms.IRoomService, PhucNguyenResort.Services.Rooms.RoomService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.RoomCategories.IRoomCategoryService, PhucNguyenResort.Services.RoomCategories.RoomCategoryService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Users.IUserService, PhucNguyenResort.Services.Users.UserService>();
 
 var app = builder.Build();
 
