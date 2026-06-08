@@ -11,5 +11,7 @@ public class MenuCategoryConfiguration : IEntityTypeConfiguration<MenuCategory>
     {
         builder.ToTable("MenuCategories");
         builder.HasKey(x => x.CategoryId);
+        builder.Property(x => x.CategoryName).IsRequired().HasMaxLength(100);
+        builder.HasIndex(x => x.CategoryName).IsUnique();
     }
 }

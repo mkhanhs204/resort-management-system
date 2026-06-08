@@ -1,10 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
+using PhucNguyenResort.Services.MenuCategories;
+using PhucNguyenResort.Services.RestaurantMenus;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // MVC
 builder.Services.AddControllersWithViews();
+
+// Services
+builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
+builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 
 // DbContext
 builder.Services.AddDbContext<ResortDbContext>(options =>
