@@ -8,8 +8,8 @@ public class MenuCategory
 {
     public int CategoryId { get; set; }
 
-    [StringLength(100)]
-    public string? CategoryName { get; set; }
+    [Required, StringLength(100)]
+    public string CategoryName { get; set; } = string.Empty;
 
     public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
 }
