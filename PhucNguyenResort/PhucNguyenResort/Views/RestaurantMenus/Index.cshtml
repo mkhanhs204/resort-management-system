@@ -1,0 +1,47 @@
+@model IReadOnlyList<PhucNguyenResort.ViewModels.RestaurantMenus.MenuItemListViewModel>
+
+@{
+    ViewData["Title"] = "Restaurant Menu";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Restaurant Menu</h1>
+    <a asp-action="Create" class="btn btn-primary">Add menu item</a>
+</div>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th class="text-end">Price</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ItemName</td>
+                <td>@item.CategoryName</td>
+                <td class="text-end">@item.Price.ToString("N0")</td>
+                <td>
+                    @if (item.IsAvailable)
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Unavailable</span>
+                    }
+                </td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-secondary">Details</a>
+                    <a asp-action="Edit" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

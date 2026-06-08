@@ -1,21 +1,22 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PhucNguyenResort.Enums;
 
 namespace PhucNguyenResort.Models;
 
+//Lưu trữ thông tin về món ăn trong thực đơn nhà hàng, bao gồm tên, mô tả, giá cả, hình ảnh và tình trạng sẵn có.
 public class MenuItem
 {
     public int MenuItemId { get; set; }
     public int? CategoryId { get; set; }
 
-    [StringLength(100)]
-    public string? ItemName { get; set; }
+    [Required, StringLength(100)]
+    public string ItemName { get; set; } = string.Empty;
 
     public string? Description { get; set; }
 
     [Range(0, 999999999)]
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
     [StringLength(255)]
     public string? ImageUrl { get; set; }

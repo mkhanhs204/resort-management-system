@@ -1,0 +1,34 @@
+@model PhucNguyenResort.ViewModels.MenuCategories.MenuCategoryDetailViewModel
+
+@{
+    ViewData["Title"] = "Delete Menu Category";
+}
+
+<h1 class="h3 mb-3">Delete Menu Category</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="alert alert-warning">
+    Are you sure you want to delete <strong>@Model.CategoryName</strong>?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Menu items</dt>
+    <dd class="col-sm-9">@Model.MenuItemCount</dd>
+</dl>
+
+<form asp-action="DeleteConfirmed" asp-route-id="@Model.CategoryId" method="post" class="d-flex gap-2">
+    @Html.AntiForgeryToken()
+    @if (Model.MenuItemCount > 0)
+    {
+        <button type="submit" class="btn btn-danger" disabled>Delete</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-danger">Delete</button>
+    }
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
