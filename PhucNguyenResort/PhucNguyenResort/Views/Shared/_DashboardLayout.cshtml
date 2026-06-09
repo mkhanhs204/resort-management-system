@@ -46,17 +46,6 @@
                     <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
                 </li>
 
-                <!-- Receptionist Section -->
-                <li>
-                    <p>FRONT DESK</p>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Bookings" ? "active" : "")">
-                    <a href="#"><i class="fa fa-book"></i> Bookings</a>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Guests" ? "active" : "")">
-                    <a href="#"><i class="fa fa-user"></i> Guests</a>
-                </li>
-
                 <!-- Room Management (Housekeeping / Admin) -->
                 <li>
                     <p>ROOMS</p>
@@ -83,11 +72,25 @@
                 <li>
                     <p>FOOD & BEVERAGE</p>
                 </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "MenuCategories" ? "active" : "")">
+                    <a asp-controller="MenuCategories" asp-action="Index"><i class="fa fa-list"></i> Menu Categories</a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RestaurantMenus" ? "active" : "")">
+                    <a asp-controller="RestaurantMenus" asp-action="Index"><i class="fa fa-coffee"></i> Restaurant Menus</a>
+                </li>
                 <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
                     <a href="#"><i class="fa fa-cutlery"></i> Orders</a>
                 </li>
                 <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventory" ? "active" : "")">
                     <a href="#"><i class="fa fa-archive"></i> Kitchen Inventory</a>
+                </li>
+
+                <!-- Services & Tours -->
+                <li>
+                    <p>SERVICES & TOURS</p>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
+                    <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
                 </li>
             </ul>
         </nav>
