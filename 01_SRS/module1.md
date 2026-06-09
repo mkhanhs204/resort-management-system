@@ -120,15 +120,15 @@ UC05  --> EmailSys : gửi email xác nhận
 
 ### UC01 — Đăng ký, Xác minh Email & Đăng nhập
 
-| Thuộc tính | Nội dung |
-|-----------|----------|
-| **Use Case ID** | UC01 |
-| **Tên** | Đăng ký, Xác minh Email & Đăng nhập |
-| **Actor chính** | Guest |
-| **Actor phụ** | Email System (SendGrid) |
-| **Mô tả** | Cho phép khách hàng tạo tài khoản mới, xác minh danh tính qua email và đăng nhập vào hệ thống |
-| **Tiền điều kiện** | Khách chưa có tài khoản (cho đăng ký) hoặc đã có tài khoản được xác minh (cho đăng nhập) |
-| **Hậu điều kiện** | Khách được xác thực và truy cập vào hệ thống với session hợp lệ |
+| Thuộc tính         | Nội dung                                                                                      |
+| --------------------| -----------------------------------------------------------------------------------------------|
+| **Use Case ID**    | UC01                                                                                          |
+| **Tên**            | Đăng ký, Xác minh Email & Đăng nhập                                                           |
+| **Actor chính**    | Guest                                                                                         |
+| **Actor phụ**      | Email System (SendGrid)                                                                       |
+| **Mô tả**          | Cho phép khách hàng tạo tài khoản mới, xác minh danh tính qua email và đăng nhập vào hệ thống |
+| **Tiền điều kiện** | Khách chưa có tài khoản (cho đăng ký) hoặc đã có tài khoản được xác minh (cho đăng nhập)      |
+| **Hậu điều kiện**  | Khách được xác thực và truy cập vào hệ thống với session hợp lệ                               |
 
 **Luồng chính (Main Flow) – Đăng ký:**
 

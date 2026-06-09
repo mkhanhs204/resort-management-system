@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Dashboard</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
+
+    <!-- Css Styles from template to maintain consistent UI components -->
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="~/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="~/css/flaticon.css" type="text/css">
+    <link rel="stylesheet" href="~/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="~/css/style.css" type="text/css">
+    
+    <!-- Dashboard specific styles -->
+    <link rel="stylesheet" href="~/css/dashboard.css" type="text/css">
+</head>
+<body>
+
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>PhucNguyen</h3>
+                <span style="color: #aaa; font-size: 14px;">Resort Management</span>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                    <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
+                </li>
+                
+                <!-- Admin & Business Manager Section -->
+                <li>
+                    <p>MANAGEMENT</p>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "StaffAccounts" ? "active" : "")">
+                    <a asp-controller="StaffAccounts" asp-action="Index"><i class="fa fa-users"></i> Staff Accounts</a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
+                    <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
+                </li>
+
+                <!-- Receptionist Section -->
+                <li>
+                    <p>FRONT DESK</p>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Bookings" ? "active" : "")">
+                    <a href="#"><i class="fa fa-book"></i> Bookings</a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Guests" ? "active" : "")">
+                    <a href="#"><i class="fa fa-user"></i> Guests</a>
+                </li>
+
+                <!-- Room Management (Housekeeping / Admin) -->
+                <li>
+                    <p>ROOMS</p>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <a asp-controller="Rooms" asp-action="Index"><i class="fa fa-bed"></i> Manage Rooms</a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RoomCategories" ? "active" : "")">
+                    <a asp-controller="RoomCategories" asp-action="Index"><i class="fa fa-tags"></i> Room Categories</a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Housekeeping" ? "active" : "")">
+                    <a href="#"><i class="fa fa-paint-brush"></i> Housekeeping</a>
+                </li>
+
+                <!-- Maintenance Section -->
+                <li>
+                    <p>MAINTENANCE</p>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
+                    <a href="#"><i class="fa fa-wrench"></i> Service Requests</a>
+                </li>
+
+                <!-- F&B and Kitchen Section -->
+                <li>
+                    <p>FOOD & BEVERAGE</p>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
+                    <a href="#"><i class="fa fa-cutlery"></i> Orders</a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventory" ? "active" : "")">
+                    <a href="#"><i class="fa fa-archive"></i> Kitchen Inventory</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            
+            <!-- Top Navbar -->
+            <nav class="dashboard-nav">
+                <div class="nav-left">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-dark d-md-none">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <span class="ml-3" style="font-family: 'Lora', serif; font-size: 20px; font-weight: bold;">Dashboard</span>
+                </div>
+                <div class="nav-right">
+                    <div class="user-profile dropdown">
+                        <img src="~/img/blog/blog-1.jpg" alt="User">
+                        <span>Staff Name <i class="fa fa-angle-down"></i></span>
+                        <!-- Dropdown menu placeholder -->
+                    </div>
+                    <a href="/" class="btn btn-sm btn-outline-secondary" title="View Website"><i class="fa fa-globe"></i></a>
+                    <a href="#" class="btn btn-sm btn-danger" title="Logout"><i class="fa fa-sign-out"></i></a>
+                </div>
+            </nav>
+
+            <!-- Main Body -->
+            <div class="main-body">
+                @RenderBody()
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Js Plugins -->
+    <script src="~/js/jquery-3.3.1.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/jquery.nice-select.min.js"></script>
+    <script src="~/js/main.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
