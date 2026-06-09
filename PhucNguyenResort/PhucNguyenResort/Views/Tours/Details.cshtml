@@ -1,0 +1,47 @@
+@model PhucNguyenResort.Models.Tour
+
+@{
+    ViewData["Title"] = "Tour Details";
+}
+
+<div class="container mt-5 mb-5">
+    <h2>Tour Details</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row">
+                <dt class="col-sm-4">Tour Name</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.TourName)</dd>
+
+                <dt class="col-sm-4">Description</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Description)</dd>
+
+                <dt class="col-sm-4">Price</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Price)</dd>
+
+                <dt class="col-sm-4">Max Capacity</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.MaxCapacity)</dd>
+
+                <dt class="col-sm-4">Duration (Hours)</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.DurationHours)</dd>
+
+                <dt class="col-sm-4">Location</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Location)</dd>
+            </dl>
+            <div class="mt-4">
+                <a asp-action="Edit" asp-route-id="@Model?.TourId" class="btn btn-warning">Edit</a>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="Tour Image" class="img-fluid rounded shadow-sm" />
+            }
+            else
+            {
+                <div class="alert alert-secondary text-center">No Image Available</div>
+            }
+        </div>
+    </div>
+</div>
