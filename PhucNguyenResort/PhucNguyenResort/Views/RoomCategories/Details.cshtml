@@ -1,0 +1,78 @@
+@model PhucNguyenResort.Models.RoomCategory
+
+@{
+    ViewData["Title"] = "Room Category Details";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">@Model.CategoryName</h4>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-primary">Edit</a>
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl) || (Model.Images != null && Model.Images.Any()))
+                    {
+                        var allImages = new List<string>();
+                        if (!string.IsNullOrEmpty(Model.ImageUrl)) allImages.Add(Model.ImageUrl);
+                        if (Model.Images != null) allImages.AddRange(Model.Images.Select(i => i.ImageUrl));
+
+                        if (allImages.Count == 1)
+                        {
+                            <img src="@allImages[0]" alt="@Model.CategoryName" class="img-fluid rounded shadow-sm w-100" style="max-height: 300px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner rounded shadow-sm">
+                                    @for (int i = 0; i < allImages.Count; i++)
+                                    {
+                                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                                            <img src="@allImages[i]" class="d-block w-100" alt="Gallery Image @i" style="height: 300px; object-fit: cover;">
+                                        </div>
+                                    }
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded h-100" style="min-height: 300px;">
+                            <h4>No Image Available</h4>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.CategoryName)</dt>
+                        <dd class="col-sm-9 fw-bold fs-5">@Html.DisplayFor(model => model.CategoryName)</dd>
+
+                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.Capacity)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Capacity) Persons</dd>
+
+                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.PricePerNight)</dt>
+                        <dd class="col-sm-9 text-success fw-bold">@Model.PricePerNight?.ToString("N0") VND / Night</dd>
+
+                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.Description)</dt>
+                        <dd class="col-sm-9 text-justify">
+                            @(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

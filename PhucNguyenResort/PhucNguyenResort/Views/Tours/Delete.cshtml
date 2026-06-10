@@ -1,0 +1,34 @@
+@model PhucNguyenResort.Models.Tour
+
+@{
+    ViewData["Title"] = "Delete Tour";
+}
+
+<div class="container mt-5 mb-5">
+    <h2>Delete Tour</h2>
+    <h4 class="text-danger">Are you sure you want to delete this tour?</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row">
+                <dt class="col-sm-4">Tour Name</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.TourName)</dd>
+
+                <dt class="col-sm-4">Price</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Price)</dd>
+
+                <dt class="col-sm-4">Max Capacity</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.MaxCapacity)</dd>
+                
+                <dt class="col-sm-4">Location</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Location)</dd>
+            </dl>
+
+            <form asp-action="Delete" class="mt-4">
+                <input type="hidden" asp-for="TourId" />
+                <input type="submit" value="Delete" class="btn btn-danger" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
