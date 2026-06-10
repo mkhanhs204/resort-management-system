@@ -54,7 +54,7 @@
         <nav class="mainmenu mobile-menu">
             <ul>
                 <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
-                <li><a href="./rooms.html">Phòng Ngủ</a></li>
+                <li><a asp-controller="Home" asp-action="SearchRooms">Phòng Ngủ</a></li>
                 <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
                 <li><a href="./pages.html">Trang</a>
                     <ul class="dropdown">
@@ -132,7 +132,7 @@
                             <nav class="mainmenu">
                                 <ul>
                                     <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
-                                    <li><a href="./rooms.html">Phòng Ngủ</a></li>
+                                    <li><a asp-controller="Home" asp-action="SearchRooms">Phòng Ngủ</a></li>
                                     <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
                                     <li><a href="./pages.html">Trang</a>
                                         <ul class="dropdown">

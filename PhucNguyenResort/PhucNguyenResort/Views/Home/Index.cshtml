@@ -18,29 +18,33 @@
             <div class="col-xl-4 col-lg-5 offset-xl-2 offset-lg-1">
                 <div class="booking-form">
                     <h3>Đặt Phòng Của Bạn</h3>
-                    <form action="#">
+                    <form asp-controller="Home" asp-action="SearchRooms" method="get">
                         <div class="check-date">
                             <label for="date-in">Ngày Nhận Phòng:</label>
-                            <input type="text" class="date-input" id="date-in">
+                            <input type="text" class="date-input" id="date-in" name="checkIn" required autocomplete="off">
                             <i class="icon_calendar"></i>
                         </div>
                         <div class="check-date">
                             <label for="date-out">Ngày Trả Phòng:</label>
-                            <input type="text" class="date-input" id="date-out">
+                            <input type="text" class="date-input" id="date-out" name="checkOut" required autocomplete="off">
                             <i class="icon_calendar"></i>
                         </div>
                         <div class="select-option">
                             <label for="guest">Số Khách:</label>
-                            <select id="guest">
-                                <option value="">2 Người Lớn</option>
-                                <option value="">3 Người Lớn</option>
+                            <select id="guest" name="guestCount">
+                                <option value="1">1 Người</option>
+                                <option value="2" selected>2 Người</option>
+                                <option value="3">3 Người</option>
+                                <option value="4">4 Người</option>
+                                <option value="5">5+ Người</option>
                             </select>
                         </div>
                         <div class="select-option">
-                            <label for="room">Phòng:</label>
-                            <select id="room">
-                                <option value="">1 Phòng</option>
-                                <option value="">2 Phòng</option>
+                            <label for="room">Số Lượng Phòng:</label>
+                            <select id="room" name="roomCount">
+                                <option value="1" selected>1 Phòng</option>
+                                <option value="2">2 Phòng</option>
+                                <option value="3">3 Phòng</option>
                             </select>
                         </div>
                         <button type="submit">Kiểm Tra Phòng Trống</button>
@@ -174,22 +178,25 @@
                             imgIndex++;
                             if (imgIndex > 4) imgIndex = 1;
 
-                            <div class="card border-0 shadow-sm mx-2" style="border-radius: 0; background: #fff;">
-                                <div style="position: relative;">
-                                    <img src="@bgImage" class="card-img-top" alt="@roomCategory.CategoryName" style="height: 250px; object-fit: cover; border-radius: 0;">
-                                    <div style="position: absolute; top: 15px; right: 0; background: rgba(144, 75, 75, 0.9); color: white; padding: 8px 18px; font-size: 14px;">
-                                        @(roomCategory.PricePerNight?.ToString("N0") ?? "0") VNĐ / Đêm
+                            <div class="card h-100 border-0 luxury-card mx-2">
+                                <div class="card-img-wrapper">
+                                    <img src="@bgImage" class="card-img-top" alt="@roomCategory.CategoryName">
+                                    <div class="price-pill">
+                                        @(roomCategory.PricePerNight?.ToString("N0") ?? "0") VNĐ <span>/ Đêm</span>
                                     </div>
                                 </div>
                                 <div class="card-body d-flex flex-column" style="padding: 30px;">
-                                    <h4 class="card-title" style="font-family: 'Lora', serif; font-size: 22px; color: #333; margin-bottom: 15px; min-height: 52px;">@roomCategory.CategoryName</h4>
-                                    <p class="card-text" style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 20px; flex-grow: 1;">
+                                    <h4 class="card-title" style="font-family: 'Playfair Display', serif; font-size: 24px; color: #1e293b; font-weight: 700; margin-bottom: 15px; min-height: 52px;">@roomCategory.CategoryName</h4>
+                                    <p class="card-text text-muted" style="font-size: 15px; line-height: 1.7; margin-bottom: 25px; flex-grow: 1;">
                                         Tận hưởng sự tiện nghi đẳng cấp và trải nghiệm không gian sang trọng cùng gia đình. Đặt trực tiếp để nhận ưu đãi tốt nhất.
                                     </p>
-                                    <p style="color: #cca471; font-size: 14px; margin-bottom: 25px; font-weight: 500;">
-                                        Tối đa @(roomCategory.Capacity ?? 2) người
-                                    </p>
-                                    <a asp-controller="Home" asp-action="RoomDetails" asp-route-id="@roomCategory.CategoryId" class="btn" style="background-color: #c09b63; color: white; border-radius: 0; padding: 14px; font-weight: 600; font-size: 14px; text-transform: uppercase; width: 100%; border: none;">XEM CHI TIẾT & ĐẶT PHÒNG</a>
+                                    <div class="room-amenities mb-4">
+                                        <span class="amenity-pill"><i class="fa fa-user"></i> Tối đa @(roomCategory.Capacity ?? 2) khách</span>
+                                    </div>
+                                    <a asp-controller="Home" asp-action="RoomDetails" asp-route-id="@roomCategory.CategoryId" 
+                                       class="btn w-100 luxury-book-btn">
+                                        Chi Tiết & Đặt Phòng
+                                    </a>
                                 </div>
                             </div>
                         }
@@ -313,6 +320,87 @@
 <!-- Blog Section End -->
 
 @section Scripts {
+    <style>
+        /* Luxury Room Card */
+        .luxury-card {
+            border-radius: 16px !important;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+        }
+        .luxury-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            overflow: hidden;
+            height: 280px;
+        }
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .luxury-card:hover .card-img-wrapper img {
+            transform: scale(1.08);
+        }
+
+        .price-pill {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+        }
+        .price-pill span {
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .amenity-pill {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .amenity-pill i {
+            color: #dfa974;
+            margin-right: 4px;
+        }
+
+        .luxury-book-btn {
+            background-color: transparent !important;
+            border: 2px solid #e2e8f0 !important;
+            color: #1e293b !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            text-transform: uppercase;
+            transition: all 0.3s ease !important;
+            letter-spacing: 1px;
+        }
+        .luxury-card:hover .luxury-book-btn {
+            background-color: #dfa974 !important;
+            border-color: #dfa974 !important;
+            color: white !important;
+        }
+    </style>
     <script>
         $(document).ready(function() {
             $(".home-room-slider").owlCarousel({
