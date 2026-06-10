@@ -24,7 +24,7 @@
     --------------------*/
     $('.set-bg').each(function () {
         var bg = $(this).data('setbg');
-        $(this).css('background-image', 'url(' + bg + ')');
+        $(this).css('background-image', 'url("' + bg + '")');
     });
 
     //Offcanvas Menu
@@ -84,6 +84,26 @@
         smartSpeed: 1200,
         nav: true,
         navText: ["<i class='arrow_left'></i>", "<i class='arrow_right'></i>"]
+    });
+
+    /*------------------
+        Room Slider
+    --------------------*/
+    $(".room-slider").owlCarousel({
+        items: 4,
+        dots: false,
+        autoplay: true,
+        loop: true,
+        smartSpeed: 1200,
+        nav: true,
+        navText: ["<i class='arrow_left'></i>", "<i class='arrow_right'></i>"],
+        margin: 0,
+        responsive: {
+            0: { items: 1 },
+            768: { items: 2 },
+            992: { items: 3 },
+            1200: { items: 4 }
+        }
     });
 
     /*------------------
