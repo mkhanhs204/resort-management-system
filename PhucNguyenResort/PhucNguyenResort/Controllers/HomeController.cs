@@ -27,6 +27,11 @@ namespace PhucNguyenResort.Controllers
             return View();
         }
 
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> RoomDetails(int id)
         {
             var roomCategory = await _homeService.GetRoomDetailsAsync(id);
