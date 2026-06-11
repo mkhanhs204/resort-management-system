@@ -1,13 +1,13 @@
 @model PhucNguyenResort.ViewModels.RestaurantMenus.MenuItemDetailViewModel
 
 @{
-    ViewData["Title"] = "Delete Menu Item";
+    ViewData["Title"] = "Discontinue Menu Item";
 }
 
-<h1 class="h3 mb-3">Delete Menu Item</h1>
+<h1 class="h3 mb-3">Discontinue Menu Item</h1>
 
 <div class="alert alert-warning">
-    Are you sure you want to delete <strong>@Model.ItemName</strong>?
+    Are you sure you want to discontinue <strong>@Model.ItemName</strong>? This item will be removed from active menus and customer ordering screens.
 </div>
 
 <dl class="row">
@@ -18,8 +18,8 @@
     <dd class="col-sm-9">@Model.Price.ToString("N0")</dd>
 </dl>
 
-<form asp-action="DeleteConfirmed" asp-route-id="@Model.MenuItemId" method="post" class="d-flex gap-2">
+<form asp-action="DiscontinueConfirmed" asp-route-id="@Model.MenuItemId" method="post" class="d-flex gap-2">
     @Html.AntiForgeryToken()
-    <button type="submit" class="btn btn-danger">Delete</button>
+    <button type="submit" class="btn btn-danger">Discontinue</button>
     <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>

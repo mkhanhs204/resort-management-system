@@ -10,59 +10,6 @@ namespace PhucNguyenResort.Web.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("""
-                UPDATE MenuCategories
-                SET CategoryName = LTRIM(RTRIM(CategoryName))
-                WHERE CategoryName IS NOT NULL;
-                """);
-
-            migrationBuilder.Sql("""
-                UPDATE MenuCategories
-                SET CategoryName = CONCAT('Unnamed Category ', CategoryId)
-                WHERE CategoryName IS NULL OR CategoryName = '';
-                """);
-
-            migrationBuilder.Sql("""
-                WITH DuplicateCategories AS
-                (
-                    SELECT
-                        CategoryId,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY LOWER(CategoryName)
-                            ORDER BY CategoryId) AS RowNumber
-                    FROM MenuCategories
-                )
-                UPDATE c
-                SET CategoryName = CONCAT(c.CategoryName, ' ', c.CategoryId)
-                FROM MenuCategories c
-                INNER JOIN DuplicateCategories d ON c.CategoryId = d.CategoryId
-                WHERE d.RowNumber > 1;
-                """);
-
-            migrationBuilder.Sql("""
-                UPDATE MenuItems
-                SET ItemName = LTRIM(RTRIM(ItemName))
-                WHERE ItemName IS NOT NULL;
-                """);
-
-            migrationBuilder.Sql("""
-                UPDATE MenuItems
-                SET ItemName = CONCAT('Unnamed Item ', MenuItemId)
-                WHERE ItemName IS NULL OR ItemName = '';
-                """);
-
-            migrationBuilder.Sql("""
-                UPDATE MenuItems
-                SET Price = 0
-                WHERE Price IS NULL;
-                """);
-
-            migrationBuilder.Sql("""
-                UPDATE MenuItems
-                SET IsAvailable = 0
-                WHERE CategoryId IS NULL AND IsAvailable = 1;
-                """);
-
             migrationBuilder.AlterColumn<decimal>(
                 name: "Price",
                 table: "MenuItems",
