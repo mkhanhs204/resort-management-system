@@ -1,0 +1,285 @@
+@model PhucNguyenResort.Models.RoomCategory
+
+@{
+    ViewData["Title"] = Model.CategoryName;
+    string mainImage = string.IsNullOrEmpty(Model.ImageUrl) || Model.ImageUrl.Contains("category-") 
+                       ? "/img/room/room-details.jpg" 
+                       : Model.ImageUrl.Replace(" ", "%20");
+    
+    // Get up to 4 gallery images
+    var galleryImages = Model.Images?.Take(4).ToList() ?? new List<PhucNguyenResort.Models.RoomCategoryImage>();
+}
+
+<!-- Breadcrumb Section Begin -->
+<div class="breadcrumb-section" style="padding: 40px 0 30px; background: #fff;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-text" style="text-align: left;">
+                    <div class="bt-option">
+                        <a asp-controller="Home" asp-action="Index" style="color: #333; text-transform: capitalize; font-weight: 400; font-size: 15px; margin-right: 8px;">Trang Chủ</a>
+                        <span style="color: #888; font-size: 14px;">/</span>
+                        <a href="#" style="color: #333; text-transform: capitalize; font-weight: 400; font-size: 15px; margin: 0 8px;">Phúc Nguyên Resort</a>
+                        <span style="color: #888; font-size: 14px;">/</span>
+                        <span style="color: #888; font-weight: 400; font-size: 15px; margin-left: 8px;">Chi Tiết Phòng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb Section End -->
+
+<!-- Gallery Section Begin -->
+<section class="room-gallery-section spad" style="padding-top: 0; padding-bottom: 50px;">
+    <div class="container">
+        <div class="row">
+            <!-- Main Image -->
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <a href="@mainImage" class="gallery-popup">
+                    <img src="@mainImage" alt="@Model.CategoryName" style="width: 100%; height: 516px; object-fit: cover; cursor: pointer; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                </a>
+            </div>
+            <!-- Sub Images -->
+            <div class="col-lg-6">
+                <div class="row">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        string imgUrl = $"/img/room/room-b{i+1}.jpg"; // Default fallback images
+                        if (i < galleryImages.Count)
+                        {
+                            imgUrl = galleryImages[i].ImageUrl.Replace(" ", "%20");
+                        }
+                        
+                        <div class="col-6 mb-4">
+                            <a href="@imgUrl" class="gallery-popup" style="display: block; position: relative;">
+                                <img src="@imgUrl" alt="Gallery Image @i" style="width: 100%; height: 246px; object-fit: cover; cursor: pointer; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                                @if (i == 3)
+                                {
+                                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='rgba(0,0,0,0.3)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">
+                                        + Xem Tất Cả
+                                    </div>
+                                }
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Gallery Section End -->
+
+<!-- Room Info Section Begin -->
+<section class="room-info-section spad" style="padding-top: 0; padding-bottom: 80px;">
+    <div class="container">
+        <div class="row">
+            <!-- Left Column: Description & Details -->
+            <div class="col-lg-8 pr-lg-5 mb-5 mb-lg-0">
+                <h2 style="color: #8f3636; font-family: 'Lora', serif; font-size: 38px; font-weight: 700; margin-bottom: 15px;">@Model.CategoryName</h2>
+                
+                <div style="color: #b58d56; font-size: 22px; font-weight: 600; margin-bottom: 25px;">
+                    Chỉ từ @(Model.PricePerNight?.ToString("N0") ?? "0") VNĐ <span style="font-size: 16px; color: #666; font-weight: 400;">/ Đêm</span>
+                </div>
+
+                <p style="color: #444; font-size: 16px; line-height: 1.8; margin-bottom: 35px;">
+                    @(string.IsNullOrEmpty(Model.Description) ? "Khởi đầu hành trình nghỉ dưỡng hoàn hảo với dịch vụ cá nhân hóa và tiện nghi đẳng cấp tại Phúc Nguyên Resort. Với tầm nhìn tuyệt đẹp và không gian yên tĩnh, phòng nghỉ của chúng tôi được thiết kế để mang đến sự thư giãn tuyệt đối cho bạn và người thân." : Model.Description)
+                </p>
+
+                <h4 style="color: #222; font-size: 20px; font-weight: 700; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    Tiện Nghi Nổi Bật
+                </h4>
+                
+                <!-- Amenities Grid -->
+                <div class="row" style="margin-bottom: 40px;">
+                    <div class="col-md-6 mb-4">
+                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
+                            <i class="fa fa-arrows-alt" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
+                            <span><strong>Diện tích:</strong> Khoảng 30 - 45 m²</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
+                            <i class="fa fa-users" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
+                            <span><strong>Sức chứa:</strong> Tối đa @(Model.Capacity ?? 2) Người lớn</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
+                            <i class="fa fa-bed" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
+                            <span><strong>Giường:</strong> 1 Giường Đôi (King)</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
+                            <i class="fa fa-wifi" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
+                            <span><strong>Kết nối:</strong> Wifi tốc độ cao miễn phí</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
+                            <i class="fa fa-television" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
+                            <span><strong>Giải trí:</strong> Smart TV màn hình phẳng</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
+                            <i class="fa fa-bath" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
+                            <span><strong>Phòng tắm:</strong> Bồn tắm & Vòi sen đứng</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Package Includes -->
+                <div style="background-color: #fdfbf9; border-left: 4px solid #8f3636; padding: 25px;">
+                    <h5 style="color: #222; font-size: 18px; font-weight: 600; margin-bottom: 15px;">Gói Ưu Đãi Bao Gồm:</h5>
+                    <ul style="list-style: none; padding: 0; color: #444; font-size: 15px; line-height: 1.8; margin: 0;">
+                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Miễn phí bữa sáng tự chọn tiêu chuẩn quốc tế hàng ngày.</li>
+                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Tặng phiếu Spa trị giá 300,000 VNĐ cho mỗi lần lưu trú.</li>
+                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Nước suối, trà và cà phê miễn phí trong phòng mỗi ngày.</li>
+                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Miễn phí sử dụng hồ bơi vô cực và phòng Gym hiện đại.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Column: Booking Widget (Sticky) -->
+            <div class="col-lg-4">
+                <div class="booking-widget" style="background: #fff; padding: 30px; border: 1px solid #eaeaea; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: sticky; top: 120px; z-index: 99;">
+                    <h3 style="font-size: 22px; color: #19191a; margin-bottom: 25px; font-weight: 700; text-align: center;">Đặt Phòng Ngay</h3>
+                    
+                    <div style="text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                        <span style="font-size: 14px; color: #666;">Giá ưu đãi trực tiếp từ</span><br>
+                        <strong style="font-size: 28px; color: #8f3636;">@(Model.PricePerNight?.ToString("N0") ?? "0") VNĐ</strong>
+                    </div>
+
+                    <form id="booking-form" action="#">
+                        <input type="hidden" id="category-id" value="@Model.CategoryId" />
+                        <div class="mb-3">
+                            <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Ngày Nhận Phòng</label>
+                            <div style="position: relative;">
+                                <input type="text" id="checkin-date" class="room-date-picker" placeholder="Chọn ngày" autocomplete="off" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; cursor: pointer;">
+                                <i class="fa fa-calendar" style="position: absolute; left: 15px; top: 14px; color: #8f3636; pointer-events: none;"></i>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Ngày Trả Phòng</label>
+                            <div style="position: relative;">
+                                <input type="text" id="checkout-date" class="room-date-picker" placeholder="Chọn ngày" autocomplete="off" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; cursor: pointer;">
+                                <i class="fa fa-calendar" style="position: absolute; left: 15px; top: 14px; color: #8f3636; pointer-events: none;"></i>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Số Khách</label>
+                            <select id="guest-count" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; color: #555;">
+                                <option value="1">1 Người Lớn</option>
+                                <option value="2" selected>2 Người Lớn</option>
+                                <option value="3">3 Người Lớn</option>
+                                <option value="4">4 Người Lớn</option>
+                            </select>
+                        </div>
+                        
+                        <div id="availability-msg" style="margin-bottom: 15px; font-weight: 600; text-align: center; display: none; font-size: 15px;"></div>
+
+                        <button type="button" id="check-availability-btn" class="btn" style="background-color: #8f3636; color: white; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#7a2e2e'" onmouseout="this.style.backgroundColor='#8f3636'">KIỂM TRA PHÒNG TRỐNG</button>
+                        
+                        <button type="submit" id="book-now-btn" class="btn" style="background-color: #dfa974; color: white; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s; display: none;" onmouseover="this.style.backgroundColor='#c99560'" onmouseout="this.style.backgroundColor='#dfa974'">TIẾN HÀNH ĐẶT PHÒNG</button>
+                    </form>
+                    
+                    <p style="text-align: center; font-size: 13px; color: #888; margin-top: 15px; margin-bottom: 0;">
+                        Thanh toán an toàn, bảo mật thông tin.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Room Info Section End -->
+
+@section Scripts {
+    <style>
+        .ui-datepicker {
+            z-index: 9999 !important;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            // Initialize Magnific Popup for Gallery Images
+            $('.gallery-popup').magnificPopup({
+                type: 'image',
+                gallery:{
+                    enabled: true,
+                    navigateByImgClick: true,
+                    preload: [0,1]
+                },
+                image: {
+                    tError: '<a href="%url%">Ảnh này</a> không thể tải được.'
+                }
+            });
+
+            // Initialize explicitly for room-date-picker to avoid main.js conflicts
+            $(".room-date-picker").datepicker({
+                minDate: 0,
+                dateFormat: 'dd/mm/yy'
+            });
+
+            // AJAX Check Availability
+            $('#check-availability-btn').click(function() {
+                var checkIn = $('#checkin-date').val();
+                var checkOut = $('#checkout-date').val();
+                var categoryId = $('#category-id').val();
+                var msgDiv = $('#availability-msg');
+                var btn = $(this);
+                
+                if (!checkIn || !checkOut) {
+                    msgDiv.css('color', '#dc3545').text('Vui lòng chọn ngày nhận và trả phòng.').show();
+                    return;
+                }
+
+                btn.text('ĐANG KIỂM TRA...');
+                btn.prop('disabled', true);
+
+                $.ajax({
+                    url: '/Home/CheckRoomAvailability',
+                    type: 'GET',
+                    data: {
+                        categoryId: categoryId,
+                        checkIn: checkIn,
+                        checkOut: checkOut
+                    },
+                    success: function(response) {
+                        btn.text('KIỂM TRA PHÒNG TRỐNG');
+                        btn.prop('disabled', false);
+
+                        if (response.success) {
+                            if (response.availableRooms > 0) {
+                                msgDiv.css('color', '#28a745').text(response.message).show();
+                                $('#check-availability-btn').hide();
+                                $('#book-now-btn').show();
+                            } else {
+                                msgDiv.css('color', '#dc3545').text(response.message).show();
+                                $('#check-availability-btn').show();
+                                $('#book-now-btn').hide();
+                            }
+                        } else {
+                            msgDiv.css('color', '#dc3545').text(response.message).show();
+                            $('#check-availability-btn').show();
+                            $('#book-now-btn').hide();
+                        }
+                    },
+                    error: function() {
+                        btn.text('KIỂM TRA PHÒNG TRỐNG');
+                        btn.prop('disabled', false);
+                        msgDiv.css('color', '#dc3545').text('Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau.').show();
+                    }
+                });
+            });
+
+            // Reset buttons if dates change
+            $('.room-date-picker').change(function() {
+                $('#availability-msg').hide();
+                $('#book-now-btn').hide();
+                $('#check-availability-btn').show();
+            });
+        });
+    </script>
+}
