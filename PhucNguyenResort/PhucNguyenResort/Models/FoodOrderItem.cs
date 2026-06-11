@@ -11,10 +11,10 @@ public class FoodOrderItem
     public int? MenuItemId { get; set; }
 
     [Range(1, 1000)]
-    public int? Quantity { get; set; }
+    public int Quantity { get; set; }
 
     [Range(0, 999999999)]
-    public decimal? UnitPrice { get; set; }
+    public decimal UnitPrice { get; set; }
 
     public FoodOrder? FoodOrder { get; set; }
     public MenuItem? MenuItem { get; set; }

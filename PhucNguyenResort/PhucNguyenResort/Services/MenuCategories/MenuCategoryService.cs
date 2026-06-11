@@ -57,13 +57,12 @@ public class MenuCategoryService : IMenuCategoryService
 
     public async Task<bool> CategoryNameExistsAsync(string categoryName, int? excludedCategoryId = null)
     {
-        var normalizedName = categoryName.Trim().ToLower();
+        var normalizedName = NormalizeCategoryName(categoryName);
 
         return await _context.MenuCategories
             .AsNoTracking()
             .AnyAsync(category =>
-                category.CategoryName != null
-                && category.CategoryName.ToLower() == normalizedName
+                category.CategoryName.Trim().ToLower() == normalizedName
                 && (!excludedCategoryId.HasValue || category.CategoryId != excludedCategoryId.Value));
     }
 
@@ -71,7 +70,7 @@ public class MenuCategoryService : IMenuCategoryService
     {
         var menuCategory = new MenuCategory
         {
-            CategoryName = viewModel.CategoryName.Trim()
+            CategoryName = NormalizeDisplayName(viewModel.CategoryName)
         };
 
         _context.MenuCategories.Add(menuCategory);
@@ -87,7 +86,7 @@ public class MenuCategoryService : IMenuCategoryService
             return false;
         }
 
-        menuCategory.CategoryName = viewModel.CategoryName.Trim();
+        menuCategory.CategoryName = NormalizeDisplayName(viewModel.CategoryName);
 
         await _context.SaveChangesAsync();
         return true;
@@ -112,5 +111,15 @@ public class MenuCategoryService : IMenuCategoryService
         _context.MenuCategories.Remove(menuCategory);
         await _context.SaveChangesAsync();
         return MenuCategoryDeleteResult.Deleted;
+    }
+
+    private static string NormalizeCategoryName(string categoryName)
+    {
+        return categoryName.Trim().ToLowerInvariant();
+    }
+
+    private static string NormalizeDisplayName(string categoryName)
+    {
+        return categoryName.Trim();
     }
 }
