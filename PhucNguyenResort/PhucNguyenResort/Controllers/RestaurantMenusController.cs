@@ -13,10 +13,10 @@ public class RestaurantMenusController : Controller
         _restaurantMenuService = restaurantMenuService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] MenuItemIndexViewModel filter)
     {
-        var menuItems = await _restaurantMenuService.GetMenuItemsAsync();
-        return View(menuItems);
+        var viewModel = await _restaurantMenuService.BuildIndexAsync(filter);
+        return View(viewModel);
     }
 
     public async Task<IActionResult> Details(int id)
@@ -41,6 +41,8 @@ public class RestaurantMenusController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MenuItemFormViewModel viewModel)
     {
+        await ValidateMenuItemNameAsync(viewModel);
+
         if (!ModelState.IsValid)
         {
             await _restaurantMenuService.PopulateCategoryOptionsAsync(viewModel);
@@ -72,6 +74,8 @@ public class RestaurantMenusController : Controller
             return BadRequest();
         }
 
+        await ValidateMenuItemNameAsync(viewModel, id);
+
         if (!ModelState.IsValid)
         {
             await _restaurantMenuService.PopulateCategoryOptionsAsync(viewModel);
@@ -88,7 +92,7 @@ public class RestaurantMenusController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Discontinue(int id)
     {
         var menuItem = await _restaurantMenuService.GetMenuItemDetailAsync(id);
 
@@ -102,15 +106,37 @@ public class RestaurantMenusController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> DiscontinueConfirmed(int id)
     {
-        var deleted = await _restaurantMenuService.DeleteMenuItemAsync(id);
+        var result = await _restaurantMenuService.DiscontinueMenuItemAsync(id);
 
-        if (!deleted)
+        if (result == MenuItemDiscontinueResult.NotFound)
         {
             return NotFound();
         }
 
+        TempData["SuccessMessage"] = "Menu item discontinued successfully. It will no longer appear in active menus or customer ordering screens.";
+
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task ValidateMenuItemNameAsync(MenuItemFormViewModel viewModel, int? excludedMenuItemId = null)
+    {
+        if (string.IsNullOrWhiteSpace(viewModel.ItemName))
+        {
+            return;
+        }
+
+        var exists = await _restaurantMenuService.MenuItemNameExistsInCategoryAsync(
+            viewModel.ItemName,
+            viewModel.CategoryId,
+            excludedMenuItemId);
+
+        if (exists)
+        {
+            ModelState.AddModelError(
+                nameof(viewModel.ItemName),
+                "A menu item with this name already exists in the selected category.");
+        }
     }
 }
