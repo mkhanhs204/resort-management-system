@@ -36,6 +36,12 @@
                             </div>
                         </div>
 
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label fw-bold"></label>
+                            <input asp-for="Password" class="form-control" placeholder="Leave blank to keep current password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
                         <div class="mb-4">
                             <label asp-for="RoleId" class="form-label fw-bold"></label>
                             <select asp-for="RoleId" class="form-select" asp-items="ViewBag.RoleId">
