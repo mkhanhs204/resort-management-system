@@ -1146,10 +1146,10 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<int?>("MenuItemId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("UnitPrice")
+                    b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -2165,6 +2165,11 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("ItemName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -2176,7 +2181,9 @@ namespace PhucNguyenResort.Web.Migrations
 
                     b.HasKey("MenuItemId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryId", "ItemName")
+                        .IsUnique()
+                        .HasFilter("[CategoryId] IS NOT NULL AND [IsDeleted] = 0");
 
                     b.ToTable("MenuItems", null, t =>
                         {
@@ -2191,6 +2198,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Pho Bo prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-01.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Pho Bo",
                             Price = 85000.00m
                         },
@@ -2201,6 +2209,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Bun Cha prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-02.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Bun Cha",
                             Price = 110000.00m
                         },
@@ -2211,6 +2220,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Spring Rolls prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-03.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Spring Rolls",
                             Price = 135000.00m
                         },
@@ -2221,6 +2231,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Seafood Soup prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-04.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Seafood Soup",
                             Price = 160000.00m
                         },
@@ -2231,6 +2242,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Caesar Salad prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-05.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Caesar Salad",
                             Price = 185000.00m
                         },
@@ -2241,6 +2253,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Grilled Prawns prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-06.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Grilled Prawns",
                             Price = 210000.00m
                         },
@@ -2251,6 +2264,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Beef Steak prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-07.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Beef Steak",
                             Price = 235000.00m
                         },
@@ -2261,6 +2275,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Vegetable Curry prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-08.jpg",
                             IsAvailable = false,
+                            IsDeleted = false,
                             ItemName = "Vegetable Curry",
                             Price = 260000.00m
                         },
@@ -2271,6 +2286,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Chocolate Cake prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-09.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Chocolate Cake",
                             Price = 285000.00m
                         },
@@ -2281,6 +2297,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Vietnamese Coffee prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-10.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Vietnamese Coffee",
                             Price = 310000.00m
                         },
@@ -2291,6 +2308,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Lotus Tea prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-11.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Lotus Tea",
                             Price = 335000.00m
                         },
@@ -2301,6 +2319,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Mango Juice prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-12.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Mango Juice",
                             Price = 360000.00m
                         },
@@ -2311,6 +2330,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Sunset Cocktail prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-13.jpg",
                             IsAvailable = false,
+                            IsDeleted = false,
                             ItemName = "Sunset Cocktail",
                             Price = 385000.00m
                         },
@@ -2321,6 +2341,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Blue Lagoon Mocktail prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-14.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Blue Lagoon Mocktail",
                             Price = 410000.00m
                         },
@@ -2331,6 +2352,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Kids Pasta prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-15.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Kids Pasta",
                             Price = 435000.00m
                         },
@@ -2341,6 +2363,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Club Sandwich prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-16.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Club Sandwich",
                             Price = 460000.00m
                         },
@@ -2351,6 +2374,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "BBQ Platter prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-17.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "BBQ Platter",
                             Price = 485000.00m
                         },
@@ -2361,6 +2385,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Seafood Noodle prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-18.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Seafood Noodle",
                             Price = 510000.00m
                         },
@@ -2371,6 +2396,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Chicken Fried Rice prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-19.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Chicken Fried Rice",
                             Price = 535000.00m
                         },
@@ -2381,6 +2407,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Description = "Resort Combo prepared by resort kitchen.",
                             ImageUrl = "/images/menu/item-20.jpg",
                             IsAvailable = true,
+                            IsDeleted = false,
                             ItemName = "Resort Combo",
                             Price = 560000.00m
                         });

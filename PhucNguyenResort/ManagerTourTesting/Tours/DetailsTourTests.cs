@@ -5,7 +5,7 @@ using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Tours;
 using Xunit;
 
-namespace PhucNguyenResort.Tests.Tours
+namespace ManagerTourTesting.Tours
 {
     public class DetailsTourTests
     {
