@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Enums;
@@ -17,9 +17,16 @@ public class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
         });
 
         builder.HasKey(x => x.MenuItemId);
-        builder.Property(x => x.ItemName).IsRequired().HasMaxLength(100);
+        // thêm required cho ItemName, required/precision cho Price, và check constrain 
+        //Món đang bán thì bắt buộc có Category.
+        //Món chưa có Category thì phải để IsAvailable = false.
+        builder.Property(x => x.ItemName).IsRequired().HasMaxLength(100); 
         builder.Property(x => x.Price).IsRequired().HasPrecision(18, 2);
         builder.Property(x => x.IsAvailable).HasDefaultValue(true);
+        builder.Property(x => x.IsDeleted).HasDefaultValue(false);
+        builder.HasIndex(x => new { x.CategoryId, x.ItemName })
+            .IsUnique()
+            .HasFilter("[CategoryId] IS NOT NULL AND [IsDeleted] = 0");
         builder.HasOne(x => x.Category).WithMany(x => x.MenuItems).HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.SetNull);
     }
 }

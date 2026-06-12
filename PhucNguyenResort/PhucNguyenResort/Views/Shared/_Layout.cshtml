@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,11 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PhucNguyenResort</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
 
-    <!-- Css Styles -->
     <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/elegant-icons.css" type="text/css">
@@ -22,23 +21,24 @@
     <link rel="stylesheet" href="~/css/style.css" type="text/css">
 </head>
 <body>
-    <!-- Page Preloder -->
     <div id="preloder">
         <div class="loader"></div>
     </div>
 
-    <!-- Offcanvas Menu Section Begin -->
     <div class="offcanvas-menu-overlay"></div>
     <div class="canvas-open">
         <i class="icon_menu"></i>
     </div>
+
     <div class="offcanvas-menu-wrapper">
         <div class="canvas-close">
             <i class="icon_close"></i>
         </div>
-        <div class="search-icon  search-switch">
+
+        <div class="search-icon search-switch">
             <i class="icon_search"></i>
         </div>
+
         <div class="header-configure-area">
             <div class="language-option">
                 <img src="~/img/flag.jpg" alt="">
@@ -51,12 +51,30 @@
             </div>
             <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
         </div>
+
+        <!-- Mobile Menu -->
         <nav class="mainmenu mobile-menu">
             <ul>
-                <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
-                <li><a asp-controller="Home" asp-action="SearchRooms">Phòng Ngủ</a></li>
-                <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
-                <li><a href="./pages.html">Trang</a>
+                <li class="active">
+                    <a asp-area="" asp-controller="Home" asp-action="Index">
+                        Trang Chủ
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Home" asp-action="SearchRooms">
+                        Phòng Ngủ
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-area="" asp-controller="Home" asp-action="AboutUs">
+                        Về Chúng Tôi
+                    </a>
+                </li>
+
+                <li>
+                    <a href="./pages.html">Trang</a>
                     <ul class="dropdown">
                         <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
                         <li><a href="#">Phòng Deluxe</a></li>
@@ -64,26 +82,45 @@
                         <li><a href="#">Phòng Premium</a></li>
                     </ul>
                 </li>
+
                 <li><a href="./blog.html">Tin Tức</a></li>
-                <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
-                <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+
+                <li>
+                    <a asp-area="" asp-controller="Home" asp-action="Contact">
+                        Liên Hệ
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Dashboard" asp-action="Index">
+                        Quản Trị
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-area="" asp-controller="Profile" asp-action="Index">
+                        <i class="fa fa-user-circle-o"></i> My Profile
+                    </a>
+                </li>
+
             </ul>
         </nav>
+
         <div id="mobile-menu-wrap"></div>
+
         <div class="top-social">
             <a href="#"><i class="fa fa-facebook"></i></a>
             <a href="#"><i class="fa fa-twitter"></i></a>
             <a href="#"><i class="fa fa-tripadvisor"></i></a>
             <a href="#"><i class="fa fa-instagram"></i></a>
         </div>
+
         <ul class="top-widget">
             <li><i class="fa fa-phone"></i> (12) 345 67890</li>
             <li><i class="fa fa-envelope"></i> info.colorlib@gmail.com</li>
         </ul>
     </div>
-    <!-- Offcanvas Menu Section End -->
 
-    <!-- Header Section Begin -->
     <header class="header-section">
         <div class="top-nav">
             <div class="container">
@@ -94,6 +131,7 @@
                             <li><i class="fa fa-envelope"></i> info.colorlib@gmail.com</li>
                         </ul>
                     </div>
+
                     <div class="col-lg-6">
                         <div class="tn-right">
                             <div class="top-social">
@@ -102,7 +140,9 @@
                                 <a href="#"><i class="fa fa-tripadvisor"></i></a>
                                 <a href="#"><i class="fa fa-instagram"></i></a>
                             </div>
+
                             <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
+
                             <div class="language-option">
                                 <img src="~/img/flag.jpg" alt="">
                                 <span>VN <i class="fa fa-angle-down"></i></span>
@@ -117,6 +157,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Desktop Menu -->
         <div class="menu-item">
             <div class="container">
                 <div class="row">
@@ -127,14 +169,31 @@
                             </a>
                         </div>
                     </div>
+
                     <div class="col-lg-10">
                         <div class="nav-menu">
                             <nav class="mainmenu">
                                 <ul>
-                                    <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
-                                    <li><a asp-controller="Home" asp-action="SearchRooms">Phòng Ngủ</a></li>
-                                    <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
-                                    <li><a href="./pages.html">Trang</a>
+                                    <li class="active">
+                                        <a asp-area="" asp-controller="Home" asp-action="Index">
+                                            Trang Chủ
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a asp-controller="Home" asp-action="SearchRooms">
+                                            Phòng Ngủ
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a asp-area="" asp-controller="Home" asp-action="AboutUs">
+                                            Về Chúng Tôi
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="./pages.html">Trang</a>
                                         <ul class="dropdown">
                                             <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
                                             <li><a href="./blog-details.html">Chi Tiết Tin Tức</a></li>
@@ -142,11 +201,31 @@
                                             <li><a href="#">Phòng Premium</a></li>
                                         </ul>
                                     </li>
+
                                     <li><a href="./blog.html">Tin Tức</a></li>
-                                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
-                                    <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+
+                                    <li>
+                                        <a asp-area="" asp-controller="Home" asp-action="Contact">
+                                            Liên Hệ
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a asp-controller="Dashboard" asp-action="Index">
+                                            Quản Trị
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a asp-area="" asp-controller="Profile" asp-action="Index">
+                                            My Profile
+                                        </a>
+                                    </li>
+
+                                    
                                 </ul>
                             </nav>
+
                             <div class="nav-right search-switch">
                                 <i class="icon_search"></i>
                             </div>
@@ -156,91 +235,9 @@
             </div>
         </div>
     </header>
-    <!-- Header End -->
 
-    <!-- Main Body Area -->
     @RenderBody()
-    <!-- Main Body Area End -->
 
-    <!-- Footer Section Begin -->
-    <footer class="footer-section">
-        <div class="container">
-            <div class="footer-text">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="ft-about">
-                            <div class="logo">
-                                <a href="#">
-                                    <img src="~/img/footer-logo.png" alt="">
-                                </a>
-                            </div>
-                            <p>Chúng tôi kết nối và truyền cảm hứng<br /> cho hàng triệu du khách mỗi ngày</p>
-                            <div class="fa-social">
-                                <a href="#"><i class="fa fa-facebook"></i></a>
-                                <a href="#"><i class="fa fa-twitter"></i></a>
-                                <a href="#"><i class="fa fa-tripadvisor"></i></a>
-                                <a href="#"><i class="fa fa-instagram"></i></a>
-                                <a href="#"><i class="fa fa-youtube-play"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 offset-lg-1">
-                        <div class="ft-contact">
-                            <h6>Liên Hệ</h6>
-                            <ul>
-                                <li>(12) 345 67890</li>
-                                <li>info.colorlib@gmail.com</li>
-                                <li>856 Cordia Extension Apt. 356, Lake, United State</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 offset-lg-1">
-                        <div class="ft-newslatter">
-                            <h6>Đăng Ký Nhận Tin</h6>
-                            <p>Nhận thông tin cập nhật và ưu đãi mới nhất.</p>
-                            <form action="#" class="fn-form">
-                                <input type="text" placeholder="Email của bạn">
-                                <button type="submit"><i class="fa fa-send"></i></button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="copyright-option">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-7">
-                        <ul>
-                            <li><a href="#">Liên Hệ</a></li>
-                            <li><a href="#">Điều Khoản</a></li>
-                            <li><a href="#">Bảo Mật</a></li>
-                            <li><a href="#">Chính Sách Môi Trường</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="co-text"><p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- Footer Section End -->
-
-    <!-- Search model Begin -->
-    <div class="search-model">
-        <div class="h-100 d-flex align-items-center justify-content-center">
-            <div class="search-close-switch"><i class="icon_close"></i></div>
-            <form class="search-model-form">
-                <input type="text" id="search-input" placeholder="Tìm kiếm.....">
-            </form>
-        </div>
-    </div>
-    <!-- Search model end -->
-
-    <!-- Js Plugins -->
     <script src="~/js/jquery-3.3.1.min.js"></script>
     <script src="~/js/bootstrap.min.js"></script>
     <script src="~/js/jquery.magnific-popup.min.js"></script>

@@ -34,7 +34,7 @@ namespace PhucNguyenResort.Web.Migrations
                 {
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
+                    CategoryName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -97,15 +97,17 @@ namespace PhucNguyenResort.Web.Migrations
                     MenuItemId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
-                    ItemName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ItemName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    IsAvailable = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                    IsAvailable = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MenuItems", x => x.MenuItemId);
+                    table.CheckConstraint("CK_MenuItems_AvailableRequiresCategory", "[IsAvailable] = 0 OR [CategoryId] IS NOT NULL");
                     table.ForeignKey(
                         name: "FK_MenuItems_MenuCategories_CategoryId",
                         column: x => x.CategoryId,
@@ -137,6 +139,26 @@ namespace PhucNguyenResort.Web.Migrations
                         principalTable: "Roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoomCategoryImages",
+                columns: table => new
+                {
+                    ImageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ImageUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomCategoryImages", x => x.ImageId);
+                    table.ForeignKey(
+                        name: "FK_RoomCategoryImages_RoomCategories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "RoomCategories",
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -468,8 +490,8 @@ namespace PhucNguyenResort.Web.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FoodOrderId = table.Column<int>(type: "int", nullable: true),
                     MenuItemId = table.Column<int>(type: "int", nullable: true),
-                    Quantity = table.Column<int>(type: "int", nullable: true),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true)
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -688,26 +710,15 @@ namespace PhucNguyenResort.Web.Migrations
                 columns: new[] { "RoleId", "RoleName" },
                 values: new object[,]
                 {
-                    { 1, "Guest" },
-                    { 2, "Receptionist" },
-                    { 3, "BusinessManager" },
-                    { 4, "SystemAdmin" },
-                    { 5, "HousekeepingStaff" },
-                    { 6, "KitchenStaff" },
-                    { 7, "TourGuide" },
-                    { 8, "Accountant" },
-                    { 9, "RestaurantStaff" },
-                    { 10, "MaintenanceStaff" },
-                    { 11, "SpaStaff" },
-                    { 12, "SecurityStaff" },
-                    { 13, "MarketingStaff" },
-                    { 14, "HRStaff" },
-                    { 15, "InventoryStaff" },
-                    { 16, "SalesStaff" },
-                    { 17, "CustomerSupport" },
-                    { 18, "EventCoordinator" },
-                    { 19, "TransportStaff" },
-                    { 20, "Auditor" }
+                    { 1, "System Admin" },
+                    { 2, "Business Manager" },
+                    { 3, "Customer" },
+                    { 4, "Receptionist" },
+                    { 5, "F&B Staff" },
+                    { 6, "Kitchen Staff" },
+                    { 7, "Tour Guide" },
+                    { 8, "Housekeeping Staff" },
+                    { 9, "Maintenance Staff" }
                 });
 
             migrationBuilder.InsertData(
@@ -913,28 +924,28 @@ namespace PhucNguyenResort.Web.Migrations
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 10, new DateTime(2026, 3, 10, 8, 30, 0, 0, DateTimeKind.Unspecified), "user10@phucnguyenresort.test", "Ngo Thanh Oanh", true, "hashed-password-10", "0900000010", 10 },
-                    { 11, new DateTime(2026, 3, 11, 8, 30, 0, 0, DateTimeKind.Unspecified), "user11@phucnguyenresort.test", "Huynh Duc Phat", true, "hashed-password-11", "0900000011", 11 },
-                    { 12, new DateTime(2026, 3, 12, 8, 30, 0, 0, DateTimeKind.Unspecified), "user12@phucnguyenresort.test", "Phan My Quyen", true, "hashed-password-12", "0900000012", 12 },
-                    { 13, new DateTime(2026, 4, 13, 8, 30, 0, 0, DateTimeKind.Unspecified), "user13@phucnguyenresort.test", "Vu Khanh Son", true, "hashed-password-13", "0900000013", 13 },
-                    { 14, new DateTime(2026, 4, 14, 8, 30, 0, 0, DateTimeKind.Unspecified), "user14@phucnguyenresort.test", "Truong Hai Tam", true, "hashed-password-14", "0900000014", 14 },
-                    { 15, new DateTime(2026, 4, 15, 8, 30, 0, 0, DateTimeKind.Unspecified), "user15@phucnguyenresort.test", "Ly Bao Uyen", true, "hashed-password-15", "0900000015", 15 },
-                    { 16, new DateTime(2026, 4, 16, 8, 30, 0, 0, DateTimeKind.Unspecified), "user16@phucnguyenresort.test", "Mai Hoai Viet", true, "hashed-password-16", "0900000016", 16 },
-                    { 17, new DateTime(2026, 5, 17, 8, 30, 0, 0, DateTimeKind.Unspecified), "user17@phucnguyenresort.test", "Dinh Nhat Vy", true, "hashed-password-17", "0900000017", 17 }
+                    { 10, new DateTime(2026, 3, 10, 8, 30, 0, 0, DateTimeKind.Unspecified), "user10@phucnguyenresort.test", "Ngo Thanh Oanh", true, "hashed-password-10", "0900000010", 3 },
+                    { 11, new DateTime(2026, 3, 11, 8, 30, 0, 0, DateTimeKind.Unspecified), "user11@phucnguyenresort.test", "Huynh Duc Phat", true, "hashed-password-11", "0900000011", 3 },
+                    { 12, new DateTime(2026, 3, 12, 8, 30, 0, 0, DateTimeKind.Unspecified), "user12@phucnguyenresort.test", "Phan My Quyen", true, "hashed-password-12", "0900000012", 3 },
+                    { 13, new DateTime(2026, 4, 13, 8, 30, 0, 0, DateTimeKind.Unspecified), "user13@phucnguyenresort.test", "Vu Khanh Son", true, "hashed-password-13", "0900000013", 3 },
+                    { 14, new DateTime(2026, 4, 14, 8, 30, 0, 0, DateTimeKind.Unspecified), "user14@phucnguyenresort.test", "Truong Hai Tam", true, "hashed-password-14", "0900000014", 3 },
+                    { 15, new DateTime(2026, 4, 15, 8, 30, 0, 0, DateTimeKind.Unspecified), "user15@phucnguyenresort.test", "Ly Bao Uyen", true, "hashed-password-15", "0900000015", 3 },
+                    { 16, new DateTime(2026, 4, 16, 8, 30, 0, 0, DateTimeKind.Unspecified), "user16@phucnguyenresort.test", "Mai Hoai Viet", true, "hashed-password-16", "0900000016", 3 },
+                    { 17, new DateTime(2026, 5, 17, 8, 30, 0, 0, DateTimeKind.Unspecified), "user17@phucnguyenresort.test", "Dinh Nhat Vy", true, "hashed-password-17", "0900000017", 3 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "PasswordHash", "PhoneNumber", "RoleId" },
-                values: new object[] { 18, new DateTime(2026, 5, 18, 8, 30, 0, 0, DateTimeKind.Unspecified), "user18@phucnguyenresort.test", "Cao Tien Dat", "hashed-password-18", "0900000018", 18 });
+                values: new object[] { 18, new DateTime(2026, 5, 18, 8, 30, 0, 0, DateTimeKind.Unspecified), "user18@phucnguyenresort.test", "Cao Tien Dat", "hashed-password-18", "0900000018", 3 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 19, new DateTime(2026, 5, 19, 8, 30, 0, 0, DateTimeKind.Unspecified), "user19@phucnguyenresort.test", "Ta Minh Anh", true, "hashed-password-19", "0900000019", 19 },
-                    { 20, new DateTime(2026, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), "user20@phucnguyenresort.test", "Lam Gia Bao", true, "hashed-password-20", "0900000020", 20 }
+                    { 19, new DateTime(2026, 5, 19, 8, 30, 0, 0, DateTimeKind.Unspecified), "user19@phucnguyenresort.test", "Ta Minh Anh", true, "hashed-password-19", "0900000019", 3 },
+                    { 20, new DateTime(2026, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), "user20@phucnguyenresort.test", "Lam Gia Bao", true, "hashed-password-20", "0900000020", 3 }
                 });
 
             migrationBuilder.InsertData(
@@ -1833,9 +1844,17 @@ namespace PhucNguyenResort.Web.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MenuItems_CategoryId",
+                name: "IX_MenuCategories_CategoryName",
+                table: "MenuCategories",
+                column: "CategoryName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItems_CategoryId_ItemName",
                 table: "MenuItems",
-                column: "CategoryId");
+                columns: new[] { "CategoryId", "ItemName" },
+                unique: true,
+                filter: "[CategoryId] IS NOT NULL AND [IsDeleted] = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_UserId",
@@ -1872,6 +1891,11 @@ namespace PhucNguyenResort.Web.Migrations
                 table: "Roles",
                 column: "RoleName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoomCategoryImages_CategoryId",
+                table: "RoomCategoryImages",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_CategoryId",
@@ -1959,6 +1983,9 @@ namespace PhucNguyenResort.Web.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reviews");
+
+            migrationBuilder.DropTable(
+                name: "RoomCategoryImages");
 
             migrationBuilder.DropTable(
                 name: "TableReservations");

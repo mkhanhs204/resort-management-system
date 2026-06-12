@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.ViewModels;
 using System.Diagnostics;
 using PhucNguyenResort.Services.Home;
+using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.Models;
 
 namespace PhucNguyenResort.Controllers
@@ -10,16 +11,19 @@ namespace PhucNguyenResort.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHomeService _homeService;
+        private readonly ITourService _tourService;
 
-        public HomeController(ILogger<HomeController> logger, IHomeService homeService)
+        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourService tourService)
         {
             _logger = logger;
             _homeService = homeService;
+            _tourService = tourService;
         }
 
         public async Task<IActionResult> Index()
         {
             var roomCategories = await _homeService.GetRoomCategoriesForHomeAsync();
+            ViewBag.Tours = await _tourService.GetAllToursAsync();
             return View(roomCategories);
         }
 

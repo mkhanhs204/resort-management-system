@@ -1,4 +1,4 @@
-@model IReadOnlyList<PhucNguyenResort.ViewModels.RestaurantMenus.MenuItemListViewModel>
+@model PhucNguyenResort.ViewModels.RestaurantMenus.MenuItemIndexViewModel
 
 @{
     ViewData["Title"] = "Restaurant Menu";
@@ -9,18 +9,48 @@
     <a asp-action="Create" class="btn btn-primary">Add menu item</a>
 </div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-md-4">
+        <label asp-for="SearchTerm" class="form-label">Search by name</label>
+        <input asp-for="SearchTerm" class="form-control" placeholder="Menu item name" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+            <option value="">All categories</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="IsAvailable" class="form-label">Selling status</label>
+        <select asp-for="IsAvailable" class="form-select">
+            <option value="">All statuses</option>
+            <option value="true">Selling</option>
+            <option value="false">Out of stock</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">Filter</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
 <table class="table table-striped align-middle">
     <thead>
         <tr>
             <th>Name</th>
             <th>Category</th>
             <th class="text-end">Price</th>
-            <th>Status</th>
+            <th>Selling status</th>
             <th class="text-end">Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Items)
         {
             <tr>
                 <td>@item.ItemName</td>
@@ -29,18 +59,24 @@
                 <td>
                     @if (item.IsAvailable)
                     {
-                        <span class="badge bg-success">Available</span>
+                        <span class="badge bg-success">Selling</span>
                     }
                     else
                     {
-                        <span class="badge bg-secondary">Unavailable</span>
+                        <span class="badge bg-warning text-dark">Out of stock</span>
                     }
                 </td>
                 <td class="text-end">
                     <a asp-action="Details" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-secondary">Details</a>
                     <a asp-action="Edit" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-primary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    <a asp-action="Discontinue" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-danger">Discontinue</a>
                 </td>
+            </tr>
+        }
+        @if (!Model.Items.Any())
+        {
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">No menu items found.</td>
             </tr>
         }
     </tbody>

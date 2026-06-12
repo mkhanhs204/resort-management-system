@@ -4,6 +4,7 @@ using Moq;
 using PhucNguyenResort.Controllers;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Home;
+using PhucNguyenResort.Services.Tours;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,13 +16,15 @@ namespace PhucNguyenResort.Tests
     {
         private readonly Mock<ILogger<HomeController>> _mockLogger;
         private readonly Mock<IHomeService> _mockHomeService;
+        private readonly Mock<ITourService> _mockTourService;
         private readonly HomeController _controller;
 
         public HomeControllerTests()
         {
             _mockLogger = new Mock<ILogger<HomeController>>();
             _mockHomeService = new Mock<IHomeService>();
-            _controller = new HomeController(_mockLogger.Object, _mockHomeService.Object);
+            _mockTourService = new Mock<ITourService>();
+            _controller = new HomeController(_mockLogger.Object, _mockHomeService.Object, _mockTourService.Object);
         }
 
         [Fact]
