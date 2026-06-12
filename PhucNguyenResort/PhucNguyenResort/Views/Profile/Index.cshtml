@@ -1,0 +1,150 @@
+﻿@model PhucNguyenResort.ViewModels.Users.ProfileVM
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+<div class="breadcrumb-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-text">
+                    <h2>Hồ sơ tài khoản</h2>
+                    <div class="bt-option">
+                        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        <span>Thông tin cá nhân</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="profile-section spad" style="background-color: #f8f9fa; padding: 60px 0;">
+    <div class="container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-left: 5px solid #dfa974;">
+                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm" style="border-radius: 10px;">
+                    <div class="card-body text-center" style="padding: 30px;">
+                        <div class="avatar-wrapper mb-3 mx-auto" style="width: 120px; height: 120px; background-color: #dfa974; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 45px; color: #fff; font-weight: 600;">@Model.FullName.Substring(0, 1).ToUpper()</span>
+                        </div>
+                        <h4 style="font-family: 'Lora', serif; font-weight: 700; color: #191d3a;">@Model.FullName</h4>
+                        <p class="text-muted small">@Model.Email</p>
+                        <hr>
+
+                        <div class="passport-box text-left mt-3">
+                            <h6 style="font-weight: 600; color: #191d3a; font-size: 14px; text-transform: uppercase;" class="mb-2">Ảnh hộ chiếu / ID xác minh:</h6>
+                            @if (!string.IsNullOrEmpty(Model.PassportImage))
+                            {
+                                <div class="img-thumbnail-wrapper" style="border-radius: 8px; overflow: hidden; border: 1px solid #ddd;">
+                                    <img src="@Model.PassportImage" alt="Passport" class="img-fluid" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-3 text-center text-muted" style="background: #f1f1f1; border-radius: 8px; border: 1px dashed #ccc; font-size: 13px;">
+                                    <i class="fa fa-id-card-o fa-2x d-block mb-2"></i> Chưa cập nhật ảnh hộ chiếu xác minh
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm" style="border-radius: 10px;">
+                    <div class="card-body" style="padding: 40px;">
+                        <h4 style="font-family: 'Lora', serif; font-weight: 700; color: #191d3a;" class="mb-4">Chi tiết thông tin cá nhân</h4>
+
+                        <form asp-controller="Profile" asp-action="Update" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="UserId" />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="FullName" class="form-label" style="font-weight: 600; color: #333;"></label>
+                                    <input asp-for="FullName" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" />
+                                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" style="font-weight: 600; color: #333;">Địa chỉ Email</label>
+                                    <input asp-for="Email" class="form-control-plaintext bg-light px-3" readonly style="height: 46px; border-radius: 4px; border: 1px solid #ebebeb;" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="PhoneNumber" class="form-label" style="font-weight: 600; color: #333;"></label>
+                                    <input asp-for="PhoneNumber" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="DateOfBirth" class="form-label" style="font-weight: 600; color: #333;"></label>
+                                    <input asp-for="DateOfBirth" type="date" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" />
+                                    <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Nationality" class="form-label" style="font-weight: 600; color: #333;"></label>
+                                    <input asp-for="Nationality" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" placeholder="Ví dụ: Việt Nam" />
+                                    <span asp-validation-for="Nationality" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="PassportNumberString" class="form-label" style="font-weight: 600; color: #333;"></label>
+                                    <input asp-for="PassportNumberString" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" placeholder="Nhập số hộ chiếu hoặc CMND" />
+                                    <span asp-validation-for="PassportNumberString" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Address" class="form-label" style="font-weight: 600; color: #333;"></label>
+                                <input asp-for="Address" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" placeholder="Số nhà, tên đường, thành phố..." />
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="PassportImageFile" class="form-label" style="font-weight: 600; color: #333;"></label>
+                                <div class="custom-file">
+                                    <input asp-for="PassportImageFile" type="file" class="custom-file-input" id="passportFile" accept="image/*">
+                                    <label class="custom-file-label" for="passportFile" style="border: 1px solid #ebebeb; height: 46px; line-height: 32px;">Chọn file hình ảnh...</label>
+                                </div>
+                                <span asp-validation-for="PassportImageFile" class="text-danger small"></span>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn" style="background-color: #dfa974; color: #fff; padding: 12px 30px; font-family: 'Cabin', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; border: none; border-radius: 2px; cursor: pointer; transition: 0.3s;">
+                                    Lưu Thay Đổi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
