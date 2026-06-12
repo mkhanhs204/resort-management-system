@@ -18,24 +18,24 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 
 ## CHANGELOG
 **Policy 4.4 — Immutable History**: Không bao giờ xóa thông tin cũ.
-| Ngày | Người thực hiện | Nội dung thay đổi |
-| --- | --- | --- |
-| 2026-06-11 | System Agent | Khởi tạo tài liệu — TDD cho logic tính toán phòng trống |
+| Ngày       | Người thực hiện | Nội dung thay đổi                                       |
+| ------------| -----------------| ---------------------------------------------------------|
+| 2026-06-11 | System Agent    | Khởi tạo tài liệu — TDD cho logic tính toán phòng trống |
 
 ---
 
 ## 1. Thông tin Module
-| Field | Value |
-| --- | --- |
-| Feature / Gap ID | FEAT-ROOM-AVAILABILITY |
-| Module | `Room Reservation` |
-| Spec gốc | `EDS_CheckRoomAvailability.md` |
-| Priority | 🔴 P0 |
-| Sprint | S1 |
-| Data Classification | Internal |
-| Compliance Scope | N/A |
+| Field                 | Value　　　　　　　　　　　　　　 |
+| -----------------------| -----------------------------------|
+| Feature / Gap ID      | FEAT-ROOM-AVAILABILITY　　　　　　|
+| Module                | `Room Reservation`　　　　　　　　|
+| Spec gốc              | `EDS_CheckRoomAvailability.md`　　|
+| Priority              | 🔴 P0　　　　　　　　　　　　　　 |
+| Sprint                | S1　　　　　　　　　　　　　　　　|
+| Data Classification   | Internal　　　　　　　　　　　　　|
+| Compliance Scope      | N/A　　　　　　　　　　　　　　　 |
 | Upstream Dependencies | `RoomCategory`, `Room`, `Booking` |
-| Downstream Consumers | `HomeService` |
+| Downstream Consumers  | `HomeService`　　　　　　　　　　 |
 
 ## 2. Logic Issues Resolved
 | # | Spec gốc (sai / thiếu) | Thực tế (schema / policy) | Fix áp dụng trong test |
@@ -157,3 +157,62 @@ Phạm vi của TDD spec này:
 
 **Expected Result (PASS)**:
 - Trả về kết quả: `5` (Bởi vì cả 2 Booking kia đều không còn hiệu lực nên phòng được trả lại cho hệ thống).
+
+### UC04_06_TC_001 — Tìm kiếm với ngày không hợp lệ (SearchRooms)
+**Severity**: MEDIUM
+**Feature Under Test**: `HomeController.SearchRooms()`
+**TDD Phase**: 🟢 GREEN
+
+**Preconditions**:
+- `checkIn` và `checkOut` là chuỗi không hợp lệ (ví dụ: "invalid").
+
+**Test Steps**:
+1. Gọi `SearchRooms("invalid-date", "invalid-date", 2, 1)`
+
+**Expected Result (PASS)**:
+- Hệ thống tự động gán `checkInDate = Today` và `checkOutDate = Today + 1`.
+- Cập nhật đúng các biến `ViewBag` (ViewData) và gọi service tìm kiếm thành công.
+
+### UC04_06_TC_002 — Tìm kiếm với ngày hợp lệ (SearchRooms)
+**Severity**: HIGH
+**Feature Under Test**: `HomeController.SearchRooms()`
+**TDD Phase**: 🟢 GREEN
+
+**Preconditions**:
+- `checkIn` = "01/12/2027", `checkOut` = "05/12/2027".
+
+**Test Steps**:
+1. Gọi `SearchRooms("01/12/2027", "05/12/2027", 2, 1)`
+
+**Expected Result (PASS)**:
+- Trả về danh sách RoomCategory chính xác.
+- Gọi chính xác hàm `SearchAvailableCategoriesAsync` với đúng tham số ngày tháng.
+
+### UC59_TC_001 — Cập nhật trạng thái phòng thành công (Edit)
+**Severity**: CRITICAL
+**Feature Under Test**: `RoomsController.Edit()`
+**TDD Phase**: 🟢 GREEN
+
+**Preconditions**:
+- Gửi lên model `RoomEditVM` với ID = 1 và `Status = RoomStatus.Maintenance`.
+
+**Test Steps**:
+1. Gọi hàm `Edit(1, model)`
+
+**Expected Result (PASS)**:
+- Gọi hàm `UpdateRoomAsync` của `RoomService` với tham số `Status` đã được cập nhật thành `Maintenance`.
+- Chuyển hướng (Redirect) thành công về trang Index.
+
+### UC59_TC_002 — Truyền vào ID không khớp với Model ID (Edit)
+**Severity**: MEDIUM
+**Feature Under Test**: `RoomsController.Edit()`
+**TDD Phase**: 🟢 GREEN
+
+**Preconditions**:
+- Truyền vào ID = 1 nhưng model có `RoomId = 2`.
+
+**Test Steps**:
+1. Gọi hàm `Edit(1, model)`
+
+**Expected Result (PASS)**:
+- Trả về mã lỗi `404 NotFound`.

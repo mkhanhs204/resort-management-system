@@ -1,26 +1,26 @@
 # ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
-| Field | Value |
-| --- | --- |
-| Document ID | `PNR-ROOM-IMP-001` |
-| Version | 1.0 |
-| Date | 2026-06-11 |
-| Status | Approved |
-| Document Owner | Backend Team |
-| Author | System Agent |
-| Reviewed by | Tech Lead |
-| DPO Sign-off | N/A (Không xử lý PII trực tiếp) |
-| Approved by | Principal Architect |
-| Last Review | 2026-06-11 |
-| Based on EDS | v2.0 |
+| Field          | Value                           |
+| ----------------| ---------------------------------|
+| Document ID    | `PNR-ROOM-IMP-001`              |
+| Version        | 1.0                             |
+| Date           | 2026-06-11                      |
+| Status         | Approved                        |
+| Document Owner | Backend Team                    |
+| Author         | System Agent                    |
+| Reviewed by    | Tech Lead                       |
+| DPO Sign-off   | N/A (Không xử lý PII trực tiếp) |
+| Approved by    | Principal Architect             |
+| Last Review    | 2026-06-11                      |
+| Based on EDS   | v2.0                            |
 
 ## CHANGELOG
 **Policy 4.4 — Immutable History**: Không bao giờ xóa thông tin cũ. Mọi thay đổi phải ghi vào bảng này.
 
-| Ngày | Người thực hiện | Nội dung thay đổi |
-| --- | --- | --- |
-| 2026-06-11 | System Agent | Tạo tài liệu lần đầu - Logic kiểm tra phòng trống theo Category |
+| Ngày       | Người thực hiện | Nội dung thay đổi                                               |
+| ------------| -----------------| -----------------------------------------------------------------|
+| 2026-06-11 | System Agent    | Tạo tài liệu lần đầu - Logic kiểm tra phòng trống theo Category |
 
 ## MỤC LỤC
 1. Tổng quan Module
@@ -45,14 +45,14 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 ## 1. Tổng quan Module
 Mô tả ngắn gọn mục đích của module, phạm vi nghiệp vụ và lý do tồn tại.
 
-| Field | Value |
-| --- | --- |
-| Module Name | `Room Reservation & Front Desk` (Module 2) |
-| Bounded Context | `Booking / Availability` |
-| Data Classification | Internal / Public |
-| Compliance Scope | N/A |
-| Upstream Dependencies | `Room Service`, `Booking Service` |
-| Downstream Consumers | `Home Controller`, `Booking Controller` |
+| Field                 | Value                                      |
+| -----------------------| --------------------------------------------|
+| Module Name           | `Room Reservation & Front Desk` (Module 2) |
+| Bounded Context       | `Booking / Availability`                   |
+| Data Classification   | Internal / Public                          |
+| Compliance Scope      | N/A                                        |
+| Upstream Dependencies | `Room Service`, `Booking Service`          |
+| Downstream Consumers  | `Home Controller`, `Booking Controller`    |
 
 ## 2. Ma trận Truy vết (Traceability Matrix)
 
@@ -65,20 +65,20 @@ Mô tả ngắn gọn mục đích của module, phạm vi nghiệp vụ và lý
 ## 3. Architecture Decision Records (ADR)
 
 ### ADR-001 — Phương pháp tính số lượng phòng trống
-| Field | Value |
-| --- | --- |
-| Status | Accepted |
+| Field    | Value               |
+| ----------| ---------------------|
+| Status   | Accepted            |
 | Deciders | Principal Architect |
-| Date | 2026-06-11 |
+| Date     | 2026-06-11          |
 
 **Bối cảnh (Context)**
 Cần xác định thuật toán tính số phòng trống (Available Rooms) cho một `CategoryId` trong khoảng thời gian `[CheckInDate, CheckOutDate]`.
 
 **Các phương án đã xem xét (Options Considered)**
-| Phương án | Mô tả | Ưu điểm | Nhược điểm |
-| --- | --- | --- | --- |
-| A: Tính theo từng phòng cụ thể | Truy vấn từng phòng xem phòng nào trống trong thời gian đó. | Chặt chẽ, cấp phát phòng ngay từ đầu. | Tốn kém chi phí truy vấn, dễ gây deadlock khi có nhiều booking đồng thời. |
-| B: Tính gộp theo Category (Công thức) | Lấy Tổng số phòng (trừ Maintenance) trừ đi Số phòng đã Booking (trùng lịch và không Cancel/NoShow). | Tốc độ cao, linh hoạt trong việc sắp xếp phòng vật lý sau này. | Cần phải ánh xạ lại vào Room thực tế khi Check-in. |
+| Phương án                             | Mô tả                                                                                               | Ưu điểm                                                        | Nhược điểm                                                                |
+| ---------------------------------------| -----------------------------------------------------------------------------------------------------| ----------------------------------------------------------------| ---------------------------------------------------------------------------|
+| A: Tính theo từng phòng cụ thể        | Truy vấn từng phòng xem phòng nào trống trong thời gian đó.                                         | Chặt chẽ, cấp phát phòng ngay từ đầu.                          | Tốn kém chi phí truy vấn, dễ gây deadlock khi có nhiều booking đồng thời. |
+| B: Tính gộp theo Category (Công thức) | Lấy Tổng số phòng (trừ Maintenance) trừ đi Số phòng đã Booking (trùng lịch và không Cancel/NoShow). | Tốc độ cao, linh hoạt trong việc sắp xếp phòng vật lý sau này. | Cần phải ánh xạ lại vào Room thực tế khi Check-in.                        |
 
 **Quyết định (Decision)**
 Chọn **Phương án B** vì kiến trúc hệ thống hiện tại quản lý việc đặt phòng theo `RoomCategory` thay vì `Room` vật lý trong giai đoạn Guest đặt (Guest booking by category). Số phòng thực tế sẽ được Receptionist gán (UC54 - Assign Room) lúc Check-in.
