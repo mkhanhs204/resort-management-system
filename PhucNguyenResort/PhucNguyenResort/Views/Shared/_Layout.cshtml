@@ -36,7 +36,7 @@
         <div class="canvas-close">
             <i class="icon_close"></i>
         </div>
-        <div class="search-icon  search-switch">
+        <div class="search-icon search-switch">
             <i class="icon_search"></i>
         </div>
         <div class="header-configure-area">
@@ -56,7 +56,8 @@
                 <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
                 <li><a href="./rooms.html">Phòng Ngủ</a></li>
                 <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
-                <li><a href="./pages.html">Trang</a>
+                <li>
+                    <a href="./pages.html">Trang</a>
                     <ul class="dropdown">
                         <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
                         <li><a href="#">Phòng Deluxe</a></li>
@@ -67,6 +68,17 @@
                 <li><a href="./blog.html">Tin Tức</a></li>
                 <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
                 <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <li><a href="#">Xin chào, @User.Identity.Name</a></li>
+                    <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                }
+                else
+                {
+                    <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                    <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                }
             </ul>
         </nav>
         <div id="mobile-menu-wrap"></div>
@@ -82,7 +94,6 @@
         </ul>
     </div>
     <!-- Offcanvas Menu Section End -->
-
     <!-- Header Section Begin -->
     <header class="header-section">
         <div class="top-nav">
@@ -117,6 +128,7 @@
                 </div>
             </div>
         </div>
+
         <div class="menu-item">
             <div class="container">
                 <div class="row">
@@ -134,7 +146,8 @@
                                     <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
                                     <li><a href="./rooms.html">Phòng Ngủ</a></li>
                                     <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
-                                    <li><a href="./pages.html">Trang</a>
+                                    <li>
+                                        <a href="./pages.html">Trang</a>
                                         <ul class="dropdown">
                                             <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
                                             <li><a href="./blog-details.html">Chi Tiết Tin Tức</a></li>
@@ -144,7 +157,22 @@
                                     </li>
                                     <li><a href="./blog.html">Tin Tức</a></li>
                                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
-                                    <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
+                                    {
+                                        <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+                                    }
+
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                    {
+                                        <li><a href="#">Xin chào, @User.Identity.Name</a></li>
+                                        <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                                        <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                                    }
                                 </ul>
                             </nav>
                             <div class="nav-right search-switch">
@@ -157,11 +185,9 @@
         </div>
     </header>
     <!-- Header End -->
-
     <!-- Main Body Area -->
     @RenderBody()
     <!-- Main Body Area End -->
-
     <!-- Footer Section Begin -->
     <footer class="footer-section">
         <div class="container">
@@ -219,16 +245,20 @@
                         </ul>
                     </div>
                     <div class="col-lg-5">
-                        <div class="co-text"><p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p></div>
+                        <div class="co-text">
+                            <p>
+                                Copyright &copy;<script>document.write(new Date().getFullYear());</script>
+                                All rights reserved | This template is made with
+                                <i class="fa fa-heart" aria-hidden="true"></i> by
+                                <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </footer>
     <!-- Footer Section End -->
-
     <!-- Search model Begin -->
     <div class="search-model">
         <div class="h-100 d-flex align-items-center justify-content-center">
@@ -239,7 +269,6 @@
         </div>
     </div>
     <!-- Search model end -->
-
     <!-- Js Plugins -->
     <script src="~/js/jquery-3.3.1.min.js"></script>
     <script src="~/js/bootstrap.min.js"></script>
