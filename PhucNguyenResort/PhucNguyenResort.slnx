@@ -1,4 +1,4 @@
 <Solution>
   <Project Path="PhucNguyenResort/PhucNguyenResort.Web.csproj" />
-  <Project Path="PhucNguyenResort.Tests/PhucNguyenResort.Tests.csproj" />
+  <Project Path="ManagerTourTesting/ManagerTourTesting.csproj" />
 </Solution>
