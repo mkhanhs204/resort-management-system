@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
+using PhucNguyenResort.Services.FoodOrders;
 using PhucNguyenResort.Services.MenuCategories;
 using PhucNguyenResort.Services.RestaurantMenus;
 
@@ -26,6 +27,7 @@ builder.Services.AddAuthorization();
 // Services
 builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
+builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
 
 // DbContext
 builder.Services.AddDbContext<ResortDbContext>(options =>

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.ViewModels;
 using System.Diagnostics;
 using PhucNguyenResort.Services.Home;
+using PhucNguyenResort.Services.Tours;
+using PhucNguyenResort.Models;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -9,16 +11,19 @@ namespace PhucNguyenResort.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHomeService _homeService;
+        private readonly ITourService _tourService;
 
-        public HomeController(ILogger<HomeController> logger, IHomeService homeService)
+        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourService tourService)
         {
             _logger = logger;
             _homeService = homeService;
+            _tourService = tourService;
         }
 
         public async Task<IActionResult> Index()
         {
             var roomCategories = await _homeService.GetRoomCategoriesForHomeAsync();
+            ViewBag.Tours = await _tourService.GetAllToursAsync();
             return View(roomCategories);
         }
 
@@ -45,14 +50,56 @@ namespace PhucNguyenResort.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> DebugData(int categoryId, string checkIn, string checkOut)
+        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int guestCount = 2, int roomCount = 1)
         {
+            bool isFiltered = !string.IsNullOrEmpty(checkIn) && !string.IsNullOrEmpty(checkOut);
+            IEnumerable<RoomCategory> availableCategories;
+
+            if (!isFiltered)
+            {
+                availableCategories = await _homeService.GetRoomCategoriesForHomeAsync();
+                
+                ViewBag.CheckIn = "";
+                ViewBag.CheckOut = "";
+                ViewBag.GuestCount = guestCount;
+                ViewBag.RoomCount = roomCount;
+                ViewBag.IsFiltered = false;
+
+                return View(availableCategories);
+            }
+
             string[] formats = { "dd/MM/yyyy", "dd MM, yyyy", "d MMMM, yyyy", "dd MMMM, yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
-            DateTime.TryParseExact(checkIn, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime checkInDate);
-            DateTime.TryParseExact(checkOut, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime checkOutDate);
             
-            int totalRooms = await _homeService.CheckAvailabilityAsync(categoryId, checkInDate, checkOutDate);
-            return Ok(new { available = totalRooms, checkInDate, checkOutDate });
+            if (!DateTime.TryParseExact(checkIn, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime checkInDate))
+            {
+                checkInDate = DateTime.Today;
+            }
+
+            if (!DateTime.TryParseExact(checkOut, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime checkOutDate))
+            {
+                checkOutDate = checkInDate.AddDays(1);
+            }
+
+            if (checkOutDate <= checkInDate)
+            {
+                checkOutDate = checkInDate.AddDays(1);
+            }
+
+            if (checkInDate < DateTime.Today)
+            {
+                checkInDate = DateTime.Today;
+                if (checkOutDate <= checkInDate) checkOutDate = checkInDate.AddDays(1);
+            }
+
+            availableCategories = await _homeService.SearchAvailableCategoriesAsync(checkInDate, checkOutDate, guestCount, roomCount);
+
+            ViewBag.CheckIn = checkInDate.ToString("dd/MM/yyyy");
+            ViewBag.CheckOut = checkOutDate.ToString("dd/MM/yyyy");
+            ViewBag.GuestCount = guestCount;
+            ViewBag.RoomCount = roomCount;
+            ViewBag.IsFiltered = true;
+
+            return View(availableCategories);
         }
 
         [HttpGet]

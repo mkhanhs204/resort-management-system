@@ -23,7 +23,7 @@ public class MenuItemFormViewModel : IValidatableObject
     [Display(Name = "Image URL")]
     public string? ImageUrl { get; set; }
 
-    [Display(Name = "Available")]
+    [Display(Name = "Currently selling")]
     public bool IsAvailable { get; set; } = true;
 
     [Display(Name = "Category")]
@@ -37,7 +37,7 @@ public class MenuItemFormViewModel : IValidatableObject
         if (IsAvailable && !CategoryId.HasValue)
         {
             yield return new ValidationResult(
-                "Available menu items must be assigned to a category.",
+                "Items that are currently selling must be assigned to a category.",
                 new[] { nameof(CategoryId) });
         }
     }

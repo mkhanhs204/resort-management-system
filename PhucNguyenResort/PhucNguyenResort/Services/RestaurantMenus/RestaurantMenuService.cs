@@ -19,6 +19,7 @@ public class RestaurantMenuService : IRestaurantMenuService
     {
         return await _context.MenuItems
             .AsNoTracking()
+            .Where(item => !item.IsDeleted)
             .Include(item => item.Category)
             .OrderBy(item => item.Category == null ? string.Empty : item.Category.CategoryName)
             .ThenBy(item => item.ItemName)
@@ -35,12 +36,77 @@ public class RestaurantMenuService : IRestaurantMenuService
             .ToListAsync();
     }
 
+    public async Task<MenuItemIndexViewModel> BuildIndexAsync(MenuItemIndexViewModel filter)
+    {
+        filter.SearchTerm = NormalizeNullableDisplayText(filter.SearchTerm);
+
+        var query = _context.MenuItems
+            .AsNoTracking()
+            .Where(item => !item.IsDeleted);
+
+        if (filter.CategoryId.HasValue)
+        {
+            query = query.Where(item => item.CategoryId == filter.CategoryId.Value);
+        }
+
+        if (filter.IsAvailable.HasValue)
+        {
+            query = query.Where(item => item.IsAvailable == filter.IsAvailable.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+        {
+            var searchPattern = $"%{filter.SearchTerm}%";
+            query = query.Where(item => EF.Functions.Like(item.ItemName, searchPattern));
+        }
+
+        filter.CategoryOptions = await BuildCategoryOptionsAsync();
+        filter.Items = await query
+            .Include(item => item.Category)
+            .OrderBy(item => item.Category == null ? string.Empty : item.Category.CategoryName)
+            .ThenBy(item => item.ItemName)
+            .Select(item => new MenuItemListViewModel
+            {
+                MenuItemId = item.MenuItemId,
+                ItemName = item.ItemName,
+                CategoryName = item.Category == null
+                    ? "Uncategorized"
+                    : item.Category.CategoryName,
+                Price = item.Price,
+                IsAvailable = item.IsAvailable
+            })
+            .ToListAsync();
+
+        return filter;
+    }
+
+    public async Task<IReadOnlyList<MenuItemListViewModel>> GetAvailableMenuItemsAsync()
+    {
+        return await _context.MenuItems
+            .AsNoTracking()
+            .Where(item => item.IsAvailable && !item.IsDeleted)
+            .Include(item => item.Category)
+            .OrderBy(item => item.Category == null ? string.Empty : item.Category.CategoryName)
+            .ThenBy(item => item.ItemName)
+            .Select(item => new MenuItemListViewModel
+            {
+                MenuItemId = item.MenuItemId,
+                ItemName = item.ItemName,
+                CategoryName = item.Category == null
+                    ? "Uncategorized"
+                    : item.Category.CategoryName,
+                Price = item.Price,
+                IsAvailable = item.IsAvailable
+            })
+            .ToListAsync();
+    }
+
     public async Task<MenuItemDetailViewModel?> GetMenuItemDetailAsync(int id)
     {
         return await _context.MenuItems
             .AsNoTracking()
             .Include(item => item.Category)
-            .Where(item => item.MenuItemId == id)
+            .Where(item => item.MenuItemId == id && !item.IsDeleted)
             .Select(item => new MenuItemDetailViewModel
             {
                 MenuItemId = item.MenuItemId,
@@ -67,7 +133,7 @@ public class RestaurantMenuService : IRestaurantMenuService
     {
         var viewModel = await _context.MenuItems
             .AsNoTracking()
-            .Where(item => item.MenuItemId == id)
+            .Where(item => item.MenuItemId == id && !item.IsDeleted)
             .Select(item => new MenuItemFormViewModel
             {
                 MenuItemId = item.MenuItemId,
@@ -91,7 +157,12 @@ public class RestaurantMenuService : IRestaurantMenuService
 
     public async Task PopulateCategoryOptionsAsync(MenuItemFormViewModel viewModel)
     {
-        viewModel.CategoryOptions = await _context.MenuCategories
+        viewModel.CategoryOptions = await BuildCategoryOptionsAsync();
+    }
+
+    private async Task<List<SelectListItem>> BuildCategoryOptionsAsync()
+    {
+        return await _context.MenuCategories
             .AsNoTracking()
             .OrderBy(category => category.CategoryName)
             .Select(category => new SelectListItem
@@ -102,15 +173,29 @@ public class RestaurantMenuService : IRestaurantMenuService
             .ToListAsync();
     }
 
+    public async Task<bool> MenuItemNameExistsInCategoryAsync(string itemName, int? categoryId, int? excludedMenuItemId = null)
+    {
+        var normalizedName = NormalizeMenuItemName(itemName);
+
+        return await _context.MenuItems
+            .AsNoTracking()
+            .AnyAsync(item =>
+                !item.IsDeleted
+                && item.ItemName.Trim().ToLower() == normalizedName
+                && item.CategoryId == categoryId
+                && (!excludedMenuItemId.HasValue || item.MenuItemId != excludedMenuItemId.Value));
+    }
+
     public async Task CreateMenuItemAsync(MenuItemFormViewModel viewModel)
     {
         var menuItem = new MenuItem
         {
-            ItemName = viewModel.ItemName,
+            ItemName = NormalizeDisplayName(viewModel.ItemName),
             Description = viewModel.Description,
             Price = viewModel.Price,
             ImageUrl = viewModel.ImageUrl,
             IsAvailable = viewModel.IsAvailable,
+            IsDeleted = false,
             CategoryId = viewModel.CategoryId
         };
 
@@ -120,14 +205,15 @@ public class RestaurantMenuService : IRestaurantMenuService
 
     public async Task<bool> UpdateMenuItemAsync(int id, MenuItemFormViewModel viewModel)
     {
-        var menuItem = await _context.MenuItems.FindAsync(id);
+        var menuItem = await _context.MenuItems
+            .FirstOrDefaultAsync(item => item.MenuItemId == id && !item.IsDeleted);
 
         if (menuItem == null)
         {
             return false;
         }
 
-        menuItem.ItemName = viewModel.ItemName;
+        menuItem.ItemName = NormalizeDisplayName(viewModel.ItemName);
         menuItem.Description = viewModel.Description;
         menuItem.Price = viewModel.Price;
         menuItem.ImageUrl = viewModel.ImageUrl;
@@ -138,17 +224,34 @@ public class RestaurantMenuService : IRestaurantMenuService
         return true;
     }
 
-    public async Task<bool> DeleteMenuItemAsync(int id)
+    public async Task<MenuItemDiscontinueResult> DiscontinueMenuItemAsync(int id)
     {
-        var menuItem = await _context.MenuItems.FindAsync(id);
+        var menuItem = await _context.MenuItems
+            .FirstOrDefaultAsync(item => item.MenuItemId == id && !item.IsDeleted);
 
         if (menuItem == null)
         {
-            return false;
+            return MenuItemDiscontinueResult.NotFound;
         }
 
-        _context.MenuItems.Remove(menuItem);
+        menuItem.IsDeleted = true;
+        menuItem.IsAvailable = false;
         await _context.SaveChangesAsync();
-        return true;
+        return MenuItemDiscontinueResult.Discontinued;
+    }
+
+    private static string NormalizeMenuItemName(string itemName)
+    {
+        return itemName.Trim().ToLowerInvariant();
+    }
+
+    private static string NormalizeDisplayName(string itemName)
+    {
+        return itemName.Trim();
+    }
+
+    private static string? NormalizeNullableDisplayText(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

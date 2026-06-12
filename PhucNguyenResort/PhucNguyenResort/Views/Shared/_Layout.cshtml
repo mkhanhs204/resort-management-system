@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,11 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PhucNguyenResort</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
 
-    <!-- Css Styles -->
     <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/elegant-icons.css" type="text/css">
@@ -22,23 +21,24 @@
     <link rel="stylesheet" href="~/css/style.css" type="text/css">
 </head>
 <body>
-    <!-- Page Preloder -->
     <div id="preloder">
         <div class="loader"></div>
     </div>
 
-    <!-- Offcanvas Menu Section Begin -->
     <div class="offcanvas-menu-overlay"></div>
     <div class="canvas-open">
         <i class="icon_menu"></i>
     </div>
+
     <div class="offcanvas-menu-wrapper">
         <div class="canvas-close">
             <i class="icon_close"></i>
         </div>
+
         <div class="search-icon search-switch">
             <i class="icon_search"></i>
         </div>
+
         <div class="header-configure-area">
             <div class="language-option">
                 <img src="~/img/flag.jpg" alt="">
@@ -51,11 +51,28 @@
             </div>
             <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
         </div>
+
+        <!-- Mobile Menu -->
         <nav class="mainmenu mobile-menu">
             <ul>
-                <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
-                <li><a href="./rooms.html">Phòng Ngủ</a></li>
-                <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
+                <li class="active">
+                    <a asp-area="" asp-controller="Home" asp-action="Index">
+                        Trang Chủ
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Home" asp-action="SearchRooms">
+                        Phòng Ngủ
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-area="" asp-controller="Home" asp-action="AboutUs">
+                        Về Chúng Tôi
+                    </a>
+                </li>
+
                 <li>
                     <a href="./pages.html">Trang</a>
                     <ul class="dropdown">
@@ -65,6 +82,7 @@
                         <li><a href="#">Phòng Premium</a></li>
                     </ul>
                 </li>
+
                 <li><a href="./blog.html">Tin Tức</a></li>
                 <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
                 <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
@@ -81,18 +99,22 @@
                 }
             </ul>
         </nav>
+
         <div id="mobile-menu-wrap"></div>
+
         <div class="top-social">
             <a href="#"><i class="fa fa-facebook"></i></a>
             <a href="#"><i class="fa fa-twitter"></i></a>
             <a href="#"><i class="fa fa-tripadvisor"></i></a>
             <a href="#"><i class="fa fa-instagram"></i></a>
         </div>
+
         <ul class="top-widget">
             <li><i class="fa fa-phone"></i> (12) 345 67890</li>
             <li><i class="fa fa-envelope"></i> info.colorlib@gmail.com</li>
         </ul>
     </div>
+
     <!-- Offcanvas Menu Section End -->
     <!-- Header Section Begin -->
     <header class="header-section">
@@ -105,6 +127,7 @@
                             <li><i class="fa fa-envelope"></i> info.colorlib@gmail.com</li>
                         </ul>
                     </div>
+
                     <div class="col-lg-6">
                         <div class="tn-right">
                             <div class="top-social">
@@ -113,7 +136,9 @@
                                 <a href="#"><i class="fa fa-tripadvisor"></i></a>
                                 <a href="#"><i class="fa fa-instagram"></i></a>
                             </div>
+
                             <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
+
                             <div class="language-option">
                                 <img src="~/img/flag.jpg" alt="">
                                 <span>VN <i class="fa fa-angle-down"></i></span>
@@ -129,6 +154,7 @@
             </div>
         </div>
 
+        <!-- Desktop Menu -->
         <div class="menu-item">
             <div class="container">
                 <div class="row">
@@ -139,13 +165,29 @@
                             </a>
                         </div>
                     </div>
+
                     <div class="col-lg-10">
                         <div class="nav-menu">
                             <nav class="mainmenu">
                                 <ul>
-                                    <li class="active"><a asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
-                                    <li><a href="./rooms.html">Phòng Ngủ</a></li>
-                                    <li><a asp-area="" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
+                                    <li class="active">
+                                        <a asp-area="" asp-controller="Home" asp-action="Index">
+                                            Trang Chủ
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a asp-controller="Home" asp-action="SearchRooms">
+                                            Phòng Ngủ
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a asp-area="" asp-controller="Home" asp-action="AboutUs">
+                                            Về Chúng Tôi
+                                        </a>
+                                    </li>
+
                                     <li>
                                         <a href="./pages.html">Trang</a>
                                         <ul class="dropdown">
@@ -155,6 +197,7 @@
                                             <li><a href="#">Phòng Premium</a></li>
                                         </ul>
                                     </li>
+
                                     <li><a href="./blog.html">Tin Tức</a></li>
                                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
@@ -173,8 +216,14 @@
                                         <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
                                         <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
                                     }
+                                    <li>
+    <a asp-area="" asp-controller="Profile" asp-action="Index">
+        My Profile
+    </a>
+</li>
                                 </ul>
                             </nav>
+
                             <div class="nav-right search-switch">
                                 <i class="icon_search"></i>
                             </div>
