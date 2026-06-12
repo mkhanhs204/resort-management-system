@@ -4,6 +4,7 @@ public enum FoodOrderCreateStatus
 {
     Created,
     BookingNotFound,
+    BookingNotCheckedIn,
     NoItems,
     InvalidQuantity,
     MenuItemUnavailable

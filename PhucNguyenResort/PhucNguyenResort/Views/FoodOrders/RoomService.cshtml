@@ -1,0 +1,105 @@
+@model PhucNguyenResort.ViewModels.FoodOrders.RoomServiceOrderViewModel
+
+@{
+    ViewData["Title"] = "Room Service";
+}
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Room Service</h1>
+        <a asp-controller="RestaurantMenus" asp-action="Index" class="btn btn-outline-secondary">Manage menu</a>
+    </div>
+
+    <form asp-action="RoomService" method="get" class="row g-2 align-items-end mb-4">
+        <div class="col-md-4">
+            <label asp-for="BookingId" class="form-label"></label>
+            <input asp-for="BookingId" class="form-control" placeholder="Checked-in booking id" />
+            <span asp-validation-for="BookingId" class="text-danger"></span>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Load menu</button>
+        </div>
+    </form>
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    @if (Model.BookingId > 0)
+    {
+        <div class="alert @(Model.CanPlaceOrder ? "alert-success" : "alert-warning")">
+            <div>Booking #@Model.BookingId</div>
+            @if (!string.IsNullOrWhiteSpace(Model.CustomerName) || !string.IsNullOrWhiteSpace(Model.RoomNumber))
+            {
+                <div>@Model.CustomerName - Room @Model.RoomNumber</div>
+            }
+            @if (Model.BookingStatus.HasValue)
+            {
+                <div>Status: @Model.BookingStatus</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Message))
+            {
+                <div>@Model.Message</div>
+            }
+        </div>
+    }
+
+    @if (Model.CanPlaceOrder)
+    {
+        @if (Model.MenuItems.Any())
+        {
+            <form asp-action="RoomService" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="BookingId" type="hidden" />
+
+                @{
+                    var groupedItems = Model.MenuItems
+                        .Select((item, index) => new { Item = item, Index = index })
+                        .GroupBy(item => item.Item.CategoryName);
+                }
+
+                @foreach (var category in groupedItems)
+                {
+                    <h2 class="h5 mt-4">@category.Key</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th class="text-end">Price</th>
+                                    <th style="width: 160px;">Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var entry in category)
+                                {
+                                    <tr>
+                                        <td>
+                                            @entry.Item.ItemName
+                                            <input name="MenuItems[@entry.Index].MenuItemId" value="@entry.Item.MenuItemId" type="hidden" />
+                                            <input name="MenuItems[@entry.Index].ItemName" value="@entry.Item.ItemName" type="hidden" />
+                                            <input name="MenuItems[@entry.Index].CategoryName" value="@entry.Item.CategoryName" type="hidden" />
+                                            <input name="MenuItems[@entry.Index].Price" value="@entry.Item.Price" type="hidden" />
+                                        </td>
+                                        <td class="text-end">@entry.Item.Price.ToString("N0")</td>
+                                        <td>
+                                            <input name="MenuItems[@entry.Index].Quantity" value="@entry.Item.Quantity" class="form-control" type="number" min="0" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary">Place room service order</button>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-info">No menu items are currently available.</div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
