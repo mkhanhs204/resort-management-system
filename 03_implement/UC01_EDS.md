@@ -18,8 +18,8 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 ## CHANGELOG
 **Policy 4.4 — Immutable History**: Không bao giờ xóa thông tin cũ. Mọi thay đổi phải ghi vào bảng này.
 
-| Ngày | Người thực hiện | Nội dung thay đổi |
-| --- | --- | --- |
+| Ngày       | Người thực hiện                 | Nội dung thay đổi             |
+| ------------| ---------------------------------| -------------------------------|
 | 2026-06-08 | `Student 1 - Backend Developer` | Tạo tài liệu lần đầu cho UC01 |
 
 ## MỤC LỤC
@@ -76,9 +76,9 @@ Mô tả ngắn gọn mục đích của module, phạm vi nghiệp vụ và lý
 Hệ thống được chia làm nhiều module (phục vụ frontend và có thể mobile app tương lai). Cần một phương thức xác thực phi trạng thái (stateless) để dễ scale và không phụ thuộc vào bộ nhớ server.
 
 **Các phương án đã xem xét (Options Considered)**
-| Phương án | Mô tả | Ưu điểm | Nhược điểm |
-| --- | --- | --- | --- |
-| Session/Cookie | Lưu session trên Redis/Database | + Dễ revoke quyền | - Yêu cầu Redis/DB lookup mỗi request, stateful |
+| Phương án            | Mô tả                              | Ưu điểm                                               | Nhược điểm                                           |
+| ----------------------| ------------------------------------| -------------------------------------------------------| ------------------------------------------------------|
+| Session/Cookie       | Lưu session trên Redis/Database    | + Dễ revoke quyền                                     | - Yêu cầu Redis/DB lookup mỗi request, stateful      |
 | JWT (JSON Web Token) | Client lưu token và gửi kèm Header | + Stateless, dễ scale, tích hợp tốt với microservices | - Khó revoke token trước khi hết hạn (cần blacklist) |
 
 **Quyết định (Decision)**

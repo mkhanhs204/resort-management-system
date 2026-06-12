@@ -65,11 +65,11 @@ Mô tả ngắn gọn mục đích của module, phạm vi nghiệp vụ và lý
 ## 3. Architecture Decision Records (ADR)
 
 ### ADR-001 — Phương pháp tính số lượng phòng trống
-| Field | Value |
-| --- | --- |
-| Status | Accepted |
+| Field    | Value               |
+| ----------| ---------------------|
+| Status   | Accepted            |
 | Deciders | Principal Architect |
-| Date | 2026-06-11 |
+| Date     | 2026-06-11          |
 
 **Bối cảnh (Context)**
 Cần xác định thuật toán tính số phòng trống (Available Rooms) cho một `CategoryId` trong khoảng thời gian `[CheckInDate, CheckOutDate]`.

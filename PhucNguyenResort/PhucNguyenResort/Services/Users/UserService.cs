@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Models;
-using PhucNguyenResort.Services.Users;
 
 namespace PhucNguyenResort.Services.Users
 {
@@ -16,9 +15,9 @@ namespace PhucNguyenResort.Services.Users
 
         public async Task<IEnumerable<User>> GetAllStaffAsync()
         {
-            // RoleId 3 is Customer. We want all other roles.
             return await _context.Users
                 .Include(u => u.Role)
+                .Where(u => u.Role != null && u.Role.RoleName != "Customer")
                 .ToListAsync();
         }
 
@@ -26,7 +25,7 @@ namespace PhucNguyenResort.Services.Users
         {
             return await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.UserId == id && u.RoleId != 3);
+                .FirstOrDefaultAsync(u => u.UserId == id && u.Role != null && u.Role.RoleName != "Customer");
         }
 
         public async Task<User> AddStaffAsync(User user)
@@ -44,7 +43,10 @@ namespace PhucNguyenResort.Services.Users
 
         public async Task ToggleStaffStatusAsync(int id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id && u.RoleId != 3);
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.UserId == id && u.Role != null && u.Role.RoleName != "Customer");
+
             if (user != null)
             {
                 user.IsActive = !user.IsActive;
