@@ -5,7 +5,7 @@ using PhucNguyenResort.ViewModels.Tours;
 using System.Web;
 using Xunit;
 
-namespace ManagerTourTesting.Tours
+namespace PhucNguyenResort.Tests.Tours
 {
     public class TourSecurityTests
     {
