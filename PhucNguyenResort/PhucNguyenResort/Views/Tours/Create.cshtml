@@ -4,65 +4,156 @@
     ViewData["Title"] = "Create Tour";
 }
 
-<div class="container mt-5 mb-5">
-    <h2>Create Tour</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                
-                <div class="form-group mb-3">
-                    <label asp-for="TourName" class="control-label">Tour Name</label>
-                    <input asp-for="TourName" class="form-control" />
-                    <span asp-validation-for="TourName" class="text-danger"></span>
-                </div>
-                
-                <div class="form-group mb-3">
-                    <label asp-for="Description" class="control-label">Description</label>
-                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-                
-                <div class="form-group mb-3">
-                    <label asp-for="Price" class="control-label">Price</label>
-                    <input asp-for="Price" type="number" step="0.01" class="form-control" />
-                    <span asp-validation-for="Price" class="text-danger"></span>
-                </div>
-                
-                <div class="form-group mb-3">
-                    <label asp-for="MaxCapacity" class="control-label">Max Capacity</label>
-                    <input asp-for="MaxCapacity" type="number" class="form-control" />
-                    <span asp-validation-for="MaxCapacity" class="text-danger"></span>
+<div class="page-header">
+    <h2><i class="fa fa-plus-circle"></i> Create New Tour</h2>
+    <p class="text-muted">Add a new tour to the catalog. Fields marked <span class="text-danger">*</span> are required.</p>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <strong>Tour Information</strong>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" id="create-tour-form">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Tour Name -->
+                    <div class="form-group mb-3">
+                        <label asp-for="TourName" class="control-label font-weight-bold">
+                            Tour Name <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="TourName" class="form-control" id="input-tour-name"
+                               placeholder="e.g. Hạ Long Bay Cruise" maxlength="100" />
+                        <span asp-validation-for="TourName" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Description" class="control-label font-weight-bold">Description</label>
+                        <textarea asp-for="Description" class="form-control" id="input-description"
+                                  rows="4" placeholder="Describe the tour activities, highlights..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Price + Capacity -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Price" class="control-label font-weight-bold">
+                                    Price (VND) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="Price" type="number" step="1000" min="0" max="999999999"
+                                           class="form-control" id="input-price" placeholder="0" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">₫</span>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Price" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="MaxCapacity" class="control-label font-weight-bold">
+                                    Max Capacity <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="MaxCapacity" type="number" min="1" max="1000"
+                                           class="form-control" id="input-max-capacity" placeholder="1–1000" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">pax</span>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="MaxCapacity" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duration + Location -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="DurationHours" class="control-label font-weight-bold">
+                                    Duration <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="DurationHours" type="number" min="1" max="1000"
+                                           class="form-control" id="input-duration-hours" placeholder="1–1000" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">hours</span>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="DurationHours" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Location" class="control-label font-weight-bold">Location</label>
+                                <input asp-for="Location" class="form-control" id="input-location"
+                                       placeholder="e.g. Hạ Long Bay, Quảng Ninh" maxlength="255" />
+                                <span asp-validation-for="Location" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image URL -->
+                    <div class="form-group mb-3">
+                        <label asp-for="ImageUrl" class="control-label font-weight-bold">Image URL</label>
+                        <input asp-for="ImageUrl" class="form-control" id="input-image-url"
+                               placeholder="/images/tours/halong.jpg" maxlength="255"
+                               oninput="previewImage(this.value)" />
+                        <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                    </div>
                 </div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="DurationHours" class="control-label">Duration (Hours)</label>
-                    <input asp-for="DurationHours" type="number" class="form-control" />
-                    <span asp-validation-for="DurationHours" class="text-danger"></span>
+                <!-- Live Image Preview -->
+                <div class="col-md-4">
+                    <label class="control-label font-weight-bold">Image Preview</label>
+                    <div id="image-preview-container"
+                         style="border:2px dashed #ddd;border-radius:8px;min-height:200px;display:flex;align-items:center;justify-content:center;background:#f8f9fa;">
+                        <div id="preview-placeholder" class="text-muted text-center">
+                            <i class="fa fa-image fa-3x mb-2"></i><br/>
+                            <small>Enter image URL to preview</small>
+                        </div>
+                        <img id="preview-img" src="" alt="Preview" class="img-fluid rounded d-none"
+                             style="max-height:200px;object-fit:cover;" />
+                    </div>
                 </div>
-                
-                <div class="form-group mb-3">
-                    <label asp-for="Location" class="control-label">Location</label>
-                    <input asp-for="Location" class="form-control" />
-                    <span asp-validation-for="Location" class="text-danger"></span>
-                </div>
+            </div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="ImageUrl" class="control-label">Image URL</label>
-                    <input asp-for="ImageUrl" class="form-control" />
-                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mt-4">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-                </div>
-            </form>
-        </div>
+            <hr />
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" id="btn-submit-create">
+                    <i class="fa fa-save"></i> Create Tour
+                </button>
+                <a asp-action="Index" class="btn btn-secondary" id="btn-back-to-list">
+                    <i class="fa fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(url) {
+            var img = document.getElementById('preview-img');
+            var placeholder = document.getElementById('preview-placeholder');
+            if (url && url.trim() !== '') {
+                img.src = url;
+                img.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+                img.onerror = function () {
+                    img.classList.add('d-none');
+                    placeholder.classList.remove('d-none');
+                };
+            } else {
+                img.classList.add('d-none');
+                placeholder.classList.remove('d-none');
+            }
+        }
+    </script>
 }

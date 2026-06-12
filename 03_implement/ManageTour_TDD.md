@@ -109,7 +109,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: CRITICAL
 **Feature Under Test**: `ToursController.Create(TourCreateVM)` → `TourService.AddTourAsync()`
 **Test File**: `Tests/Tours/CreateTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-001
 
 **Preconditions**:
@@ -139,7 +139,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ToursController.Create(TourCreateVM)` — ModelState validation
 **Test File**: `Tests/Tours/CreateTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-002
 
 **Preconditions**:
@@ -168,7 +168,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: MEDIUM
 **Feature Under Test**: `TourCreateVM` Data Annotation validation
 **Test File**: `Tests/Tours/TourValidationTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-003
 
 **Preconditions**:
@@ -200,7 +200,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ToursController.Index()` → `TourService.GetAllToursAsync()`
 **Test File**: `Tests/Tours/ListTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-004
 
 **Preconditions**:
@@ -224,7 +224,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ToursController.Details(int? id)`
 **Test File**: `Tests/Tours/DetailsTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-005
 
 **Preconditions**:
@@ -247,7 +247,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: MEDIUM
 **Feature Under Test**: `ToursController.Details(int? id)`
 **Test File**: `Tests/Tours/DetailsTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-006
 
 **Preconditions**:
@@ -273,7 +273,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ToursController.Edit(int id, TourEditVM model)` → `TourService.UpdateTourAsync()`
 **Test File**: `Tests/Tours/EditTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-007
 
 **Preconditions**:
@@ -297,7 +297,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: MEDIUM
 **Feature Under Test**: `ToursController.Edit(int id, TourEditVM model)`
 **Test File**: `Tests/Tours/EditTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-008
 
 **Preconditions**:
@@ -320,7 +320,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ToursController.DeleteConfirmed(int id)` → `TourService.DeleteTourAsync()`
 **Test File**: `Tests/Tours/DeleteTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-009
 
 **Preconditions**:
@@ -344,7 +344,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `TourService.DeleteTourAsync(int id)` — FK constraint handling
 **Test File**: `Tests/Tours/DeleteTourTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-010
 
 **Preconditions**:
@@ -376,7 +376,7 @@ Tour Catalog Management bao gồm các layer:
 **CWE**: CWE-79 — Cross-site Scripting (XSS)
 **Feature Under Test**: `ToursController.Create(TourCreateVM)` + Razor View rendering
 **Test File**: `Tests/Tours/TourSecurityTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-011
 
 **Preconditions**:
@@ -406,7 +406,7 @@ Tour Catalog Management bao gồm các layer:
 **CWE**: CWE-352 — Cross-Site Request Forgery (CSRF)
 **Feature Under Test**: `[ValidateAntiForgeryToken]` attribute trên Create/Edit/Delete POST
 **Test File**: `Tests/Tours/TourSecurityTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-012
 
 **Preconditions**:
@@ -434,7 +434,7 @@ Tour Catalog Management bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: Full flow: `Create → Index → Details → Edit → Delete`
 **Test File**: `Tests/Tours/TourIntegrationTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-001, TC-COND-004, TC-COND-005, TC-COND-007, TC-COND-009
 
 **Preconditions**:
@@ -478,7 +478,7 @@ Assert.Null(deleted);
 **Severity**: MEDIUM
 **Feature Under Test**: `TourService.AddTourAsync()` — concurrency safety
 **Test File**: `Tests/Tours/TourIntegrationTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 
 **Preconditions**:
 - SQL Server chạy.
