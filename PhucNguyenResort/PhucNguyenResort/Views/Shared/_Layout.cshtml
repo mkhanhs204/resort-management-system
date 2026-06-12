@@ -84,25 +84,19 @@
                 </li>
 
                 <li><a href="./blog.html">Tin Tức</a></li>
+                <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
+                <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
 
-                <li>
-                    <a asp-area="" asp-controller="Home" asp-action="Contact">
-                        Liên Hệ
-                    </a>
-                </li>
-
-                <li>
-                    <a asp-controller="Dashboard" asp-action="Index">
-                        Quản Trị
-                    </a>
-                </li>
-
-                <li>
-                    <a asp-area="" asp-controller="Profile" asp-action="Index">
-                        <i class="fa fa-user-circle-o"></i> My Profile
-                    </a>
-                </li>
-
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <li><a href="#">Xin chào, @User.Identity.Name</a></li>
+                    <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                }
+                else
+                {
+                    <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                    <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                }
             </ul>
         </nav>
 
@@ -121,6 +115,8 @@
         </ul>
     </div>
 
+    <!-- Offcanvas Menu Section End -->
+    <!-- Header Section Begin -->
     <header class="header-section">
         <div class="top-nav">
             <div class="container">
@@ -203,26 +199,28 @@
                                     </li>
 
                                     <li><a href="./blog.html">Tin Tức</a></li>
+                                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
+                                    {
+                                        <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+                                    }
+
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                    {
+                                        <li><a href="#">Xin chào, @User.Identity.Name</a></li>
+                                        <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                                        <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                                    }
                                     <li>
-                                        <a asp-area="" asp-controller="Home" asp-action="Contact">
-                                            Liên Hệ
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a asp-controller="Dashboard" asp-action="Index">
-                                            Quản Trị
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a asp-area="" asp-controller="Profile" asp-action="Index">
-                                            My Profile
-                                        </a>
-                                    </li>
-
-                                    
+    <a asp-area="" asp-controller="Profile" asp-action="Index">
+        My Profile
+    </a>
+</li>
                                 </ul>
                             </nav>
 
@@ -235,9 +233,92 @@
             </div>
         </div>
     </header>
-
+    <!-- Header End -->
+    <!-- Main Body Area -->
     @RenderBody()
-
+    <!-- Main Body Area End -->
+    <!-- Footer Section Begin -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="footer-text">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="ft-about">
+                            <div class="logo">
+                                <a href="#">
+                                    <img src="~/img/footer-logo.png" alt="">
+                                </a>
+                            </div>
+                            <p>Chúng tôi kết nối và truyền cảm hứng<br /> cho hàng triệu du khách mỗi ngày</p>
+                            <div class="fa-social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-tripadvisor"></i></a>
+                                <a href="#"><i class="fa fa-instagram"></i></a>
+                                <a href="#"><i class="fa fa-youtube-play"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 offset-lg-1">
+                        <div class="ft-contact">
+                            <h6>Liên Hệ</h6>
+                            <ul>
+                                <li>(12) 345 67890</li>
+                                <li>info.colorlib@gmail.com</li>
+                                <li>856 Cordia Extension Apt. 356, Lake, United State</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 offset-lg-1">
+                        <div class="ft-newslatter">
+                            <h6>Đăng Ký Nhận Tin</h6>
+                            <p>Nhận thông tin cập nhật và ưu đãi mới nhất.</p>
+                            <form action="#" class="fn-form">
+                                <input type="text" placeholder="Email của bạn">
+                                <button type="submit"><i class="fa fa-send"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="copyright-option">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <ul>
+                            <li><a href="#">Liên Hệ</a></li>
+                            <li><a href="#">Điều Khoản</a></li>
+                            <li><a href="#">Bảo Mật</a></li>
+                            <li><a href="#">Chính Sách Môi Trường</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="co-text">
+                            <p>
+                                Copyright &copy;<script>document.write(new Date().getFullYear());</script>
+                                All rights reserved | This template is made with
+                                <i class="fa fa-heart" aria-hidden="true"></i> by
+                                <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+    <!-- Search model Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch"><i class="icon_close"></i></div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Tìm kiếm.....">
+            </form>
+        </div>
+    </div>
+    <!-- Search model end -->
+    <!-- Js Plugins -->
     <script src="~/js/jquery-3.3.1.min.js"></script>
     <script src="~/js/bootstrap.min.js"></script>
     <script src="~/js/jquery.magnific-popup.min.js"></script>
