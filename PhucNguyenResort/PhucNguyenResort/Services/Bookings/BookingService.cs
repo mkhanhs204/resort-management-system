@@ -63,6 +63,33 @@ namespace PhucNguyenResort.Services.Bookings
             };
 
             _context.Bookings.Add(booking);
+
+            // Xử lý tạo TourBookings nếu khách có chọn Add-on
+            if (request.SelectedTourScheduleIds != null && request.SelectedTourScheduleIds.Any())
+            {
+                // Lấy thông tin các Schedule để tính tiền
+                var schedules = await _context.TourSchedules
+                    .Include(s => s.Tour)
+                    .Where(s => request.SelectedTourScheduleIds.Contains(s.ScheduleId))
+                    .ToListAsync();
+
+                foreach (var schedule in schedules)
+                {
+                    if (schedule.Tour != null)
+                    {
+                        var tourBooking = new TourBooking
+                        {
+                            Booking = booking, // EF Core sẽ tự link BookingId khi booking được save
+                            UserId = userId,
+                            ScheduleId = schedule.ScheduleId,
+                            Participants = request.NumberOfGuests,
+                            TotalAmount = schedule.Tour.Price * request.NumberOfGuests,
+                            BookingStatus = TourBookingStatus.Pending
+                        };
+                        _context.TourBookings.Add(tourBooking);
+                    }
+                }
+            }
             
             try
             {

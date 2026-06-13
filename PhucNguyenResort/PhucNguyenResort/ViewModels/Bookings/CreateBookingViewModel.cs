@@ -20,5 +20,8 @@ namespace PhucNguyenResort.ViewModels.Bookings
         
         [Range(1, 10)]
         public int NumberOfGuests { get; set; }
+
+        // Mảng lưu ID của các Tour Schedule mà khách chọn thêm
+        public List<int>? SelectedTourScheduleIds { get; set; }
     }
 }
