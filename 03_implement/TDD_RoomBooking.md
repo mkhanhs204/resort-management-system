@@ -6,10 +6,10 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 **Date**: 2026-06-12
 **Status**: Draft
 **Standard**: ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
-**Author**: AI Assistant - Developer
-**Reviewed by**: [ ] Tech Lead - Pending
-**DPO Sign-off**: [ ] Pending
-**Approved by**: [ ] Pending
+**Author**: Cuong
+**Reviewed by**: Khanh
+**DPO Sign-off**: Khanh
+**Approved by**: Cuong
 **Classification**: Internal - Confidential
 
 **References**:
@@ -82,11 +82,11 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 | TC-COND-005 | Hủy đặt phòng dưới 48h (Không hoàn cọc) | `CancelBookingAsync` | `BKG-TC-005` |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
-| Technique (ISO 29119-4) | Applied To | Rationale |
-| --- | --- | --- |
-| Equivalence Partitioning | `CheckInDate`, `CheckOutDate` | Phân vùng ngày hợp lệ và không hợp lệ |
-| Boundary Value Analysis | Thời gian hủy (48h) | Test đúng 48h, 47h59m, 48h01m |
-| Error Guessing | Concurrency `DbUpdateConcurrencyException` | Khách hàng bấm đúp, hoặc 2 khách đặt cùng lúc |
+| Technique (ISO 29119-4)  | Applied To                                 | Rationale                                     |
+| --------------------------| --------------------------------------------| -----------------------------------------------|
+| Equivalence Partitioning | `CheckInDate`, `CheckOutDate`              | Phân vùng ngày hợp lệ và không hợp lệ         |
+| Boundary Value Analysis  | Thời gian hủy (48h)                        | Test đúng 48h, 47h59m, 48h01m                 |
+| Error Guessing           | Concurrency `DbUpdateConcurrencyException` | Khách hàng bấm đúp, hoặc 2 khách đặt cùng lúc |
 
 ### TDS-05 — Test Data Requirements
 | Fixture ID | Type | Value / Logic | Mục đích |

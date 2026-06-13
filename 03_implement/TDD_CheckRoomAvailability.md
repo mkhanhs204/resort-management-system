@@ -8,7 +8,7 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 **Standard**: ISO/IEC/IEEE 29119-3:2021
 **Author**: Cuong
 **Reviewed by**: Khanh
-**DPO Sign-off**: N/A
+**DPO Sign-off**: Khanh
 **Approved by**: Cuong
 **Classification**: Internal - Confidential
 

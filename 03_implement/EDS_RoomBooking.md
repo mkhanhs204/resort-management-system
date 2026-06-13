@@ -1,19 +1,19 @@
 # ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
-| Field          | Value                    |
-| ----------------| --------------------------|
-| Document ID    | `SWP391-MOD2-IMP-002`    |
-| Version        | 1.0                      |
-| Date           | 2026-06-12               |
-| Status         | Draft                    |
-| Document Owner | Cuong                    |
-| Author         | AI Assistant - Developer |
-| Reviewed by    | Khanh                    |
-| DPO Sign-off   | Approve                  |
-| Approved by    | Cuong                    |
-| Last Review    | 2026-06-12               |
-| Based on EDS   | v2.0                     |
+| Field          | Value                 |
+| ----------------| -----------------------|
+| Document ID    | `SWP391-MOD2-IMP-002` |
+| Version        | 1.0                   |
+| Date           | 2026-06-12            |
+| Status         | Draft                 |
+| Document Owner | Cuong                 |
+| Author         | Cuong                 |
+| Reviewed by    | Khanh                 |
+| DPO Sign-off   | Khanh                 |
+| Approved by    | Cuong                 |
+| Last Review    | 2026-06-12            |
+| Based on EDS   | v2.0                  |
 
 ## CHANGELOG
 | Ngày | Người thực hiện | Nội dung thay đổi |
