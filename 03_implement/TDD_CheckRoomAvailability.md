@@ -61,13 +61,13 @@ Phạm vi của TDD spec này:
 | `HomeService.cs` | Logic `b.CheckInDate < checkOutDate && b.CheckOutDate > checkInDate` |
 
 ### TDS-03 — Test Conditions and Coverage Items
-| Condition ID | Test Condition | Coverage Item | Test Cases |
-| --- | --- | --- | --- |
-| TC-COND-001 | Tính toán cơ bản khi không có booking nào | `CheckAvailabilityAsync` | `ROOM-TC-001` |
-| TC-COND-002 | Booking không trùng ngày (trước/sau) | `CheckAvailabilityAsync` | `ROOM-TC-002` |
-| TC-COND-003 | Booking trùng lấp ngày | `CheckAvailabilityAsync` | `ROOM-TC-003` |
-| TC-COND-004 | Loại trừ phòng Maintenance | `CheckAvailabilityAsync` | `ROOM-TC-004` |
-| TC-COND-005 | Trạng thái Booking Cancelled/NoShow | `CheckAvailabilityAsync` | `ROOM-TC-005` |
+| Condition ID | Test Condition                            | Coverage Item            | Test Cases    |
+| --------------| -------------------------------------------| --------------------------| ---------------|
+| TC-COND-001  | Tính toán cơ bản khi không có booking nào | `CheckAvailabilityAsync` | `ROOM-TC-001` |
+| TC-COND-002  | Booking không trùng ngày (trước/sau)      | `CheckAvailabilityAsync` | `ROOM-TC-002` |
+| TC-COND-003  | Booking trùng lấp ngày                    | `CheckAvailabilityAsync` | `ROOM-TC-003` |
+| TC-COND-004  | Loại trừ phòng Maintenance                | `CheckAvailabilityAsync` | `ROOM-TC-004` |
+| TC-COND-005  | Trạng thái Booking Cancelled/NoShow       | `CheckAvailabilityAsync` | `ROOM-TC-005` |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 | Technique (ISO 29119-4) | Applied To | Rationale |
