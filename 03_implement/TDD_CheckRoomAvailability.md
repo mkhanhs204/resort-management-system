@@ -6,10 +6,10 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 **Date**: 2026-06-11
 **Status**: Approved
 **Standard**: ISO/IEC/IEEE 29119-3:2021
-**Author**: System Agent
-**Reviewed by**: Tech Lead
+**Author**: Cuong
+**Reviewed by**: Khanh
 **DPO Sign-off**: N/A
-**Approved by**: Principal Architect
+**Approved by**: Cuong
 **Classification**: Internal - Confidential
 
 **References**:
