@@ -2642,7 +2642,7 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("InvoiceId")
+                    b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("PaidAt")
@@ -2656,6 +2656,9 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("TourBookingId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TransactionCode")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -2663,6 +2666,8 @@ namespace PhucNguyenResort.Web.Migrations
                     b.HasKey("PaymentId");
 
                     b.HasIndex("InvoiceId");
+
+                    b.HasIndex("TourBookingId");
 
                     b.ToTable("Payments", (string)null);
 
@@ -4337,7 +4342,7 @@ namespace PhucNguyenResort.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TourBookingId"));
 
-                    b.Property<int>("BookingId")
+                    b.Property<int?>("BookingId")
                         .HasColumnType("int");
 
                     b.Property<string>("BookingStatus")
@@ -4357,11 +4362,16 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("TourBookingId");
 
                     b.HasIndex("BookingId");
 
                     b.HasIndex("ScheduleId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TourBookings", (string)null);
 
@@ -5449,10 +5459,16 @@ namespace PhucNguyenResort.Web.Migrations
                     b.HasOne("PhucNguyenResort.Models.Invoice", "Invoice")
                         .WithMany("Payments")
                         .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhucNguyenResort.Models.TourBooking", "TourBooking")
+                        .WithMany("Payments")
+                        .HasForeignKey("TourBookingId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Invoice");
+
+                    b.Navigation("TourBooking");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.Refund", b =>
@@ -5535,8 +5551,7 @@ namespace PhucNguyenResort.Web.Migrations
                     b.HasOne("PhucNguyenResort.Models.Booking", "Booking")
                         .WithMany("TourBookings")
                         .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("PhucNguyenResort.Models.TourSchedule", "Schedule")
                         .WithMany("TourBookings")
@@ -5544,9 +5559,16 @@ namespace PhucNguyenResort.Web.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhucNguyenResort.Models.User", "User")
+                        .WithMany("TourBookings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Booking");
 
                     b.Navigation("Schedule");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.TourSchedule", b =>
@@ -5662,6 +5684,11 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Navigation("TourSchedules");
                 });
 
+            modelBuilder.Entity("PhucNguyenResort.Models.TourBooking", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
             modelBuilder.Entity("PhucNguyenResort.Models.TourSchedule", b =>
                 {
                     b.Navigation("TourBookings");
@@ -5678,6 +5705,8 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("TableReservations");
+
+                    b.Navigation("TourBookings");
 
                     b.Navigation("UserProfile");
                 });
