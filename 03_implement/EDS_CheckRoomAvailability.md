@@ -1,19 +1,19 @@
 # ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
-| Field          | Value                           |
-| ----------------| ---------------------------------|
-| Document ID    | `PNR-ROOM-IMP-001`              |
-| Version        | 1.0                             |
-| Date           | 2026-06-11                      |
-| Status         | Approved                        |
-| Document Owner | Backend Team                    |
-| Author         | System Agent                    |
-| Reviewed by    | Tech Lead                       |
-| DPO Sign-off   | N/A (Không xử lý PII trực tiếp) |
-| Approved by    | Principal Architect             |
-| Last Review    | 2026-06-11                      |
-| Based on EDS   | v2.0                            |
+| Field          | Value              |
+| ----------------| --------------------|
+| Document ID    | `PNR-ROOM-IMP-001` |
+| Version        | 1.0                |
+| Date           | 2026-06-11         |
+| Status         | Approved           |
+| Document Owner | Cuong              |
+| Author         | Cuong              |
+| Reviewed by    | Khanh              |
+| DPO Sign-off   | Khanh              |
+| Approved by    | Cuong              |
+| Last Review    | 2026-06-11         |
+| Based on EDS   | v2.0               |
 
 ## CHANGELOG
 **Policy 4.4 — Immutable History**: Không bao giờ xóa thông tin cũ. Mọi thay đổi phải ghi vào bảng này.

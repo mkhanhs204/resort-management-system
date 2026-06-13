@@ -134,6 +134,11 @@ namespace PhucNguyenResort.Controllers
                 userToUpdate.PhoneNumber = model.PhoneNumber;
                 userToUpdate.RoleId = model.RoleId;
 
+                if (!string.IsNullOrEmpty(model.Password))
+                {
+                    userToUpdate.PasswordHash = PasswordHelper.HashPassword(userToUpdate, model.Password);
+                }
+
                 await _userService.UpdateStaffAsync(userToUpdate);
                 return RedirectToAction(nameof(Index));
             }

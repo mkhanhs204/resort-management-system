@@ -84,13 +84,13 @@ Mô tả phạm vi của TDD spec này: component nào được kiểm thử, la
 ### TDS-02 — Test Basis / Cơ sở Kiểm thử
 Điều kiện kiểm thử được derive từ các nguồn sau:
 
-| Source | Items Derived |
-| --- | --- |
-| `SRS.md` UC-XX | *(hành vi người dùng / business rule)* |
-| `ADR-0XX` | *(architecture constraint)* |
-| `BR-XXXX-001` | *(business rule số hiệu)* |
-| Luật 91/2025 Điều X | *(yêu cầu pháp lý)* |
-| NĐ 356/2025 Điều X | *(yêu cầu nghị định)* |
+| Source              | Items Derived                          |
+| ---------------------| ----------------------------------------|
+| `SRS.md` UC-XX      | *(hành vi người dùng / business rule)* |
+| `ADR-0XX`           | *(architecture constraint)*            |
+| `BR-XXXX-001`       | *(business rule số hiệu)*              |
+| Luật 91/2025 Điều X | *(yêu cầu pháp lý)*                    |
+| NĐ 356/2025 Điều X  | *(yêu cầu nghị định)*                  |
 | `[TECH-SPEC-ID]` §X | *(algorithm / logic từ spec kỹ thuật)* |
 
 ### TDS-03 — Test Conditions and Coverage Items
