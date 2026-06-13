@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using PhucNguyenResort.ViewModels.Tours;
 using Xunit;
 
-namespace ManagerTourTesting.Tours
+namespace PhucNguyenResort.Tests.Tours
 {
     public class TourValidationTests
     {

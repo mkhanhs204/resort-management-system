@@ -2,12 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
+using PhucNguyenResort.Helpers;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Users;
 using PhucNguyenResort.ViewModels.Staff;
-
+using PhucNguyenResort.Helpers;
+using Microsoft.AspNetCore.Authorization;
 namespace PhucNguyenResort.Controllers
 {
+    [Authorize(Roles = "System Admin,Business Manager")]
     public class StaffAccountsController : Controller
     {
         private readonly IUserService _userService;
@@ -58,12 +61,13 @@ namespace PhucNguyenResort.Controllers
                 {
                     FullName = model.FullName,
                     Email = model.Email,
-                    PasswordHash = model.Password, // Simple for now
                     PhoneNumber = model.PhoneNumber,
                     RoleId = model.RoleId,
                     IsActive = true,
                     CreatedAt = DateTime.Now
                 };
+
+                user.PasswordHash = PasswordHelper.HashPassword(user, model.Password);
 
                 await _userService.AddStaffAsync(user);
                 return RedirectToAction(nameof(Index));

@@ -7,9 +7,9 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ManagerTourTesting
+namespace PhucNguyenResort.Tests
 {
-    public class ManagerTourTesting
+    public class HomeServiceTests
     {
         private DbContextOptions<ResortDbContext> CreateNewContextOptions()
         {
