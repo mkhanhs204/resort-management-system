@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization; // Dùng để chặn truy cập bừa bãi
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.ViewModels.Users;
+using System.Security.Claims; // Thư viện bắt buộc để đọc dữ liệu từ Cookie đăng nhập
 using System.Text;
 
 namespace PhucNguyenResort.Controllers
 {
+    [Authorize] // Bổ sung: Chỉ những ai đã đăng nhập thành công mới được phép gọi vào Controller này
     public class ProfileController : Controller
     {
         private readonly ResortDbContext _context;
@@ -21,26 +24,33 @@ namespace PhucNguyenResort.Controllers
         // GET: /Profile
         public async Task<IActionResult> Index()
         {
-            // GIẢ ĐỊNH: Lấy UserId từ Session/Cookie hoặc User.Identity sau khi đăng nhập.
-            // Để test giao diện, bạn có thể thay bằng 1 ID tài khoản khách hàng thực tế có trong DB.
-            int currentUserId = 1;
+            // 1. Đọc UserId động từ các mảnh thông tin (Claims) lưu trong Cookie đăng nhập
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int currentUserId))
+            {
+                // Nếu Cookie lỗi hoặc không tìm thấy ID hợp lệ, yêu cầu đăng nhập lại
+                return RedirectToAction("Login", "Account");
+            }
+
+            // 2. Truy vấn dữ liệu từ DB theo ID tài khoản vừa lấy động
             var user = await _context.Users
                 .Include(u => u.UserProfile)
                 .FirstOrDefaultAsync(u => u.UserId == currentUserId);
 
             if (user == null)
             {
-                return NotFound("Không tìm thấy thông tin tài khoản.");
+                return NotFound("Không tìm thấy dữ liệu tài khoản trong hệ thống.");
             }
 
-            // Giải mã Passport từ byte[] sang string để hiển thị
+            // 3. Giải mã Passport từ dạng byte[] sang chuỗi kí tự (string) hiển thị lên Form
             string? passportStr = null;
             if (user.UserProfile?.PassportNumber != null)
             {
                 passportStr = Encoding.UTF8.GetString(user.UserProfile.PassportNumber);
             }
 
+            // 4. Gán toàn bộ dữ liệu vào ViewModel để ném sang trang hiển thị
             var viewModel = new ProfileVM
             {
                 UserId = user.UserId,
@@ -62,6 +72,13 @@ namespace PhucNguyenResort.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(ProfileVM model)
         {
+            // Bảo mật: Đảm bảo người dùng không cố tình sửa UserId ẩn (Hidden Field) trên Form để phá tài khoản người khác
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || model.UserId.ToString() != userIdClaim.Value)
+            {
+                return Forbid("Hành động không hợp lệ. Bạn không có quyền chỉnh sửa hồ sơ này.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View("Index", model);
@@ -73,26 +90,26 @@ namespace PhucNguyenResort.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound("Tài khoản cần cập nhật không tồn tại.");
             }
 
-            // 1. Cập nhật bảng User
+            // 1. Cập nhật thông tin bảng lõi User
             user.FullName = model.FullName;
             user.PhoneNumber = model.PhoneNumber;
 
-            // 2. Kiểm tra và khởi tạo UserProfile nếu chưa tồn tại (One-to-One)
+            // 2. Đề phòng tài khoản mới tinh chưa từng nhập hồ sơ chi tiết (UserProfile trống)
             if (user.UserProfile == null)
             {
                 user.UserProfile = new UserProfile { UserId = user.UserId };
                 _context.UserProfiles.Add(user.UserProfile);
             }
 
-            // 3. Cập nhật thông tin chi tiết
+            // 3. Cập nhật thông tin bổ sung sang bảng vệ tinh UserProfile
             user.UserProfile.DateOfBirth = model.DateOfBirth;
             user.UserProfile.Nationality = model.Nationality;
             user.UserProfile.Address = model.Address;
 
-            // Chuyển chuỗi hộ chiếu thành byte[] để lưu bảo mật vào DB
+            // Đóng gói chuỗi Hộ chiếu nhập từ form thành mảng byte[] bảo mật trước khi cất vào DB
             if (!string.IsNullOrEmpty(model.PassportNumberString))
             {
                 user.UserProfile.PassportNumber = Encoding.UTF8.GetBytes(model.PassportNumberString);
@@ -102,17 +119,17 @@ namespace PhucNguyenResort.Controllers
                 user.UserProfile.PassportNumber = null;
             }
 
-            // 4. Xử lý File tải lên (Upload Passport Image) nếu có
+            // 4. Xử lý logic tải ảnh lên của hệ thống (Upload File)
             if (model.PassportImageFile != null && model.PassportImageFile.Length > 0)
             {
-                // Tạo thư mục lưu trữ trong wwwroot/uploads/passports
+                // Chỉ định thư mục lưu trữ thực tế trên máy chủ
                 string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "passports");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                // Đổi tên file để tránh trùng lặp
+                // Gán mã định danh duy nhất Guid để tránh tình trạng trùng lặp tên file giữa các khách hàng
                 string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.PassportImageFile.FileName);
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -121,10 +138,11 @@ namespace PhucNguyenResort.Controllers
                     await model.PassportImageFile.CopyToAsync(fileStream);
                 }
 
-                // Lưu đường dẫn tương đối vào database
+                // Cập nhật đường dẫn URL truy cập ảnh mới vào cơ sở dữ liệu
                 user.UserProfile.PassportImage = "/uploads/passports/" + uniqueFileName;
             }
 
+            // 5. Đồng bộ hóa và lưu toàn bộ thay đổi xuống Database
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Cập nhật hồ sơ thông tin thành công!";
 
