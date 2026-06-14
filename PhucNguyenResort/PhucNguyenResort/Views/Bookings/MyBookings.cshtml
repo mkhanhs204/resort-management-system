@@ -1,0 +1,139 @@
+@model IEnumerable<PhucNguyenResort.Models.Booking>
+
+@{
+    ViewData["Title"] = "Lịch Sử Đặt Phòng";
+}
+
+<div class="breadcrumb-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-text">
+                    <h2>Lịch Sử Đặt Phòng</h2>
+                    <div class="bt-option">
+                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
+                        <span>Lịch Sử Đặt Phòng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="spad">
+    <div class="container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+        
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="text-center mt-5 mb-5">
+                <h4>Bạn chưa có đặt phòng nào.</h4>
+                <a asp-controller="Home" asp-action="SearchRooms" class="btn btn-primary mt-3">Tìm Phòng Ngay</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Mã BKG</th>
+                            <th>Phòng</th>
+                            <th>Thời Gian</th>
+                            <th>Tour Kèm Theo</th>
+                            <th>Tổng Tiền</th>
+                            <th>Trạng Thái</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model)
+                        {
+                            <tr>
+                                <td>#@booking.BookingId</td>
+                                <td>
+                                    <strong>@booking.Room?.Category?.CategoryName</strong><br />
+                                    <span class="text-muted small">Phòng: @booking.Room?.RoomNumber</span>
+                                </td>
+                                <td>
+                                    In: @booking.CheckInDate.ToString("dd/MM/yyyy")<br />
+                                    Out: @booking.CheckOutDate.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    @if (booking.TourBookings != null && booking.TourBookings.Any())
+                                    {
+                                        <ul class="list-unstyled mb-0 small">
+                                            @foreach (var tb in booking.TourBookings)
+                                            {
+                                                <li>- @tb.Schedule?.Tour?.TourName (@tb.TotalAmount?.ToString("N0")đ)</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Không có</span>
+                                    }
+                                </td>
+                                <td>
+                                    @booking.TotalAmount?.ToString("N0") VNĐ<br/>
+                                    <span class="text-info small">Cọc: @booking.DepositAmount?.ToString("N0") VNĐ</span>
+                                </td>
+                                <td>
+                                    @switch (booking.BookingStatus)
+                                    {
+                                        case PhucNguyenResort.Enums.BookingStatus.Reserved:
+                                            <span class="badge badge-primary">Đã Đặt</span>
+                                            break;
+                                        case PhucNguyenResort.Enums.BookingStatus.CheckedIn:
+                                            <span class="badge badge-success">Đang Lưu Trú</span>
+                                            break;
+                                        case PhucNguyenResort.Enums.BookingStatus.CheckedOut:
+                                            <span class="badge badge-secondary">Đã Trả Phòng</span>
+                                            break;
+                                        case PhucNguyenResort.Enums.BookingStatus.Cancelled:
+                                            <span class="badge badge-danger">Đã Hủy</span>
+                                            break;
+                                        case PhucNguyenResort.Enums.BookingStatus.NoShow:
+                                            <span class="badge badge-dark">Không Đến</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved && booking.CheckInDate > DateTime.Now)
+                                    {
+                                        var isMoreThan48h = (booking.CheckInDate - DateTime.Now).TotalHours > 48;
+                                        var confirmMsg = isMoreThan48h 
+                                            ? "Bạn có chắc chắn muốn hủy? Bạn sẽ được hoàn lại 100% tiền cọc." 
+                                            : "CẢNH BÁO: Hủy phòng trước giờ Check-in dưới 48 tiếng sẽ KHÔNG ĐƯỢC HOÀN CỌC. Bạn vẫn muốn hủy?";
+
+                                        <form asp-action="Cancel" asp-route-id="@booking.BookingId" method="post" onsubmit="return confirm('@confirmMsg');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hủy Phòng</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>

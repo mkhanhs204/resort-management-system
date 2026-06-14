@@ -5,6 +5,8 @@ using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Bookings;
 using PhucNguyenResort.ViewModels.Bookings;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -40,7 +42,8 @@ namespace PhucNguyenResort.Tests.Bookings
                     RoomId = 1,
                     CheckInDate = DateTime.Today.AddDays(10),
                     CheckOutDate = DateTime.Today.AddDays(14),
-                    NumberOfGuests = 2
+                    NumberOfAdults = 2,
+                    NumberOfChildren = 0
                 };
 
                 // Act
@@ -53,6 +56,7 @@ namespace PhucNguyenResort.Tests.Bookings
                 var savedBooking = await context.Bookings.FindAsync(result.BookingId);
                 Assert.Equal(BookingStatus.Reserved, savedBooking.BookingStatus);
                 Assert.Equal(2000000, savedBooking.DepositAmount); // 4 đêm = 4tr, cọc 50% = 2tr
+                Assert.Equal(4000000, savedBooking.TotalAmount); // Tổng 4tr
             }
         }
 
@@ -88,7 +92,8 @@ namespace PhucNguyenResort.Tests.Bookings
                     RoomId = 1,
                     CheckInDate = DateTime.Today.AddDays(11),
                     CheckOutDate = DateTime.Today.AddDays(13),
-                    NumberOfGuests = 2
+                    NumberOfAdults = 2,
+                    NumberOfChildren = 0
                 };
 
                 // Act
@@ -113,7 +118,8 @@ namespace PhucNguyenResort.Tests.Bookings
                     RoomId = 1,
                     CheckInDate = DateTime.Today.AddDays(14),
                     CheckOutDate = DateTime.Today.AddDays(10), // CheckOut < CheckIn
-                    NumberOfGuests = 2
+                    NumberOfAdults = 2,
+                    NumberOfChildren = 0
                 };
 
                 // Act
@@ -126,7 +132,58 @@ namespace PhucNguyenResort.Tests.Bookings
         }
 
         [Fact]
-        public async Task BKG_TC_004_CancelBooking_Refund100_WhenMoreThan48Hours()
+        public async Task BKG_TC_004_CreateBooking_WithTourAddOn_Success()
+        {
+            // Arrange
+            var options = CreateNewContextOptions();
+            using (var context = new ResortDbContext(options))
+            {
+                context.RoomCategories.Add(new RoomCategory { CategoryId = 1, CategoryName = "Standard", PricePerNight = 1000000 });
+                context.Rooms.Add(new Room { RoomId = 1, CategoryId = 1, Status = RoomStatus.Available });
+                context.Users.Add(new User { UserId = 1, FullName = "Test User" });
+                
+                context.Tours.Add(new Tour { TourId = 1, TourName = "Island Hopping", Price = 200000 });
+                context.TourSchedules.Add(new TourSchedule { ScheduleId = 5, TourId = 1, StartTime = new TimeSpan(8, 0, 0) });
+                
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ResortDbContext(options))
+            {
+                var service = new BookingService(context);
+                var request = new CreateBookingViewModel
+                {
+                    RoomId = 1,
+                    CheckInDate = DateTime.Today.AddDays(10),
+                    CheckOutDate = DateTime.Today.AddDays(14),
+                    NumberOfAdults = 2,
+                NumberOfChildren = 0,
+                    SelectedTourScheduleIds = new List<int> { 5 }
+                };
+
+                // Act
+                var result = await service.CreateBookingAsync(request, 1);
+
+                // Assert
+                Assert.True(result.Success);
+                Assert.NotNull(result.BookingId);
+                
+                var savedBooking = await context.Bookings
+                    .Include(b => b.TourBookings)
+                    .FirstOrDefaultAsync(b => b.BookingId == result.BookingId);
+                    
+                Assert.NotNull(savedBooking);
+                Assert.Single(savedBooking.TourBookings); // Phải có đúng 1 tour booking đi kèm
+                
+                var tourBooking = savedBooking.TourBookings.First();
+                Assert.Equal(5, tourBooking.ScheduleId);
+                Assert.Equal(400000, tourBooking.TotalAmount); // 200,000 * 2 guests
+                Assert.Equal(TourBookingStatus.Pending, tourBooking.BookingStatus);
+            }
+        }
+
+        [Fact]
+        public async Task BKG_TC_005_CancelBooking_Refund100_WhenMoreThan48Hours()
         {
             // Arrange
             var options = CreateNewContextOptions();
@@ -162,7 +219,7 @@ namespace PhucNguyenResort.Tests.Bookings
         }
 
         [Fact]
-        public async Task BKG_TC_005_CancelBooking_NoRefund_WhenLessThan48Hours()
+        public async Task BKG_TC_006_CancelBooking_NoRefund_WhenLessThan48Hours()
         {
             // Arrange
             var options = CreateNewContextOptions();

@@ -52,7 +52,10 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("GuestCount")
+                    b.Property<int?>("NumberOfAdults")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NumberOfChildren")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomId")
@@ -77,171 +80,184 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             BookingId = 1,
-                            BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 2, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 550000.00m,
-                            GuestCount = 2,
+                            BookingStatus = "CheckedOut",
+                            CheckInDate = new DateTime(2026, 6, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6319),
+                            CheckOutDate = new DateTime(2026, 6, 5, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6326),
+                            CreatedAt = new DateTime(2026, 5, 29, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6329),
+                            DepositAmount = 1200000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 1,
-                            TotalAmount = 2050000.00m,
-                            UserId = 1
+                            TotalAmount = 2400000m,
+                            UserId = 2
                         },
                         new
                         {
                             BookingId = 2,
-                            BookingStatus = "CheckedIn",
-                            CheckInDate = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 3, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 600000.00m,
-                            GuestCount = 3,
+                            BookingStatus = "Reserved",
+                            CheckInDate = new DateTime(2026, 6, 18, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6332),
+                            CheckOutDate = new DateTime(2026, 6, 21, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6332),
+                            CreatedAt = new DateTime(2026, 6, 11, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6334),
+                            DepositAmount = 1500000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 2,
-                            TotalAmount = 2300000.00m,
+                            TotalAmount = 3000000m,
                             UserId = 2
                         },
                         new
                         {
                             BookingId = 3,
-                            BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 4, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 650000.00m,
-                            GuestCount = 4,
-                            RoomId = 3,
-                            TotalAmount = 2550000.00m,
+                            BookingStatus = "PendingPayment",
+                            CheckInDate = new DateTime(2026, 6, 23, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6336),
+                            CheckOutDate = new DateTime(2026, 6, 25, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6336),
+                            CreatedAt = new DateTime(2026, 6, 12, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6338),
+                            DepositAmount = 2500000m,
+                            NumberOfAdults = 4,
+                            NumberOfChildren = 0,
+                            RoomId = 10,
+                            TotalAmount = 5000000m,
                             UserId = 3
                         },
                         new
                         {
                             BookingId = 4,
                             BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 5, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 700000.00m,
-                            GuestCount = 5,
-                            RoomId = 4,
-                            TotalAmount = 2800000.00m,
-                            UserId = 4
+                            CheckInDate = new DateTime(2026, 6, 8, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6341),
+                            CheckOutDate = new DateTime(2026, 6, 10, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6342),
+                            CreatedAt = new DateTime(2026, 6, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6344),
+                            DepositAmount = 1000000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
+                            RoomId = 11,
+                            TotalAmount = 2000000m,
+                            UserId = 3
                         },
                         new
                         {
                             BookingId = 5,
-                            BookingStatus = "NoShow",
-                            CheckInDate = new DateTime(2026, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 6, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 750000.00m,
-                            GuestCount = 1,
-                            RoomId = 5,
-                            TotalAmount = 3050000.00m,
-                            UserId = 5
+                            BookingStatus = "Reserved",
+                            CheckInDate = new DateTime(2026, 6, 14, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6345),
+                            CheckOutDate = new DateTime(2026, 6, 17, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6345),
+                            CreatedAt = new DateTime(2026, 6, 8, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6347),
+                            DepositAmount = 12000000m,
+                            NumberOfAdults = 6,
+                            NumberOfChildren = 0,
+                            RoomId = 13,
+                            TotalAmount = 24000000m,
+                            UserId = 2
                         },
                         new
                         {
                             BookingId = 6,
-                            BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 7, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 800000.00m,
-                            GuestCount = 2,
-                            RoomId = 6,
-                            TotalAmount = 3300000.00m,
-                            UserId = 6
+                            BookingStatus = "CheckedOut",
+                            CheckInDate = new DateTime(2026, 5, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6348),
+                            CheckOutDate = new DateTime(2026, 5, 15, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6353),
+                            CreatedAt = new DateTime(2026, 5, 8, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6355),
+                            DepositAmount = 1200000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
+                            RoomId = 1,
+                            TotalAmount = 2400000m,
+                            UserId = 2
                         },
                         new
                         {
                             BookingId = 7,
-                            BookingStatus = "CheckedIn",
-                            CheckInDate = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 8, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 850000.00m,
-                            GuestCount = 3,
-                            RoomId = 7,
-                            TotalAmount = 3550000.00m,
-                            UserId = 7
+                            BookingStatus = "CheckedOut",
+                            CheckInDate = new DateTime(2026, 4, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6356),
+                            CheckOutDate = new DateTime(2026, 4, 16, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6357),
+                            CreatedAt = new DateTime(2026, 4, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6359),
+                            DepositAmount = 1500000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
+                            RoomId = 2,
+                            TotalAmount = 3000000m,
+                            UserId = 3
                         },
                         new
                         {
                             BookingId = 8,
-                            BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 9, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 900000.00m,
-                            GuestCount = 4,
-                            RoomId = 8,
-                            TotalAmount = 3800000.00m,
-                            UserId = 8
+                            BookingStatus = "Cancelled",
+                            CheckInDate = new DateTime(2026, 5, 24, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6360),
+                            CheckOutDate = new DateTime(2026, 5, 26, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6361),
+                            CreatedAt = new DateTime(2026, 5, 19, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6362),
+                            DepositAmount = 1200000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
+                            RoomId = 4,
+                            TotalAmount = 2400000m,
+                            UserId = 3
                         },
                         new
                         {
                             BookingId = 9,
-                            BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 10, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 950000.00m,
-                            GuestCount = 5,
-                            RoomId = 9,
-                            TotalAmount = 4050000.00m,
-                            UserId = 9
+                            BookingStatus = "CheckedOut",
+                            CheckInDate = new DateTime(2026, 5, 29, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6365),
+                            CheckOutDate = new DateTime(2026, 6, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6365),
+                            CreatedAt = new DateTime(2026, 5, 24, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6366),
+                            DepositAmount = 3000000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
+                            RoomId = 5,
+                            TotalAmount = 6000000m,
+                            UserId = 2
                         },
                         new
                         {
                             BookingId = 10,
-                            BookingStatus = "NoShow",
-                            CheckInDate = new DateTime(2026, 6, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 11, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 1000000.00m,
-                            GuestCount = 1,
-                            RoomId = 10,
-                            TotalAmount = 4300000.00m,
-                            UserId = 10
+                            BookingStatus = "Reserved",
+                            CheckInDate = new DateTime(2026, 7, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6368),
+                            CheckOutDate = new DateTime(2026, 7, 5, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6369),
+                            CreatedAt = new DateTime(2026, 6, 12, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6370),
+                            DepositAmount = 8000000m,
+                            NumberOfAdults = 5,
+                            NumberOfChildren = 0,
+                            RoomId = 13,
+                            TotalAmount = 16000000m,
+                            UserId = 3
                         },
                         new
                         {
                             BookingId = 11,
-                            BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 12, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 1050000.00m,
-                            GuestCount = 2,
-                            RoomId = 11,
-                            TotalAmount = 4550000.00m,
-                            UserId = 11
+                            BookingStatus = "PendingPayment",
+                            CheckInDate = new DateTime(2026, 6, 28, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6372),
+                            CheckOutDate = new DateTime(2026, 7, 1, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6372),
+                            CreatedAt = new DateTime(2026, 6, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6374),
+                            DepositAmount = 12000000m,
+                            NumberOfAdults = 6,
+                            NumberOfChildren = 0,
+                            RoomId = 14,
+                            TotalAmount = 24000000m,
+                            UserId = 2
                         },
                         new
                         {
                             BookingId = 12,
-                            BookingStatus = "CheckedIn",
-                            CheckInDate = new DateTime(2026, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 13, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 1100000.00m,
-                            GuestCount = 3,
-                            RoomId = 12,
-                            TotalAmount = 4800000.00m,
-                            UserId = 12
+                            BookingStatus = "CheckedOut",
+                            CheckInDate = new DateTime(2026, 2, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6375),
+                            CheckOutDate = new DateTime(2026, 2, 18, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6376),
+                            CreatedAt = new DateTime(2026, 2, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6377),
+                            DepositAmount = 3000000m,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
+                            RoomId = 6,
+                            TotalAmount = 6000000m,
+                            UserId = 3
                         },
                         new
                         {
                             BookingId = 13,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CheckOutDate = new DateTime(2026, 6, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2026, 5, 14, 9, 0, 0, 0, DateTimeKind.Unspecified),
-                            DepositAmount = 1150000.00m,
-                            GuestCount = 4,
-                            RoomId = 13,
-                            TotalAmount = 5050000.00m,
-                            UserId = 13
+                            CheckInDate = new DateTime(2026, 1, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6379),
+                            CheckOutDate = new DateTime(2026, 1, 14, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6379),
+                            CreatedAt = new DateTime(2026, 1, 10, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6381),
+                            DepositAmount = 600000m,
+                            NumberOfAdults = 1,
+                            NumberOfChildren = 0,
+                            RoomId = 1,
+                            TotalAmount = 1200000m,
+                            UserId = 3
                         },
                         new
                         {
@@ -251,7 +267,8 @@ namespace PhucNguyenResort.Web.Migrations
                             CheckOutDate = new DateTime(2026, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 5, 15, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             DepositAmount = 1200000.00m,
-                            GuestCount = 5,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 14,
                             TotalAmount = 5300000.00m,
                             UserId = 14
@@ -264,7 +281,8 @@ namespace PhucNguyenResort.Web.Migrations
                             CheckOutDate = new DateTime(2026, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 5, 16, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             DepositAmount = 1250000.00m,
-                            GuestCount = 1,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 15,
                             TotalAmount = 5550000.00m,
                             UserId = 15
@@ -277,7 +295,8 @@ namespace PhucNguyenResort.Web.Migrations
                             CheckOutDate = new DateTime(2026, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 5, 17, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             DepositAmount = 1300000.00m,
-                            GuestCount = 2,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 16,
                             TotalAmount = 5800000.00m,
                             UserId = 16
@@ -290,7 +309,8 @@ namespace PhucNguyenResort.Web.Migrations
                             CheckOutDate = new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 5, 18, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             DepositAmount = 1350000.00m,
-                            GuestCount = 3,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 17,
                             TotalAmount = 6050000.00m,
                             UserId = 17
@@ -303,7 +323,8 @@ namespace PhucNguyenResort.Web.Migrations
                             CheckOutDate = new DateTime(2026, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 5, 19, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             DepositAmount = 1400000.00m,
-                            GuestCount = 4,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 18,
                             TotalAmount = 6300000.00m,
                             UserId = 18
@@ -316,7 +337,8 @@ namespace PhucNguyenResort.Web.Migrations
                             CheckOutDate = new DateTime(2026, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 5, 20, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             DepositAmount = 1450000.00m,
-                            GuestCount = 5,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 19,
                             TotalAmount = 6550000.00m,
                             UserId = 19
@@ -329,7 +351,8 @@ namespace PhucNguyenResort.Web.Migrations
                             CheckOutDate = new DateTime(2026, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 5, 21, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             DepositAmount = 1500000.00m,
-                            GuestCount = 1,
+                            NumberOfAdults = 2,
+                            NumberOfChildren = 0,
                             RoomId = 20,
                             TotalAmount = 6800000.00m,
                             UserId = 20
@@ -3605,9 +3628,6 @@ namespace PhucNguyenResort.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
-                    b.Property<int?>("Capacity")
-                        .HasColumnType("int");
-
                     b.Property<string>("CategoryName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -3618,6 +3638,12 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("MaxAdults")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaxChildren")
+                        .HasColumnType("int");
 
                     b.Property<decimal?>("PricePerNight")
                         .HasPrecision(18, 2)
@@ -3631,181 +3657,201 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             CategoryId = 1,
-                            Capacity = 2,
-                            CategoryName = "Standard Garden",
-                            Description = "Standard Garden category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-01.jpg",
-                            PricePerNight = 1080000.00m
+                            CategoryName = "Deluxe Ocean View",
+                            Description = "Phòng cao cấp hướng biển",
+                            ImageUrl = "/img/room/room-1.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 1,
+                            PricePerNight = 1200000m
                         },
                         new
                         {
                             CategoryId = 2,
-                            Capacity = 2,
-                            CategoryName = "Superior Sea View",
-                            Description = "Superior Sea View category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-02.jpg",
-                            PricePerNight = 1260000.00m
+                            CategoryName = "Premium Garden View",
+                            Description = "Phòng view vườn yên tĩnh",
+                            ImageUrl = "/img/room/room-2.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 1,
+                            PricePerNight = 1000000m
                         },
                         new
                         {
                             CategoryId = 3,
-                            Capacity = 2,
-                            CategoryName = "Deluxe Pool View",
-                            Description = "Deluxe Pool View category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-03.jpg",
-                            PricePerNight = 1440000.00m
+                            CategoryName = "Family Suite",
+                            Description = "Suite rộng rãi cho gia đình",
+                            ImageUrl = "/img/room/room-3.jpg",
+                            MaxAdults = 4,
+                            MaxChildren = 2,
+                            PricePerNight = 2500000m
                         },
                         new
                         {
                             CategoryId = 4,
-                            Capacity = 3,
-                            CategoryName = "Premium Ocean",
-                            Description = "Premium Ocean category with capacity 3 guest(s).",
-                            ImageUrl = "/images/rooms/category-04.jpg",
-                            PricePerNight = 1620000.00m
+                            CategoryName = "Presidential Villa",
+                            Description = "Biệt thự siêu cấp sang trọng",
+                            ImageUrl = "/img/room/room-4.jpg",
+                            MaxAdults = 6,
+                            MaxChildren = 4,
+                            PricePerNight = 8000000m
                         },
                         new
                         {
                             CategoryId = 5,
-                            Capacity = 4,
                             CategoryName = "Family Suite",
                             Description = "Family Suite category with capacity 4 guest(s).",
                             ImageUrl = "/images/rooms/category-05.jpg",
+                            MaxAdults = 4,
+                            MaxChildren = 0,
                             PricePerNight = 1800000.00m
                         },
                         new
                         {
                             CategoryId = 6,
-                            Capacity = 4,
                             CategoryName = "Executive Suite",
                             Description = "Executive Suite category with capacity 4 guest(s).",
                             ImageUrl = "/images/rooms/category-06.jpg",
+                            MaxAdults = 4,
+                            MaxChildren = 0,
                             PricePerNight = 1980000.00m
                         },
                         new
                         {
                             CategoryId = 7,
-                            Capacity = 6,
                             CategoryName = "Presidential Villa",
                             Description = "Presidential Villa category with capacity 6 guest(s).",
                             ImageUrl = "/images/rooms/category-07.jpg",
+                            MaxAdults = 6,
+                            MaxChildren = 0,
                             PricePerNight = 2160000.00m
                         },
                         new
                         {
                             CategoryId = 8,
-                            Capacity = 2,
                             CategoryName = "Honeymoon Villa",
                             Description = "Honeymoon Villa category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-08.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 2340000.00m
                         },
                         new
                         {
                             CategoryId = 9,
-                            Capacity = 2,
                             CategoryName = "Bungalow Garden",
                             Description = "Bungalow Garden category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-09.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 2520000.00m
                         },
                         new
                         {
                             CategoryId = 10,
-                            Capacity = 3,
                             CategoryName = "Bungalow Beach",
                             Description = "Bungalow Beach category with capacity 3 guest(s).",
                             ImageUrl = "/images/rooms/category-10.jpg",
+                            MaxAdults = 3,
+                            MaxChildren = 0,
                             PricePerNight = 2700000.00m
                         },
                         new
                         {
                             CategoryId = 11,
-                            Capacity = 2,
                             CategoryName = "Twin Standard",
                             Description = "Twin Standard category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-11.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 2880000.00m
                         },
                         new
                         {
                             CategoryId = 12,
-                            Capacity = 3,
                             CategoryName = "Triple Deluxe",
                             Description = "Triple Deluxe category with capacity 3 guest(s).",
                             ImageUrl = "/images/rooms/category-12.jpg",
+                            MaxAdults = 3,
+                            MaxChildren = 0,
                             PricePerNight = 3060000.00m
                         },
                         new
                         {
                             CategoryId = 13,
-                            Capacity = 2,
                             CategoryName = "Accessible Room",
                             Description = "Accessible Room category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-13.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 3240000.00m
                         },
                         new
                         {
                             CategoryId = 14,
-                            Capacity = 4,
                             CategoryName = "Connecting Room",
                             Description = "Connecting Room category with capacity 4 guest(s).",
                             ImageUrl = "/images/rooms/category-14.jpg",
+                            MaxAdults = 4,
+                            MaxChildren = 0,
                             PricePerNight = 3420000.00m
                         },
                         new
                         {
                             CategoryId = 15,
-                            Capacity = 2,
                             CategoryName = "Long Stay Studio",
                             Description = "Long Stay Studio category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-15.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 3600000.00m
                         },
                         new
                         {
                             CategoryId = 16,
-                            Capacity = 2,
                             CategoryName = "Business Room",
                             Description = "Business Room category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-16.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 3780000.00m
                         },
                         new
                         {
                             CategoryId = 17,
-                            Capacity = 4,
                             CategoryName = "Penthouse Suite",
                             Description = "Penthouse Suite category with capacity 4 guest(s).",
                             ImageUrl = "/images/rooms/category-17.jpg",
+                            MaxAdults = 4,
+                            MaxChildren = 0,
                             PricePerNight = 3960000.00m
                         },
                         new
                         {
                             CategoryId = 18,
-                            Capacity = 5,
                             CategoryName = "Lagoon Villa",
                             Description = "Lagoon Villa category with capacity 5 guest(s).",
                             ImageUrl = "/images/rooms/category-18.jpg",
+                            MaxAdults = 5,
+                            MaxChildren = 0,
                             PricePerNight = 4140000.00m
                         },
                         new
                         {
                             CategoryId = 19,
-                            Capacity = 2,
                             CategoryName = "Mountain View",
                             Description = "Mountain View category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-19.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 4320000.00m
                         },
                         new
                         {
                             CategoryId = 20,
-                            Capacity = 2,
                             CategoryName = "Budget Room",
                             Description = "Budget Room category with capacity 2 guest(s).",
                             ImageUrl = "/images/rooms/category-20.jpg",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
                             PricePerNight = 4500000.00m
                         });
                 });

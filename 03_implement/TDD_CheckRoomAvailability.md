@@ -326,7 +326,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 
 **Test Steps**:
 1. Arrange: Mock `IHomeService.GetRoomCategoriesForHomeAsync()` trả về danh sách categories
-2. Act: Gọi `SearchRooms("", "", 2, 1)` — chuỗi rỗng
+2. Act: Gọi `SearchRooms("", "", 2, 0, 1)` — chuỗi rỗng
 3. Assert:
    - Trả về `ViewResult`
    - `ViewBag.IsFiltered = false`
@@ -358,13 +358,13 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 
 **Test Steps**:
 1. Arrange: Mock `IHomeService.SearchAvailableCategoriesAsync()` trả về danh sách categories
-2. Act: Gọi `SearchRooms("01/12/2027", "05/12/2027", 2, 1)`
+2. Act: Gọi `SearchRooms("01/12/2027", "05/12/2027", 2, 0, 1)`
 3. Assert:
    - Trả về `ViewResult`
    - `ViewBag.IsFiltered = true`
    - `ViewBag.CheckIn = "01/12/2027"`, `ViewBag.CheckOut = "05/12/2027"`
-   - `ViewBag.GuestCount = 2`, `ViewBag.RoomCount = 1`
-   - Mock verify: `SearchAvailableCategoriesAsync` được gọi với `checkInDate = 2027-12-01`, `checkOutDate = 2027-12-05`, `guestCount = 2`, `roomCount = 1`
+   - `ViewBag.AdultsCount = 2`, `ViewBag.ChildrenCount = 0`, `ViewBag.RoomCount = 1`
+   - Mock verify: `SearchAvailableCategoriesAsync` được gọi với `checkInDate = 2027-12-01`, `checkOutDate = 2027-12-05`, `adultsCount = 2`, `childrenCount = 0`, `roomCount = 1`
 
 **Expected Result (PASS)**:
 - Trả về danh sách RoomCategory chính xác

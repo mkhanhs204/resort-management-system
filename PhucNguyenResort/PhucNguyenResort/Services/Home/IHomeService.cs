@@ -9,6 +9,6 @@ namespace PhucNguyenResort.Services.Home
         Task<IEnumerable<RoomCategory>> GetRoomCategoriesForHomeAsync();
         Task<RoomCategory?> GetRoomDetailsAsync(int id);
         Task<int> CheckAvailabilityAsync(int categoryId, System.DateTime checkInDate, System.DateTime checkOutDate);
-        Task<IEnumerable<RoomCategory>> SearchAvailableCategoriesAsync(System.DateTime checkInDate, System.DateTime checkOutDate, int guestCount, int roomCount);
+        Task<IEnumerable<RoomCategory>> SearchAvailableCategoriesAsync(System.DateTime checkInDate, System.DateTime checkOutDate, int adultsCount, int childrenCount, int roomCount);
     }
 }

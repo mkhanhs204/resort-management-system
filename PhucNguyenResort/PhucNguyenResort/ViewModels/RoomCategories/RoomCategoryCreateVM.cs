@@ -13,7 +13,10 @@ namespace PhucNguyenResort.ViewModels.RoomCategories
         public string? Description { get; set; }
 
         [Range(1, 20)]
-        public int? Capacity { get; set; }
+        public int? MaxAdults { get; set; }
+
+        [Range(0, 10)]
+        public int? MaxChildren { get; set; }
 
         [Range(0, 999999999)]
         [Display(Name = "Price Per Night")]

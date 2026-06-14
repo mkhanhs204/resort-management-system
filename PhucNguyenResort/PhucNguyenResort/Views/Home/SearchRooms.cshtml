@@ -30,23 +30,34 @@
                 <form asp-controller="Home" asp-action="SearchRooms" method="get" class="search-criteria p-4 mb-5" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); position: relative; z-index: 10;">
                     <h5 class="mb-4" style="font-family: 'Playfair Display', serif; color: #1e293b; font-size: 22px; font-weight: 700;">Điều Chỉnh Ngày Đặt & Số Khách</h5>
                     <div class="row w-100 m-0">
-                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0 pl-0">
-                            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Ngày Nhận Phòng</label>
+                        <div class="col-lg-2 col-md-4 mb-3 mb-lg-0 pl-0">
+                            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Nhận Phòng</label>
                             <input type="text" name="checkIn" class="form-control date-input luxury-input" value="@ViewBag.CheckIn" required autocomplete="off" placeholder="Chọn ngày">
                         </div>
-                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
-                            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Ngày Trả Phòng</label>
+                        <div class="col-lg-2 col-md-4 mb-3 mb-lg-0">
+                            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Trả Phòng</label>
                             <input type="text" name="checkOut" class="form-control date-input luxury-input" value="@ViewBag.CheckOut" required autocomplete="off" placeholder="Chọn ngày">
                         </div>
                         <div class="col-lg-2 col-md-4 mb-3 mb-lg-0">
-                            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Số Khách</label>
-                            <select name="guestCount" class="form-control luxury-select">
+                            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Người Lớn</label>
+                            <select name="adultsCount" class="form-control luxury-select">
                                 @for(int i=1; i<=5; i++) {
-                                    var text = i == 5 ? "5+ Người" : $"{i} Người";
-                                    if(ViewBag.GuestCount == i) {
-                                        <option value="@i" selected>@text</option>
+                                    if(ViewBag.AdultsCount == i) {
+                                        <option value="@i" selected>@i</option>
                                     } else {
-                                        <option value="@i">@text</option>
+                                        <option value="@i">@i</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-4 mb-3 mb-lg-0">
+                            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Trẻ Em</label>
+                            <select name="childrenCount" class="form-control luxury-select">
+                                @for(int i=0; i<=4; i++) {
+                                    if(ViewBag.ChildrenCount == i) {
+                                        <option value="@i" selected>@i</option>
+                                    } else {
+                                        <option value="@i">@i</option>
                                     }
                                 }
                             </select>
@@ -112,11 +123,11 @@
                             <div class="card-body d-flex flex-column" style="padding: 30px;">
                                 <h4 class="card-title" style="font-family: 'Playfair Display', serif; font-size: 24px; color: #1e293b; font-weight: 700; margin-bottom: 15px;">@room.CategoryName</h4>
                                 <p class="card-text text-muted" style="font-size: 15px; line-height: 1.7; margin-bottom: 25px; flex-grow: 1;">
-                                    Tận hưởng không gian lưu trú lý tưởng cho @ViewBag.GuestCount khách. Tiện nghi đầy đủ, view tuyệt đẹp và dịch vụ phòng 24/7.
+                                    Tận hưởng không gian lưu trú lý tưởng cho @ViewBag.AdultsCount người lớn, @ViewBag.ChildrenCount trẻ em. Tiện nghi đầy đủ, view tuyệt đẹp và dịch vụ phòng 24/7.
                                 </p>
                                 <div class="room-amenities mb-4">
                                     <span class="amenity-pill"><i class="fa fa-arrows-alt"></i> 30 m²</span>
-                                    <span class="amenity-pill"><i class="fa fa-user"></i> Sức chứa: @(room.Capacity ?? 2) khách</span>
+                                    <span class="amenity-pill"><i class="fa fa-user"></i> Tối đa @(room.MaxAdults ?? 2) người lớn, @(room.MaxChildren ?? 1) trẻ em</span>
                                 </div>
                                 <a asp-controller="Home" asp-action="RoomDetails" asp-route-id="@room.CategoryId" 
                                    class="btn w-100 luxury-book-btn">

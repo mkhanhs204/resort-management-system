@@ -142,9 +142,9 @@ public interface IHomeService
 {
     /// <summary>
     /// Kiểm tra số lượng phòng trống của một loại phòng trong khoảng thời gian nhất định
-    /// Loại bỏ các phòng đang bảo trì (Maintenance) và các booking bị hủy (Cancelled/NoShow)
+    /// Loại bỏ các phòng đang bảo trì (Maintenance)    /// Tìm tất cả RoomCategory có phòng trống ≥ roomCount, phù hợp số lượng người lớn và trẻ em.
     /// </summary>
-    Task<int> CheckAvailabilityAsync(int categoryId, DateTime checkInDate, DateTime checkOutDate);
+    Task<IEnumerable<RoomCategory>> SearchAvailableCategoriesAsync(DateTime checkInDate, DateTime checkOutDate, int adultsCount, int childrenCount, int roomCount);
 }
 ```
 
