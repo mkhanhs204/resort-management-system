@@ -15,8 +15,11 @@ public class Booking
     [Required, DataType(DataType.Date)]
     public DateTime CheckOutDate { get; set; }
 
-    [Range(1, 50)]
-    public int? GuestCount { get; set; }
+    [Range(1, 20)]
+    public int? NumberOfAdults { get; set; }
+
+    [Range(0, 10)]
+    public int? NumberOfChildren { get; set; }
 
     public BookingStatus BookingStatus { get; set; } = BookingStatus.Reserved;
 

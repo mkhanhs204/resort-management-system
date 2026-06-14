@@ -57,9 +57,11 @@ namespace PhucNguyenResort.Services.Bookings
                 UserId = userId,
                 CheckInDate = request.CheckInDate,
                 CheckOutDate = request.CheckOutDate,
+                NumberOfAdults = request.NumberOfAdults,
+                NumberOfChildren = request.NumberOfChildren,
                 TotalAmount = totalPrice,
                 DepositAmount = depositAmount,
-                BookingStatus = BookingStatus.Reserved
+                BookingStatus = BookingStatus.PendingPayment
             };
 
             _context.Bookings.Add(booking);
@@ -77,16 +79,21 @@ namespace PhucNguyenResort.Services.Bookings
                 {
                     if (schedule.Tour != null)
                     {
+                        decimal tourTotal = (schedule.Tour.Price ?? 0) * (request.NumberOfAdults + request.NumberOfChildren);
                         var tourBooking = new TourBooking
                         {
                             Booking = booking, // EF Core sẽ tự link BookingId khi booking được save
                             UserId = userId,
                             ScheduleId = schedule.ScheduleId,
-                            Participants = request.NumberOfGuests,
-                            TotalAmount = schedule.Tour.Price * request.NumberOfGuests,
+                            Participants = request.NumberOfAdults + request.NumberOfChildren,
+                            TotalAmount = tourTotal,
                             BookingStatus = TourBookingStatus.Pending
                         };
                         _context.TourBookings.Add(tourBooking);
+                        
+                        // Cập nhật lại tổng tiền phòng và tiền cọc bao gồm cả Tour
+                        booking.TotalAmount += tourTotal;
+                        booking.DepositAmount += tourTotal * 0.5m;
                     }
                 }
             }

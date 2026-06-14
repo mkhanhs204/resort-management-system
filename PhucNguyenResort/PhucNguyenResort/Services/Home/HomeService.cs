@@ -46,10 +46,10 @@ namespace PhucNguyenResort.Services.Home
             return available > 0 ? available : 0;
         }
 
-        public async Task<IEnumerable<RoomCategory>> SearchAvailableCategoriesAsync(System.DateTime checkInDate, System.DateTime checkOutDate, int guestCount, int roomCount)
+        public async Task<IEnumerable<RoomCategory>> SearchAvailableCategoriesAsync(System.DateTime checkInDate, System.DateTime checkOutDate, int adultsCount, int childrenCount, int roomCount)
         {
             var categories = await _context.RoomCategories
-                .Where(c => c.Capacity >= guestCount)
+                .Where(c => c.MaxAdults >= adultsCount && c.MaxChildren >= childrenCount)
                 .ToListAsync();
 
             var availableCategories = new List<RoomCategory>();

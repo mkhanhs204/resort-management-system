@@ -18,8 +18,11 @@ namespace PhucNguyenResort.ViewModels.Bookings
         [Display(Name = "Ngày trả phòng")]
         public DateTime CheckOutDate { get; set; }
         
-        [Range(1, 10)]
-        public int NumberOfGuests { get; set; }
+        [Range(1, 20)]
+        public int NumberOfAdults { get; set; }
+
+        [Range(0, 10)]
+        public int NumberOfChildren { get; set; }
 
         // Mảng lưu ID của các Tour Schedule mà khách chọn thêm
         public List<int>? SelectedTourScheduleIds { get; set; }

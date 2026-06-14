@@ -1,4 +1,18 @@
-
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    
+    string IsActive(string controller, string action = "")
+    {
+        bool isControllerMatch = string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+        if (string.IsNullOrEmpty(action))
+        {
+            return isControllerMatch ? "active" : "";
+        }
+        bool isActionMatch = string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+        return isControllerMatch && isActionMatch ? "active" : "";
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,37 +69,27 @@
         <!-- Mobile Menu -->
         <nav class="mainmenu mobile-menu">
             <ul>
-                <li class="active">
+                <li class="@IsActive("Home", "Index")">
                     <a asp-area="" asp-controller="Home" asp-action="Index">
                         Trang Chủ
                     </a>
                 </li>
 
-                <li>
+                <li class="@IsActive("Home", "SearchRooms") @IsActive("Bookings", "Create") @IsActive("Home", "RoomDetails")">
                     <a asp-controller="Home" asp-action="SearchRooms">
                         Phòng Ngủ
                     </a>
                 </li>
 
-                <li>
+                <li class="@IsActive("Home", "AboutUs")">
                     <a asp-area="" asp-controller="Home" asp-action="AboutUs">
                         Về Chúng Tôi
                     </a>
                 </li>
 
-                <li>
-                    <a href="./pages.html">Trang</a>
-                    <ul class="dropdown">
-                        <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
-                        <li><a href="#">Phòng Deluxe</a></li>
-                        <li><a href="#">Phòng Gia Đình</a></li>
-                        <li><a href="#">Phòng Premium</a></li>
-                    </ul>
-                </li>
-
-                <li><a href="./blog.html">Tin Tức</a></li>
-                <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
-                <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+                <li class="@IsActive("Home", "Blog")"><a href="./blog.html">Tin Tức</a></li>
+                <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
+                <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
 
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
@@ -170,40 +174,30 @@
                         <div class="nav-menu">
                             <nav class="mainmenu">
                                 <ul>
-                                    <li class="active">
+                                    <li class="@IsActive("Home", "Index")">
                                         <a asp-area="" asp-controller="Home" asp-action="Index">
                                             Trang Chủ
                                         </a>
                                     </li>
 
-                                    <li>
+                                    <li class="@IsActive("Home", "SearchRooms") @IsActive("Bookings", "Create") @IsActive("Home", "RoomDetails")">
                                         <a asp-controller="Home" asp-action="SearchRooms">
                                             Phòng Ngủ
                                         </a>
                                     </li>
 
-                                    <li>
+                                    <li class="@IsActive("Home", "AboutUs")">
                                         <a asp-area="" asp-controller="Home" asp-action="AboutUs">
                                             Về Chúng Tôi
                                         </a>
                                     </li>
 
-                                    <li>
-                                        <a href="./pages.html">Trang</a>
-                                        <ul class="dropdown">
-                                            <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
-                                            <li><a href="./blog-details.html">Chi Tiết Tin Tức</a></li>
-                                            <li><a href="#">Phòng Gia Đình</a></li>
-                                            <li><a href="#">Phòng Premium</a></li>
-                                        </ul>
-                                    </li>
 
-                                    <li><a href="./blog.html">Tin Tức</a></li>
-                                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
+                                    <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
                                     @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                                     {
-                                        <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+                                        <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
                                     }
 
                                     @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -213,10 +207,10 @@
                                     }
                                     else
                                     {
-                                        <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
-                                        <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                                        <li class="@IsActive("Account", "Login")"><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                                        <li class="@IsActive("Account", "Register")"><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
                                     }
-                                    <li>
+                                    <li class="@IsActive("Profile")">
                                         <a asp-area="" asp-controller="Profile" asp-action="Index">
                                             My Profile
                                         </a>

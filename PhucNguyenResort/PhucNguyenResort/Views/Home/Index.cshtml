@@ -1,18 +1,230 @@
 @model IEnumerable<PhucNguyenResort.Models.RoomCategory>
 @{
     ViewData["Title"] = "Trang Chủ";
-
 }
+
+<!-- Google Fonts for Luxury Vibe -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    /* Global Luxury Overrides for Home Page */
+    h1, h2, h3, .section-title h2 {
+        font-family: 'Playfair Display', serif !important;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Fix Datepicker z-index */
+    #ui-datepicker-div {
+        z-index: 9999 !important;
+    }
+
+    /* Hero Section Overrides */
+    .hero-section {
+        position: relative;
+    }
+    .hero-slider .hs-item {
+        position: relative;
+    }
+    .hero-slider .hs-item::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(to right, rgba(13, 35, 58, 0.8) 0%, rgba(13, 35, 58, 0.3) 100%);
+        z-index: 1;
+    }
+    .hero-text {
+        position: relative;
+        z-index: 2;
+        padding-top: 150px;
+    }
+    .hero-text h1 {
+        font-size: 80px !important;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 20px;
+        text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        line-height: 1.1;
+    }
+    .hero-text p {
+        font-size: 18px;
+        color: rgba(255,255,255,0.9);
+        font-weight: 300;
+        margin-bottom: 40px;
+        max-width: 90%;
+        line-height: 1.8;
+    }
+    .hero-text .primary-btn {
+        background: transparent;
+        border: 2px solid #dfa974;
+        color: #dfa974;
+        padding: 14px 35px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        border-radius: 30px;
+        transition: all 0.4s ease;
+    }
+    .hero-text .primary-btn:hover {
+        background: #dfa974;
+        color: #ffffff;
+        box-shadow: 0 10px 20px rgba(223, 169, 116, 0.3);
+        transform: translateY(-3px);
+    }
+
+    /* Booking Form Overrides (The Glassmorphism Card) */
+    .booking-form {
+        position: relative;
+        z-index: 2;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px);
+        padding: 40px !important;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255,255,255,0.2);
+        margin-top: 100px;
+    }
+    .booking-form h3 {
+        font-size: 28px;
+        color: #0d233a;
+        margin-bottom: 30px;
+        text-align: center;
+        font-weight: 700;
+        position: relative;
+    }
+    .booking-form h3::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 3px;
+        background: #dfa974;
+        border-radius: 2px;
+    }
+    .booking-form .check-date, .booking-form .select-option {
+        margin-bottom: 25px;
+    }
+    .booking-form label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+    .booking-form input, .booking-form select {
+        width: 100%;
+        height: 50px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0 20px;
+        font-size: 15px;
+        color: #1e293b;
+        background: #f8fafc;
+        transition: all 0.3s ease;
+    }
+    .booking-form input:focus, .booking-form select:focus {
+        border-color: #dfa974;
+        box-shadow: 0 0 0 4px rgba(223, 169, 116, 0.15);
+        outline: none;
+        background: #ffffff;
+    }
+    .booking-form button {
+        width: 100%;
+        height: 55px;
+        background: linear-gradient(135deg, #dfa974, #b87c4c) !important;
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 10px 20px rgba(223, 169, 116, 0.3);
+        transition: all 0.4s ease;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    .booking-form button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(223, 169, 116, 0.4);
+    }
+    .booking-form i.icon_calendar {
+        top: 40px;
+        color: #dfa974;
+    }
+
+    /* Section Titles */
+    .section-title span {
+        color: #dfa974;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 10px;
+    }
+    .section-title h2 {
+        color: #0d233a;
+        font-size: 42px;
+    }
+
+    /* About Us */
+    .about-text .primary-btn.about-btn {
+        background: #0d233a;
+        color: #fff;
+        border-radius: 30px;
+        padding: 12px 30px;
+        border: none;
+    }
+    .about-text .primary-btn.about-btn:hover {
+        background: #dfa974;
+    }
+
+    /* Services Section */
+    .services-section {
+        background: #f8fafc;
+    }
+    .service-item {
+        background: #fff;
+        padding: 40px 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        transition: all 0.4s ease;
+        border: 1px solid rgba(0,0,0,0.02);
+        margin-bottom: 30px;
+    }
+    .service-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        border-color: #dfa974;
+    }
+    .service-item i {
+        font-size: 45px;
+        color: #dfa974;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+    .service-item h4 {
+        font-family: 'Playfair Display', serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #0d233a;
+        margin-bottom: 15px;
+    }
+</style>
 
 <!-- Hero Section Begin -->
 <section class="hero-section">
     <div class="container">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-lg-6">
                 <div class="hero-text">
-                    <h1>Phúc Nguyên Resort</h1>
-                    <p>Trải nghiệm dịch vụ nghỉ dưỡng tuyệt vời hàng đầu, mang đến cho bạn không gian yên bình và những tiện nghi đẳng cấp nhất.</p>
-                    <a href="#" class="primary-btn">Khám Phá Ngay</a>
+                    <h1>Phúc Nguyên<br/>Resort</h1>
+                    <p>Trải nghiệm dịch vụ nghỉ dưỡng tuyệt vời hàng đầu, mang đến cho bạn không gian yên bình và những tiện nghi đẳng cấp nhất giữa thiên nhiên rực rỡ.</p>
+                    <a href="#about-us" class="primary-btn">Khám Phá Ngay</a>
                 </div>
             </div>
             <div class="col-xl-4 col-lg-5 offset-xl-2 offset-lg-1">
@@ -20,34 +232,50 @@
                     <h3>Đặt Phòng Của Bạn</h3>
                     <form asp-controller="Home" asp-action="SearchRooms" method="get">
                         <div class="check-date">
-                            <label for="date-in">Ngày Nhận Phòng:</label>
-                            <input type="text" class="date-input" id="date-in" name="checkIn" required autocomplete="off">
+                            <label for="date-in">Ngày Nhận Phòng</label>
+                            <input type="text" class="date-input" id="date-in" name="checkIn" required autocomplete="off" placeholder="DD/MM/YYYY">
                             <i class="icon_calendar"></i>
                         </div>
                         <div class="check-date">
-                            <label for="date-out">Ngày Trả Phòng:</label>
-                            <input type="text" class="date-input" id="date-out" name="checkOut" required autocomplete="off">
+                            <label for="date-out">Ngày Trả Phòng</label>
+                            <input type="text" class="date-input" id="date-out" name="checkOut" required autocomplete="off" placeholder="DD/MM/YYYY">
                             <i class="icon_calendar"></i>
                         </div>
-                        <div class="select-option">
-                            <label for="guest">Số Khách:</label>
-                            <select id="guest" name="guestCount">
-                                <option value="1">1 Người</option>
-                                <option value="2" selected>2 Người</option>
-                                <option value="3">3 Người</option>
-                                <option value="4">4 Người</option>
-                                <option value="5">5+ Người</option>
-                            </select>
+                        <div class="row" style="margin: 0 -15px;">
+                            <div class="col-6" style="padding: 0 15px;">
+                                <div class="select-option">
+                                    <label for="adults">Người Lớn</label>
+                                    <select id="adults" name="adultsCount">
+                                        <option value="1">1</option>
+                                        <option value="2" selected>2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5+</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6" style="padding: 0 15px;">
+                                <div class="select-option">
+                                    <label for="children">Trẻ Em</label>
+                                    <select id="children" name="childrenCount">
+                                        <option value="0" selected>0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4+</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="select-option">
-                            <label for="room">Số Lượng Phòng:</label>
+                            <label for="room">Số Lượng Phòng</label>
                             <select id="room" name="roomCount">
                                 <option value="1" selected>1 Phòng</option>
                                 <option value="2">2 Phòng</option>
                                 <option value="3">3 Phòng</option>
                             </select>
                         </div>
-                        <button type="submit">Kiểm Tra Phòng Trống</button>
+                        <button type="submit">Tìm Phòng Trống</button>
                     </form>
                 </div>
             </div>
@@ -62,28 +290,28 @@
 <!-- Hero Section End -->
 
 <!-- About Us Section Begin -->
-<section class="aboutus-section spad">
+<section id="about-us" class="aboutus-section spad">
     <div class="container">
         <div class="row">
             <div class="col-lg-6">
                 <div class="about-text">
                     <div class="section-title">
                         <span>Về Chúng Tôi</span>
-                        <h2>Khu Nghỉ Dưỡng <br />Phúc Nguyên Resort</h2>
+                        <h2>Nghệ Thuật Nghỉ Dưỡng<br />Chuẩn 5 Sao</h2>
                     </div>
                     <p class="f-para">Phúc Nguyên Resort tự hào là điểm đến lý tưởng cho những ai yêu thích sự yên bình và sang trọng. Hàng ngày, chúng tôi mang đến những trải nghiệm tuyệt vời cho hàng ngàn du khách trong và ngoài nước.</p>
-                    <p class="s-para">Bất kể bạn đang tìm kiếm một phòng nghỉ dưỡng hoàn hảo, một dịch vụ thư giãn hay một căn hộ tiện nghi, chúng tôi đều sẵn lòng phục vụ.</p>
-                    <a href="#" class="primary-btn about-btn">Xem Thêm</a>
+                    <p class="s-para">Với kiến trúc kết hợp hài hòa giữa thiên nhiên và phong cách hiện đại, mỗi góc nhỏ tại Phúc Nguyên đều được chăm chút tỉ mỉ, giúp bạn có những phút giây thư giãn tuyệt đối.</p>
+                    <a href="#" class="primary-btn about-btn">Xem Chi Tiết</a>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="about-pic">
                     <div class="row">
                         <div class="col-sm-6">
-                            <img src="~/img/about/about-1.jpg" alt="">
+                            <img src="~/img/about/about-1.jpg" alt="" style="border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1);">
                         </div>
                         <div class="col-sm-6">
-                            <img src="~/img/about/about-2.jpg" alt="">
+                            <img src="~/img/about/about-2.jpg" alt="" style="border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); margin-top: 30px;">
                         </div>
                     </div>
                 </div>
@@ -98,52 +326,52 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <div class="section-title">
-                    <span>Dịch Vụ Của Chúng Tôi</span>
-                    <h2>Khám Phá Dịch Vụ Nổi Bật</h2>
+                <div class="section-title text-center">
+                    <span>Tiện Ích Cao Cấp</span>
+                    <h2>Dịch Vụ Nổi Bật</h2>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-4 col-sm-6">
-                <div class="service-item">
+                <div class="service-item text-center">
                     <i class="flaticon-036-parking"></i>
-                    <h4>Kế Hoạch Du Lịch</h4>
+                    <h4>Trải Nghiệm Độc Quyền</h4>
                     <p>Lên kế hoạch hoàn hảo cho chuyến đi của bạn với các gói tour và hoạt động dã ngoại hấp dẫn.</p>
                 </div>
             </div>
             <div class="col-lg-4 col-sm-6">
-                <div class="service-item">
+                <div class="service-item text-center">
                     <i class="flaticon-033-dinner"></i>
-                    <h4>Dịch Vụ Ăn Uống</h4>
+                    <h4>Tinh Hoa Ẩm Thực</h4>
                     <p>Trải nghiệm tinh hoa ẩm thực từ các đầu bếp hàng đầu với thực đơn phong phú và đa dạng.</p>
                 </div>
             </div>
             <div class="col-lg-4 col-sm-6">
-                <div class="service-item">
+                <div class="service-item text-center">
                     <i class="flaticon-026-bed"></i>
-                    <h4>Trông Trẻ</h4>
+                    <h4>Chăm Sóc Gia Đình</h4>
                     <p>Dịch vụ trông trẻ an toàn và tận tâm giúp gia đình bạn có thời gian thư giãn tuyệt đối.</p>
                 </div>
             </div>
             <div class="col-lg-4 col-sm-6">
-                <div class="service-item">
+                <div class="service-item text-center">
                     <i class="flaticon-024-towel"></i>
-                    <h4>Giặt Ủi</h4>
+                    <h4>Dịch Vụ Giặt Ủi</h4>
                     <p>Dịch vụ giặt ủi nhanh chóng, sạch sẽ và phẳng phiu như mới cho mọi trang phục của bạn.</p>
                 </div>
             </div>
             <div class="col-lg-4 col-sm-6">
-                <div class="service-item">
+                <div class="service-item text-center">
                     <i class="flaticon-044-clock-1"></i>
-                    <h4>Thuê Tài Xế</h4>
-                    <p>Cung cấp dịch vụ thuê tài xế chuyên nghiệp, đảm bảo chuyến đi an toàn và tiện lợi.</p>
+                    <h4>Dịch Vụ Di Chuyển</h4>
+                    <p>Cung cấp dịch vụ xe đưa đón và tài xế riêng, đảm bảo chuyến đi an toàn và tiện lợi.</p>
                 </div>
             </div>
             <div class="col-lg-4 col-sm-6">
-                <div class="service-item">
+                <div class="service-item text-center">
                     <i class="flaticon-012-cocktail"></i>
-                    <h4>Quầy Bar & Đồ Uống</h4>
+                    <h4>Bar & Lounge</h4>
                     <p>Thưởng thức các loại thức uống đa dạng và cocktail tuyệt hảo trong không gian lãng mạn.</p>
                 </div>
             </div>
@@ -153,13 +381,13 @@
 <!-- Services Section End -->
 
 <!-- Home Room Section Begin -->
-<section class="hp-room-section spad" style="background-color: #f5ede6;">
+<section class="hp-room-section spad" style="background-color: #ffffff;">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <div class="section-title">
-                    <span>Phòng & Ưu Đãi</span>
-                    <h2>Khám Phá Các Loại Phòng</h2>
+                <div class="section-title text-center">
+                    <span>Phòng & Villa</span>
+                    <h2>Tuyệt Tác Nghỉ Dưỡng</h2>
                 </div>
             </div>
         </div>
@@ -191,11 +419,11 @@
                                         Tận hưởng sự tiện nghi đẳng cấp và trải nghiệm không gian sang trọng cùng gia đình. Đặt trực tiếp để nhận ưu đãi tốt nhất.
                                     </p>
                                     <div class="room-amenities mb-4">
-                                        <span class="amenity-pill"><i class="fa fa-user"></i> Tối đa @(roomCategory.Capacity ?? 2) khách</span>
+                                        <span class="amenity-pill"><i class="fa fa-user"></i> Tối đa @(roomCategory.MaxAdults ?? 2) người lớn, @(roomCategory.MaxChildren ?? 1) trẻ em</span>
                                     </div>
                                     <a asp-controller="Home" asp-action="RoomDetails" asp-route-id="@roomCategory.CategoryId" 
                                        class="btn w-100 luxury-book-btn">
-                                        Chi Tiết & Đặt Phòng
+                                        Khám Phá Căn Phòng Này
                                     </a>
                                 </div>
                             </div>
@@ -208,109 +436,42 @@
 </section>
 <!-- Home Room Section End -->
 
-<!-- Testimonial Section Begin -->
-<section class="testimonial-section spad">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="section-title">
-                    <span>Đánh Giá Khách Hàng</span>
-                    <h2>Khách Hàng Nói Gì?</h2>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8 offset-lg-2">
-                <div class="testimonial-slider owl-carousel">
-                    <div class="ts-item">
-                        <p>Kỳ nghỉ tại Phúc Nguyên Resort thực sự vượt ngoài mong đợi của tôi. Gia đình tôi đã có một quãng thời gian vô cùng tuyệt vời và thư giãn với các dịch vụ chu đáo. Chắc chắn tôi sẽ quay lại đây.</p>
-                        <div class="ti-author">
-                            <div class="rating">
-                                <i class="icon_star"></i>
-                                <i class="icon_star"></i>
-                                <i class="icon_star"></i>
-                                <i class="icon_star"></i>
-                                <i class="icon_star-half_alt"></i>
-                            </div>
-                            <h5> - Alexander Vasquez</h5>
-                        </div>
-                        <img src="~/img/testimonial-logo.png" alt="">
-                    </div>
-                    <div class="ts-item">
-                        <p>Không gian cực kỳ yên tĩnh và thoải mái, nhân viên nhiệt tình hỗ trợ. Thực sự là một nơi lý tưởng để trốn khỏi sự ồn ào của thành phố. Dịch vụ ăn uống ở đây cũng rất xuất sắc.</p>
-                        <div class="ti-author">
-                            <div class="rating">
-                                <i class="icon_star"></i>
-                                <i class="icon_star"></i>
-                                <i class="icon_star"></i>
-                                <i class="icon_star"></i>
-                                <i class="icon_star"></i>
-                            </div>
-                            <h5> - Maria Tran</h5>
-                        </div>
-                        <img src="~/img/testimonial-logo.png" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Testimonial Section End -->
-
 <!-- Blog Section Begin -->
-<section class="blog-section spad">
+<section class="blog-section spad" style="background: #f8fafc;">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <div class="section-title">
-                    <span>Tin Tức Khách Sạn</span>
-                    <h2>Blog & Sự Kiện Của Chúng Tôi</h2>
+                <div class="section-title text-center">
+                    <span>Tin Tức & Sự Kiện</span>
+                    <h2>Câu Chuyện Phúc Nguyên</h2>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-4">
-                <div class="blog-item set-bg" data-setbg="/img/blog/blog-1.jpg">
-                    <div class="bi-text">
-                        <span class="b-tag">Du Lịch</span>
-                        <h4><a href="#">Kinh nghiệm nghỉ dưỡng tại Resort</a></h4>
-                        <div class="b-time"><i class="icon_clock_alt"></i> 15 Tháng 4, 2024</div>
+                <div class="blog-item set-bg" data-setbg="/img/blog/blog-1.jpg" style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div class="bi-text" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+                        <span class="b-tag">Trải Nghiệm</span>
+                        <h4><a href="#">Bí mật đằng sau những liệu trình Spa tại Resort</a></h4>
+                        <div class="b-time"><i class="icon_clock_alt"></i> 15 Tháng 6, 2026</div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="blog-item set-bg" data-setbg="/img/blog/blog-2.jpg">
-                    <div class="bi-text">
-                        <span class="b-tag">Cắm Trại</span>
-                        <h4><a href="#">Cách chọn lều trại mùa hè</a></h4>
-                        <div class="b-time"><i class="icon_clock_alt"></i> 18 Tháng 4, 2024</div>
+                <div class="blog-item set-bg" data-setbg="/img/blog/blog-2.jpg" style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div class="bi-text" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+                        <span class="b-tag">Ẩm Thực</span>
+                        <h4><a href="#">Lễ hội Hải Sản Tươi Sống chuẩn sao Michelin</a></h4>
+                        <div class="b-time"><i class="icon_clock_alt"></i> 18 Tháng 6, 2026</div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="blog-item set-bg" data-setbg="/img/blog/blog-3.jpg">
-                    <div class="bi-text">
+                <div class="blog-item set-bg" data-setbg="/img/blog/blog-3.jpg" style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div class="bi-text" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
                         <span class="b-tag">Sự Kiện</span>
-                        <h4><a href="#">Tuần lễ ẩm thực mùa thu</a></h4>
-                        <div class="b-time"><i class="icon_clock_alt"></i> 21 Tháng 4, 2024</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-8">
-                <div class="blog-item small-size set-bg" data-setbg="/img/blog/blog-wide.jpg">
-                    <div class="bi-text">
-                        <span class="b-tag">Sự Kiện</span>
-                        <h4><a href="#">Lễ hội ánh sáng chào mừng năm mới</a></h4>
-                        <div class="b-time"><i class="icon_clock_alt"></i> 08 Tháng 5, 2024</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="blog-item small-size set-bg" data-setbg="/img/blog/blog-10.jpg">
-                    <div class="bi-text">
-                        <span class="b-tag">Du Lịch</span>
-                        <h4><a href="#">Lịch trình vi vu Đà Lạt 3 ngày</a></h4>
-                        <div class="b-time"><i class="icon_clock_alt"></i> 12 Tháng 5, 2024</div>
+                        <h4><a href="#">Tiệc trà chiều hoàng gia mỗi chiều Chủ Nhật</a></h4>
+                        <div class="b-time"><i class="icon_clock_alt"></i> 21 Tháng 6, 2026</div>
                     </div>
                 </div>
             </div>
@@ -321,97 +482,95 @@
 
 @section Scripts {
     <style>
-        /* Luxury Room Card */
+        /* Luxury Room Card CSS (retained and improved) */
         .luxury-card {
-            border-radius: 16px !important;
+            border-radius: 20px !important;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05) !important;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+            border: 1px solid rgba(0,0,0,0.02) !important;
         }
         .luxury-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1) !important;
         }
-
         .card-img-wrapper {
             position: relative;
             overflow: hidden;
-            height: 280px;
+            height: 300px;
         }
         .card-img-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
         .luxury-card:hover .card-img-wrapper img {
-            transform: scale(1.08);
+            transform: scale(1.1);
         }
-
         .price-pill {
             position: absolute;
             top: 20px;
             right: 20px;
             background: rgba(255, 255, 255, 0.95);
-            color: #1e293b;
-            padding: 8px 16px;
+            color: #0d233a;
+            padding: 8px 18px;
             border-radius: 30px;
             font-weight: 700;
             font-size: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            font-family: 'Inter', sans-serif;
         }
         .price-pill span {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: #64748b;
         }
-
         .amenity-pill {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: #475569;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 30px;
             font-size: 13px;
             font-weight: 600;
             display: inline-block;
             margin-right: 8px;
             margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
         }
         .amenity-pill i {
             color: #dfa974;
-            margin-right: 4px;
+            margin-right: 6px;
         }
-
         .luxury-book-btn {
             background-color: transparent !important;
-            border: 2px solid #e2e8f0 !important;
-            color: #1e293b !important;
-            border-radius: 8px !important;
-            padding: 12px !important;
+            border: 2px solid #0d233a !important;
+            color: #0d233a !important;
+            border-radius: 12px !important;
+            padding: 14px !important;
             font-weight: 700 !important;
             font-size: 14px !important;
             text-transform: uppercase;
-            transition: all 0.3s ease !important;
+            transition: all 0.4s ease !important;
             letter-spacing: 1px;
         }
         .luxury-card:hover .luxury-book-btn {
-            background-color: #dfa974 !important;
-            border-color: #dfa974 !important;
+            background-color: #0d233a !important;
             color: white !important;
+            box-shadow: 0 10px 20px rgba(13, 35, 58, 0.2) !important;
         }
     </style>
     <script>
         $(document).ready(function() {
             $(".home-room-slider").owlCarousel({
                 items: 3,
-                dots: false,
+                dots: true,
                 autoplay: true,
                 loop: true,
                 smartSpeed: 1200,
-                nav: true,
-                navText: ["<i class='arrow_left'></i>", "<i class='arrow_right'></i>"],
-                margin: 0,
+                nav: false,
+                margin: 20,
                 responsive: {
                     0: { items: 1 },
                     768: { items: 2 },

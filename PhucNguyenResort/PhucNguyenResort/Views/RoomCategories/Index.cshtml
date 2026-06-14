@@ -19,7 +19,8 @@
                         <tr>
                             <th>Image</th>
                             <th>@Html.DisplayNameFor(model => model.CategoryName)</th>
-                            <th>@Html.DisplayNameFor(model => model.Capacity)</th>
+                            <th>@Html.DisplayNameFor(model => model.MaxAdults)</th>
+                            <th>@Html.DisplayNameFor(model => model.MaxChildren)</th>
                             <th>@Html.DisplayNameFor(model => model.PricePerNight)</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -38,7 +39,8 @@
                                     }
                                 </td>
                                 <td class="fw-bold">@Html.DisplayFor(modelItem => item.CategoryName)</td>
-                                <td>@Html.DisplayFor(modelItem => item.Capacity) Persons</td>
+                                <td>@Html.DisplayFor(modelItem => item.MaxAdults) Người lớn</td>
+                                <td>@Html.DisplayFor(modelItem => item.MaxChildren) Trẻ em</td>
                                 <td>@item.PricePerNight?.ToString("N0") VND</td>
                                 <td class="text-end">
                                     <div class="btn-group" role="group">
