@@ -208,13 +208,19 @@ namespace PhucNguyenResort.Tests.Bookings
                 var service = new BookingService(context);
 
                 // Act
-                var result = await service.CancelBookingAsync(1, 1);
+                var result = await service.CancelBookingAsync(1, 1, "Bận việc", "VCB-123");
 
                 // Assert
                 Assert.True(result.Success);
                 Assert.Equal(1000000, result.RefundAmount);
                 var savedBooking = await context.Bookings.FindAsync(1);
                 Assert.Equal(BookingStatus.Cancelled, savedBooking.BookingStatus);
+                
+                var refund = await context.Refunds.FirstOrDefaultAsync(r => r.BookingId == 1);
+                Assert.NotNull(refund);
+                Assert.Equal(RefundStatus.Pending, refund.RefundStatus);
+                Assert.Equal("Bận việc", refund.RefundReason);
+                Assert.Equal("VCB-123", refund.BankDetails);
             }
         }
 
@@ -251,6 +257,9 @@ namespace PhucNguyenResort.Tests.Bookings
                 Assert.Equal(0, result.RefundAmount); // Không hoàn cọc
                 var savedBooking = await context.Bookings.FindAsync(1);
                 Assert.Equal(BookingStatus.Cancelled, savedBooking.BookingStatus);
+                
+                var refund = await context.Refunds.FirstOrDefaultAsync(r => r.BookingId == 1);
+                Assert.Null(refund);
             }
         }
 

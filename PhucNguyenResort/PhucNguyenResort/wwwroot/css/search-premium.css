@@ -1,0 +1,237 @@
+/* Premium Search Rooms Page Styles */
+
+/* Hero Banner */
+.search-hero {
+    position: relative;
+    padding: 150px 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.search-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+}
+
+.search-hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.search-hero-title {
+    color: #fff;
+    font-size: 50px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.search-hero-breadcrumb a {
+    color: #dfa974;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    margin-right: 15px;
+}
+
+.search-hero-breadcrumb span {
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+}
+
+/* Glassmorphism Search Form */
+.search-criteria-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    z-index: 10;
+    margin-top: -80px; /* Overlap effect */
+    margin-bottom: 50px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-criteria-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(223, 169, 116, 0.15), 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Luxury Search Form Inputs */
+.luxury-input {
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 12px 18px !important;
+    background: #f1f5f9 !important;
+    font-size: 15px;
+    color: #1e293b;
+    transition: all 0.3s ease;
+    height: 50px;
+}
+
+.luxury-input:focus {
+    background: #ffffff !important;
+    border-color: #dfa974 !important;
+    box-shadow: 0 0 0 3px rgba(223, 169, 116, 0.2) !important;
+    outline: none;
+}
+
+.luxury-btn {
+    background-color: #dfa974 !important;
+    color: white !important;
+    border-radius: 12px !important;
+    padding: 13px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    border: none !important;
+    transition: all 0.3s ease !important;
+    letter-spacing: 1px;
+    height: 50px;
+    box-shadow: 0 10px 20px rgba(223, 169, 116, 0.3) !important;
+}
+
+.luxury-btn:hover {
+    background-color: #c58f58 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(223, 169, 116, 0.4) !important;
+}
+
+.luxury-btn-outline {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #64748b !important;
+    border-radius: 12px !important;
+    padding: 0 18px !important;
+    transition: all 0.3s ease !important;
+    height: 50px;
+}
+
+.luxury-btn-outline:hover {
+    background-color: #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+/* Ghi đè thư viện nice-select của Sona */
+.search-criteria-wrapper .nice-select {
+    width: 100%;
+    height: 50px;
+    line-height: 48px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background-color: #f1f5f9;
+    float: none;
+    padding-left: 18px;
+    padding-right: 30px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.search-criteria-wrapper .nice-select:active, .search-criteria-wrapper .nice-select.open, .search-criteria-wrapper .nice-select:focus {
+    border-color: #dfa974;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(223, 169, 116, 0.2);
+}
+.search-criteria-wrapper .nice-select .current {
+    color: #1e293b;
+}
+.search-criteria-wrapper .nice-select::after {
+    right: 18px;
+}
+
+/* Luxury Room Card */
+.luxury-card {
+    border-radius: 20px !important;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05) !important;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    border: 1px solid rgba(0,0,0,0.02) !important;
+}
+
+.luxury-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.1) !important;
+}
+
+.card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 280px;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.luxury-card:hover .card-img-wrapper img {
+    transform: scale(1.08);
+}
+
+.price-pill {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1e293b;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    backdrop-filter: blur(5px);
+}
+
+.price-pill span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.amenity-pill {
+    background-color: #f8fafc;
+    color: #475569;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.amenity-pill i {
+    color: #dfa974;
+    margin-right: 4px;
+}
+
+.luxury-book-btn {
+    background-color: transparent !important;
+    border: 2px solid #0d233a !important;
+    color: #0d233a !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    text-transform: uppercase;
+    transition: all 0.3s ease !important;
+    letter-spacing: 1px;
+}
+
+.luxury-card:hover .luxury-book-btn {
+    background-color: #0d233a !important;
+    color: white !important;
+    box-shadow: 0 10px 20px rgba(13, 35, 58, 0.2) !important;
+}

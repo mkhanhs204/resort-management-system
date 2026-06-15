@@ -205,7 +205,7 @@ namespace PhucNguyenResort.Controllers
         [HttpPost]
         [Authorize(Roles = "Customer, Receptionist, Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cancel(int id)
+        public async Task<IActionResult> Cancel(int id, string? reason, string? bankDetails)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId))
@@ -213,10 +213,6 @@ namespace PhucNguyenResort.Controllers
                 return Unauthorized();
             }
 
-            // Admin/Receptionist can cancel any booking. We might need a slightly different logic for them if the service requires strictly the owner's userId.
-            // For now, if role is Admin/Receptionist, we bypass the userId check in the service by getting the actual booking's UserId, or we modify the service.
-            // Let's pass the booking's owner userId if the current user is Staff.
-            
             int targetUserId = userId;
             if (User.IsInRole("Admin") || User.IsInRole("Receptionist"))
             {
@@ -227,7 +223,7 @@ namespace PhucNguyenResort.Controllers
                 }
             }
 
-            var result = await _bookingService.CancelBookingAsync(id, targetUserId);
+            var result = await _bookingService.CancelBookingAsync(id, targetUserId, reason, bankDetails);
 
             if (result.Success)
             {

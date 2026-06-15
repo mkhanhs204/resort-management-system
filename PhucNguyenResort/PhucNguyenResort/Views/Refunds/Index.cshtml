@@ -1,0 +1,196 @@
+@model IEnumerable<PhucNguyenResort.Models.Refund>
+@using PhucNguyenResort.Enums
+
+@{
+    ViewData["Title"] = "Quản lý Hoàn Tiền";
+    Layout = "_DashboardLayout";
+}
+<div class="container-fluid refund-container py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 page-title">Quản lý Hoàn Tiền</h1>
+        
+        <!-- Filter Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-premium-action btn-primary shadow-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-filter fa-sm text-white-50 mr-2"></i> Lọc trạng thái
+            </button>
+            <div class="dropdown-menu dropdown-menu-right shadow-lg border-0 rounded-lg" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item py-2 @(ViewBag.CurrentStatus == null ? "active font-weight-bold" : "")" asp-action="Index" asp-route-status=""><i class="fas fa-border-all text-muted mr-2"></i> Tất cả</a>
+                <a class="dropdown-item py-2 @(ViewBag.CurrentStatus?.ToString() == "Pending" ? "active font-weight-bold" : "")" asp-action="Index" asp-route-status="Pending"><i class="fas fa-hourglass-half text-warning mr-2"></i> Chờ xử lý</a>
+                <a class="dropdown-item py-2 @(ViewBag.CurrentStatus?.ToString() == "Completed" ? "active font-weight-bold" : "")" asp-action="Index" asp-route-status="Completed"><i class="fas fa-check-circle text-success mr-2"></i> Đã hoàn tiền</a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" style="border-radius: 12px; background-color: #ecfdf5; color: #065f46;" role="alert">
+            <i class="fas fa-check-circle mr-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" style="border-radius: 12px; background-color: #fef2f2; color: #991b1b;" role="alert">
+            <i class="fas fa-exclamation-circle mr-2"></i>@TempData["Error"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="card premium-card mb-4">
+        <div class="premium-card-header d-flex align-items-center">
+            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Danh sách Yêu cầu Hủy phòng & Hoàn tiền</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table premium-table mb-0" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="pl-4">Mã Refund</th>
+                            <th>Mã Booking</th>
+                            <th>Khách Hàng</th>
+                            <th>Số Tiền (VNĐ)</th>
+                            <th>Lý Do Hủy</th>
+                            <th>Ngân Hàng</th>
+                            <th>Trạng Thái</th>
+                            <th>Ngày Tạo</th>
+                            <th class="pr-4 text-right">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="pl-4 font-weight-bold text-secondary">#@item.RefundId</td>
+                                <td>
+                                    <a asp-controller="Bookings" asp-action="Details" asp-route-id="@item.BookingId" class="badge badge-light p-2 border">#@item.BookingId</a>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-2 rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                            <i class="fas fa-user text-secondary"></i>
+                                        </div>
+                                        <span class="font-weight-bold">@item.Booking?.User?.FullName</span>
+                                    </div>
+                                </td>
+                                <td class="amount-text">@item.RefundAmount?.ToString("N0")</td>
+                                <td><span class="text-muted" style="font-size: 0.9rem;">@(string.IsNullOrEmpty(item.RefundReason) ? "-" : item.RefundReason)</span></td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.BankDetails))
+                                    {
+                                        <button class="btn btn-sm btn-outline-info btn-premium-action btn-view-bank" type="button" data-details="@item.BankDetails">
+                                            <i class="fas fa-credit-card mr-1"></i> Xem
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.RefundStatus == RefundStatus.Pending)
+                                    {
+                                        <span class="badge badge-gradient-warning"><i class="fas fa-clock mr-1"></i> Chờ Xử Lý</span>
+                                    }
+                                    else if (item.RefundStatus == RefundStatus.Completed)
+                                    {
+                                        <span class="badge badge-gradient-success"><i class="fas fa-check mr-1"></i> Đã Hoàn Tiền</span>
+                                    }
+                                </td>
+                                <td><span class="text-muted"><i class="far fa-calendar-alt mr-1"></i> @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span></td>
+                                <td class="pr-4 text-right">
+                                    @if (item.RefundStatus == RefundStatus.Pending)
+                                    {
+                                        <form asp-action="ProcessRefund" asp-route-id="@item.RefundId" method="post" style="display:inline;" onsubmit="return confirm('Bạn xác nhận ĐÃ CHUYỂN KHOẢN số tiền @item.RefundAmount?.ToString("N0") VNĐ cho khách hàng này?');">
+                                            <button type="submit" class="btn btn-sm btn-success btn-premium-action">
+                                                <i class="fas fa-check"></i> Duyệt
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        @if(!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-5">
+                                    <div class="d-flex flex-column align-items-center justify-content-center">
+                                        <i class="fas fa-box-open fa-3x mb-3 text-light"></i>
+                                        <p class="mb-0">Không có yêu cầu hoàn tiền nào.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Premium Modal Thông tin chuyển khoản -->
+<div class="modal fade premium-modal" id="bankDetailsModal" tabindex="-1" role="dialog" aria-labelledby="bankDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-white" id="bankDetailsModalLabel">
+            <i class="fas fa-university mr-2"></i> Chi tiết Chuyển khoản
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3 text-primary">
+            <i class="fas fa-money-check-alt fa-3x"></i>
+        </div>
+        <p class="mb-3 text-muted" style="font-size: 0.95rem;">Vui lòng thực hiện chuyển khoản đến tài khoản dưới đây để hoàn tất yêu cầu hoàn tiền.</p>
+        
+        <div class="bank-details-box shadow-sm">
+            <button class="btn-copy" onclick="copyToClipboard()" title="Sao chép">
+                <i class="far fa-copy"></i> Copy
+            </button>
+            <h4 id="modalBankDetailsText" class="text-dark font-weight-bold mb-0 mt-2" style="white-space: pre-line; word-break: break-word; font-family: monospace;"></h4>
+        </div>
+        <div id="copyToast" class="text-success mt-2" style="display: none; font-size: 0.85rem; font-weight: 500;">
+            <i class="fas fa-check-circle mr-1"></i> Đã sao chép vào clipboard!
+        </div>
+      </div>
+      <div class="modal-footer border-top-0 justify-content-center pb-4">
+        <button type="button" class="btn btn-light btn-premium-action px-4" data-dismiss="modal">Đóng cửa sổ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.btn-view-bank').on('click', function() {
+                var details = $(this).data('details');
+                // Gán nội dung vào modal
+                $('#modalBankDetailsText').text(details);
+                // Reset toast
+                $('#copyToast').hide();
+                // Hiển thị modal
+                $('#bankDetailsModal').modal('show');
+            });
+        });
+
+        function copyToClipboard() {
+            var text = document.getElementById("modalBankDetailsText").innerText;
+            navigator.clipboard.writeText(text).then(function() {
+                $('#copyToast').fadeIn().delay(2000).fadeOut();
+            }, function(err) {
+                console.error('Không thể sao chép: ', err);
+            });
+        }
+    </script>
+}
