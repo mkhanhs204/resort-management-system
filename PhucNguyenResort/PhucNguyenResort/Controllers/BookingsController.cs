@@ -7,6 +7,8 @@ using PhucNguyenResort.ViewModels.Bookings;
 using PhucNguyenResort.Services.Payments;
 using PhucNguyenResort.ViewModels.Payments;
 using System.Security.Claims;
+using PhucNguyenResort.Models;
+using PhucNguyenResort.Enums;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -16,12 +18,14 @@ namespace PhucNguyenResort.Controllers
         private readonly IBookingService _bookingService;
         private readonly ResortDbContext _context;
         private readonly IVnPayService _vnPayService;
+        private readonly IBookingGuestService _bookingGuestService;
 
-        public BookingsController(IBookingService bookingService, ResortDbContext context, IVnPayService vnPayService)
+        public BookingsController(IBookingService bookingService, ResortDbContext context, IVnPayService vnPayService, IBookingGuestService bookingGuestService)
         {
             _bookingService = bookingService;
             _context = context;
             _vnPayService = vnPayService;
+            _bookingGuestService = bookingGuestService;
         }
 
         // GET: /Bookings/Create
@@ -96,6 +100,11 @@ namespace PhucNguyenResort.Controllers
                 return NotFound();
             }
 
+            if (!model.PdpdConsentChecked)
+            {
+                ModelState.AddModelError(nameof(model.PdpdConsentChecked), "Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD).");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Room = room;
@@ -117,6 +126,19 @@ namespace PhucNguyenResort.Controllers
 
             if (result.Success)
             {
+                // Save primary guest details for stay registration (Law on Residence 2020 & PDPD Compliance)
+                var primaryGuest = new BookingGuestDto
+                {
+                    FullName = model.PrimaryGuestName,
+                    DateOfBirth = model.PrimaryGuestDateOfBirth,
+                    Gender = model.PrimaryGuestGender,
+                    PassportNumber = model.PrimaryGuestPassportNumber,
+                    Nationality = model.PrimaryGuestNationality,
+                    IsPrimaryBooker = true
+                };
+
+                await _bookingGuestService.SaveBookingGuestsAsync(result.BookingId!.Value, new[] { primaryGuest }, model.PdpdConsentChecked);
+
                 // Lấy thông tin Booking từ DB để có được DepositAmount chính xác (đã bao gồm tiền Tour)
                 var newBooking = await _context.Bookings.FindAsync(result.BookingId!.Value);
                 var depositAmount = (double)(newBooking?.DepositAmount ?? 0);
@@ -242,7 +264,441 @@ namespace PhucNguyenResort.Controllers
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
 
+            var tokens = new Dictionary<int, string>();
+            foreach (var b in bookings)
+            {
+                tokens[b.BookingId] = GeneratePreCheckinToken(b);
+            }
+            ViewBag.PreCheckinTokens = tokens;
+
             return View(bookings);
+        }
+
+        // GET: /Bookings/PreCheckin/{id}
+        [AllowAnonymous]
+        public async Task<IActionResult> PreCheckin(int id, string? token)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Category)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
+
+            if (booking == null)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            bool isOwner = false;
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdString, out int userId) && booking.UserId == userId)
+            {
+                isOwner = true;
+            }
+
+            if (!isOwner)
+            {
+                if (string.IsNullOrEmpty(token))
+                {
+                    return RedirectToAction("Login", "Account", new { returnUrl = Request.Path + Request.QueryString });
+                }
+
+                var expectedToken = GeneratePreCheckinToken(booking);
+                if (expectedToken != token)
+                {
+                    return Forbid("Token xác thực không hợp lệ hoặc đã hết hạn.");
+                }
+            }
+
+            // Load existing guests
+            var guests = await _bookingGuestService.GetBookingGuestsForCheckInAsync(id);
+            var guestList = guests.ToList();
+
+            // Total slots = Adults + Children
+            int maxCapacity = (booking.NumberOfAdults ?? 0) + (booking.NumberOfChildren ?? 0);
+            
+            // Prefill with default empty guests to fill up the capacity slots
+            while (guestList.Count < maxCapacity)
+            {
+                guestList.Add(new BookingGuestDto
+                {
+                    IsPrimaryBooker = guestList.Count == 0 // First guest is primary booker by default
+                });
+            }
+
+            var model = new PreCheckinViewModel
+            {
+                BookingId = booking.BookingId,
+                RoomNumber = booking.Room?.RoomNumber ?? string.Empty,
+                CategoryName = booking.Room?.Category?.CategoryName ?? string.Empty,
+                CheckInDate = booking.CheckInDate,
+                CheckOutDate = booking.CheckOutDate,
+                PdpdConsentChecked = booking.PdpdConsentChecked,
+                Guests = guestList
+            };
+
+            ViewBag.Token = token;
+            ViewBag.ShareableLink = Url.Action("PreCheckin", "Bookings", new { id = booking.BookingId, token = GeneratePreCheckinToken(booking) }, Request.Scheme);
+            return View(model);
+        }
+
+        // POST: /Bookings/PreCheckin/{id}
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PreCheckin(PreCheckinViewModel model, string? token)
+        {
+            var booking = await _context.Bookings.FindAsync(model.BookingId);
+            if (booking == null)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            bool isOwner = false;
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdString, out int userId) && booking.UserId == userId)
+            {
+                isOwner = true;
+            }
+
+            if (!isOwner)
+            {
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Forbid();
+                }
+
+                var expectedToken = GeneratePreCheckinToken(booking);
+                if (expectedToken != token)
+                {
+                    return Forbid("Token xác thực không hợp lệ hoặc đã hết hạn.");
+                }
+            }
+
+            if (!model.PdpdConsentChecked)
+            {
+                ModelState.AddModelError(nameof(model.PdpdConsentChecked), "Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD) để tiếp tục.");
+            }
+
+            // Validations for guests
+            for (int i = 0; i < model.Guests.Count; i++)
+            {
+                var guest = model.Guests[i];
+                if (guest.IsPrimaryBooker)
+                {
+                    if (string.IsNullOrWhiteSpace(guest.FullName))
+                    {
+                        ModelState.AddModelError($"Guests[{i}].FullName", "Họ tên người đặt chính không được để trống.");
+                    }
+                    if (guest.DateOfBirth == null)
+                    {
+                        ModelState.AddModelError($"Guests[{i}].DateOfBirth", "Ngày sinh người đặt chính không được để trống.");
+                    }
+                    if (guest.Gender == null)
+                    {
+                        ModelState.AddModelError($"Guests[{i}].Gender", "Vui lòng chọn giới tính người đặt chính.");
+                    }
+                    if (string.IsNullOrWhiteSpace(guest.PassportNumber))
+                    {
+                        ModelState.AddModelError($"Guests[{i}].PassportNumber", "Số CCCD/Hộ chiếu người đặt chính không được để trống.");
+                    }
+                    if (string.IsNullOrWhiteSpace(guest.Nationality))
+                    {
+                        ModelState.AddModelError($"Guests[{i}].Nationality", "Quốc tịch người đặt chính không được để trống.");
+                    }
+                }
+                else
+                {
+                    bool hasAnyField = !string.IsNullOrWhiteSpace(guest.FullName) 
+                                       || !string.IsNullOrWhiteSpace(guest.PassportNumber) 
+                                       || guest.DateOfBirth != null;
+                    if (hasAnyField)
+                    {
+                        if (string.IsNullOrWhiteSpace(guest.FullName))
+                        {
+                            ModelState.AddModelError($"Guests[{i}].FullName", $"Họ tên khách thứ {i + 1} không được để trống.");
+                        }
+                        if (guest.DateOfBirth == null)
+                        {
+                            ModelState.AddModelError($"Guests[{i}].DateOfBirth", $"Ngày sinh khách thứ {i + 1} không được để trống.");
+                        }
+                        if (guest.Gender == null)
+                        {
+                            ModelState.AddModelError($"Guests[{i}].Gender", $"Vui lòng chọn giới tính khách thứ {i + 1}.");
+                        }
+                        if (string.IsNullOrWhiteSpace(guest.Nationality))
+                        {
+                            ModelState.AddModelError($"Guests[{i}].Nationality", $"Quốc tịch khách thứ {i + 1} không được để trống.");
+                        }
+                    }
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var fullBooking = await _context.Bookings
+                    .Include(b => b.Room)
+                        .ThenInclude(r => r.Category)
+                    .FirstOrDefaultAsync(b => b.BookingId == model.BookingId);
+                if (fullBooking != null)
+                {
+                    model.RoomNumber = fullBooking.Room?.RoomNumber ?? string.Empty;
+                    model.CategoryName = fullBooking.Room?.Category?.CategoryName ?? string.Empty;
+                    model.CheckInDate = fullBooking.CheckInDate;
+                    model.CheckOutDate = fullBooking.CheckOutDate;
+                }
+                ViewBag.Token = token;
+                ViewBag.ShareableLink = Url.Action("PreCheckin", "Bookings", new { id = booking.BookingId, token = GeneratePreCheckinToken(booking) }, Request.Scheme);
+                return View(model);
+            }
+
+            var validGuests = model.Guests
+                .Where(g => !string.IsNullOrWhiteSpace(g.FullName))
+                .ToList();
+
+            try
+            {
+                await _bookingGuestService.SaveBookingGuestsAsync(model.BookingId, validGuests, model.PdpdConsentChecked);
+                TempData["SuccessMessage"] = "Khai báo thông tin tạm trú thành công!";
+                
+                if (isOwner)
+                {
+                    return RedirectToAction(nameof(MyBookings));
+                }
+                else
+                {
+                    return RedirectToAction("PreCheckinSuccess", new { id = model.BookingId, token = token });
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Có lỗi xảy ra: {ex.Message}");
+                ViewBag.Token = token;
+                ViewBag.ShareableLink = Url.Action("PreCheckin", "Bookings", new { id = booking.BookingId, token = GeneratePreCheckinToken(booking) }, Request.Scheme);
+                return View(model);
+            }
+        }
+
+        // GET: /Bookings/PreCheckinSuccess/{id}
+        [AllowAnonymous]
+        public async Task<IActionResult> PreCheckinSuccess(int id, string? token)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Category)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
+
+            if (booking == null)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            if (token != GeneratePreCheckinToken(booking))
+            {
+                return Forbid("Xác thực token thất bại.");
+            }
+
+            return View(booking);
+        }
+
+        // GET: /Bookings/CheckIn/{id}
+        [Authorize(Roles = "Receptionist, Admin")]
+        public async Task<IActionResult> CheckIn(int id)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Category)
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
+
+            if (booking == null)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            if (booking.BookingStatus != BookingStatus.Reserved && booking.BookingStatus != BookingStatus.PendingPayment)
+            {
+                TempData["Error"] = "Đơn đặt phòng này không ở trạng thái có thể Check-in.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var guests = await _bookingGuestService.GetBookingGuestsForCheckInAsync(id);
+            var guestList = guests.ToList();
+
+            int maxCapacity = (booking.NumberOfAdults ?? 0) + (booking.NumberOfChildren ?? 0);
+            while (guestList.Count < maxCapacity)
+            {
+                guestList.Add(new BookingGuestDto
+                {
+                    IsPrimaryBooker = guestList.Count == 0
+                });
+            }
+
+            var model = new PreCheckinViewModel
+            {
+                BookingId = booking.BookingId,
+                RoomNumber = booking.Room?.RoomNumber ?? string.Empty,
+                CategoryName = booking.Room?.Category?.CategoryName ?? string.Empty,
+                CheckInDate = booking.CheckInDate,
+                CheckOutDate = booking.CheckOutDate,
+                PdpdConsentChecked = booking.PdpdConsentChecked,
+                Guests = guestList
+            };
+
+            return View(model);
+        }
+
+        // POST: /Bookings/CheckIn/{id}
+        [HttpPost]
+        [Authorize(Roles = "Receptionist, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckIn(PreCheckinViewModel model)
+        {
+            var booking = await _context.Bookings.FindAsync(model.BookingId);
+            if (booking == null)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            // Validations for guests
+            for (int i = 0; i < model.Guests.Count; i++)
+            {
+                var guest = model.Guests[i];
+                if (guest.IsPrimaryBooker)
+                {
+                    if (string.IsNullOrWhiteSpace(guest.FullName))
+                    {
+                        ModelState.AddModelError($"Guests[{i}].FullName", "Họ tên người đặt chính không được để trống.");
+                    }
+                    if (guest.DateOfBirth == null)
+                    {
+                        ModelState.AddModelError($"Guests[{i}].DateOfBirth", "Ngày sinh người đặt chính không được để trống.");
+                    }
+                    if (guest.Gender == null)
+                    {
+                        ModelState.AddModelError($"Guests[{i}].Gender", "Vui lòng chọn giới tính người đặt chính.");
+                    }
+                    if (string.IsNullOrWhiteSpace(guest.PassportNumber))
+                    {
+                        ModelState.AddModelError($"Guests[{i}].PassportNumber", "Số CCCD/Hộ chiếu người đặt chính không được để trống.");
+                    }
+                    if (string.IsNullOrWhiteSpace(guest.Nationality))
+                    {
+                        ModelState.AddModelError($"Guests[{i}].Nationality", "Quốc tịch người đặt chính không được để trống.");
+                    }
+                }
+                else
+                {
+                    bool hasAnyField = !string.IsNullOrWhiteSpace(guest.FullName) 
+                                       || !string.IsNullOrWhiteSpace(guest.PassportNumber) 
+                                       || guest.DateOfBirth != null;
+                    if (hasAnyField)
+                    {
+                        if (string.IsNullOrWhiteSpace(guest.FullName))
+                        {
+                            ModelState.AddModelError($"Guests[{i}].FullName", $"Họ tên khách thứ {i + 1} không được để trống.");
+                        }
+                        if (guest.DateOfBirth == null)
+                        {
+                            ModelState.AddModelError($"Guests[{i}].DateOfBirth", $"Ngày sinh khách thứ {i + 1} không được để trống.");
+                        }
+                        if (guest.Gender == null)
+                        {
+                            ModelState.AddModelError($"Guests[{i}].Gender", $"Vui lòng chọn giới tính khách thứ {i + 1}.");
+                        }
+                        if (string.IsNullOrWhiteSpace(guest.Nationality))
+                        {
+                            ModelState.AddModelError($"Guests[{i}].Nationality", $"Quốc tịch khách thứ {i + 1} không được để trống.");
+                        }
+                    }
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var fullBooking = await _context.Bookings
+                    .Include(b => b.Room)
+                        .ThenInclude(r => r.Category)
+                    .FirstOrDefaultAsync(b => b.BookingId == model.BookingId);
+                if (fullBooking != null)
+                {
+                    model.RoomNumber = fullBooking.Room?.RoomNumber ?? string.Empty;
+                    model.CategoryName = fullBooking.Room?.Category?.CategoryName ?? string.Empty;
+                    model.CheckInDate = fullBooking.CheckInDate;
+                    model.CheckOutDate = fullBooking.CheckOutDate;
+                }
+                return View(model);
+            }
+
+            var validGuests = model.Guests
+                .Where(g => !string.IsNullOrWhiteSpace(g.FullName))
+                .ToList();
+
+            try
+            {
+                await _bookingGuestService.SaveBookingGuestsAsync(model.BookingId, validGuests, true);
+
+                booking.BookingStatus = BookingStatus.CheckedIn;
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Thực hiện Check-in thành công cho Booking #{booking.BookingId}!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Có lỗi xảy ra: {ex.Message}");
+                return View(model);
+            }
+        }
+
+        // GET: /Bookings/ExportManifest/{id}
+        [Authorize(Roles = "Receptionist, Admin")]
+        public async Task<IActionResult> ExportManifest(int id)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Room)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
+
+            if (booking == null)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            var guests = await _bookingGuestService.GetBookingGuestsForCheckInAsync(id);
+            var guestList = guests.ToList();
+
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("\uFEFF"); // BOM for Excel
+            csv.AppendLine("STT,Họ và Tên,Ngày Sinh,Giới Tính,Số CCCD/Hộ Chiếu,Quốc Tịch,Vai Trò,Thời Gian Tạm Trú");
+
+            int index = 1;
+            foreach (var guest in guestList)
+            {
+                var dobStr = guest.DateOfBirth?.ToString("dd/MM/yyyy") ?? "";
+                var genderStr = guest.Gender?.ToString() ?? "";
+                var role = guest.IsPrimaryBooker ? "Người đặt chính" : "Khách đi cùng";
+                var durationStr = $"{booking.CheckInDate:dd/MM/yyyy} - {booking.CheckOutDate:dd/MM/yyyy}";
+
+                var nameEscaped = $"\"{guest.FullName.Replace("\"", "\"\"")}\"";
+                var nationalityEscaped = $"\"{guest.Nationality.Replace("\"", "\"\"")}\"";
+
+                csv.AppendLine($"{index},{nameEscaped},{dobStr},{genderStr},{guest.PassportNumber},{nationalityEscaped},{role},{durationStr}");
+                index++;
+            }
+
+            var fileBytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+            var fileName = $"BaoCaoTamTru_Booking_{booking.BookingId}.csv";
+            return File(fileBytes, "text/csv; charset=utf-8", fileName);
+        }
+
+        private string GeneratePreCheckinToken(Booking booking)
+        {
+            var input = $"{booking.BookingId}-{booking.CheckInDate.Ticks}-PNSecretKey2026";
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+                var hash = sha256.ComputeHash(bytes);
+                return Convert.ToHexString(hash).ToLower();
+            }
         }
     }
 }

@@ -26,8 +26,10 @@
         <!-- Sidebar -->
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h3>PhucNguyen</h3>
-                <span style="color: #aaa; font-size: 14px;">Resort Management</span>
+                <a href="/" style="text-decoration: none; display: block;">
+                    <h3>PhucNguyen</h3>
+                    <span style="color: #aaa; font-size: 13px; display: block; margin-top: 3px; font-weight: normal; letter-spacing: 0.5px;">Resort Management</span>
+                </a>
             </div>
 
             <ul class="list-unstyled components">
@@ -109,11 +111,10 @@
                 <div class="nav-right">
                     <div class="user-profile dropdown">
                         <img src="~/img/blog/blog-1.jpg" alt="User">
-                        <span>Staff Name <i class="fa fa-angle-down"></i></span>
-                        <!-- Dropdown menu placeholder -->
+                        <span>@(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Staff Member") <i class="fa fa-angle-down"></i></span>
                     </div>
                     <a href="/" class="btn btn-sm btn-outline-secondary" title="View Website"><i class="fa fa-globe"></i></a>
-                    <a href="#" class="btn btn-sm btn-danger" title="Logout"><i class="fa fa-sign-out"></i></a>
+                    <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-danger" title="Logout"><i class="fa fa-sign-out"></i></a>
                 </div>
             </nav>
 

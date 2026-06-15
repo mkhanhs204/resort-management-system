@@ -43,6 +43,9 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<DateTime>("CheckOutDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("ConsentTimestamp")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -57,6 +60,9 @@ namespace PhucNguyenResort.Web.Migrations
 
                     b.Property<int?>("NumberOfChildren")
                         .HasColumnType("int");
+
+                    b.Property<bool>("PdpdConsentChecked")
+                        .HasColumnType("bit");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
@@ -81,12 +87,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 1,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 6, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6319),
-                            CheckOutDate = new DateTime(2026, 6, 5, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6326),
-                            CreatedAt = new DateTime(2026, 5, 29, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6329),
+                            CheckInDate = new DateTime(2026, 6, 4, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2845),
+                            CheckOutDate = new DateTime(2026, 6, 6, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2853),
+                            CreatedAt = new DateTime(2026, 5, 30, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2856),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 1,
                             TotalAmount = 2400000m,
                             UserId = 2
@@ -95,12 +102,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 2,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 18, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6332),
-                            CheckOutDate = new DateTime(2026, 6, 21, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6332),
-                            CreatedAt = new DateTime(2026, 6, 11, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6334),
+                            CheckInDate = new DateTime(2026, 6, 19, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2859),
+                            CheckOutDate = new DateTime(2026, 6, 22, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2860),
+                            CreatedAt = new DateTime(2026, 6, 12, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2862),
                             DepositAmount = 1500000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 2,
                             TotalAmount = 3000000m,
                             UserId = 2
@@ -109,12 +117,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 3,
                             BookingStatus = "PendingPayment",
-                            CheckInDate = new DateTime(2026, 6, 23, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6336),
-                            CheckOutDate = new DateTime(2026, 6, 25, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6336),
-                            CreatedAt = new DateTime(2026, 6, 12, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6338),
+                            CheckInDate = new DateTime(2026, 6, 24, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2864),
+                            CheckOutDate = new DateTime(2026, 6, 26, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2865),
+                            CreatedAt = new DateTime(2026, 6, 13, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2866),
                             DepositAmount = 2500000m,
                             NumberOfAdults = 4,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 10,
                             TotalAmount = 5000000m,
                             UserId = 3
@@ -123,12 +132,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 4,
                             BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 6, 8, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6341),
-                            CheckOutDate = new DateTime(2026, 6, 10, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6342),
-                            CreatedAt = new DateTime(2026, 6, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6344),
+                            CheckInDate = new DateTime(2026, 6, 9, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2870),
+                            CheckOutDate = new DateTime(2026, 6, 11, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2870),
+                            CreatedAt = new DateTime(2026, 6, 4, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2872),
                             DepositAmount = 1000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 11,
                             TotalAmount = 2000000m,
                             UserId = 3
@@ -137,12 +147,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 5,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 14, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6345),
-                            CheckOutDate = new DateTime(2026, 6, 17, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6345),
-                            CreatedAt = new DateTime(2026, 6, 8, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6347),
+                            CheckInDate = new DateTime(2026, 6, 15, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2874),
+                            CheckOutDate = new DateTime(2026, 6, 18, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2875),
+                            CreatedAt = new DateTime(2026, 6, 9, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2876),
                             DepositAmount = 12000000m,
                             NumberOfAdults = 6,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 13,
                             TotalAmount = 24000000m,
                             UserId = 2
@@ -151,12 +162,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 6,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 5, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6348),
-                            CheckOutDate = new DateTime(2026, 5, 15, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6353),
-                            CreatedAt = new DateTime(2026, 5, 8, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6355),
+                            CheckInDate = new DateTime(2026, 5, 14, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2878),
+                            CheckOutDate = new DateTime(2026, 5, 16, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2883),
+                            CreatedAt = new DateTime(2026, 5, 9, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2885),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 1,
                             TotalAmount = 2400000m,
                             UserId = 2
@@ -165,12 +177,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 7,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 4, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6356),
-                            CheckOutDate = new DateTime(2026, 4, 16, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6357),
-                            CreatedAt = new DateTime(2026, 4, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6359),
+                            CheckInDate = new DateTime(2026, 4, 14, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2918),
+                            CheckOutDate = new DateTime(2026, 4, 17, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2918),
+                            CreatedAt = new DateTime(2026, 4, 4, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2921),
                             DepositAmount = 1500000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 2,
                             TotalAmount = 3000000m,
                             UserId = 3
@@ -179,12 +192,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 8,
                             BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 5, 24, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6360),
-                            CheckOutDate = new DateTime(2026, 5, 26, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6361),
-                            CreatedAt = new DateTime(2026, 5, 19, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6362),
+                            CheckInDate = new DateTime(2026, 5, 25, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2923),
+                            CheckOutDate = new DateTime(2026, 5, 27, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2923),
+                            CreatedAt = new DateTime(2026, 5, 20, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2925),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 4,
                             TotalAmount = 2400000m,
                             UserId = 3
@@ -193,12 +207,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 9,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 5, 29, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6365),
-                            CheckOutDate = new DateTime(2026, 6, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6365),
-                            CreatedAt = new DateTime(2026, 5, 24, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6366),
+                            CheckInDate = new DateTime(2026, 5, 30, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2928),
+                            CheckOutDate = new DateTime(2026, 6, 4, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2928),
+                            CreatedAt = new DateTime(2026, 5, 25, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2930),
                             DepositAmount = 3000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 5,
                             TotalAmount = 6000000m,
                             UserId = 2
@@ -207,12 +222,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 10,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 7, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6368),
-                            CheckOutDate = new DateTime(2026, 7, 5, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6369),
-                            CreatedAt = new DateTime(2026, 6, 12, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6370),
+                            CheckInDate = new DateTime(2026, 7, 4, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2932),
+                            CheckOutDate = new DateTime(2026, 7, 6, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2933),
+                            CreatedAt = new DateTime(2026, 6, 13, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2935),
                             DepositAmount = 8000000m,
                             NumberOfAdults = 5,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 13,
                             TotalAmount = 16000000m,
                             UserId = 3
@@ -221,12 +237,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 11,
                             BookingStatus = "PendingPayment",
-                            CheckInDate = new DateTime(2026, 6, 28, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6372),
-                            CheckOutDate = new DateTime(2026, 7, 1, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6372),
-                            CreatedAt = new DateTime(2026, 6, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6374),
+                            CheckInDate = new DateTime(2026, 6, 29, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2937),
+                            CheckOutDate = new DateTime(2026, 7, 2, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2937),
+                            CreatedAt = new DateTime(2026, 6, 14, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2939),
                             DepositAmount = 12000000m,
                             NumberOfAdults = 6,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 14,
                             TotalAmount = 24000000m,
                             UserId = 2
@@ -235,12 +252,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 12,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 2, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6375),
-                            CheckOutDate = new DateTime(2026, 2, 18, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6376),
-                            CreatedAt = new DateTime(2026, 2, 3, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6377),
+                            CheckInDate = new DateTime(2026, 2, 14, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2941),
+                            CheckOutDate = new DateTime(2026, 2, 19, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2941),
+                            CreatedAt = new DateTime(2026, 2, 4, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2944),
                             DepositAmount = 3000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 6,
                             TotalAmount = 6000000m,
                             UserId = 3
@@ -249,12 +267,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 13,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 1, 13, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6379),
-                            CheckOutDate = new DateTime(2026, 1, 14, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6379),
-                            CreatedAt = new DateTime(2026, 1, 10, 18, 46, 40, 311, DateTimeKind.Local).AddTicks(6381),
+                            CheckInDate = new DateTime(2026, 1, 14, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2945),
+                            CheckOutDate = new DateTime(2026, 1, 15, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2946),
+                            CreatedAt = new DateTime(2026, 1, 11, 17, 4, 24, 614, DateTimeKind.Local).AddTicks(2948),
                             DepositAmount = 600000m,
                             NumberOfAdults = 1,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 1,
                             TotalAmount = 1200000m,
                             UserId = 3
@@ -269,6 +288,7 @@ namespace PhucNguyenResort.Web.Migrations
                             DepositAmount = 1200000.00m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 14,
                             TotalAmount = 5300000.00m,
                             UserId = 14
@@ -283,6 +303,7 @@ namespace PhucNguyenResort.Web.Migrations
                             DepositAmount = 1250000.00m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 15,
                             TotalAmount = 5550000.00m,
                             UserId = 15
@@ -297,6 +318,7 @@ namespace PhucNguyenResort.Web.Migrations
                             DepositAmount = 1300000.00m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 16,
                             TotalAmount = 5800000.00m,
                             UserId = 16
@@ -311,6 +333,7 @@ namespace PhucNguyenResort.Web.Migrations
                             DepositAmount = 1350000.00m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 17,
                             TotalAmount = 6050000.00m,
                             UserId = 17
@@ -325,6 +348,7 @@ namespace PhucNguyenResort.Web.Migrations
                             DepositAmount = 1400000.00m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 18,
                             TotalAmount = 6300000.00m,
                             UserId = 18
@@ -339,6 +363,7 @@ namespace PhucNguyenResort.Web.Migrations
                             DepositAmount = 1450000.00m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 19,
                             TotalAmount = 6550000.00m,
                             UserId = 19
@@ -353,6 +378,7 @@ namespace PhucNguyenResort.Web.Migrations
                             DepositAmount = 1500000.00m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
+                            PdpdConsentChecked = false,
                             RoomId = 20,
                             TotalAmount = 6800000.00m,
                             UserId = 20
@@ -377,13 +403,19 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPrimaryBooker")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Nationality")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PassportNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("BookingGuestId");
 
@@ -398,6 +430,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 1,
                             DateOfBirth = new DateTime(1991, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 01",
+                            IsPrimaryBooker = false,
                             Nationality = "Korean",
                             PassportNumber = "P20260001"
                         },
@@ -407,6 +440,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 2,
                             DateOfBirth = new DateTime(1992, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 02",
+                            IsPrimaryBooker = false,
                             Nationality = "Japanese",
                             PassportNumber = "P20260002"
                         },
@@ -416,6 +450,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 3,
                             DateOfBirth = new DateTime(1993, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 03",
+                            IsPrimaryBooker = false,
                             Nationality = "American",
                             PassportNumber = "P20260003"
                         },
@@ -425,6 +460,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 4,
                             DateOfBirth = new DateTime(1994, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 04",
+                            IsPrimaryBooker = false,
                             Nationality = "French",
                             PassportNumber = "P20260004"
                         },
@@ -434,6 +470,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 5,
                             DateOfBirth = new DateTime(1995, 8, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 05",
+                            IsPrimaryBooker = false,
                             Nationality = "German",
                             PassportNumber = "P20260005"
                         },
@@ -443,6 +480,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 6,
                             DateOfBirth = new DateTime(1996, 9, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 06",
+                            IsPrimaryBooker = false,
                             Nationality = "Australian",
                             PassportNumber = "P20260006"
                         },
@@ -452,6 +490,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 7,
                             DateOfBirth = new DateTime(1997, 10, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 07",
+                            IsPrimaryBooker = false,
                             Nationality = "Singaporean",
                             PassportNumber = "P20260007"
                         },
@@ -461,6 +500,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 8,
                             DateOfBirth = new DateTime(1998, 11, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 08",
+                            IsPrimaryBooker = false,
                             Nationality = "Thai",
                             PassportNumber = "P20260008"
                         },
@@ -470,6 +510,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 9,
                             DateOfBirth = new DateTime(1999, 12, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 09",
+                            IsPrimaryBooker = false,
                             Nationality = "Malaysian",
                             PassportNumber = "P20260009"
                         },
@@ -479,6 +520,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 10,
                             DateOfBirth = new DateTime(2000, 1, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 10",
+                            IsPrimaryBooker = false,
                             Nationality = "British",
                             PassportNumber = "P20260010"
                         },
@@ -488,6 +530,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 11,
                             DateOfBirth = new DateTime(2001, 2, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 11",
+                            IsPrimaryBooker = false,
                             Nationality = "Canadian",
                             PassportNumber = "P20260011"
                         },
@@ -497,6 +540,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 12,
                             DateOfBirth = new DateTime(2002, 3, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 12",
+                            IsPrimaryBooker = false,
                             Nationality = "Indian",
                             PassportNumber = "P20260012"
                         },
@@ -506,6 +550,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 13,
                             DateOfBirth = new DateTime(2003, 4, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 13",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260013"
                         },
@@ -515,6 +560,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 14,
                             DateOfBirth = new DateTime(2004, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 14",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260014"
                         },
@@ -524,6 +570,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 15,
                             DateOfBirth = new DateTime(1990, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 15",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260015"
                         },
@@ -533,6 +580,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 16,
                             DateOfBirth = new DateTime(1991, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 16",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260016"
                         },
@@ -542,6 +590,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 17,
                             DateOfBirth = new DateTime(1992, 8, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 17",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260017"
                         },
@@ -551,6 +600,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 18,
                             DateOfBirth = new DateTime(1993, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 18",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260018"
                         },
@@ -560,6 +610,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 19,
                             DateOfBirth = new DateTime(1994, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 19",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260019"
                         },
@@ -569,6 +620,7 @@ namespace PhucNguyenResort.Web.Migrations
                             BookingId = 20,
                             DateOfBirth = new DateTime(1995, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Guest Companion 20",
+                            IsPrimaryBooker = false,
                             Nationality = "Vietnamese",
                             PassportNumber = "P20260020"
                         });

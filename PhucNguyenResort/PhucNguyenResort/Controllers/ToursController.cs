@@ -67,7 +67,7 @@ namespace PhucNguyenResort.Controllers
                 };
 
                 await _tourService.AddTourAsync(tour);
-                TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been created successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -129,7 +129,7 @@ namespace PhucNguyenResort.Controllers
                 tour.ImageUrl      = model.ImageUrl;
 
                 await _tourService.UpdateTourAsync(tour);
-                TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been updated successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -165,17 +165,17 @@ namespace PhucNguyenResort.Controllers
                 var tour = await _tourService.GetTourByIdAsync(id);
                 if (tour == null)
                 {
-                    return NotFound();
+                    return RedirectToAction(nameof(Index));
                 }
 
                 string tourName = tour.TourName ?? $"Tour #{id}";
                 await _tourService.DeleteTourAsync(id);
-                TempData["SuccessMessage"] = $"Tour \"{tourName}\" has been deleted successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tourName}\" has been deleted successfully.";
             }
             catch (InvalidOperationException ex) when (ex.Message.StartsWith("TOUR-003"))
             {
                 // BR-TOUR-005: Tour has active TourSchedules — refuse delete
-                TempData["ErrorMessage"] = "Cannot delete this tour because it has active schedules (TourSchedules). Please remove all schedules first.";
+                if (TempData != null) TempData["ErrorMessage"] = "Cannot delete this tour because it has active schedules (TourSchedules). Please remove all schedules first.";
             }
 
             return RedirectToAction(nameof(Index));

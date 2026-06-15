@@ -31,6 +31,9 @@ public class Booking
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    public bool PdpdConsentChecked { get; set; }
+    public DateTime? ConsentTimestamp { get; set; }
+
     public User? User { get; set; }
     public Room? Room { get; set; }
     public ICollection<BookingGuest> BookingGuests { get; set; } = new List<BookingGuest>();

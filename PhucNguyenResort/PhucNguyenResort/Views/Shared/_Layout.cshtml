@@ -93,8 +93,14 @@
 
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <li><a href="#">Xin chào, @User.Identity.Name</a></li>
-                    <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                    <li>
+                        <a href="#">Xin chào, @User.Identity.Name <i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown">
+                            <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                            <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
+                            <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                        </ul>
+                    </li>
                 }
                 else
                 {
@@ -200,21 +206,22 @@
                                         <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
                                     }
 
-                                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                                    {
-                                        <li><a href="#">Xin chào, @User.Identity.Name</a></li>
-                                        <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
-                                    }
-                                    else
-                                    {
-                                        <li class="@IsActive("Account", "Login")"><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
-                                        <li class="@IsActive("Account", "Register")"><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
-                                    }
-                                    <li class="@IsActive("Profile")">
-                                        <a asp-area="" asp-controller="Profile" asp-action="Index">
-                                            My Profile
-                                        </a>
-                                     </li>
+                                     @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                     {
+                                         <li>
+                                             <a href="#">Xin chào, @User.Identity.Name <i class="fa fa-angle-down"></i></a>
+                                             <ul class="dropdown">
+                                                 <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                                                 <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
+                                                 <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                                             </ul>
+                                         </li>
+                                     }
+                                     else
+                                     {
+                                         <li class="@IsActive("Account", "Login")"><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                                         <li class="@IsActive("Account", "Register")"><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                                     }
                                 </ul>
                             </nav>
 
