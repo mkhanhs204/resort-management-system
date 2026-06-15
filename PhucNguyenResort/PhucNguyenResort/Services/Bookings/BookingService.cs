@@ -126,7 +126,7 @@ namespace PhucNguyenResort.Services.Bookings
             }
         }
 
-        public async Task<CancelBookingResult> CancelBookingAsync(int bookingId, int userId)
+        public async Task<CancelBookingResult> CancelBookingAsync(int bookingId, int userId, string? reason = null, string? bankDetails = null)
         {
             var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.BookingId == bookingId && b.UserId == userId);
             if (booking == null)
@@ -146,6 +146,20 @@ namespace PhucNguyenResort.Services.Bookings
             }
 
             booking.BookingStatus = BookingStatus.Cancelled;
+            
+            if (refundAmount > 0)
+            {
+                var refund = new Refund
+                {
+                    BookingId = booking.BookingId,
+                    RefundAmount = refundAmount,
+                    RefundReason = reason,
+                    BankDetails = bankDetails,
+                    RefundStatus = RefundStatus.Pending,
+                    CreatedAt = DateTime.Now
+                };
+                _context.Refunds.Add(refund);
+            }
 
             // Cancel all associated tour bookings and restore slots
             var tourBookings = await _context.TourBookings

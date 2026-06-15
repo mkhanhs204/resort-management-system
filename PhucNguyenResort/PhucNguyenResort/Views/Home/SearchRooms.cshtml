@@ -4,31 +4,34 @@
     ViewData["Title"] = "Kết Quả Tìm Kiếm";
 }
 
-<!-- Breadcrumb Section Begin -->
-<div class="breadcrumb-section">
-    <div class="container">
+@section Styles {
+    <link rel="stylesheet" href="~/css/search-premium.css" asp-append-version="true" />
+}
+
+<!-- Search Hero Section Begin -->
+<section class="search-hero" style="background-image: url('/img/room/room-b2.jpg');">
+    <div class="search-hero-overlay"></div>
+    <div class="container search-hero-content">
         <div class="row">
             <div class="col-lg-12">
-                <div class="breadcrumb-text">
-                    <h2>Phòng Trống Phù Hợp</h2>
-                    <div class="bt-option">
-                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
-                        <span>Tìm Kiếm</span>
-                    </div>
+                <h2 class="search-hero-title">Phòng Trống Phù Hợp</h2>
+                <div class="search-hero-breadcrumb">
+                    <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
+                    <span>/ Tìm Kiếm</span>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Breadcrumb Section End -->
+</section>
+<!-- Search Hero Section End -->
 
 <!-- Search Details Section Begin -->
 <section class="search-details-section spad pt-0">
     <div class="container">
-        <div class="row mb-5">
+        <div class="row">
             <div class="col-lg-12">
-                <form asp-controller="Home" asp-action="SearchRooms" method="get" class="search-criteria p-4 mb-5" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); position: relative; z-index: 10;">
-                    <h5 class="mb-4" style="font-family: 'Playfair Display', serif; color: #1e293b; font-size: 22px; font-weight: 700;">Điều Chỉnh Ngày Đặt & Số Khách</h5>
+                <form asp-controller="Home" asp-action="SearchRooms" method="get" class="search-criteria-wrapper">
+                    <h5 class="mb-4" style="font-family: 'Playfair Display', serif; color: #1e293b; font-size: 24px; font-weight: 700;">Điều Chỉnh Ngày Đặt & Số Khách</h5>
                     <div class="row w-100 m-0">
                         <div class="col-lg-2 col-md-4 mb-3 mb-lg-0 pl-0">
                             <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Nhận Phòng</label>
@@ -153,160 +156,3 @@
     </div>
 </section>
 <!-- Search Details Section End -->
-
-@section Scripts {
-    <style>
-        /* Luxury Search Form */
-        .luxury-input {
-            border-radius: 8px !important;
-            border: 1px solid #e2e8f0 !important;
-            padding: 12px 18px !important;
-            background: #f8fafc !important;
-            font-size: 15px;
-            color: #1e293b;
-            transition: all 0.3s ease;
-            height: 50px;
-        }
-        .luxury-input:focus {
-            background: #ffffff !important;
-            border-color: #dfa974 !important;
-            box-shadow: 0 0 0 3px rgba(223, 169, 116, 0.2) !important;
-        }
-        
-        .luxury-btn {
-            background-color: #1e293b !important;
-            color: white !important;
-            border-radius: 8px !important;
-            padding: 13px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase;
-            border: none !important;
-            transition: all 0.3s ease !important;
-            letter-spacing: 1px;
-            height: 50px;
-        }
-        .luxury-btn:hover {
-            background-color: #dfa974 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(223, 169, 116, 0.4) !important;
-        }
-
-        .luxury-btn-outline {
-            background-color: #f1f5f9 !important;
-            border: 1px solid #cbd5e1 !important;
-            color: #64748b !important;
-            border-radius: 8px !important;
-            padding: 0 18px !important;
-            transition: all 0.3s ease !important;
-            height: 50px;
-        }
-        .luxury-btn-outline:hover {
-            background-color: #e2e8f0 !important;
-            color: #1e293b !important;
-        }
-
-        /* Luxury Room Card */
-        .luxury-card {
-            border-radius: 16px !important;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
-        }
-        .luxury-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
-        }
-
-        .card-img-wrapper {
-            position: relative;
-            overflow: hidden;
-            height: 280px;
-        }
-        .card-img-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        .luxury-card:hover .card-img-wrapper img {
-            transform: scale(1.08);
-        }
-
-        .price-pill {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #1e293b;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            backdrop-filter: blur(5px);
-        }
-        .price-pill span {
-            font-size: 13px;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .amenity-pill {
-            background-color: #f1f5f9;
-            color: #475569;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-block;
-            margin-right: 8px;
-            margin-bottom: 8px;
-        }
-        .amenity-pill i {
-            color: #dfa974;
-            margin-right: 4px;
-        }
-
-        .luxury-book-btn {
-            background-color: transparent !important;
-            border: 2px solid #e2e8f0 !important;
-            color: #1e293b !important;
-            border-radius: 8px !important;
-            padding: 12px !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            text-transform: uppercase;
-            transition: all 0.3s ease !important;
-            letter-spacing: 1px;
-        }
-        .luxury-card:hover .luxury-book-btn {
-            background-color: #dfa974 !important;
-            border-color: #dfa974 !important;
-            color: white !important;
-        }
-        
-        /* Ghi đè thư viện nice-select của Sona */
-        .search-criteria .nice-select {
-            width: 100%;
-            height: 50px;
-            line-height: 48px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            background-color: #f8fafc;
-            float: none;
-            padding-left: 18px;
-            padding-right: 30px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .search-criteria .nice-select:active, .search-criteria .nice-select.open, .search-criteria .nice-select:focus {
-            border-color: #dfa974;
-        }
-        .search-criteria .nice-select .current {
-            color: #1e293b;
-        }
-        .search-criteria .nice-select::after {
-            right: 18px;
-        }
-    </style>
-}

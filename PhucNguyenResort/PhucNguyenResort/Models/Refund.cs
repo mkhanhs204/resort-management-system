@@ -13,6 +13,10 @@ public class Refund
     public decimal? RefundAmount { get; set; }
 
     public string? RefundReason { get; set; }
+    
+    [StringLength(200)]
+    public string? BankDetails { get; set; }
+    
     public RefundStatus? RefundStatus { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 

@@ -4,377 +4,9 @@
     ViewData["Title"] = "Lịch Sử Đặt Phòng";
 }
 
-<style>
-    :root {
-        --primary-color: #0d233a;
-        --accent-color: #dfa974;
-        --text-main: #2c3e50;
-        --text-muted: #6b7280;
-        --border-color: #e5e7eb;
-        --bg-card: #ffffff;
-        --transition-smooth: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    }
-
-    body {
-        background-color: #f6f8fa;
-        font-family: 'Cabin', sans-serif;
-    }
-
-    .booking-history-section {
-        padding: 50px 0 100px;
-    }
-
-    /* Breadcrumbs override */
-    .breadcrumb-section {
-        background-color: #ffffff;
-        border-bottom: 1px solid #e5e7eb;
-        padding: 35px 0;
-    }
-    .breadcrumb-text h2 {
-        font-family: 'Lora', serif;
-        color: var(--primary-color);
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-    .breadcrumb-text .bt-option a, .breadcrumb-text .bt-option span {
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-
-    /* Cards container */
-    .booking-list-container {
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-        margin-top: 30px;
-    }
-
-    /* Individual Card */
-    .booking-card {
-        background: var(--bg-card);
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: 0 5px 25px rgba(0,0,0,0.015);
-        display: flex;
-        transition: var(--transition-smooth);
-        position: relative;
-    }
-    .booking-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.04);
-        border-color: rgba(223, 169, 116, 0.3);
-    }
-
-    /* Card Image Section */
-    .booking-card-image {
-        flex: 0 0 280px;
-        position: relative;
-        overflow: hidden;
-        height: 220px;
-    }
-    .booking-card-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    .booking-card:hover .booking-card-image img {
-        transform: scale(1.03);
-    }
-
-    /* Status Pill Badge */
-    .status-badge {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        padding: 6px 14px;
-        border-radius: 30px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        z-index: 2;
-    }
-    .status-reserved {
-        background-color: #e0f2fe;
-        color: #0369a1;
-    }
-    .status-checkedin {
-        background-color: #dcfce7;
-        color: #15803d;
-    }
-    .status-checkedout {
-        background-color: #f3f4f6;
-        color: #4b5563;
-    }
-    .status-cancelled {
-        background-color: #fee2e2;
-        color: #b91c1c;
-    }
-    .status-noshow {
-        background-color: #fef3c7;
-        color: #d97706;
-    }
-
-    /* Info Section */
-    .booking-card-info {
-        flex: 1;
-        padding: 25px 30px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        border-right: 1px dashed var(--border-color);
-    }
-    .booking-card-info .booking-id {
-        font-size: 0.85rem;
-        color: var(--accent-color);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 5px;
-    }
-    .booking-card-info h3 {
-        font-family: 'Lora', serif;
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin: 0 0 15px 0;
-    }
-    
-    /* Timeline Grid */
-    .stay-timeline {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 15px;
-        background: #f9fafb;
-        padding: 10px 15px;
-        border-radius: 8px;
-        width: fit-content;
-    }
-    .timeline-node {
-        display: flex;
-        flex-direction: column;
-    }
-    .timeline-node span {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        font-weight: 600;
-    }
-    .timeline-node strong {
-        font-size: 0.9rem;
-        color: var(--primary-color);
-    }
-    .timeline-arrow {
-        color: var(--accent-color);
-        font-size: 1.1rem;
-    }
-
-    /* Guests & Tours */
-    .booking-meta-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        font-size: 0.9rem;
-        color: #4b5563;
-        margin-bottom: 10px;
-    }
-    .booking-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .booking-meta-item i {
-        color: var(--accent-color);
-    }
-
-    .addons-section {
-        margin-top: 15px;
-        border-top: 1px solid #f3f4f6;
-        padding-top: 12px;
-    }
-    .addons-title {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: var(--text-main);
-        text-transform: uppercase;
-        margin-bottom: 8px;
-        display: block;
-    }
-    .addon-tags-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    .addon-tag {
-        background: #fffbeb;
-        border: 1px solid #fef3c7;
-        color: #d97706;
-        font-size: 0.8rem;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-weight: 500;
-    }
-
-    /* Actions Section */
-    .booking-card-actions {
-        flex: 0 0 240px;
-        padding: 25px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        background-color: #fafbfc;
-    }
-    .pricing-summary {
-        text-align: right;
-        margin-bottom: 20px;
-    }
-    .pricing-summary .price-row {
-        margin-bottom: 8px;
-    }
-    .pricing-summary .price-row span {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        display: block;
-    }
-    .pricing-summary .price-row strong {
-        font-size: 1.2rem;
-        color: var(--primary-color);
-        font-weight: 700;
-    }
-    .pricing-summary .price-row.deposit strong {
-        color: #c28d58; /* Warm Dark Gold */
-        font-size: 1.05rem;
-    }
-
-    .action-buttons-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    .btn-action-premium {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 10px 14px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        border-radius: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: all 0.2s ease;
-        border: none;
-        width: 100%;
-        text-align: center;
-        cursor: pointer;
-    }
-    .btn-action-primary {
-        background-color: var(--primary-color);
-        color: #ffffff !important;
-    }
-    .btn-action-primary:hover {
-        background-color: #1c3d5a;
-        transform: translateY(-1px);
-    }
-    .btn-action-secondary {
-        background-color: #ffffff;
-        border: 1px solid #d1d5db;
-        color: #4b5563 !important;
-    }
-    .btn-action-secondary:hover {
-        background-color: #f9fafb;
-        border-color: #9ca3af;
-    }
-    .btn-action-danger {
-        background-color: #ffffff;
-        border: 1px solid #fee2e2;
-        color: #ef4444 !important;
-    }
-    .btn-action-danger:hover {
-        background-color: #fef2f2;
-        border-color: #fca5a5;
-    }
-
-    /* Empty State */
-    .no-bookings-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 60px 40px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.015);
-        border: 1px solid rgba(0,0,0,0.05);
-        max-width: 600px;
-        margin: 40px auto;
-    }
-    .no-bookings-card i {
-        font-size: 4rem;
-        color: var(--accent-color);
-        margin-bottom: 20px;
-        display: block;
-    }
-    .no-bookings-card h4 {
-        font-family: 'Lora', serif;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 10px;
-    }
-    .no-bookings-card p {
-        color: var(--text-muted);
-        margin-bottom: 25px;
-        line-height: 1.6;
-    }
-    .btn-primary-custom {
-        background-color: var(--primary-color);
-        color: #ffffff;
-        padding: 12px 28px;
-        font-weight: 700;
-        border-radius: 8px;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        letter-spacing: 0.5px;
-        display: inline-block;
-        transition: all 0.2s ease;
-    }
-    .btn-primary-custom:hover {
-        background-color: #1c3d5a;
-        color: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px rgba(13, 35, 58, 0.15);
-    }
-
-    /* Responsive */
-    @@media (max-width: 992px) {
-        .booking-card {
-            flex-direction: column;
-        }
-        .booking-card-image {
-            flex: 0 0 180px;
-            width: 100%;
-        }
-        .booking-card-info {
-            border-right: none;
-            border-bottom: 1px dashed var(--border-color);
-        }
-        .booking-card-actions {
-            flex: 0 0 auto;
-            width: 100%;
-        }
-        .pricing-summary {
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .pricing-summary .price-row {
-            margin-bottom: 0;
-        }
-    }
-</style>
+@section Styles {
+    <link rel="stylesheet" href="~/css/booking-cards.css" />
+}
 
 <div class="breadcrumb-section">
     <div class="container">
@@ -533,13 +165,13 @@
                                     @if (booking.CheckInDate > DateTime.Now)
                                     {
                                         var isMoreThan48h = (booking.CheckInDate - DateTime.Now).TotalHours > 48;
-                                        var confirmMsg = isMoreThan48h 
-                                            ? "Bạn có chắc chắn muốn hủy? Bạn sẽ được hoàn lại 100% tiền cọc." 
-                                            : "CẢNH BÁO: Hủy phòng trước giờ Check-in dưới 48 tiếng sẽ KHÔNG ĐƯỢC HOÀN CỌC. Bạn vẫn muốn hủy?";
-
-                                        <form asp-action="Cancel" asp-route-id="@booking.BookingId" method="post" onsubmit="return confirm('@confirmMsg');">
-                                            <button type="submit" class="btn-action-premium btn-action-danger"><i class="fa fa-times-circle"></i> Hủy Phòng</button>
-                                        </form>
+                                        var refundAmount = booking.DepositAmount?.ToString("N0") ?? "0";
+                                        <button type="button" class="btn-action-premium btn-action-danger btn-cancel-booking" 
+                                                data-id="@booking.BookingId" 
+                                                data-refund="@(isMoreThan48h ? "true" : "false")"
+                                                data-amount="@refundAmount">
+                                            <i class="fa fa-times-circle"></i> Hủy Phòng
+                                        </button>
                                     }
                                 }
                                 else if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedIn)
@@ -561,6 +193,44 @@
     </div>
 </section>
 
+<!-- Cancel Booking Modal -->
+<div class="modal fade" id="cancelBookingModal" tabindex="-1" role="dialog" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden;">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelBookingModalLabel"><i class="fa fa-exclamation-triangle"></i> Hủy Đặt Phòng</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="Cancel" method="post" id="cancelBookingForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="cancelBookingId" name="id" value="" />
+                    
+                    <div id="refundNotice" class="alert mb-3" style="border-radius: 8px;">
+                        <!-- Will be populated by JS -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cancelReason" class="font-weight-bold">Lý do hủy (Không bắt buộc)</label>
+                        <textarea class="form-control" id="cancelReason" name="reason" rows="2" placeholder="Ví dụ: Thay đổi kế hoạch..."></textarea>
+                    </div>
+
+                    <div class="form-group" id="bankDetailsGroup" style="display: none;">
+                        <label for="bankDetails" class="font-weight-bold">Thông tin tài khoản nhận tiền hoàn <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="bankDetails" name="bankDetails" rows="2" placeholder="Tên Ngân Hàng - Số Tài Khoản - Tên Chủ Tài Khoản"></textarea>
+                        <small class="form-text text-muted">Vui lòng nhập chính xác để chúng tôi tiến hành hoàn tiền.</small>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius: 8px;">Đóng</button>
+                    <button type="submit" class="btn btn-danger" id="btnConfirmCancel" style="border-radius: 8px;">Xác Nhận Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         function copyShareLink(btn) {
@@ -579,5 +249,31 @@
                 }, 2000);
             });
         }
+
+        $(document).ready(function() {
+            $('.btn-cancel-booking').click(function() {
+                var bookingId = $(this).data('id');
+                var isRefund = $(this).data('refund');
+                var amount = $(this).data('amount');
+
+                $('#cancelBookingId').val(bookingId);
+                $('#cancelReason').val('');
+                $('#bankDetails').val('');
+
+                if (isRefund) {
+                    $('#refundNotice').removeClass('alert-danger').addClass('alert-success');
+                    $('#refundNotice').html('<strong>Hoàn 100% cọc:</strong> Bạn đã hủy trước 48 giờ. Bạn sẽ được hoàn lại <strong>' + amount + ' VNĐ</strong>.');
+                    $('#bankDetailsGroup').show();
+                    $('#bankDetails').prop('required', true);
+                } else {
+                    $('#refundNotice').removeClass('alert-success').addClass('alert-danger');
+                    $('#refundNotice').html('<strong>CẢNH BÁO:</strong> Bạn hủy phòng dưới 48 giờ trước thời điểm Check-in. Theo quy định, bạn sẽ <strong>không được hoàn lại tiền cọc</strong>.');
+                    $('#bankDetailsGroup').hide();
+                    $('#bankDetails').prop('required', false);
+                }
+
+                $('#cancelBookingModal').modal('show');
+            });
+        });
     </script>
 }
