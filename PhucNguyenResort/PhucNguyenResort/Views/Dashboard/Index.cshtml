@@ -5,7 +5,7 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <h2 style="font-family: 'Lora', serif; margin-bottom: 20px;">Welcome back, Staff Member!</h2>
+        <h2 style="font-family: 'Lora', serif; margin-bottom: 20px;">Welcome back, @(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Staff Member")!</h2>
     </div>
 </div>
 

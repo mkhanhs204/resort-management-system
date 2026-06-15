@@ -4,6 +4,378 @@
     ViewData["Title"] = "Lịch Sử Đặt Phòng";
 }
 
+<style>
+    :root {
+        --primary-color: #0d233a;
+        --accent-color: #dfa974;
+        --text-main: #2c3e50;
+        --text-muted: #6b7280;
+        --border-color: #e5e7eb;
+        --bg-card: #ffffff;
+        --transition-smooth: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    body {
+        background-color: #f6f8fa;
+        font-family: 'Cabin', sans-serif;
+    }
+
+    .booking-history-section {
+        padding: 50px 0 100px;
+    }
+
+    /* Breadcrumbs override */
+    .breadcrumb-section {
+        background-color: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 35px 0;
+    }
+    .breadcrumb-text h2 {
+        font-family: 'Lora', serif;
+        color: var(--primary-color);
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .breadcrumb-text .bt-option a, .breadcrumb-text .bt-option span {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* Cards container */
+    .booking-list-container {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    /* Individual Card */
+    .booking-card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 5px 25px rgba(0,0,0,0.015);
+        display: flex;
+        transition: var(--transition-smooth);
+        position: relative;
+    }
+    .booking-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        border-color: rgba(223, 169, 116, 0.3);
+    }
+
+    /* Card Image Section */
+    .booking-card-image {
+        flex: 0 0 280px;
+        position: relative;
+        overflow: hidden;
+        height: 220px;
+    }
+    .booking-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .booking-card:hover .booking-card-image img {
+        transform: scale(1.03);
+    }
+
+    /* Status Pill Badge */
+    .status-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+    }
+    .status-reserved {
+        background-color: #e0f2fe;
+        color: #0369a1;
+    }
+    .status-checkedin {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+    .status-checkedout {
+        background-color: #f3f4f6;
+        color: #4b5563;
+    }
+    .status-cancelled {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    .status-noshow {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+
+    /* Info Section */
+    .booking-card-info {
+        flex: 1;
+        padding: 25px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-right: 1px dashed var(--border-color);
+    }
+    .booking-card-info .booking-id {
+        font-size: 0.85rem;
+        color: var(--accent-color);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+    .booking-card-info h3 {
+        font-family: 'Lora', serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 0 0 15px 0;
+    }
+    
+    /* Timeline Grid */
+    .stay-timeline {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        background: #f9fafb;
+        padding: 10px 15px;
+        border-radius: 8px;
+        width: fit-content;
+    }
+    .timeline-node {
+        display: flex;
+        flex-direction: column;
+    }
+    .timeline-node span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .timeline-node strong {
+        font-size: 0.9rem;
+        color: var(--primary-color);
+    }
+    .timeline-arrow {
+        color: var(--accent-color);
+        font-size: 1.1rem;
+    }
+
+    /* Guests & Tours */
+    .booking-meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 0.9rem;
+        color: #4b5563;
+        margin-bottom: 10px;
+    }
+    .booking-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .booking-meta-item i {
+        color: var(--accent-color);
+    }
+
+    .addons-section {
+        margin-top: 15px;
+        border-top: 1px solid #f3f4f6;
+        padding-top: 12px;
+    }
+    .addons-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-main);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .addon-tags-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .addon-tag {
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+        color: #d97706;
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    /* Actions Section */
+    .booking-card-actions {
+        flex: 0 0 240px;
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #fafbfc;
+    }
+    .pricing-summary {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+    .pricing-summary .price-row {
+        margin-bottom: 8px;
+    }
+    .pricing-summary .price-row span {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: block;
+    }
+    .pricing-summary .price-row strong {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+    .pricing-summary .price-row.deposit strong {
+        color: #c28d58; /* Warm Dark Gold */
+        font-size: 1.05rem;
+    }
+
+    .action-buttons-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .btn-action-premium {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border-radius: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+        border: none;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+    }
+    .btn-action-primary {
+        background-color: var(--primary-color);
+        color: #ffffff !important;
+    }
+    .btn-action-primary:hover {
+        background-color: #1c3d5a;
+        transform: translateY(-1px);
+    }
+    .btn-action-secondary {
+        background-color: #ffffff;
+        border: 1px solid #d1d5db;
+        color: #4b5563 !important;
+    }
+    .btn-action-secondary:hover {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+    }
+    .btn-action-danger {
+        background-color: #ffffff;
+        border: 1px solid #fee2e2;
+        color: #ef4444 !important;
+    }
+    .btn-action-danger:hover {
+        background-color: #fef2f2;
+        border-color: #fca5a5;
+    }
+
+    /* Empty State */
+    .no-bookings-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.015);
+        border: 1px solid rgba(0,0,0,0.05);
+        max-width: 600px;
+        margin: 40px auto;
+    }
+    .no-bookings-card i {
+        font-size: 4rem;
+        color: var(--accent-color);
+        margin-bottom: 20px;
+        display: block;
+    }
+    .no-bookings-card h4 {
+        font-family: 'Lora', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+    .no-bookings-card p {
+        color: var(--text-muted);
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+    .btn-primary-custom {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        padding: 12px 28px;
+        font-weight: 700;
+        border-radius: 8px;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        transition: all 0.2s ease;
+    }
+    .btn-primary-custom:hover {
+        background-color: #1c3d5a;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px rgba(13, 35, 58, 0.15);
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .booking-card {
+            flex-direction: column;
+        }
+        .booking-card-image {
+            flex: 0 0 180px;
+            width: 100%;
+        }
+        .booking-card-info {
+            border-right: none;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .booking-card-actions {
+            flex: 0 0 auto;
+            width: 100%;
+        }
+        .pricing-summary {
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pricing-summary .price-row {
+            margin-bottom: 0;
+        }
+    }
+</style>
+
 <div class="breadcrumb-section">
     <div class="container">
         <div class="row">
@@ -20,11 +392,11 @@
     </div>
 </div>
 
-<section class="spad">
+<section class="booking-history-section">
     <div class="container">
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; font-size: 0.95rem;">
                 @TempData["SuccessMessage"]
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -34,7 +406,7 @@
         
         @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; font-size: 0.95rem;">
                 @TempData["Error"]
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -44,80 +416,121 @@
 
         @if (!Model.Any())
         {
-            <div class="text-center mt-5 mb-5">
-                <h4>Bạn chưa có đặt phòng nào.</h4>
-                <a asp-controller="Home" asp-action="SearchRooms" class="btn btn-primary mt-3">Tìm Phòng Ngay</a>
+            <div class="no-bookings-card">
+                <i class="fa fa-folder-open-o"></i>
+                <h4>Bạn chưa có lượt đặt phòng nào.</h4>
+                <p>Hãy trải nghiệm các phòng ngủ sang trọng tại Phúc Nguyên Resort và lên kế hoạch cho kỳ nghỉ của bạn ngay hôm nay!</p>
+                <a asp-controller="Home" asp-action="SearchRooms" class="btn-primary-custom">Tìm Phòng Ngay</a>
             </div>
         }
         else
         {
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Mã BKG</th>
-                            <th>Phòng</th>
-                            <th>Thời Gian</th>
-                            <th>Tour Kèm Theo</th>
-                            <th>Tổng Tiền</th>
-                            <th>Trạng Thái</th>
-                            <th>Hành Động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var booking in Model)
+            <div class="booking-list-container">
+                @foreach (var booking in Model)
+                {
+                    var tokens = ViewBag.PreCheckinTokens as Dictionary<int, string>;
+                    var token = (tokens != null && tokens.ContainsKey(booking.BookingId)) ? tokens[booking.BookingId] : string.Empty;
+                    var shareLink = Url.Action("PreCheckin", "Bookings", new { id = booking.BookingId, token = token }, Context.Request.Scheme);
+                    
+                    <div class="booking-card">
+                        <!-- Status Pill Badge -->
+                        @switch (booking.BookingStatus)
                         {
-                            <tr>
-                                <td>#@booking.BookingId</td>
-                                <td>
-                                    <strong>@booking.Room?.Category?.CategoryName</strong><br />
-                                    <span class="text-muted small">Phòng: @booking.Room?.RoomNumber</span>
-                                </td>
-                                <td>
-                                    In: @booking.CheckInDate.ToString("dd/MM/yyyy")<br />
-                                    Out: @booking.CheckOutDate.ToString("dd/MM/yyyy")
-                                </td>
-                                <td>
-                                    @if (booking.TourBookings != null && booking.TourBookings.Any())
-                                    {
-                                        <ul class="list-unstyled mb-0 small">
-                                            @foreach (var tb in booking.TourBookings)
-                                            {
-                                                <li>- @tb.Schedule?.Tour?.TourName (@tb.TotalAmount?.ToString("N0")đ)</li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted small">Không có</span>
-                                    }
-                                </td>
-                                <td>
-                                    @booking.TotalAmount?.ToString("N0") VNĐ<br/>
-                                    <span class="text-info small">Cọc: @booking.DepositAmount?.ToString("N0") VNĐ</span>
-                                </td>
-                                <td>
-                                    @switch (booking.BookingStatus)
-                                    {
-                                        case PhucNguyenResort.Enums.BookingStatus.Reserved:
-                                            <span class="badge badge-primary">Đã Đặt</span>
-                                            break;
-                                        case PhucNguyenResort.Enums.BookingStatus.CheckedIn:
-                                            <span class="badge badge-success">Đang Lưu Trú</span>
-                                            break;
-                                        case PhucNguyenResort.Enums.BookingStatus.CheckedOut:
-                                            <span class="badge badge-secondary">Đã Trả Phòng</span>
-                                            break;
-                                        case PhucNguyenResort.Enums.BookingStatus.Cancelled:
-                                            <span class="badge badge-danger">Đã Hủy</span>
-                                            break;
-                                        case PhucNguyenResort.Enums.BookingStatus.NoShow:
-                                            <span class="badge badge-dark">Không Đến</span>
-                                            break;
-                                    }
-                                </td>
-                                <td>
-                                    @if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved && booking.CheckInDate > DateTime.Now)
+                            case PhucNguyenResort.Enums.BookingStatus.Reserved:
+                                <span class="status-badge status-reserved">Đã Đặt</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.CheckedIn:
+                                <span class="status-badge status-checkedin">Đang Lưu Trú</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.CheckedOut:
+                                <span class="status-badge status-checkedout">Đã Trả Phòng</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.Cancelled:
+                                <span class="status-badge status-cancelled">Đã Hủy</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.NoShow:
+                                <span class="status-badge status-noshow">Không Đến</span>
+                                break;
+                        }
+
+                        <!-- Left: Image Section -->
+                        <div class="booking-card-image">
+                            @if (!string.IsNullOrEmpty(booking.Room?.Category?.ImageUrl))
+                            {
+                                <img src="@booking.Room.Category.ImageUrl" alt="@booking.Room.Category.CategoryName" />
+                            }
+                            else
+                            {
+                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Resort Room" />
+                            }
+                        </div>
+
+                        <!-- Middle: Details -->
+                        <div class="booking-card-info">
+                            <div>
+                                <div class="booking-id">Mã BKG: #@booking.BookingId</div>
+                                <h3>@booking.Room?.Category?.CategoryName <span style="font-size: 1rem; color: var(--text-muted); font-weight: normal;">(Phòng @booking.Room?.RoomNumber)</span></h3>
+                                
+                                <div class="stay-timeline">
+                                    <div class="timeline-node">
+                                        <span>Check-In</span>
+                                        <strong>@booking.CheckInDate.ToString("dd/MM/yyyy")</strong>
+                                    </div>
+                                    <div class="timeline-arrow">
+                                        <i class="fa fa-long-arrow-right"></i>
+                                    </div>
+                                    <div class="timeline-node">
+                                        <span>Check-Out</span>
+                                        <strong>@booking.CheckOutDate.ToString("dd/MM/yyyy")</strong>
+                                    </div>
+                                </div>
+
+                                <div class="booking-meta-row">
+                                    <div class="booking-meta-item">
+                                        <i class="fa fa-users"></i>
+                                        <span>@booking.NumberOfAdults NL, @booking.NumberOfChildren TE</span>
+                                    </div>
+                                    <div class="booking-meta-item">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span>@((booking.CheckOutDate - booking.CheckInDate).Days) đêm nghỉ</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (booking.TourBookings != null && booking.TourBookings.Any())
+                            {
+                                <div class="addons-section">
+                                    <span class="addons-title">Trải Nghiệm Đã Chọn</span>
+                                    <div class="addon-tags-list">
+                                        @foreach (var tb in booking.TourBookings)
+                                        {
+                                            <span class="addon-tag"><i class="fa fa-compass mr-1"></i> @tb.Schedule?.Tour?.TourName (+@tb.TotalAmount?.ToString("N0")đ)</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Right: Pricing & Actions -->
+                        <div class="booking-card-actions">
+                            <div class="pricing-summary">
+                                <div class="price-row">
+                                    <span>Tổng chi phí:</span>
+                                    <strong>@booking.TotalAmount?.ToString("N0") VNĐ</strong>
+                                </div>
+                                <div class="price-row deposit">
+                                    <span>Đã đặt cọc:</span>
+                                    <strong>@booking.DepositAmount?.ToString("N0") VNĐ</strong>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons-group">
+                                @if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
+                                {
+                                    <a asp-action="PreCheckin" asp-route-id="@booking.BookingId" class="btn-action-premium btn-action-primary"><i class="fa fa-id-card-o"></i> Khai Báo Tạm Trú</a>
+                                    <button type="button" class="btn-action-premium btn-action-secondary" data-link="@shareLink" onclick="copyShareLink(this)"><i class="fa fa-copy"></i> Copy Link Đoàn</button>
+
+                                    @if (booking.CheckInDate > DateTime.Now)
                                     {
                                         var isMoreThan48h = (booking.CheckInDate - DateTime.Now).TotalHours > 48;
                                         var confirmMsg = isMoreThan48h 
@@ -125,15 +538,46 @@
                                             : "CẢNH BÁO: Hủy phòng trước giờ Check-in dưới 48 tiếng sẽ KHÔNG ĐƯỢC HOÀN CỌC. Bạn vẫn muốn hủy?";
 
                                         <form asp-action="Cancel" asp-route-id="@booking.BookingId" method="post" onsubmit="return confirm('@confirmMsg');">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hủy Phòng</button>
+                                            <button type="submit" class="btn-action-premium btn-action-danger"><i class="fa fa-times-circle"></i> Hủy Phòng</button>
                                         </form>
                                     }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                }
+                                else if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedIn)
+                                {
+                                    <a asp-action="PreCheckin" asp-route-id="@booking.BookingId" class="btn-action-premium btn-action-primary"><i class="fa fa-id-card-o"></i> Xem Khai Báo</a>
+                                }
+                                else
+                                {
+                                    <span class="text-center text-muted small py-2" style="border: 1px dashed var(--border-color); border-radius: 8px; font-weight: 500;">
+                                        Không có hành động
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        function copyShareLink(btn) {
+            var link = btn.getAttribute('data-link');
+            navigator.clipboard.writeText(link).then(function() {
+                var oldText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa fa-check"></i> Copied!';
+                btn.className = 'btn-action-premium btn-action-primary';
+                btn.style.backgroundColor = '#10b981';
+                btn.style.color = '#ffffff';
+                setTimeout(function() {
+                    btn.innerHTML = oldText;
+                    btn.className = 'btn-action-premium btn-action-secondary';
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }, 2000);
+            });
+        }
+    </script>
+}

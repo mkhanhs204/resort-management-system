@@ -54,8 +54,8 @@ namespace PhucNguyenResort.Tests.Bookings
                 Assert.NotNull(result.BookingId);
                 
                 var savedBooking = await context.Bookings.FindAsync(result.BookingId);
-                Assert.Equal(BookingStatus.Reserved, savedBooking.BookingStatus);
-                Assert.Equal(2000000, savedBooking.DepositAmount); // 4 đêm = 4tr, cọc 50% = 2tr
+                Assert.Equal(BookingStatus.PendingPayment, savedBooking.BookingStatus);
+                Assert.Equal(1600000, savedBooking.DepositAmount); // 4 đêm = 4tr, cọc 40% = 1.6tr
                 Assert.Equal(4000000, savedBooking.TotalAmount); // Tổng 4tr
             }
         }
@@ -251,6 +251,193 @@ namespace PhucNguyenResort.Tests.Bookings
                 Assert.Equal(0, result.RefundAmount); // Không hoàn cọc
                 var savedBooking = await context.Bookings.FindAsync(1);
                 Assert.Equal(BookingStatus.Cancelled, savedBooking.BookingStatus);
+            }
+        }
+
+        [Fact]
+        public async Task BKG_TC_007_CancelBooking_ShouldCancelAssociatedTourBookings()
+        {
+            // Arrange
+            var options = CreateNewContextOptions();
+            var checkIn = DateTime.Now.AddDays(3);
+            using (var context = new ResortDbContext(options))
+            {
+                var booking = new Booking 
+                { 
+                    BookingId = 1, 
+                    RoomId = 1, 
+                    UserId = 1, 
+                    CheckInDate = checkIn, 
+                    CheckOutDate = checkIn.AddDays(2),
+                    BookingStatus = BookingStatus.Reserved,
+                    DepositAmount = 1000000
+                };
+                context.Bookings.Add(booking);
+
+                context.Tours.Add(new Tour { TourId = 1, TourName = "Island Hopping", Price = 250000 });
+                context.TourSchedules.Add(new TourSchedule { ScheduleId = 1, TourId = 1, AvailableSlots = 10 });
+                
+                context.TourBookings.Add(new TourBooking
+                {
+                    TourBookingId = 1,
+                    BookingId = 1,
+                    ScheduleId = 1,
+                    Participants = 2,
+                    TotalAmount = 500000,
+                    BookingStatus = TourBookingStatus.Pending,
+                    UserId = 1
+                });
+                
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ResortDbContext(options))
+            {
+                var service = new BookingService(context);
+
+                // Act
+                var result = await service.CancelBookingAsync(1, 1);
+
+                // Assert
+                Assert.True(result.Success);
+                var savedBooking = await context.Bookings.FindAsync(1);
+                                Assert.Equal(BookingStatus.Cancelled, savedBooking.BookingStatus);
+                
+                var savedTourBooking = await context.TourBookings.FindAsync(1);
+                Assert.Equal(TourBookingStatus.Cancelled, savedTourBooking.BookingStatus);
+            }
+        }
+
+        [Fact]
+        public async Task BKG_TC_008_CreateBooking_ShouldDecrementTourAvailableSlots()
+        {
+            // Arrange
+            var options = CreateNewContextOptions();
+            using (var context = new ResortDbContext(options))
+            {
+                context.RoomCategories.Add(new RoomCategory { CategoryId = 1, CategoryName = "Standard", PricePerNight = 1000000 });
+                context.Rooms.Add(new Room { RoomId = 1, CategoryId = 1, Status = RoomStatus.Available });
+                context.Users.Add(new User { UserId = 1, FullName = "Test User" });
+                
+                context.Tours.Add(new Tour { TourId = 1, TourName = "Island Hopping", Price = 200000 });
+                context.TourSchedules.Add(new TourSchedule { ScheduleId = 5, TourId = 1, AvailableSlots = 10 });
+                
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ResortDbContext(options))
+            {
+                var service = new BookingService(context);
+                var request = new CreateBookingViewModel
+                {
+                    RoomId = 1,
+                    CheckInDate = DateTime.Today.AddDays(10),
+                    CheckOutDate = DateTime.Today.AddDays(14),
+                    NumberOfAdults = 2,
+                    NumberOfChildren = 0,
+                    SelectedTourScheduleIds = new List<int> { 5 }
+                };
+
+                // Act
+                var result = await service.CreateBookingAsync(request, 1);
+
+                // Assert
+                Assert.True(result.Success);
+                var schedule = await context.TourSchedules.FindAsync(5);
+                Assert.Equal(8, schedule.AvailableSlots); // 10 - 2 = 8
+            }
+        }
+
+        [Fact]
+        public async Task BKG_TC_009_CreateBooking_ShouldFail_WhenTourSlotsInsufficient()
+        {
+            // Arrange
+            var options = CreateNewContextOptions();
+            using (var context = new ResortDbContext(options))
+            {
+                context.RoomCategories.Add(new RoomCategory { CategoryId = 1, CategoryName = "Standard", PricePerNight = 1000000 });
+                context.Rooms.Add(new Room { RoomId = 1, CategoryId = 1, Status = RoomStatus.Available });
+                context.Users.Add(new User { UserId = 1, FullName = "Test User" });
+                
+                context.Tours.Add(new Tour { TourId = 1, TourName = "Island Hopping", Price = 200000 });
+                context.TourSchedules.Add(new TourSchedule { ScheduleId = 5, TourId = 1, AvailableSlots = 1 });
+                
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ResortDbContext(options))
+            {
+                var service = new BookingService(context);
+                var request = new CreateBookingViewModel
+                {
+                    RoomId = 1,
+                    CheckInDate = DateTime.Today.AddDays(10),
+                    CheckOutDate = DateTime.Today.AddDays(14),
+                    NumberOfAdults = 2,
+                    NumberOfChildren = 0,
+                    SelectedTourScheduleIds = new List<int> { 5 }
+                };
+
+                // Act
+                var result = await service.CreateBookingAsync(request, 1);
+
+                // Assert
+                Assert.False(result.Success);
+                Assert.Equal("BKG-003", result.ErrorCode);
+                
+                var bookingsCount = await context.Bookings.CountAsync();
+                Assert.Equal(0, bookingsCount); // Booking không được lưu
+            }
+        }
+
+        [Fact]
+        public async Task BKG_TC_010_CancelBooking_ShouldRestoreTourAvailableSlots()
+        {
+            // Arrange
+            var options = CreateNewContextOptions();
+            var checkIn = DateTime.Now.AddDays(3);
+            using (var context = new ResortDbContext(options))
+            {
+                var booking = new Booking 
+                { 
+                    BookingId = 1, 
+                    RoomId = 1, 
+                    UserId = 1, 
+                    CheckInDate = checkIn, 
+                    CheckOutDate = checkIn.AddDays(2),
+                    BookingStatus = BookingStatus.Reserved,
+                    DepositAmount = 1000000
+                };
+                context.Bookings.Add(booking);
+                
+                context.Tours.Add(new Tour { TourId = 1, TourName = "Island Hopping", Price = 200000 });
+                context.TourSchedules.Add(new TourSchedule { ScheduleId = 5, TourId = 1, AvailableSlots = 8 });
+                
+                context.TourBookings.Add(new TourBooking
+                {
+                    TourBookingId = 1,
+                    BookingId = 1,
+                    ScheduleId = 5,
+                    Participants = 2,
+                    TotalAmount = 400000,
+                    BookingStatus = TourBookingStatus.Pending,
+                    UserId = 1
+                });
+                
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ResortDbContext(options))
+            {
+                var service = new BookingService(context);
+
+                // Act
+                var result = await service.CancelBookingAsync(1, 1);
+
+                // Assert
+                Assert.True(result.Success);
+                var schedule = await context.TourSchedules.FindAsync(5);
+                Assert.Equal(10, schedule.AvailableSlots); // 8 + 2 = 10
             }
         }
     }

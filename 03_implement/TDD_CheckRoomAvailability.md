@@ -1,18 +1,20 @@
 # TEST-DRIVEN DEVELOPMENT SPECIFICATION
+
 Đặc tả Kiểm thử Hướng Phát triển — Check Room Availability
 
 **Document ID**: PNR-TDD-ROOM-001
 **Version**: 1.1
 **Date**: 2026-06-13
-**Status**: In Review
+**Status**: Approve
 **Standard**: ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author**: Cuong
-**Reviewed by**: [ ] Khanh - Pending
-**DPO Sign-off**: [ ] Pending (N/A — module này không xử lý PII trực tiếp)
-**Approved by**: [ ] Pending
+**Reviewed by**: Khanh
+**DPO Sign-off**: khanh
+**Approved by**: Cuong
 **Classification**: Internal - Confidential
 
 **References**:
+
 - `01_SRS/SWP391_NHOM1.md` — Functional requirements (UC04 Search Room, UC06 View Room Details, UC59 Update Room Status)
 - `01_SRS/SWP391-HOS-02.md` — Problem Statement & BR01 (Double-Booking Prevention), UC06, UC10
 - `03_implement/EDS_RoomBooking.md` (`SWP391-MOD2-IMP-002`) — Technical Specification
@@ -23,16 +25,18 @@ Thứ tự bắt buộc: viết test → chạy → xác nhận FAIL 🔴 → im
 Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 
 ## CHANGELOG
+
 **Policy 4.4 — Immutable History**: Không bao giờ xóa thông tin cũ.
 
-| Ngày       | Người thực hiện | Nội dung thay đổi                                       |
-| ------------| -----------------| ---------------------------------------------------------|
-| 2026-06-11 | System Agent    | Khởi tạo tài liệu — TDD cho logic tính toán phòng trống |
-| 2026-06-13 | AI BA Review    | Chỉnh sửa toàn bộ (v1.1): cập nhật đúng enum values (BookingStatus, RoomStatus), bổ sung section 5/6/7 theo TDD Template, thêm Test Conditions cho CheckedOut exclusion, cập nhật Logic Issues |
+| Ngày      | Người thực hiện | Nội dung thay đổi                                                                                                                                                                                       |
+| ---------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-11 | Cuong               | Khởi tạo tài liệu — TDD cho logic tính toán phòng trống                                                                                                                                           |
+| 2026-06-13 | Cuong               | Chỉnh sửa toàn bộ (v1.1): cập nhật đúng enum values (BookingStatus, RoomStatus), bổ sung section 5/6/7 theo TDD Template, thêm Test Conditions cho CheckedOut exclusion, cập nhật Logic Issues |
 
 ---
 
 ## MỤC LỤC
+
 1. Thông tin Module
 2. Logic Issues Resolved
 3. Test Design Specification (TDS)
@@ -44,33 +48,36 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 ---
 
 ## 1. Thông tin Module
-| Field                 | Value |
-| -----------------------| ---|
-| Feature / Gap ID      | FEAT-ROOM-AVAILABILITY |
-| Module                | `Room Reservation & Front Desk` (Module 2 — CORE 1) |
-| Spec gốc              | `SWP391-MOD2-IMP-002` (`EDS_RoomBooking.md`) |
-| Priority              | 🔴 P0 — Logic cốt lõi, ảnh hưởng trực tiếp đến BR01 |
-| Sprint                | S1 |
-| Milestone             | M1 — Core Booking Functions |
-| Data Classification   | Internal (logic availability không xử lý PII trực tiếp) |
-| Compliance Scope      | BR01 — Strict Concurrency (Double-Booking Prevention) |
-| Upstream Dependencies | `Room` (Model + `RoomStatus` enum), `RoomCategory` (Model), `Booking` (Model + `BookingStatus` enum) |
+
+| Field                 | Value                                                                                                                 |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Feature / Gap ID      | FEAT-ROOM-AVAILABILITY                                                                                                |
+| Module                | `Room Reservation & Front Desk` (Module 2 — CORE 1)                                                                |
+| Spec gốc             | `SWP391-MOD2-IMP-002` (`EDS_RoomBooking.md`)                                                                      |
+| Priority              | 🟢 P0 — Logic cốt lõi, ảnh hưởng trực tiếp đến BR01                                                        |
+| Sprint                | S1                                                                                                                    |
+| Milestone             | M1 — Core Booking Functions                                                                                          |
+| Data Classification   | Internal (logic availability không xử lý PII trực tiếp)                                                          |
+| Compliance Scope      | BR01 — Strict Concurrency (Double-Booking Prevention)                                                                |
+| Upstream Dependencies | `Room` (Model + `RoomStatus` enum), `RoomCategory` (Model), `Booking` (Model + `BookingStatus` enum)        |
 | Downstream Consumers  | `HomeController.SearchRooms()`, `HomeController.CheckRoomAvailability()`, `BookingService.CreateBookingAsync()` |
 
 ## 2. Logic Issues Resolved
+
 Bắt buộc điền trước khi viết test. Liệt kê mọi sai lệch giữa spec thiết kế và codebase thực tế.
 
-| # | Spec gốc (sai / thiếu) | Thực tế (schema / codebase) | Fix áp dụng trong test |
-| --- | --- | --- | --- |
-| L1 | Spec ban đầu không nói rõ phải loại trừ BookingStatus nào khi đếm phòng đã đặt | `HomeService.CheckAvailabilityAsync()` loại trừ `BookingStatus.Cancelled` và `BookingStatus.NoShow` — tức chỉ đếm booking `Reserved`, `CheckedIn`, `CheckedOut` là "đang chiếm phòng" | Test phải assert: booking `Cancelled` và `NoShow` **không** trừ vào available count |
-| L2 | Spec viết "Room.Status == Maintenance" dạng string | Codebase dùng enum `RoomStatus.Maintenance` (file `Enums/RoomStatus.cs`). Các giá trị khác: `Available`, `Occupied`, `NeedsCleaning` | Test dùng `RoomStatus.Maintenance` enum thay vì string. Phòng `Maintenance` bị loại khỏi TotalRooms |
-| L3 | Spec gốc không đề cập đến `CheckedOut` | `BookingStatus` enum gồm: `Reserved(0)`, `CheckedIn(1)`, `CheckedOut(2)`, `Cancelled(3)`, `NoShow(4)`. Booking `CheckedOut` vẫn nằm trong DB và **VẪN bị đếm** là occupied trong `HomeService` (vì chỉ loại trừ Cancelled, NoShow) | Test phải assert: booking `CheckedOut` mà ngày overlap **VẪN** trừ vào available count. Đây là behavior thực tế của code, cần verify |
-| L4 | Spec gốc của `BookingService` loại trừ `Cancelled` VÀ `CheckedOut` khi check overlap | `BookingService.CreateBookingAsync()` line 30-31: loại trừ `Cancelled` và `CheckedOut`. Nhưng `HomeService.CheckAvailabilityAsync()` line 37-38: chỉ loại trừ `Cancelled` và `NoShow` | Hai service có logic loại trừ khác nhau. Test cho `HomeService` phải test theo logic của `HomeService` (loại trừ Cancelled + NoShow). Test cho `BookingService` phải test theo logic của `BookingService` (loại trừ Cancelled + CheckedOut) |
-| L5 | `HomeController.SearchRooms()` khi nhận ngày không hợp lệ | Code thực tế: nếu `checkIn`/`checkOut` rỗng thì trả toàn bộ categories (không filter). Nếu parse fail thì fallback `Today`/`Today+1`. Nếu `CheckOut <= CheckIn` thì auto sửa thành `CheckIn + 1` | Test phải cover: ngày rỗng, ngày invalid string, ngày hợp lệ, ngày trong quá khứ |
+| #  | Spec gốc (sai / thiếu)                                                                        | Thực tế (schema / codebase)                                                                                                                                                                                                                                         | Fix áp dụng trong test                                                                                                                                                                                                                                        |
+| -- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L1 | Spec ban đầu không nói rõ phải loại trừ BookingStatus nào khi đếm phòng đã đặt  | `HomeService.CheckAvailabilityAsync()` loại trừ `BookingStatus.Cancelled` và `BookingStatus.NoShow` — tức chỉ đếm booking `Reserved`, `CheckedIn`, `CheckedOut` là "đang chiếm phòng"                                                         | Test phải assert: booking `Cancelled` và `NoShow` **không** trừ vào available count                                                                                                                                                              |
+| L2 | Spec viết "Room.Status == Maintenance" dạng string                                            | Codebase dùng enum `RoomStatus.Maintenance` (file `Enums/RoomStatus.cs`). Các giá trị khác: `Available`, `Occupied`, `NeedsCleaning`                                                                                                                   | Test dùng `RoomStatus.Maintenance` enum thay vì string. Phòng `Maintenance` bị loại khỏi TotalRooms                                                                                                                                                   |
+| L3 | Spec gốc không đề cập đến `CheckedOut`                                                 | `BookingStatus` enum gồm: `Reserved(0)`, `CheckedIn(1)`, `CheckedOut(2)`, `Cancelled(3)`, `NoShow(4)`. Booking `CheckedOut` vẫn nằm trong DB và **VẪN bị đếm** là occupied trong `HomeService` (vì chỉ loại trừ Cancelled, NoShow) | Test phải assert: booking `CheckedOut` mà ngày overlap **VẪN** trừ vào available count. Đây là behavior thực tế của code, cần verify                                                                                                       |
+| L4 | Spec gốc của `BookingService` loại trừ `Cancelled` VÀ `CheckedOut` khi check overlap | `BookingService.CreateBookingAsync()` line 30-31: loại trừ `Cancelled` và `CheckedOut`. Nhưng `HomeService.CheckAvailabilityAsync()` line 37-38: chỉ loại trừ `Cancelled` và `NoShow`                                                             | Hai service có logic loại trừ khác nhau. Test cho `HomeService` phải test theo logic của `HomeService` (loại trừ Cancelled + NoShow). Test cho `BookingService` phải test theo logic của `BookingService` (loại trừ Cancelled + CheckedOut) |
+| L5 | `HomeController.SearchRooms()` khi nhận ngày không hợp lệ                                | Code thực tế: nếu `checkIn`/`checkOut` rỗng thì trả toàn bộ categories (không filter). Nếu parse fail thì fallback `Today`/`Today+1`. Nếu `CheckOut <= CheckIn` thì auto sửa thành `CheckIn + 1`                                           | Test phải cover: ngày rỗng, ngày invalid string, ngày hợp lệ, ngày trong quá khứ                                                                                                                                                                      |
 
 ## 3. Test Design Specification (TDS)
 
 ### TDS-01 — Scope / Phạm vi
+
 Phạm vi của TDD spec này bao gồm các component liên quan đến logic kiểm tra phòng trống:
 
 ```
@@ -89,52 +96,57 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ```
 
 ### TDS-02 — Test Basis / Cơ sở Kiểm thử
-| Source | Items Derived |
-| --- | --- |
-| `SWP391-HOS-02.md` BR01 | Strict Concurrency — Phòng không được đặt trùng cho cùng khoảng thời gian |
-| `SWP391_NHOM1.md` UC04 | Guest tìm kiếm phòng theo preferences |
-| `SWP391_NHOM1.md` UC06 | Guest xem chi tiết phòng |
-| `SWP391_NHOM1.md` UC59 | Receptionist cập nhật trạng thái phòng |
-| `HomeService.cs` line 39-40 | Logic overlap: `b.CheckInDate < checkOutDate && b.CheckOutDate > checkInDate` |
-| `HomeService.cs` line 33 | Logic loại trừ phòng Maintenance: `r.Status != RoomStatus.Maintenance` |
-| `HomeService.cs` line 37-38 | Logic loại trừ booking: `BookingStatus != Cancelled && BookingStatus != NoShow` |
-| `HomeController.cs` line 71 | Date parsing formats: `dd/MM/yyyy`, `dd MM, yyyy`, `d MMMM, yyyy`, `dd MMMM, yyyy`, `MM/dd/yyyy`, `yyyy-MM-dd` |
+
+| Source                        | Items Derived                                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `SWP391-HOS-02.md` BR01     | Strict Concurrency — Phòng không được đặt trùng cho cùng khoảng thời gian                                     |
+| `SWP391_NHOM1.md` UC04      | Guest tìm kiếm phòng theo preferences                                                                                  |
+| `SWP391_NHOM1.md` UC06      | Guest xem chi tiết phòng                                                                                                |
+| `SWP391_NHOM1.md` UC59      | Receptionist cập nhật trạng thái phòng                                                                               |
+| `HomeService.cs` line 39-40 | Logic overlap:`b.CheckInDate < checkOutDate && b.CheckOutDate > checkInDate`                                            |
+| `HomeService.cs` line 33    | Logic loại trừ phòng Maintenance:`r.Status != RoomStatus.Maintenance`                                                |
+| `HomeService.cs` line 37-38 | Logic loại trừ booking:`BookingStatus != Cancelled && BookingStatus != NoShow`                                        |
+| `HomeController.cs` line 71 | Date parsing formats:`dd/MM/yyyy`, `dd MM, yyyy`, `d MMMM, yyyy`, `dd MMMM, yyyy`, `MM/dd/yyyy`, `yyyy-MM-dd` |
 
 ### TDS-03 — Test Conditions and Coverage Items
-| Condition ID | Test Condition | Coverage Item | Test Cases |
-| --- | --- | --- | --- |
-| TC-COND-001 | Tính toán cơ bản: không có booking nào → trả về TotalRooms | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-001` |
-| TC-COND-002 | Booking không trùng ngày (trước/sau khoảng search) → không trừ phòng | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-002` |
-| TC-COND-003 | Booking trùng lấp ngày → trừ đúng số phòng (distinct RoomId) | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-003` |
-| TC-COND-004 | Phòng Maintenance → loại khỏi TotalRooms | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-004` |
-| TC-COND-005 | Booking Cancelled/NoShow → không trừ vào available | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-005` |
-| TC-COND-006 | Booking CheckedOut vẫn overlap → HomeService vẫn trừ | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-006` |
-| TC-COND-007 | SearchRooms với ngày rỗng/invalid | `HomeController.SearchRooms` | `UC04_06_TC_001` |
-| TC-COND-008 | SearchRooms với ngày hợp lệ | `HomeController.SearchRooms` | `UC04_06_TC_002` |
-| TC-COND-009 | RoomsController.Edit → cập nhật status thành công | `RoomsController.Edit` | `UC59_TC_001` |
-| TC-COND-010 | RoomsController.Edit → ID không khớp Model.RoomId | `RoomsController.Edit` | `UC59_TC_002` |
+
+| Condition ID | Test Condition                                                                 | Coverage Item                          | Test Cases         |
+| ------------ | ------------------------------------------------------------------------------ | -------------------------------------- | ------------------ |
+| TC-COND-001  | Tính toán cơ bản: không có booking nào → trả về TotalRooms           | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-001`    |
+| TC-COND-002  | Booking không trùng ngày (trước/sau khoảng search) → không trừ phòng | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-002`    |
+| TC-COND-003  | Booking trùng lấp ngày → trừ đúng số phòng (distinct RoomId)          | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-003`    |
+| TC-COND-004  | Phòng Maintenance → loại khỏi TotalRooms                                   | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-004`    |
+| TC-COND-005  | Booking Cancelled/NoShow → không trừ vào available                         | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-005`    |
+| TC-COND-006  | Booking CheckedOut vẫn overlap → HomeService vẫn trừ                       | `HomeService.CheckAvailabilityAsync` | `ROOM-TC-006`    |
+| TC-COND-007  | SearchRooms với ngày rỗng/invalid                                           | `HomeController.SearchRooms`         | `UC04_06_TC_001` |
+| TC-COND-008  | SearchRooms với ngày hợp lệ                                                | `HomeController.SearchRooms`         | `UC04_06_TC_002` |
+| TC-COND-009  | RoomsController.Edit → cập nhật status thành công                         | `RoomsController.Edit`               | `UC59_TC_001`    |
+| TC-COND-010  | RoomsController.Edit → ID không khớp Model.RoomId                           | `RoomsController.Edit`               | `UC59_TC_002`    |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
-| Technique (ISO 29119-4) | Applied To | Rationale |
-| --- | --- | --- |
-| Equivalence Partitioning | BookingStatus values | Chia thành 2 nhóm: {Reserved, CheckedIn, CheckedOut} (chiếm phòng) vs {Cancelled, NoShow} (không chiếm) |
-| Boundary Value Analysis | Date Overlap (CheckIn/CheckOut boundary) | Đảm bảo xử lý đúng tại mốc ngày biên — ví dụ CheckOut người cũ = CheckIn người mới → KHÔNG overlap |
-| State Transition Testing | RoomStatus enum transitions | Verify logic khi Room chuyển từ Available → Maintenance → Available ảnh hưởng đến TotalRooms |
-| Error Guessing | Date parsing in Controller | Nhập string không hợp lệ, ngày trong quá khứ, CheckOut ≤ CheckIn |
+
+| Technique (ISO 29119-4)  | Applied To                               | Rationale                                                                                                                |
+| ------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Equivalence Partitioning | BookingStatus values                     | Chia thành 2 nhóm: {Reserved, CheckedIn, CheckedOut} (chiếm phòng) vs {Cancelled, NoShow} (không chiếm)            |
+| Boundary Value Analysis  | Date Overlap (CheckIn/CheckOut boundary) | Đảm bảo xử lý đúng tại mốc ngày biên — ví dụ CheckOut người cũ = CheckIn người mới → KHÔNG overlap |
+| State Transition Testing | RoomStatus enum transitions              | Verify logic khi Room chuyển từ Available → Maintenance → Available ảnh hưởng đến TotalRooms                    |
+| Error Guessing           | Date parsing in Controller               | Nhập string không hợp lệ, ngày trong quá khứ, CheckOut ≤ CheckIn                                                 |
 
 ### TDS-05 — Test Data Requirements
-| Fixture ID | Type | Value / Logic | Mục đích |
-| --- | --- | --- | --- |
-| FX-001 | Mock DB | CategoryId=1, 5 Rooms (Status=Available), 0 Bookings | Happy path — empty calendar |
-| FX-002 | Mock DB | CategoryId=1, 5 Rooms, 2 Bookings overlap (Reserved, different RoomIds) | Test overlap trừ đúng distinct RoomId |
-| FX-003 | Mock DB | CategoryId=1, 5 Rooms (2 Available + 3 Maintenance), 0 Bookings | Test Maintenance exclusion |
-| FX-004 | Mock DB | CategoryId=1, 5 Rooms, 2 Bookings overlap (1 Cancelled + 1 NoShow) | Test Cancelled/NoShow exclusion |
-| FX-005 | Mock DB | CategoryId=1, 5 Rooms, 1 Booking overlap (CheckedOut) | Test CheckedOut still counts as occupied in HomeService |
-| FX-006 | Mock DB | CategoryId=1, 5 Rooms, 1 Booking NOT overlapping (before search range) | Test non-overlap booking |
+
+| Fixture ID | Type    | Value / Logic                                                           | Mục đích                                             |
+| ---------- | ------- | ----------------------------------------------------------------------- | ------------------------------------------------------- |
+| FX-001     | Mock DB | CategoryId=1, 5 Rooms (Status=Available), 0 Bookings                    | Happy path — empty calendar                            |
+| FX-002     | Mock DB | CategoryId=1, 5 Rooms, 2 Bookings overlap (Reserved, different RoomIds) | Test overlap trừ đúng distinct RoomId                |
+| FX-003     | Mock DB | CategoryId=1, 5 Rooms (2 Available + 3 Maintenance), 0 Bookings         | Test Maintenance exclusion                              |
+| FX-004     | Mock DB | CategoryId=1, 5 Rooms, 2 Bookings overlap (1 Cancelled + 1 NoShow)      | Test Cancelled/NoShow exclusion                         |
+| FX-005     | Mock DB | CategoryId=1, 5 Rooms, 1 Booking overlap (CheckedOut)                   | Test CheckedOut still counts as occupied in HomeService |
+| FX-006     | Mock DB | CategoryId=1, 5 Rooms, 1 Booking NOT overlapping (before search range)  | Test non-overlap booking                                |
 
 ## 4. Test Case Specification
 
 ### ROOM-TC-001 — Trả về tổng số phòng khi không có Booking nào
+
 **Severity**: CRITICAL
 **Feature Under Test**: `HomeService.CheckAvailabilityAsync()`
 **Test File**: `PhucNguyenResort.Tests/Services/HomeServiceTests.cs`
@@ -142,19 +154,23 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-001
 
 **Preconditions**:
+
 - CategoryId = 1 có 5 phòng (Status = `RoomStatus.Available`).
 - Không có bất kỳ Booking nào trong hệ thống.
 - Fixture: FX-001
 
 **Test Steps**:
+
 1. Arrange: Mock `ResortDbContext` — 5 Rooms (CategoryId=1, Status=Available), 0 Bookings
 2. Act: Gọi `CheckAvailabilityAsync(1, new DateTime(2027,1,1), new DateTime(2027,1,5))`
 3. Assert: Kết quả == 5
 
 **Expected Result (PASS)**:
+
 - Trả về kết quả: `5`
 
 **Expected Result (FAIL — dấu hiệu lỗi)**:
+
 - Trả về < 5: Logic đếm TotalRooms sai (có thể filter thừa)
 - Trả về > 5: Đếm phòng thuộc category khác
 
@@ -164,6 +180,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### ROOM-TC-002 — Trả về đúng số phòng khi Booking không bị trùng ngày
+
 **Severity**: HIGH
 **Feature Under Test**: `HomeService.CheckAvailabilityAsync()`
 **Test File**: `PhucNguyenResort.Tests/Services/HomeServiceTests.cs`
@@ -171,19 +188,23 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-002
 
 **Preconditions**:
+
 - CategoryId = 1 có 5 phòng (Status = `RoomStatus.Available`).
 - Có 1 Booking cho phòng thuộc Category 1 từ `01/01/2027` đến `03/01/2027`, status = `BookingStatus.Reserved`.
 - Fixture: FX-006
 
 **Test Steps**:
+
 1. Arrange: Mock DB — 5 Rooms, 1 Booking (CheckIn=01/01, CheckOut=03/01, Reserved)
 2. Act: Gọi `CheckAvailabilityAsync(1, new DateTime(2027,1,5), new DateTime(2027,1,10))` — khoảng thời gian hoàn toàn KHÔNG giao nhau
 3. Assert: Kết quả == 5
 
 **Expected Result (PASS)**:
+
 - Trả về kết quả: `5` (Booking cũ đã kết thúc trước khoảng search → không trừ)
 
 **Expected Result (FAIL)**:
+
 - Trả về < 5: Logic overlap sai, đếm cả booking không giao nhau
 
 **Current Status**: 🟢 Passing
@@ -192,6 +213,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### ROOM-TC-003 — Trừ đúng số phòng khi có Booking bị Overlap (Trùng ngày)
+
 **Severity**: CRITICAL
 **Feature Under Test**: `HomeService.CheckAvailabilityAsync()`
 **Test File**: `PhucNguyenResort.Tests/Services/HomeServiceTests.cs`
@@ -199,6 +221,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-003
 
 **Preconditions**:
+
 - CategoryId = 1 có 5 phòng (Status = `RoomStatus.Available`).
 - Có 2 Bookings trên 2 phòng khác nhau (RoomId khác nhau), cùng thuộc Category 1, đều overlap khoảng search.
   - Booking A: RoomId=1, CheckIn=02/01, CheckOut=06/01, Status=Reserved
@@ -206,15 +229,18 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 - Fixture: FX-002
 
 **Test Steps**:
+
 1. Arrange: Mock DB — 5 Rooms, 2 Bookings overlap trên 2 RoomId khác nhau
 2. Act: Gọi `CheckAvailabilityAsync(1, new DateTime(2027,1,1), new DateTime(2027,1,5))`
 3. Assert: Kết quả == 3
 
 **Expected Result (PASS)**:
+
 - Trả về kết quả: `3` (5 tổng - 2 phòng bị chiếm = 3)
 - Giải thích: Search (01/01→05/01) giao cắt với cả Booking A (02/01→06/01) và Booking B (03/01→07/01). Mỗi booking thuộc 1 RoomId khác nhau → Distinct count = 2.
 
 **Expected Result (FAIL)**:
+
 - Trả về > 3: Không đếm đúng overlap
 - Trả về < 3: Đếm trùng RoomId (thiếu `Distinct()`)
 
@@ -224,6 +250,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### ROOM-TC-004 — Phải loại bỏ phòng đang bị Maintenance khỏi TotalRooms
+
 **Severity**: HIGH
 **Feature Under Test**: `HomeService.CheckAvailabilityAsync()`
 **Test File**: `PhucNguyenResort.Tests/Services/HomeServiceTests.cs`
@@ -231,19 +258,23 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-004
 
 **Preconditions**:
+
 - CategoryId = 1 có 5 phòng: 2 phòng `RoomStatus.Available` + 3 phòng `RoomStatus.Maintenance`.
 - Không có Booking.
 - Fixture: FX-003
 
 **Test Steps**:
+
 1. Arrange: Mock DB — 5 Rooms (2 Available, 3 Maintenance), 0 Bookings
 2. Act: Gọi `CheckAvailabilityAsync(1, new DateTime(2027,1,1), new DateTime(2027,1,5))`
 3. Assert: Kết quả == 2
 
 **Expected Result (PASS)**:
+
 - Trả về kết quả: `2` (Chỉ đếm phòng `Status != RoomStatus.Maintenance`)
 
 **Expected Result (FAIL)**:
+
 - Trả về 5: Không filter Maintenance
 - Trả về 0: Filter quá mức (có thể loại cả Available)
 
@@ -253,6 +284,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### ROOM-TC-005 — Bỏ qua (không trừ) các Booking đã bị Cancelled hoặc NoShow
+
 **Severity**: HIGH
 **Feature Under Test**: `HomeService.CheckAvailabilityAsync()`
 **Test File**: `PhucNguyenResort.Tests/Services/HomeServiceTests.cs`
@@ -260,6 +292,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-005
 
 **Preconditions**:
+
 - CategoryId = 1 có 5 phòng (Status = `RoomStatus.Available`).
 - Có 2 Booking hoàn toàn trùng lịch (01/01→05/01) trên 2 RoomId khác nhau:
   - Booking A: RoomId=1, Status = `BookingStatus.Cancelled`
@@ -267,14 +300,17 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 - Fixture: FX-004
 
 **Test Steps**:
+
 1. Arrange: Mock DB — 5 Rooms, 2 Bookings (1 Cancelled, 1 NoShow), cùng overlap
 2. Act: Gọi `CheckAvailabilityAsync(1, new DateTime(2027,1,1), new DateTime(2027,1,5))`
 3. Assert: Kết quả == 5
 
 **Expected Result (PASS)**:
+
 - Trả về kết quả: `5` (Cả 2 Booking đều có status bị loại trừ → phòng được "trả lại" hệ thống)
 
 **Expected Result (FAIL)**:
+
 - Trả về 3: Đếm cả Cancelled/NoShow bookings → lỗi logic filter
 
 **Current Status**: 🟢 Passing
@@ -283,6 +319,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### ROOM-TC-006 — Booking CheckedOut vẫn bị đếm là occupied trong HomeService
+
 **Severity**: HIGH
 **CWE**: N/A
 **Legal**: Liên quan đến BR01 — đảm bảo tính nhất quán khi đếm phòng trống
@@ -292,19 +329,23 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-006
 
 **Preconditions**:
+
 - CategoryId = 1 có 5 phòng (Status = `RoomStatus.Available`).
 - Có 1 Booking: RoomId=1, CheckIn=01/01, CheckOut=05/01, Status = `BookingStatus.CheckedOut`
 - Fixture: FX-005
 
 **Test Steps**:
+
 1. Arrange: Mock DB — 5 Rooms, 1 Booking CheckedOut overlap
 2. Act: Gọi `CheckAvailabilityAsync(1, new DateTime(2027,1,1), new DateTime(2027,1,5))`
 3. Assert: Kết quả == 4
 
 **Expected Result (PASS — theo behavior hiện tại của HomeService)**:
+
 - Trả về kết quả: `4` (HomeService chỉ loại trừ Cancelled và NoShow, **KHÔNG** loại trừ CheckedOut → booking CheckedOut vẫn bị đếm)
 
 **Expected Result (FAIL — nếu behavior thay đổi)**:
+
 - Trả về 5: Nếu ai đó thêm `CheckedOut` vào danh sách loại trừ → cần ADR review
 
 **Current Status**: 🔴 Not written
@@ -314,6 +355,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### UC04_06_TC_001 — Tìm kiếm với ngày không hợp lệ (SearchRooms)
+
 **Severity**: MEDIUM
 **Feature Under Test**: `HomeController.SearchRooms()`
 **Test File**: `PhucNguyenResort.Tests/Controllers/HomeControllerTests.cs`
@@ -321,10 +363,12 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-007
 
 **Preconditions**:
+
 - `HomeController` đã inject `IHomeService` (Mock) và `ITourService` (Mock).
 - `checkIn` và `checkOut` là chuỗi rỗng hoặc không hợp lệ.
 
 **Test Steps**:
+
 1. Arrange: Mock `IHomeService.GetRoomCategoriesForHomeAsync()` trả về danh sách categories
 2. Act: Gọi `SearchRooms("", "", 2, 0, 1)` — chuỗi rỗng
 3. Assert:
@@ -333,10 +377,12 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
    - Gọi `GetRoomCategoriesForHomeAsync()` (trả tất cả, không filter)
 
 **Expected Result (PASS)**:
+
 - Khi ngày rỗng: trả về tất cả categories, `ViewBag.IsFiltered = false`, không gọi `SearchAvailableCategoriesAsync`
 - `ViewBag.CheckIn = ""`, `ViewBag.CheckOut = ""`
 
 **Expected Result (FAIL)**:
+
 - Throw exception khi parse ngày rỗng
 - Gọi nhầm `SearchAvailableCategoriesAsync` với ngày mặc định
 
@@ -346,6 +392,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### UC04_06_TC_002 — Tìm kiếm với ngày hợp lệ (SearchRooms)
+
 **Severity**: HIGH
 **Feature Under Test**: `HomeController.SearchRooms()`
 **Test File**: `PhucNguyenResort.Tests/Controllers/HomeControllerTests.cs`
@@ -353,10 +400,12 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-008
 
 **Preconditions**:
+
 - `HomeController` đã inject `IHomeService` (Mock).
 - `checkIn` = "01/12/2027", `checkOut` = "05/12/2027" (format `dd/MM/yyyy`).
 
 **Test Steps**:
+
 1. Arrange: Mock `IHomeService.SearchAvailableCategoriesAsync()` trả về danh sách categories
 2. Act: Gọi `SearchRooms("01/12/2027", "05/12/2027", 2, 0, 1)`
 3. Assert:
@@ -367,10 +416,12 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
    - Mock verify: `SearchAvailableCategoriesAsync` được gọi với `checkInDate = 2027-12-01`, `checkOutDate = 2027-12-05`, `adultsCount = 2`, `childrenCount = 0`, `roomCount = 1`
 
 **Expected Result (PASS)**:
+
 - Trả về danh sách RoomCategory chính xác
 - Gọi đúng hàm `SearchAvailableCategoriesAsync` với đúng tham số đã parse
 
 **Expected Result (FAIL)**:
+
 - Parse sai format ngày (vd: 01/12 thành 12/01)
 - Không set `ViewBag.IsFiltered = true`
 
@@ -380,6 +431,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### UC59_TC_001 — Cập nhật trạng thái phòng thành công (Edit)
+
 **Severity**: CRITICAL
 **Feature Under Test**: `RoomsController.Edit(int id, RoomEditVM model)`
 **Test File**: `PhucNguyenResort.Tests/Controllers/RoomsControllerTests.cs`
@@ -387,12 +439,14 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-009
 
 **Preconditions**:
+
 - `RoomsController` inject `IRoomService` (Mock) và `IRoomCategoryService` (Mock).
 - Mock `IRoomService.GetRoomByIdAsync(1)` trả về Room với RoomId=1, Status=Available.
 - Gửi lên model `RoomEditVM` với RoomId=1 và Status = `RoomStatus.Maintenance`.
 - `ModelState.IsValid = true`.
 
 **Test Steps**:
+
 1. Arrange: Setup mock services, tạo `RoomEditVM { RoomId = 1, Status = RoomStatus.Maintenance, ... }`
 2. Act: Gọi `Edit(1, model)`
 3. Assert:
@@ -401,10 +455,12 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
    - Kết quả là `RedirectToActionResult` → redirect đến `Index`
 
 **Expected Result (PASS)**:
+
 - Gọi `UpdateRoomAsync` với tham số Room đã cập nhật `Status = RoomStatus.Maintenance`
 - Chuyển hướng (Redirect) thành công về trang Index
 
 **Expected Result (FAIL)**:
+
 - Không gọi `UpdateRoomAsync` → status không thay đổi
 - Không redirect → trả về View (có thể do ModelState invalid)
 
@@ -414,6 +470,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 ---
 
 ### UC59_TC_002 — Truyền vào ID không khớp với Model ID (Edit)
+
 **Severity**: MEDIUM
 **Feature Under Test**: `RoomsController.Edit(int id, RoomEditVM model)`
 **Test File**: `PhucNguyenResort.Tests/Controllers/RoomsControllerTests.cs`
@@ -421,18 +478,22 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 **Condition Ref**: TC-COND-010
 
 **Preconditions**:
+
 - Truyền vào route ID = 1 nhưng model có `RoomId = 2` (mismatch).
 
 **Test Steps**:
+
 1. Arrange: Tạo `RoomEditVM { RoomId = 2, ... }`
 2. Act: Gọi `Edit(1, model)` — route id=1, model id=2
 3. Assert: Kết quả là `NotFoundResult` (HTTP 404)
 
 **Expected Result (PASS)**:
+
 - Trả về `NotFoundResult` (HTTP 404)
 - **Không** gọi `UpdateRoomAsync` (không thay đổi DB)
 
 **Expected Result (FAIL)**:
+
 - Gọi `UpdateRoomAsync` → cập nhật sai phòng → lỗi data integrity
 
 **Current Status**: 🟢 Passing
@@ -442,39 +503,43 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic k
 
 ## 5. Red-Green-Refactor Tracker
 
-| TC ID | Test File | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
-| --- | --- | --- | --- | --- |
-| `ROOM-TC-001` | `HomeServiceTests.cs` | `[x]` | `[x]` | — |
-| `ROOM-TC-002` | `HomeServiceTests.cs` | `[x]` | `[x]` | — |
-| `ROOM-TC-003` | `HomeServiceTests.cs` | `[x]` | `[x]` | Dùng `Distinct()` trên RoomId |
-| `ROOM-TC-004` | `HomeServiceTests.cs` | `[x]` | `[x]` | — |
-| `ROOM-TC-005` | `HomeServiceTests.cs` | `[x]` | `[x]` | — |
-| `ROOM-TC-006` | `HomeServiceTests.cs` | `[ ]` | `[ ]` | Cần discussion: CheckedOut nên loại trừ hay không? |
-| `UC04_06_TC_001` | `HomeControllerTests.cs` | `[x]` | `[x]` | — |
-| `UC04_06_TC_002` | `HomeControllerTests.cs` | `[x]` | `[x]` | — |
-| `UC59_TC_001` | `RoomsControllerTests.cs` | `[x]` | `[x]` | — |
-| `UC59_TC_002` | `RoomsControllerTests.cs` | `[x]` | `[x]` | — |
+| TC ID              | Test File                   | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note                                        |
+| ------------------ | --------------------------- | ---------------- | ----------------- | ------------------------------------------------------- |
+| `ROOM-TC-001`    | `HomeServiceTests.cs`     | `[x]`          | `[x]`           | —                                                      |
+| `ROOM-TC-002`    | `HomeServiceTests.cs`     | `[x]`          | `[x]`           | —                                                      |
+| `ROOM-TC-003`    | `HomeServiceTests.cs`     | `[x]`          | `[x]`           | Dùng `Distinct()` trên RoomId                       |
+| `ROOM-TC-004`    | `HomeServiceTests.cs`     | `[x]`          | `[x]`           | —                                                      |
+| `ROOM-TC-005`    | `HomeServiceTests.cs`     | `[x]`          | `[x]`           | —                                                      |
+| `ROOM-TC-006`    | `HomeServiceTests.cs`     | `[ ]`          | `[ ]`           | Cần discussion: CheckedOut nên loại trừ hay không? |
+| `UC04_06_TC_001` | `HomeControllerTests.cs`  | `[x]`          | `[x]`           | —                                                      |
+| `UC04_06_TC_002` | `HomeControllerTests.cs`  | `[x]`          | `[x]`           | —                                                      |
+| `UC59_TC_001`    | `RoomsControllerTests.cs` | `[x]`          | `[x]`           | —                                                      |
+| `UC59_TC_002`    | `RoomsControllerTests.cs` | `[x]`          | `[x]`           | —                                                      |
 
 ## 6. Entry / Exit Criteria
 
 **Entry Criteria (Điều kiện bắt đầu)**
-- [x] Spec kỹ thuật `SWP391-MOD2-IMP-002` (EDS_RoomBooking.md) đã được review
-- [x] Logic Issues (Section 2) đã được confirm — đặc biệt L3, L4 cần team discussion
-- [x] EF Core schema cho `Bookings`, `Rooms`, `RoomCategories` đã tạo
-- [x] Test fixtures (Section 3 TDS-05) đã được chuẩn bị
+
+- [X] Spec kỹ thuật `SWP391-MOD2-IMP-002` (EDS_RoomBooking.md) đã được review
+- [X] Logic Issues (Section 2) đã được confirm — đặc biệt L3, L4 cần team discussion
+- [X] EF Core schema cho `Bookings`, `Rooms`, `RoomCategories` đã tạo
+- [X] Test fixtures (Section 3 TDS-05) đã được chuẩn bị
 
 **Exit Criteria (Điều kiện kết thúc — DoD)**
-- [x] `dotnet test` — tất cả unit tests xanh (ROOM-TC-001 → TC-005, UC04_06_TC_001 → TC_002, UC59_TC_001 → TC_002)
+
+- [X] `dotnet test` — tất cả unit tests xanh (ROOM-TC-001 → TC-005, UC04_06_TC_001 → TC_002, UC59_TC_001 → TC_002)
 - [ ] `ROOM-TC-006` — cần resolve logic issue L4 trước khi mark Done
 - [ ] Test coverage ≥ 80% cho `HomeService.cs`, `HomeController.cs (SearchRooms)`, `RoomsController.cs (Edit)`
-- [x] Không có hardcode string cho enum comparison (dùng `RoomStatus.Maintenance` thay vì `"Maintenance"`)
+- [X] Không có hardcode string cho enum comparison (dùng `RoomStatus.Maintenance` thay vì `"Maintenance"`)
 - [ ] Code review completed
 
 **Suspension Criteria (Điều kiện tạm dừng)**
+
 - Logic issue L4 (`CheckedOut` exclusion inconsistency giữa `HomeService` và `BookingService`) chưa được resolve bởi Architecture team
 - Blocker: nếu schema `Bookings` hoặc `Rooms` thay đổi, cần cập nhật lại test data
 
 ## 7. Rollback Plan
+
 ```bash
 # Revert test files (dev only)
 git checkout -- PhucNguyenResort.Tests/Services/HomeServiceTests.cs

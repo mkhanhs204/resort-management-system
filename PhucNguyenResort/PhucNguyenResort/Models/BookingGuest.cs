@@ -15,11 +15,14 @@ public class BookingGuest
     [DataType(DataType.Date)]
     public DateTime? DateOfBirth { get; set; }
 
-    [StringLength(100)]
+    [StringLength(500)]
     public string? PassportNumber { get; set; }
 
     [StringLength(50)]
     public string? Nationality { get; set; }
+
+    public GenderType? Gender { get; set; }
+    public bool IsPrimaryBooker { get; set; }
 
     public Booking? Booking { get; set; }
 }

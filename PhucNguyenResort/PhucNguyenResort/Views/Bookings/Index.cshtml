@@ -88,12 +88,21 @@
                                 }
                             </td>
                             <td>
-                                @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
-                                {
-                                    <form asp-action="Cancel" asp-route-id="@item.BookingId" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận hủy booking này?');">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hủy</button>
-                                    </form>
-                                }
+                                <div class="d-flex flex-wrap" style="gap: 5px;">
+                                    @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.PendingPayment)
+                                    {
+                                        <a asp-action="CheckIn" asp-route-id="@item.BookingId" class="btn btn-sm btn-success">Check-in</a>
+                                    }
+                                    
+                                    <a asp-action="ExportManifest" asp-route-id="@item.BookingId" class="btn btn-sm btn-outline-info">Báo Cáo Tạm Trú</a>
+
+                                    @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
+                                    {
+                                        <form asp-action="Cancel" asp-route-id="@item.BookingId" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận hủy booking này?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hủy</button>
+                                        </form>
+                                    }
+                                </div>
                             </td>
                         </tr>
                     }

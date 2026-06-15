@@ -134,3 +134,21 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     margin-bottom: 20px;
 }
+
+/* Branding link hover states */
+#sidebar .sidebar-header a {
+    text-decoration: none !important;
+    color: inherit;
+    display: block;
+}
+#sidebar .sidebar-header a:hover h3 {
+    color: #ffffff;
+    transition: color 0.2s ease;
+}
+#sidebar .sidebar-header a:hover span {
+    color: #dfa974;
+    transition: color 0.2s ease;
+}
+#sidebar .sidebar-header a h3, #sidebar .sidebar-header a span {
+    transition: color 0.2s ease;
+}

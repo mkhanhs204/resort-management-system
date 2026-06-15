@@ -11,7 +11,7 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 | Document Owner | Cuong                   |
 | Author         | Cuong                   |
 | Reviewed by    | Khanh                   |
-| DPO Sign-off   | [ ] Pending             |
+| DPO Sign-off   | Khanh                   |
 | Approved by    | Cuong                   |
 | Last Review    | 2026-06-13              |
 | Based on EDS   | v2.0                    |
@@ -22,8 +22,9 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                                                                                                                                                                                                      |
 | ---------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-06-12 | AI Assistant        | Tạo tài liệu lần đầu - EDS cho Use Case Đặt Phòng (Room Booking)                                                                                                                                                 |
-| 2026-06-13 | AI BA Review        | Chỉnh sửa toàn bộ để khớp với codebase thực tế (v1.1): cập nhật BookingStatus enum, Booking model, IBookingService interface, CreateBookingViewModel, bổ sung đầy đủ các section theo EDS Template v2.0 |
+| 2026-06-12 | Cuong               | Tạo tài liệu lần đầu - EDS cho Use Case Đặt Phòng (Room Booking)                                                                                                                                                 |
+| 2026-06-13 | Cuong               | Chỉnh sửa toàn bộ để khớp với codebase thực tế (v1.1): cập nhật BookingStatus enum, Booking model, IBookingService interface, CreateBookingViewModel, bổ sung đầy đủ các section theo EDS Template v2.0 |
+| 2026-06-14 | Cuong               | Cập nhật v1.2: Bổ sung logic kiểm tra và tự động cập nhật AvailableSlots của TourSchedule khi tạo và hủy Booking.                                                                                           |
 
 ## MỤC LỤC
 
@@ -61,16 +62,17 @@ Module này xử lý toàn bộ luồng đặt phòng resort của khách hàng 
 
 ## 2. Ma trận Truy vết (Traceability Matrix)
 
-| Requirement ID             | Loại (BR/ADR/US) | Mô tả yêu cầu                                                                               | Thành phần Code                                                                                                            | Compliance Target   | ADR liên quan   |
-| -------------------------- | ----------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------- |
-| UC22 (SRS) / UC07 (HOS-02) | User Story        | Customer đặt phòng và thanh toán cọc an toàn                                             | `BookingService.CreateBookingAsync()`, `BookingsController.Create()`                                                     | NĐ 356/2025        | ADR-001, ADR-002 |
-| UC04 (SRS) / UC06 (HOS-02) | User Story        | Guest tìm kiếm phòng theo ngày, số khách, loại phòng                                    | `HomeService.CheckAvailabilityAsync()`, `HomeService.SearchAvailableCategoriesAsync()`, `HomeController.SearchRooms()` | —                  | —               |
-| UC06 (SRS)                 | User Story        | Guest xem chi tiết phòng                                                                      | `HomeService.GetRoomDetailsAsync()`, `HomeController.RoomDetails()`                                                      | —                  | —               |
-| UC28 (SRS)                 | User Story        | Customer xem lịch sử đặt phòng                                                             | `BookingsController.MyBookings()`                                                                                          | —                  | —               |
-| UC59 (SRS) / UC10 (HOS-02) | User Story        | Receptionist cập nhật trạng thái vận hành phòng                                          | `RoomsController.Edit()`, `RoomService.UpdateRoomAsync()`                                                                | —                  | —               |
-| BR01 (HOS-02)              | Business Rule     | Strict Concurrency — Phòng không được đặt trùng cho cùng khoảng thời gian           | `BookingService.CreateBookingAsync()` — overlap check + `DbUpdateConcurrencyException` handling                         | —                  | ADR-002          |
-| BR03 (HOS-02)              | Business Rule     | Cancellation Policy: Hoàn 100% cọc nếu hủy trước check-in > 48h, không hoàn nếu ≤ 48h | `BookingService.CancelBookingAsync()`                                                                                      | Luật Du lịch 2017 | —               |
-| BR02 (HOS-02)              | Business Rule     | Guest không thể checkout nếu còn chi phí chưa thanh toán (food, tour)                    | `Downstream — Consolidated Billing Module`                                                                                | —                  | —               |
+| Requirement ID             | Loại (BR/ADR/US) | Mô tả yêu cầu                                                                                      | Thành phần Code                                                                                                            | Compliance Target   | ADR liên quan   |
+| -------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------- |
+| UC22 (SRS) / UC07 (HOS-02) | User Story        | Customer đặt phòng và thanh toán cọc an toàn                                                    | `BookingService.CreateBookingAsync()`, `BookingsController.Create()`                                                     | NĐ 356/2025        | ADR-001, ADR-002 |
+| UC04 (SRS) / UC06 (HOS-02) | User Story        | Guest tìm kiếm phòng theo ngày, số khách, loại phòng                                           | `HomeService.CheckAvailabilityAsync()`, `HomeService.SearchAvailableCategoriesAsync()`, `HomeController.SearchRooms()` | —                  | —               |
+| UC06 (SRS)                 | User Story        | Guest xem chi tiết phòng                                                                             | `HomeService.GetRoomDetailsAsync()`, `HomeController.RoomDetails()`                                                      | —                  | —               |
+| UC28 (SRS)                 | User Story        | Customer xem lịch sử đặt phòng                                                                    | `BookingsController.MyBookings()`                                                                                          | —                  | —               |
+| UC59 (SRS) / UC10 (HOS-02) | User Story        | Receptionist cập nhật trạng thái vận hành phòng                                                 | `RoomsController.Edit()`, `RoomService.UpdateRoomAsync()`                                                                | —                  | —               |
+| BR01 (HOS-02)              | Business Rule     | Strict Concurrency — Phòng không được đặt trùng cho cùng khoảng thời gian                  | `BookingService.CreateBookingAsync()` — overlap check + `DbUpdateConcurrencyException` handling                         | —                  | ADR-002          |
+| BR03 (HOS-02)              | Business Rule     | Cancellation Policy: Hoàn 100% cọc nếu hủy trước check-in > 48h, không hoàn nếu ≤ 48h        | `BookingService.CancelBookingAsync()`                                                                                      | Luật Du lịch 2017 | —               |
+| BR04 (HOS-02)              | Business Rule     | Tour Slots Policy: Giảm AvailableSlots khi đặt tour và tự động hoàn trả khi hủy đặt phòng | `BookingService.CreateBookingAsync()`, `BookingService.CancelBookingAsync()`                                             | —                  | —               |
+| BR02 (HOS-02)              | Business Rule     | Guest không thể checkout nếu còn chi phí chưa thanh toán (food, tour)                           | `Downstream — Consolidated Billing Module`                                                                                | —                  | —               |
 
 ## 3. Architecture Decision Records (ADR)
 
@@ -323,7 +325,7 @@ sequenceDiagram
     Service->>DB: Rooms.Include(Category).FirstOrDefaultAsync(RoomId)
     DB-->>Service: Room + Category (PricePerNight)
     Service->>Service: Tính TotalAmount = nights × PricePerNight
-    Service->>Service: Tính DepositAmount = TotalAmount × 50%
+    Service->>Service: Tính DepositAmount = TotalAmount × 40%
     Service->>DB: Bookings.Add(booking) + SaveChangesAsync()
     DB-->>Service: Success
     Service-->>Controller: BookingResult { Success = true, BookingId }
@@ -376,11 +378,11 @@ stateDiagram-v2
 
 ### 7.2. Events Consumed (Tiêu thụ)
 
-| Event Name            | Source              | Handler            | Action thực hiện                              |
-| --------------------- | ------------------- | ------------------ | ----------------------------------------------- |
-| `DepositPaid`       | `PaymentService`  | `BookingService` | Cập nhật DepositAmount thực tế vào Booking |
-| `CheckInCompleted`  | `ReceptionModule` | `BookingService` | Chuyển status → CheckedIn                     |
-| `CheckOutCompleted` | `ReceptionModule` | `BookingService` | Chuyển status → CheckedOut                    |
+| Event Name            | Source              | Handler               | Action thực hiện                                                                             |
+| --------------------- | ------------------- | --------------------- | ---------------------------------------------------------------------------------------------- |
+| `DepositPaid`       | `PaymentService`  | `PaymentController` | Cập nhật BookingStatus -> Reserved và TourBookingStatus -> Confirmed cho các Tour đi kèm |
+| `CheckInCompleted`  | `ReceptionModule` | `BookingService`    | Chuyển status → CheckedIn                                                                    |
+| `CheckOutCompleted` | `ReceptionModule` | `BookingService`    | Chuyển status → CheckedOut                                                                   |
 
 ## 8. Interface Specification (Đặc tả Giao diện)
 
@@ -538,6 +540,7 @@ Trong mô hình MVC, các lỗi nghiệp vụ không trả về mã HTTP 4xx d�
 | `ERR_CONFLICT`       | `BKG-002`          | `ModelState`        | Rất tiếc, phòng này đã có người đặt trong khoảng thời gian bạn chọn. | Overlap check trả về `true` HOẶC bắt `DbUpdateConcurrencyException` |
 | `ERR_ROOM_NOT_FOUND` | —                   | `ModelState`        | Không tìm thấy thông tin phòng.                                                | `RoomId` không tồn tại trong DB                                        |
 | `ERR_CANCEL`         | —                   | `TempData["Error"]` | Không thể hủy phòng ở trạng thái hiện tại.                                 | Booking đã ở trạng thái `Cancelled`                                  |
+| `ERR_TOUR_NO_SLOTS`  | `BKG-003`          | `ModelState`        | Rất tiếc, tour đã hết chỗ hoặc không đủ số lượng đăng ký.           | Lịch trình tour không đủ chỗ (`AvailableSlots < Adults + Children`) |
 | `ERR_NOTFOUND`       | —                   | HTTP 404 View         | Không tìm thấy thông tin đặt phòng.                                          | Truy cập BookingId không tồn tại hoặc không thuộc userId             |
 
 ## 11. Quy trình Triển khai (Step-by-Step)
@@ -653,7 +656,7 @@ Feature: Room Booking
     When BookingService.CreateBookingAsync() được gọi với CheckIn=01/01, CheckOut=05/01, RoomId=1
     Then BookingResult.Success = true
     And Booking mới có TotalAmount = 2,000,000 (4 đêm × 500,000)
-    And DepositAmount = 1,000,000 (50%)
+    And DepositAmount = 800,000 (40%)
     And BookingStatus = Reserved
 ```
 
@@ -686,6 +689,39 @@ Feature: Room Booking
     When BookingService.CancelBookingAsync(11, userId) được gọi
     Then CancelBookingResult.Success = true
     And RefundAmount = 0
+```
+
+**TC-UNIT-005 — Đặt tour làm giảm AvailableSlots của lịch trình**
+
+```gherkin
+  Scenario: Customer đặt phòng thành công kèm tour addon
+    Given TourSchedule ID=5 có AvailableSlots = 10
+    When CreateBookingAsync() được gọi với SelectedTourScheduleIds = [5], NumberOfAdults = 2, NumberOfChildren = 0
+    Then Booking mới được tạo thành công
+    And TourSchedule ID=5 có AvailableSlots = 8 (giảm đi 2)
+```
+
+**TC-UNIT-006 — Đặt tour thất bại do không đủ AvailableSlots**
+
+```gherkin
+  Scenario: Customer đặt phòng kèm tour addon nhưng tour hết chỗ
+    Given TourSchedule ID=5 có AvailableSlots = 1
+    When CreateBookingAsync() được gọi với SelectedTourScheduleIds = [5], NumberOfAdults = 2, NumberOfChildren = 0
+    Then BookingResult.Success = false
+    And ErrorCode = "BKG-003"
+    And Booking mới KHÔNG được tạo
+```
+
+**TC-UNIT-007 — Hủy đặt phòng hoàn trả lại AvailableSlots cho tour**
+
+```gherkin
+  Scenario: Customer hủy đặt phòng thành công
+    Given Booking ID=10 có 1 TourBooking liên kết với TourSchedule ID=5 (Participants = 2)
+    And TourSchedule ID=5 đang có AvailableSlots = 8
+    When CancelBookingAsync(10, userId) được gọi
+    Then CancelBookingResult.Success = true
+    And TourBooking.BookingStatus = Cancelled
+    And TourSchedule ID=5 có AvailableSlots = 10 (tăng lại 2)
 ```
 
 ### 13.2. Integration Tests
@@ -828,7 +864,7 @@ Chú thích:
 | -------------- | -------------------------------------------------------------------------------- |
 | Overlap        | Hai khoảng thời gian giao nhau:`A.start < B.end AND A.end > B.start`         |
 | Double Booking | Cùng một phòng vật lý bị đặt cho 2 khách trong cùng khoảng thời gian |
-| Deposit        | Tiền đặt cọc, mặc định 50% tổng giá phòng                              |
+| Deposit        | Tiền đặt cọc, mặc định 40% tổng giá phòng                              |
 | BR01           | Business Rule: Strict Concurrency — Ngăn chặn Double Booking                  |
 | BR03           | Business Rule: Cancellation Policy — Chính sách hoàn tiền khi hủy          |
 | PII            | Personally Identifiable Information (CCCD, Passport trong BookingGuest)          |

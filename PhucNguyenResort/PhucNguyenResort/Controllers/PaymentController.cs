@@ -35,6 +35,14 @@ namespace PhucNguyenResort.Controllers
                     if (booking != null && booking.BookingStatus == BookingStatus.PendingPayment)
                     {
                         booking.BookingStatus = BookingStatus.Reserved;
+
+                        // Cập nhật trạng thái các TourBooking liên quan sang Confirmed
+                        var tourBookings = _context.TourBookings.Where(tb => tb.BookingId == bookingId && tb.BookingStatus == TourBookingStatus.Pending).ToList();
+                        foreach (var tb in tourBookings)
+                        {
+                            tb.BookingStatus = TourBookingStatus.Confirmed;
+                        }
+
                         _context.SaveChanges();
                     }
                 }
@@ -80,6 +88,14 @@ namespace PhucNguyenResort.Controllers
             {
                 // Cập nhật trạng thái thành Reserved khi đã cọc
                 booking.BookingStatus = BookingStatus.Reserved;
+
+                // Cập nhật trạng thái các TourBooking liên quan sang Confirmed
+                var tourBookings = _context.TourBookings.Where(tb => tb.BookingId == bookingId && tb.BookingStatus == TourBookingStatus.Pending).ToList();
+                foreach (var tb in tourBookings)
+                {
+                    tb.BookingStatus = TourBookingStatus.Confirmed;
+                }
+
                 _context.SaveChanges();
 
                 return Json(new { RspCode = "00", Message = "Confirm Success" });
