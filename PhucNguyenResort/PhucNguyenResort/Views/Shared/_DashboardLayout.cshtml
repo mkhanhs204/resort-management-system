@@ -80,8 +80,8 @@
                     </li>
                     @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager"))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Bookings" ? "active" : "")">
-                            <a asp-controller="Bookings" asp-action="Index"><i class="fa fa-calendar-check-o"></i> Manage Bookings</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reception" ? "active" : "")">
+                            <a asp-controller="Reception" asp-action="Index"><i class="fa fa-calendar-check-o"></i> Manage Bookings</a>
                         </li>
                     }
                     @if (User.IsInRole("Receptionist") || User.IsInRole("Housekeeping Staff") || User.IsInRole("Business Manager"))
