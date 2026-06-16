@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.ViewModels.Tours;
+using Microsoft.EntityFrameworkCore;
+using PhucNguyenResort.Data;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -12,10 +14,12 @@ namespace PhucNguyenResort.Controllers
     public class ToursController : Controller
     {
         private readonly ITourService _tourService;
+        private readonly ResortDbContext _context;
 
-        public ToursController(ITourService tourService)
+        public ToursController(ITourService tourService, ResortDbContext context)
         {
             _tourService = tourService;
+            _context = context;
         }
 
         // GET: Tours
@@ -179,6 +183,24 @@ namespace PhucNguyenResort.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Tours/CheckTicket?ticketId=123
+        [HttpGet]
+        public async Task<IActionResult> CheckTicket(int ticketId)
+        {
+            var ticket = await _context.TourBookings
+                .Include(tb => tb.User)
+                .Include(tb => tb.Schedule)
+                    .ThenInclude(s => s.Tour)
+                .FirstOrDefaultAsync(tb => tb.TourBookingId == ticketId);
+
+            if (ticket == null)
+            {
+                return NotFound("Không tìm thấy mã vé này trong hệ thống.");
+            }
+
+            return View(ticket);
         }
     }
 }
