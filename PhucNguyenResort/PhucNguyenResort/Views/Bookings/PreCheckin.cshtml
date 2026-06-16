@@ -132,16 +132,6 @@
 
             <div class="col-lg-4">
                 <div class="premium-card sticky-top" style="top: 30px;">
-                    <h5 style="font-weight: 700; color: var(--primary); margin-bottom: 15px;"><i class="fa fa-share-alt mr-2 text-warning"></i> Gửi Link Cho Người Đi Cùng</h5>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
-                        Bạn có thể copy link bảo mật dưới đây gửi cho các thành viên trong đoàn để họ tự khai báo thông tin cá nhân mà không cần đăng nhập.
-                    </p>
-                    <div class="share-link-box">
-                        <span class="share-link-input">@ViewBag.ShareableLink</span>
-                        <button class="copy-btn" onclick="copyLink()">Copy</button>
-                    </div>
-                    
-                    <div class="mt-4 pt-3" style="border-top: 1px solid var(--border);">
                         <h6 style="font-weight: 700; color: var(--primary);"><i class="fa fa-info-circle mr-2 text-info"></i> Lưu ý khi nhận phòng:</h6>
                         <ul class="pl-3 mt-2 small text-muted" style="list-style-type: square; line-height: 1.6;">
                             <li>Mang theo Giấy tờ tùy thân bản gốc (CCCD hoặc Hộ chiếu) để lễ tân đối chiếu nhanh.</li>
@@ -156,20 +146,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        function copyLink() {
-            var linkText = "@Html.Raw(ViewBag.ShareableLink)";
-            navigator.clipboard.writeText(linkText).then(function() {
-                var btn = document.querySelector('.copy-btn');
-                btn.textContent = 'Copied!';
-                btn.style.backgroundColor = '#22c55e';
-                setTimeout(function() {
-                    btn.textContent = 'Copy';
-                    btn.style.backgroundColor = 'var(--accent)';
-                }, 2000);
-            }, function(err) {
-                console.error('Could not copy text: ', err);
-            });
-        }
-    </script>
 }

@@ -6,100 +6,96 @@
     bool hasDependencies = scheduleCount > 0;
 }
 
-<div class="page-header">
-    <h2 class="text-danger"><i class="fa fa-trash"></i> Delete Tour</h2>
-    <p class="text-muted">This action cannot be undone.</p>
-</div>
-
-@if (hasDependencies)
-{
-    <div class="alert alert-danger" role="alert" id="alert-dependency">
-        <i class="fa fa-exclamation-triangle"></i>
-        <strong>Cannot Delete!</strong> This tour has <strong>@scheduleCount active schedule(s)</strong>.
-        You must remove all TourSchedules before deleting this tour. (Error code: TOUR-003)
-    </div>
-}
-else
-{
-    <div class="alert alert-warning" role="alert">
-        <i class="fa fa-question-circle"></i>
-        <strong>Confirm Delete?</strong> Are you sure you want to permanently delete this tour?
-    </div>
-}
-
-<div class="card shadow-sm">
-    <div class="card-header bg-danger text-white">
-        <strong>Tour to be Deleted</strong>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-7">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4 text-muted">Tour ID</dt>
-                    <dd class="col-sm-8">#@Model.TourId</dd>
-
-                    <dt class="col-sm-4 text-muted">Tour Name</dt>
-                    <dd class="col-sm-8"><strong>@Html.DisplayFor(model => model.TourName)</strong></dd>
-
-                    <dt class="col-sm-4 text-muted">Price</dt>
-                    <dd class="col-sm-8">@(Model.Price?.ToString("N0")) ₫</dd>
-
-                    <dt class="col-sm-4 text-muted">Max Capacity</dt>
-                    <dd class="col-sm-8">@(Model.MaxCapacity) pax</dd>
-
-                    <dt class="col-sm-4 text-muted">Location</dt>
-                    <dd class="col-sm-8">
-                        @if (!string.IsNullOrEmpty(Model.Location))
-                        {
-                            @Model.Location
-                        }
-                        else
-                        {
-                            <em class="text-muted">—</em>
-                        }
-                    </dd>
-
-                    <dt class="col-sm-4 text-muted">Active Schedules</dt>
-                    <dd class="col-sm-8">
-                        @if (hasDependencies)
-                        {
-                            <span class="badge badge-danger">@scheduleCount schedule(s) — BLOCKED</span>
-                        }
-                        else
-                        {
-                            <span class="badge badge-success">None — Safe to delete</span>
-                        }
-                    </dd>
-                </dl>
-            </div>
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <div class="col-md-5 text-center">
-                    <img src="@Model.ImageUrl" alt="@Model.TourName"
-                         class="img-fluid rounded" style="max-height:180px;object-fit:cover;opacity:0.7;filter:grayscale(50%);" />
-                </div>
-            }
+<div class="container mt-4">
+    @if (hasDependencies)
+    {
+        <div class="alert alert-danger" role="alert" id="alert-dependency">
+            <h4 class="alert-heading"><i class="fa fa-exclamation-triangle mr-2"></i> Cannot Delete!</h4>
+            <p>This tour has <strong>@scheduleCount active schedule(s)</strong>. You must remove all TourSchedules before deleting this tour.</p>
+            <hr>
+            <p class="mb-0 small">Error code: TOUR-003</p>
         </div>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading"><i class="fa fa-exclamation-triangle mr-2"></i> Confirm Delete?</h4>
+            <p class="mb-0">Are you sure you want to permanently delete this tour? This action cannot be undone.</p>
+        </div>
+    }
 
-        <hr />
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Deleting: Tour #@Model.TourId - @Model.TourName</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-7">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Tour ID</dt>
+                        <dd class="col-sm-8">#@Model.TourId</dd>
 
-        <form asp-action="Delete" id="delete-tour-form">
-            <input type="hidden" asp-for="TourId" />
-            @if (!hasDependencies)
-            {
-                <button type="submit" class="btn btn-danger" id="btn-confirm-delete">
-                    <i class="fa fa-trash"></i> Yes, Delete Permanently
-                </button>
-            }
-            else
-            {
-                <button type="button" class="btn btn-danger" disabled title="Cannot delete — active schedules exist">
-                    <i class="fa fa-ban"></i> Delete (Blocked)
-                </button>
-            }
-            <a asp-action="Index" class="btn btn-secondary ml-2" id="btn-cancel-delete">
-                <i class="fa fa-times"></i> Cancel
-            </a>
-        </form>
+                        <dt class="col-sm-4 text-muted">Tour Name</dt>
+                        <dd class="col-sm-8 fw-bold">@Html.DisplayFor(model => model.TourName)</dd>
+
+                        <dt class="col-sm-4 text-muted">Price</dt>
+                        <dd class="col-sm-8">@(Model.Price?.ToString("N0")) ₫</dd>
+
+                        <dt class="col-sm-4 text-muted">Max Capacity</dt>
+                        <dd class="col-sm-8">@(Model.MaxCapacity) pax</dd>
+
+                        <dt class="col-sm-4 text-muted">Location</dt>
+                        <dd class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.Location))
+                            {
+                                @Model.Location
+                            }
+                            else
+                            {
+                                <em class="text-muted">—</em>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Active Schedules</dt>
+                        <dd class="col-sm-8">
+                            @if (hasDependencies)
+                            {
+                                <span class="badge bg-danger">@scheduleCount schedule(s) — BLOCKED</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">None — Safe to delete</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="col-md-5 text-center d-flex align-items-center justify-content-center">
+                        <img src="@Model.ImageUrl" alt="@Model.TourName"
+                             class="img-fluid rounded border" style="max-height:180px;object-fit:cover;opacity:0.7;filter:grayscale(50%);" />
+                    </div>
+                }
+            </div>
+
+            <form asp-action="Delete" id="delete-tour-form" class="mt-4 border-top pt-3 d-flex justify-content-between">
+                <input type="hidden" asp-for="TourId" />
+                <a asp-action="Index" class="btn btn-outline-secondary" id="btn-cancel-delete">
+                    Cancel and Back to List
+                </a>
+                @if (!hasDependencies)
+                {
+                    <button type="submit" class="btn btn-danger px-4" id="btn-confirm-delete">
+                        <i class="fa fa-trash mr-1"></i> Confirm Delete
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger px-4" disabled title="Cannot delete — active schedules exist">
+                        <i class="fa fa-ban mr-1"></i> Delete Blocked
+                    </button>
+                }
+            </form>
+        </div>
     </div>
 </div>

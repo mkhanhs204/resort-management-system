@@ -45,6 +45,7 @@ builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourService, PhucNgu
 builder.Services.AddScoped<PhucNguyenResort.Services.Home.IHomeService, PhucNguyenResort.Services.Home.HomeService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingService, PhucNguyenResort.Services.Bookings.BookingService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingGuestService, PhucNguyenResort.Services.Bookings.BookingGuestService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Reception.IReceptionService, PhucNguyenResort.Services.Reception.ReceptionService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Payments.IVnPayService, PhucNguyenResort.Services.Payments.VnPayService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Refunds.IRefundService, PhucNguyenResort.Services.Refunds.RefundService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Email.IEmailSender, PhucNguyenResort.Services.Email.EmailSender>();

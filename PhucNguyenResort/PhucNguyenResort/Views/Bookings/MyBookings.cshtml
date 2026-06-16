@@ -160,7 +160,6 @@
                                 @if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
                                 {
                                     <a asp-action="PreCheckin" asp-route-id="@booking.BookingId" class="btn-action-premium btn-action-primary"><i class="fa fa-id-card-o"></i> Khai Báo Tạm Trú</a>
-                                    <button type="button" class="btn-action-premium btn-action-secondary" data-link="@shareLink" onclick="copyShareLink(this)"><i class="fa fa-copy"></i> Copy Link Đoàn</button>
 
                                     @if (booking.CheckInDate > DateTime.Now)
                                     {
@@ -233,24 +232,6 @@
 
 @section Scripts {
     <script>
-        function copyShareLink(btn) {
-            var link = btn.getAttribute('data-link');
-            navigator.clipboard.writeText(link).then(function() {
-                var oldText = btn.innerHTML;
-                btn.innerHTML = '<i class="fa fa-check"></i> Copied!';
-                btn.className = 'btn-action-premium btn-action-primary';
-                btn.style.backgroundColor = '#10b981';
-                btn.style.color = '#ffffff';
-                setTimeout(function() {
-                    btn.innerHTML = oldText;
-                    btn.className = 'btn-action-premium btn-action-secondary';
-                    btn.style.backgroundColor = '';
-                    btn.style.color = '';
-                }, 2000);
-            });
-        }
-
-        $(document).ready(function() {
             $('.btn-cancel-booking').click(function() {
                 var bookingId = $(this).data('id');
                 var isRefund = $(this).data('refund');

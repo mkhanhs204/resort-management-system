@@ -1,0 +1,158 @@
+@model IEnumerable<PhucNguyenResort.Models.Booking>
+
+@{
+    ViewData["Title"] = "Quản Lý Đặt Phòng";
+    Layout = "_DashboardLayout";
+}
+
+<div class="container-fluid refund-container py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="card premium-card mb-4">
+        <div class="card-body p-3">
+            <form asp-action="Index" method="get" class="m-0">
+                <div class="row gx-2 gy-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white text-muted"><i class="fa fa-search"></i></span>
+                            </div>
+                            <input type="text" name="searchString" value="@ViewBag.CurrentSearch" class="form-control border-left-0" placeholder="Mã BKG, Khách hàng, Email, Phòng..." />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="statusFilter" class="form-control custom-select">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            @foreach (PhucNguyenResort.Enums.BookingStatus status in Enum.GetValues(typeof(PhucNguyenResort.Enums.BookingStatus)))
+                            {
+                                if (ViewBag.CurrentStatus != null && (PhucNguyenResort.Enums.BookingStatus)ViewBag.CurrentStatus == status)
+                                {
+                                    <option value="@status" selected="selected">@status</option>
+                                }
+                                else
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex" style="gap: 10px;">
+                        <button type="submit" class="btn btn-primary flex-grow-1"><i class="fa fa-filter"></i> Lọc</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary" title="Xóa bộ lọc"><i class="fa fa-refresh"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card premium-card mb-4">
+        <div class="premium-card-header d-flex align-items-center">
+            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;">
+                <i class="fa fa-calendar-check-o"></i>
+            </div>
+            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Danh Sách Đặt Phòng (Bookings)</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table premium-table mb-0" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="pl-4">BKG_ID</th>
+                            <th>Khách Hàng</th>
+                            <th>Phòng</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Cọc / Tổng</th>
+                            <th>Trạng Thái</th>
+                            <th class="pr-4 text-end">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="pl-4 fw-bold">#@item.BookingId</td>
+                                <td>
+                                    <strong>@item.User?.FullName</strong><br />
+                                    <span class="small text-muted">@item.User?.Email</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-light border p-2">@item.Room?.RoomNumber</span><br />
+                                    <span class="small text-muted">@item.Room?.Category?.CategoryName</span>
+                                </td>
+                                <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
+                                <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @item.DepositAmount?.ToString("N0")<br />
+                                    <span class="small text-muted">/ @item.TotalAmount?.ToString("N0")</span>
+                                </td>
+                                <td>
+                                    @{
+                                        var badgeClass = item.BookingStatus switch
+                                        {
+                                            PhucNguyenResort.Enums.BookingStatus.Reserved => "badge-pastel-warning",
+                                            PhucNguyenResort.Enums.BookingStatus.CheckedIn => "badge-pastel-success",
+                                            PhucNguyenResort.Enums.BookingStatus.CheckedOut => "badge-pastel-secondary",
+                                            PhucNguyenResort.Enums.BookingStatus.Cancelled => "badge-pastel-danger",
+                                            PhucNguyenResort.Enums.BookingStatus.NoShow => "badge-pastel-danger",
+                                            _ => "badge-pastel-secondary"
+                                        };
+                                        var statusText = item.BookingStatus switch
+                                        {
+                                            PhucNguyenResort.Enums.BookingStatus.Reserved => "Reserved",
+                                            PhucNguyenResort.Enums.BookingStatus.CheckedIn => "Checked-in",
+                                            PhucNguyenResort.Enums.BookingStatus.CheckedOut => "Checked-out",
+                                            PhucNguyenResort.Enums.BookingStatus.Cancelled => "Cancelled",
+                                            PhucNguyenResort.Enums.BookingStatus.NoShow => "No-show",
+                                            _ => item.BookingStatus.ToString()
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@statusText</span>
+                                </td>
+                                <td class="pr-4 text-end">
+                                    <div class="d-flex justify-content-end flex-wrap" style="gap: 5px;">
+                                        @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.PendingPayment)
+                                        {
+                                            <a asp-action="CheckIn" asp-route-id="@item.BookingId" class="btn btn-sm btn-success">Check-in</a>
+                                        }
+                                        
+                                        <a asp-action="ExportManifest" asp-route-id="@item.BookingId" class="btn btn-sm btn-outline-info">Báo Cáo Tạm Trú</a>
+
+                                        @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
+                                        {
+                                            <form asp-controller="Bookings" asp-action="Cancel" asp-route-id="@item.BookingId" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận hủy booking này?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hủy</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
