@@ -1,4 +1,18 @@
-
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    
+    string IsActive(string controller, string action = "")
+    {
+        bool isControllerMatch = string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+        if (string.IsNullOrEmpty(action))
+        {
+            return isControllerMatch ? "active" : "";
+        }
+        bool isActionMatch = string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+        return isControllerMatch && isActionMatch ? "active" : "";
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +33,7 @@
     <link rel="stylesheet" href="~/css/magnific-popup.css" type="text/css">
     <link rel="stylesheet" href="~/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/style.css" type="text/css">
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <div id="preloder">
@@ -41,7 +56,7 @@
 
         <div class="header-configure-area">
             <div class="language-option">
-                <img src="~/img/flag.jpg" alt="">
+                <img src="https://flagcdn.com/w20/vn.png" alt="VN Flag">
                 <span>VN <i class="fa fa-angle-down"></i></span>
                 <div class="flag-dropdown">
                     <ul>
@@ -49,66 +64,47 @@
                     </ul>
                 </div>
             </div>
-            <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
+            @if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
+            }
         </div>
 
         <!-- Mobile Menu -->
         <nav class="mainmenu mobile-menu">
             <ul>
-                <li class="active">
+                <li class="@IsActive("Home", "Index")">
                     <a asp-area="" asp-controller="Home" asp-action="Index">
                         Trang Chủ
                     </a>
                 </li>
 
-                <li>
+                <li class="@IsActive("Home", "SearchRooms") @IsActive("Bookings", "Create") @IsActive("Home", "RoomDetails")">
                     <a asp-controller="Home" asp-action="SearchRooms">
                         Phòng Ngủ
                     </a>
                 </li>
 
-                <li>
+                <li class="@IsActive("Home", "AboutUs")">
                     <a asp-area="" asp-controller="Home" asp-action="AboutUs">
                         Về Chúng Tôi
                     </a>
                 </li>
 
-                <li>
-                    <a href="./pages.html">Trang</a>
-                    <ul class="dropdown">
-                        <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
-                        <li><a href="#">Phòng Deluxe</a></li>
-                        <li><a href="#">Phòng Gia Đình</a></li>
-                        <li><a href="#">Phòng Premium</a></li>
-                    </ul>
-                </li>
+                <li class="@IsActive("Home", "Blog")"><a href="./blog.html">Tin Tức</a></li>
+                <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
+                <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
 
-                <li><a href="./blog.html">Tin Tức</a></li>
-                <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
-                <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
-
-                <li>
-                    <a asp-area="" asp-controller="Home" asp-action="Contact">
-                        Liên Hệ
-                    </a>
-                </li>
-
-                <li>
-                    <a asp-controller="Dashboard" asp-action="Index">
-                        Quản Trị
-                    </a>
-                </li>
-
-                <li>
-                    <a asp-area="" asp-controller="Profile" asp-action="Index">
-                        <i class="fa fa-user-circle-o"></i> My Profile
-                    </a>
-                </li>
- 
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <li><a href="#">Xin chào, @User.Identity.Name</a></li>
-                    <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                    <li>
+                        <a href="#">Xin chào, @User.Identity.Name <i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown">
+                            <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                            <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
+                            <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                        </ul>
+                    </li>
                 }
                 else
                 {
@@ -128,8 +124,8 @@
         </div>
 
         <ul class="top-widget">
-            <li><i class="fa fa-phone"></i> (12) 345 67890</li>
-            <li><i class="fa fa-envelope"></i> info.colorlib@gmail.com</li>
+            <li><i class="fa fa-phone"></i> +84 901 234 567</li>
+            <li><i class="fa fa-envelope"></i> info@phucnguyenresort.com</li>
         </ul>
     </div>
 
@@ -141,8 +137,8 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <ul class="tn-left">
-                            <li><i class="fa fa-phone"></i> (12) 345 67890</li>
-                            <li><i class="fa fa-envelope"></i> info.colorlib@gmail.com</li>
+                            <li><i class="fa fa-phone"></i> +84 901 234 567</li>
+                            <li><i class="fa fa-envelope"></i> info@phucnguyenresort.com</li>
                         </ul>
                     </div>
 
@@ -155,10 +151,13 @@
                                 <a href="#"><i class="fa fa-instagram"></i></a>
                             </div>
 
-                            <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
+                            @if (User.Identity == null || !User.Identity.IsAuthenticated)
+                            {
+                                <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
+                            }
 
                             <div class="language-option">
-                                <img src="~/img/flag.jpg" alt="">
+                                <img src="https://flagcdn.com/w20/vn.png" alt="VN Flag">
                                 <span>VN <i class="fa fa-angle-down"></i></span>
                                 <div class="flag-dropdown">
                                     <ul>
@@ -178,8 +177,8 @@
                 <div class="row">
                     <div class="col-lg-2">
                         <div class="logo">
-                            <a asp-area="" asp-controller="Home" asp-action="Index">
-                                <img src="~/img/logo.png" alt="">
+                            <a asp-area="" asp-controller="Home" asp-action="Index" style="text-decoration: none;">
+                                <h4 style="color: #19191a; font-family: 'Lora', serif; font-weight: 700; margin: 0; line-height: 1.2;">Phúc Nguyễn<br><span style="color: #dfa974;">Resort</span></h4>
                             </a>
                         </div>
                     </div>
@@ -188,64 +187,48 @@
                         <div class="nav-menu">
                             <nav class="mainmenu">
                                 <ul>
-                                    <li class="active">
+                                    <li class="@IsActive("Home", "Index")">
                                         <a asp-area="" asp-controller="Home" asp-action="Index">
                                             Trang Chủ
                                         </a>
                                     </li>
 
-                                    <li>
+                                    <li class="@IsActive("Home", "SearchRooms") @IsActive("Bookings", "Create") @IsActive("Home", "RoomDetails")">
                                         <a asp-controller="Home" asp-action="SearchRooms">
                                             Phòng Ngủ
                                         </a>
                                     </li>
 
-                                    <li>
+                                    <li class="@IsActive("Home", "AboutUs")">
                                         <a asp-area="" asp-controller="Home" asp-action="AboutUs">
                                             Về Chúng Tôi
                                         </a>
                                     </li>
 
-                                    <li>
-                                        <a href="./pages.html">Trang</a>
-                                        <ul class="dropdown">
-                                            <li><a href="./room-details.html">Chi Tiết Phòng</a></li>
-                                            <li><a href="./blog-details.html">Chi Tiết Tin Tức</a></li>
-                                            <li><a href="#">Phòng Gia Đình</a></li>
-                                            <li><a href="#">Phòng Premium</a></li>
-                                        </ul>
-                                    </li>
 
-                                    <li><a href="./blog.html">Tin Tức</a></li>
-                                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
+                                    <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
                                     @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                                     {
-                                        <li><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+                                        <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
                                     }
 
-                                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                                    {
-                                        <li><a href="#">Xin chào, @User.Identity.Name</a></li>
-                                        <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
-                                    }
-                                    else
-                                    {
-                                        <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
-                                        <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
-                                    }
-
-                                    <li>
-                                        <a asp-controller="Dashboard" asp-action="Index">
-                                            Quản Trị
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a asp-area="" asp-controller="Profile" asp-action="Index">
-                                            My Profile
-                                        </a>
-                                    </li>
+                                     @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                     {
+                                         <li style="margin-left: 30px;">
+                                             <a href="#">Xin chào, @User.Identity.Name <i class="fa fa-angle-down"></i></a>
+                                             <ul class="dropdown">
+                                                 <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                                                 <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
+                                                 <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                                             </ul>
+                                         </li>
+                                     }
+                                     else
+                                     {
+                                         <li class="@IsActive("Account", "Login")"><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                                         <li class="@IsActive("Account", "Register")"><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                                     }
                                 </ul>
                             </nav>
 
@@ -288,9 +271,9 @@
                         <div class="ft-contact">
                             <h6>Liên Hệ</h6>
                             <ul>
-                                <li>(12) 345 67890</li>
-                                <li>info.colorlib@gmail.com</li>
-                                <li>856 Cordia Extension Apt. 356, Lake, United State</li>
+                                <li>+84 901 234 567</li>
+                                <li>info@phucnguyenresort.com</li>
+                                <li>FPT University, Hoa Lac, Ha Noi, Vietnam</li>
                             </ul>
                         </div>
                     </div>

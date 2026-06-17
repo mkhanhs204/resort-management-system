@@ -1,0 +1,43 @@
+@model PhucNguyenResort.Models.Booking
+
+@{
+    ViewData["Title"] = "Khai Báo Thành Công - Phuc Nguyen Resort";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/booking-precheckin-success.css" />
+}
+
+<div class="success-container">
+    <div class="container">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="fa fa-check"></i>
+            </div>
+            <h2>Khai Báo Thành Công!</h2>
+            <p>Thông tin lưu trú của quý khách đã được ghi nhận và mã hóa bảo mật trên hệ thống. Lễ tân sẽ xác thực nhanh khi quý khách đến làm thủ tục check-in.</p>
+
+            <div class="booking-details-box">
+                <h5>Chi Tiết Đặt Phòng #@Model.BookingId</h5>
+                <div class="details-row">
+                    <span>Loại phòng</span>
+                    <span>@Model.Room?.Category?.CategoryName</span>
+                </div>
+                <div class="details-row">
+                    <span>Số phòng</span>
+                    <span>@Model.Room?.RoomNumber</span>
+                </div>
+                <div class="details-row">
+                    <span>Ngày Check-in</span>
+                    <span>@Model.CheckInDate.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="details-row">
+                    <span>Ngày Check-out</span>
+                    <span>@Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+
+            <a asp-controller="Home" asp-action="Index" class="btn-home">Quay Lại Trang Chủ</a>
+        </div>
+    </div>
+</div>

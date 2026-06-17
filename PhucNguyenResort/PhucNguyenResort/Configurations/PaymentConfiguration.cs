@@ -14,6 +14,7 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(x => x.PaymentMethod).HasConversion<string>().HasMaxLength(50);
         builder.Property(x => x.PaymentStatus).HasConversion<string>().HasMaxLength(50);
         builder.Property(x => x.Amount).HasPrecision(18, 2);
-        builder.HasOne(x => x.Invoice).WithMany(x => x.Payments).HasForeignKey(x => x.InvoiceId).OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.Invoice).WithMany(x => x.Payments).HasForeignKey(x => x.InvoiceId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.TourBooking).WithMany(x => x.Payments).HasForeignKey(x => x.TourBookingId).OnDelete(DeleteBehavior.Restrict);
     }
 }

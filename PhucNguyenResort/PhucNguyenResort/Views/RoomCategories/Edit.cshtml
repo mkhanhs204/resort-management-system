@@ -32,9 +32,14 @@
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Capacity" class="form-label fw-bold"></label>
-                                <input asp-for="Capacity" class="form-control" type="number" />
-                                <span asp-validation-for="Capacity" class="text-danger"></span>
+                                <label asp-for="MaxAdults" class="form-label fw-bold"></label>
+                                <input asp-for="MaxAdults" class="form-control" type="number" />
+                                <span asp-validation-for="MaxAdults" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaxChildren" class="form-label fw-bold"></label>
+                                <input asp-for="MaxChildren" class="form-control" type="number" />
+                                <span asp-validation-for="MaxChildren" class="text-danger"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="PricePerNight" class="form-label fw-bold"></label>

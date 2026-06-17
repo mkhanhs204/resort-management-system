@@ -24,9 +24,10 @@ namespace PhucNguyenResort.Controllers
 
         public async Task<IActionResult> Index()
         {
-            if (!TryGetCurrentUserId(out var currentUserId))
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentUserId))
             {
-                return Challenge();
+                return Unauthorized();
             }
 
             var user = await _context.Users
@@ -98,6 +99,7 @@ namespace PhucNguyenResort.Controllers
                 model.CheckedInBookings = await GetCheckedInBookingsAsync(currentUserId);
                 return View("Index", model);
             }
+
 
             var user = await _context.Users
                 .Include(u => u.UserProfile)

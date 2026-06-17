@@ -24,5 +24,10 @@ namespace PhucNguyenResort.ViewModels.Staff
         [Required]
         [Display(Name = "Role")]
         public int RoleId { get; set; }
+
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "New Password (leave blank to keep current)")]
+        public string? Password { get; set; }
     }
 }

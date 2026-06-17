@@ -1,0 +1,92 @@
+@model IEnumerable<PhucNguyenResort.Models.DiningTable>
+
+@{
+    ViewData["Title"] = "Manage Dining Tables";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<div class="container-fluid refund-container py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
+        <a asp-action="Create" class="btn btn-premium-action btn-primary shadow-sm">
+            <i class="fa fa-plus-circle"></i> Create New Table
+        </a>
+    </div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+    <div class="card premium-card mb-4">
+        <div class="premium-card-header d-flex align-items-center">
+            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;">
+                <i class="fa fa-cutlery"></i>
+            </div>
+            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Danh sách Bàn (Dining Tables)</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table premium-table mb-0" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="pl-4">Table Number</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                            <th class="pr-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td class="pl-4 fw-bold">Bàn @item.TableNumber</td>
+                    <td><span class="badge badge-light border text-dark p-2"><i class="fa fa-users text-muted mr-1"></i> @item.Capacity Persons</span></td>
+                    <td>
+                        @switch (item.Status)
+                        {
+                            case PhucNguyenResort.Enums.DiningTableStatus.Available:
+                                <span class="badge badge-gradient-success p-2">Available</span>
+                                break;
+                            case PhucNguyenResort.Enums.DiningTableStatus.Occupied:
+                                <span class="badge badge-danger p-2">Occupied</span>
+                                break;
+                            case PhucNguyenResort.Enums.DiningTableStatus.Reserved:
+                                <span class="badge badge-gradient-warning p-2">Reserved</span>
+                                break;
+                            case PhucNguyenResort.Enums.DiningTableStatus.Maintenance:
+                                <span class="badge badge-secondary p-2">Maintenance</span>
+                                break;
+                        }
+                    </td>
+                    <td class="pr-4 text-end">
+                        <a asp-action="Edit" asp-route-id="@item.TableId" class="btn-action-icon edit" title="Sửa"><i class="fa fa-pencil"></i></a>
+                        <form asp-action="Delete" asp-route-id="@item.TableId" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this table?');">
+                            <button type="submit" class="btn-action-icon delete" title="Xóa"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (!Model.Any())
+    {
+        <div class="text-center text-muted py-5">
+            <i class="fa fa-inbox fa-3x mb-3 text-light"></i>
+            <p class="mb-0">No dining tables found.</p>
+        </div>
+    }
+            </div>
+        </div>
+    </div>
+</div>

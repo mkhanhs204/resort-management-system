@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="~/css/style.css" type="text/css">
     
     <!-- Dashboard specific styles -->
-    <link rel="stylesheet" href="~/css/dashboard.css" type="text/css">
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" type="text/css">
 </head>
 <body>
 
@@ -26,8 +26,10 @@
         <!-- Sidebar -->
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h3>PhucNguyen</h3>
-                <span style="color: #aaa; font-size: 14px;">Resort Management</span>
+                <a href="/" style="text-decoration: none; display: block;">
+                    <h3>PhucNguyen</h3>
+                    <span style="color: #aaa; font-size: 13px; display: block; margin-top: 3px; font-weight: normal; letter-spacing: 0.5px;">Resort Management</span>
+                </a>
             </div>
 
             <ul class="list-unstyled components">
@@ -36,62 +38,125 @@
                 </li>
                 
                 <!-- Admin & Business Manager Section -->
-                <li>
-                    <p>MANAGEMENT</p>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "StaffAccounts" ? "active" : "")">
-                    <a asp-controller="StaffAccounts" asp-action="Index"><i class="fa fa-users"></i> Staff Accounts</a>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
-                    <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
-                </li>
+                @if (User.IsInRole("System Admin") || User.IsInRole("Business Manager"))
+                {
+                    <li>
+                        <p>MANAGEMENT</p>
+                    </li>
+                    @if (User.IsInRole("System Admin"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "StaffAccounts" ? "active" : "")">
+                            <a asp-controller="StaffAccounts" asp-action="Index"><i class="fa fa-users"></i> Staff Accounts</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Roles" ? "active" : "")">
+                            <a href="#"><i class="fa fa-shield"></i> System Roles</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")">
+                            <a href="#"><i class="fa fa-cogs"></i> System Management</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Backup" ? "active" : "")">
+                            <a href="#"><i class="fa fa-database"></i> Backup & Restore</a>
+                        </li>
+                    }
+                    @if (User.IsInRole("Business Manager"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
+                            <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reviews" ? "active" : "")">
+                            <a href="#"><i class="fa fa-star"></i> Customer Reviews</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Refunds" ? "active" : "")">
+                            <a asp-controller="Refunds" asp-action="Index"><i class="fa fa-money"></i> Refunds</a>
+                        </li>
+                    }
+                }
 
-                <!-- Room Management (Housekeeping / Admin) -->
-                <li>
-                    <p>ROOMS</p>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                    <a asp-controller="Rooms" asp-action="Index"><i class="fa fa-bed"></i> Manage Rooms</a>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RoomCategories" ? "active" : "")">
-                    <a asp-controller="RoomCategories" asp-action="Index"><i class="fa fa-tags"></i> Room Categories</a>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Housekeeping" ? "active" : "")">
-                    <a href="#"><i class="fa fa-paint-brush"></i> Housekeeping</a>
-                </li>
+                @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager") || User.IsInRole("Housekeeping Staff"))
+                {
+                    <!-- Room Management -->
+                    <li>
+                        <p>ROOMS</p>
+                    </li>
+                    @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reception" ? "active" : "")">
+                            <a asp-controller="Reception" asp-action="Index"><i class="fa fa-calendar-check-o"></i> Manage Bookings</a>
+                        </li>
+                    }
+                    @if (User.IsInRole("Receptionist") || User.IsInRole("Housekeeping Staff") || User.IsInRole("Business Manager"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                            <a asp-controller="Rooms" asp-action="Index"><i class="fa fa-bed"></i> Manage Rooms</a>
+                        </li>
+                    }
+                    @if (User.IsInRole("Business Manager"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RoomCategories" ? "active" : "")">
+                            <a asp-controller="RoomCategories" asp-action="Index"><i class="fa fa-tags"></i> Room Categories</a>
+                        </li>
+                    }
+                    @if (User.IsInRole("Housekeeping Staff"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Housekeeping" ? "active" : "")">
+                            <a href="#"><i class="fa fa-paint-brush"></i> Housekeeping</a>
+                        </li>
+                    }
+                }
 
-                <!-- Maintenance Section -->
-                <li>
-                    <p>MAINTENANCE</p>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
-                    <a href="#"><i class="fa fa-wrench"></i> Service Requests</a>
-                </li>
+                @if (User.IsInRole("Maintenance Staff"))
+                {
+                    <!-- Maintenance Section -->
+                    <li>
+                        <p>MAINTENANCE</p>
+                    </li>
+                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
+                        <a href="#"><i class="fa fa-wrench"></i> Service Requests</a>
+                    </li>
+                }
 
-                <!-- F&B and Kitchen Section -->
-                <li>
-                    <p>FOOD & BEVERAGE</p>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "MenuCategories" ? "active" : "")">
-                    <a asp-controller="MenuCategories" asp-action="Index"><i class="fa fa-list"></i> Menu Categories</a>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RestaurantMenus" ? "active" : "")">
-                    <a asp-controller="RestaurantMenus" asp-action="Index"><i class="fa fa-coffee"></i> Restaurant Menus</a>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
-                    <a href="#"><i class="fa fa-cutlery"></i> Orders</a>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventory" ? "active" : "")">
-                    <a href="#"><i class="fa fa-archive"></i> Kitchen Inventory</a>
-                </li>
+                @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
+                {
+                    <!-- F&B and Kitchen Section -->
+                    <li>
+                        <p>FOOD & BEVERAGE</p>
+                    </li>
+                    @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "MenuCategories" ? "active" : "")">
+                            <a asp-controller="MenuCategories" asp-action="Index"><i class="fa fa-list"></i> Menu Categories</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RestaurantMenus" ? "active" : "")">
+                            <a asp-controller="RestaurantMenus" asp-action="Index"><i class="fa fa-coffee"></i> Restaurant Menus</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tables" ? "active" : "")">
+                            <a asp-controller="Tables" asp-action="Index"><i class="fa fa-table"></i> Manage Tables</a>
+                        </li>
+                    }
+                    @if (User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
+                            <a href="#"><i class="fa fa-cutlery"></i> Orders</a>
+                        </li>
+                    }
+                    @if (User.IsInRole("Kitchen Staff"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventory" ? "active" : "")">
+                            <a href="#"><i class="fa fa-archive"></i> Kitchen Inventory</a>
+                        </li>
+                    }
+                }
 
-                <!-- Services & Tours -->
-                <li>
-                    <p>SERVICES & TOURS</p>
-                </li>
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
-                    <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
-                </li>
+                @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide"))
+                {
+                    <!-- Services & Tours -->
+                    <li>
+                        <p>SERVICES & TOURS</p>
+                    </li>
+                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
+                        <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
+                    </li>
+                }
             </ul>
         </nav>
 
@@ -109,11 +174,10 @@
                 <div class="nav-right">
                     <div class="user-profile dropdown">
                         <img src="~/img/blog/blog-1.jpg" alt="User">
-                        <span>Staff Name <i class="fa fa-angle-down"></i></span>
-                        <!-- Dropdown menu placeholder -->
+                        <span>@(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Staff Member") <i class="fa fa-angle-down"></i></span>
                     </div>
                     <a href="/" class="btn btn-sm btn-outline-secondary" title="View Website"><i class="fa fa-globe"></i></a>
-                    <a href="#" class="btn btn-sm btn-danger" title="Logout"><i class="fa fa-sign-out"></i></a>
+                    <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-danger" title="Logout"><i class="fa fa-sign-out"></i></a>
                 </div>
             </nav>
 

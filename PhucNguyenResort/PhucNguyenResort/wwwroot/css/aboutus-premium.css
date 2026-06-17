@@ -1,0 +1,235 @@
+/* Premium About Us Page Styles */
+
+/* Hero Breadcrumb Section */
+.about-hero {
+    padding: 150px 0;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+.about-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+.about-hero-content {
+    position: relative;
+    z-index: 1;
+}
+.about-hero-title {
+    color: #fff;
+    font-size: 50px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+.about-hero-breadcrumb a {
+    color: #dfa974;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    margin-right: 15px;
+}
+.about-hero-breadcrumb span {
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+}
+
+/* Typography & General Classes */
+.about-section-padding {
+    padding-top: 100px;
+    padding-bottom: 80px;
+}
+.about-subtitle {
+    color: #dfa974;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 10px;
+}
+.about-title {
+    color: #19191a;
+    font-family: 'Lora', serif;
+    font-size: 40px;
+    line-height: 1.3;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+.about-title-highlight {
+    color: #8f3636;
+}
+.about-text {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+.about-btn {
+    background-color: #8f3636;
+    color: white;
+    padding: 14px 30px;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    transition: 0.3s;
+    display: inline-block;
+}
+.about-btn:hover {
+    background-color: #7a2e2e;
+    color: white;
+}
+
+/* Our Story Image Block */
+.story-img-wrapper {
+    position: relative;
+}
+.story-img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+.story-badge {
+    position: absolute;
+    bottom: -30px;
+    left: -30px;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-left: 4px solid #8f3636;
+}
+.story-badge h4 {
+    color: #19191a;
+    font-family: 'Lora', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.story-badge p {
+    margin: 0;
+    color: #666;
+    font-size: 15px;
+}
+
+/* Core Values */
+.core-values-section {
+    background-color: #fdfbf9;
+    padding: 100px 0;
+}
+.value-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+    height: 100%;
+    transition: transform 0.3s;
+}
+.value-card:hover {
+    transform: translateY(-10px);
+}
+.value-icon {
+    font-size: 50px;
+    color: #8f3636;
+    margin-bottom: 25px;
+    display: inline-block;
+}
+.value-title {
+    font-family: 'Lora', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #19191a;
+    margin-bottom: 15px;
+}
+.value-text {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Signature Experiences */
+.experience-card {
+    border-radius: 8px;
+    height: 350px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+}
+.experience-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+}
+.experience-content {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    text-align: left;
+}
+.experience-title {
+    color: white;
+    font-family: 'Lora', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.experience-desc {
+    color: #eee;
+    font-size: 15px;
+    margin: 0;
+    opacity: 0;
+    transition: 0.3s;
+    transform: translateY(20px);
+}
+.experience-card:hover .experience-desc {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Video Section */
+.about-video-section {
+    padding: 150px 0;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+.about-video-text h2 {
+    color: white;
+    font-family: 'Lora', serif;
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+.about-video-text p {
+    color: #eee;
+    font-size: 18px;
+    margin-bottom: 50px;
+}
+.about-play-btn {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    line-height: 80px;
+    text-align: center;
+    color: #8f3636;
+    font-size: 30px;
+    padding-left: 5px;
+    transition: 0.3s;
+}
+.about-play-btn:hover {
+    transform: scale(1.1);
+    color: #7a2e2e;
+}
