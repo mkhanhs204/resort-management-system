@@ -17,6 +17,7 @@ namespace PhucNguyenResort.Tests.Tours
         {
             _mockTourService = new Mock<ITourService>();
             _controller = new ToursController(_mockTourService.Object);
+            _controller.TempData = new Mock<Microsoft.AspNetCore.Mvc.ViewFeatures.ITempDataDictionary>().Object;
         }
 
         [Fact]
