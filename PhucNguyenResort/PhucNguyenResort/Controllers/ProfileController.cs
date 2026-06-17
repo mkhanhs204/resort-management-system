@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.ViewModels.Users;
+using System.Security.Claims;
 using System.Text;
 
 namespace PhucNguyenResort.Controllers
 {
+    [Authorize]
     public class ProfileController : Controller
     {
         private readonly ResortDbContext _context;
@@ -21,9 +24,11 @@ namespace PhucNguyenResort.Controllers
         // GET: /Profile
         public async Task<IActionResult> Index()
         {
-            // GIẢ ĐỊNH: Lấy UserId từ Session/Cookie hoặc User.Identity sau khi đăng nhập.
-            // Để test giao diện, bạn có thể thay bằng 1 ID tài khoản khách hàng thực tế có trong DB.
-            int currentUserId = 1;
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentUserId))
+            {
+                return Unauthorized();
+            }
 
             var user = await _context.Users
                 .Include(u => u.UserProfile)
@@ -65,6 +70,12 @@ namespace PhucNguyenResort.Controllers
             if (!ModelState.IsValid)
             {
                 return View("Index", model);
+            }
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentUserId) || currentUserId != model.UserId)
+            {
+                return Unauthorized();
             }
 
             var user = await _context.Users

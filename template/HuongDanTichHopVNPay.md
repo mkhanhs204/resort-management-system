@@ -1,0 +1,145 @@
+# Hướng dẫn tích hợp hệ thống PAY - Cổng thanh toán VNPAY
+
+## Giới thiệu
+Tài liệu hướng dẫn cấu hình và tích hợp cổng thanh toán VNPAY vào hệ thống.
+
+## Các bước merchant cần xử lý tích hợp code cài đặt
+1. Cài đặt code build URL thanh toán chuyển hướng.
+2. Cài đặt code `vnp_ReturnUrl` URL thông báo kết quả thanh toán.
+3. Cài đặt code IPN URL cập nhật kết quả thanh toán. Gửi lại VNPAY URL này khi thiết lập xong.
+
+## Mô hình kết nối
+- **Bước 1:** Khách hàng thực hiện mua hàng trên Website - ứng dụng TMĐT và tiến hành thanh toán trực tuyến cho đơn hàng.
+- **Bước 2:** Website - ứng dụng TMĐT thành lập yêu cầu thanh toán dưới dạng URL mang thông tin thanh toán và chuyển hướng khách hàng sang Cổng thanh toán VNPAY bằng URL đó.
+  - Cổng thanh toán VNPAY xử lý yêu cầu thanh toán mà Website - ứng dụng TMĐT gửi sang. Khách hàng tiến hành nhập hoặc xử lý xác thực các thông tin được yêu cầu Thanh toán.
+- **Bước 3,4:** Khách hàng nhập thông tin để xác minh tài khoản Ngân hàng của khách hàng và xác thực giao dịch (Nhập thông tin tài khoản, thẻ hoặc quét mã VNPAY-QR).
+- **Bước 5:** Giao dịch thành công tại Ngân hàng, VNPAY tiến hành:
+  - Chuyển hướng khách hàng về Website - ứng dụng TMĐT (`vnp_ReturnUrl`).
+  - Thông báo cho Website - ứng dụng TMĐT kết quả thanh toán của khách hàng thông qua IPN URL. Merchant cập nhật kết quả thanh toán VNPAY gửi tại URL này.
+- **Bước 6:** Merchant hiển thị kết quả giao dịch tới khách hàng (`vnp_ReturnUrl`).
+
+## Thông tin cấu hình
+Các thông tin cần thiết kết nối vào môi trường Sandbox Cổng thanh toán VNPAY:
+- **Mã TmnCode (`vnp_TmnCode`)**: là mã định danh kết nối được khai báo tại hệ thống của VNPAY. Mã định danh tương ứng với tên miền website, ứng dụng, dịch vụ của merchant kết nối vào VNPAY. Mỗi đơn vị có thể có một hoặc nhiều mã TmnCode kết nối.
+- **URL thanh toán (Sandbox)**: `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html`
+- **Secret Key (`vnp_HashSecret`)**: Chuỗi bí mật sử dụng để kiểm tra toàn vẹn dữ liệu khi hai hệ thống trao đổi thông tin (checksum).
+- **URL truy vấn kết quả giao dịch - hoàn tiền (Sandbox)**: `https://sandbox.vnpayment.vn/merchant_webapi/api/transaction`
+
+*Nếu chưa có thông tin cấu hình tích hợp, bạn có thể đăng ký ngay tại [http://sandbox.vnpayment.vn/devreg/](http://sandbox.vnpayment.vn/devreg/). Hệ thống sẽ gửi thông tin kết nối về email bạn đăng ký.*
+
+## Tạo URL Thanh toán
+**URL thanh toán (Sandbox):** `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html`  
+**Phương thức:** GET
+
+URL Thanh toán là địa chỉ URL mang thông tin thanh toán. Website TMĐT gửi sang Cổng thanh toán VNPAY các thông tin này khi xử lý giao dịch thanh toán trực tuyến cho Khách mua hàng.
+
+**Ví dụ URL:**
+```text
+https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=1806000&vnp_Command=pay&vnp_CreateDate=20210801153333&vnp_CurrCode=VND&vnp_IpAddr=127.0.0.1&vnp_Locale=vn&vnp_OrderInfo=Thanh+toan+don+hang+%3A5&vnp_OrderType=other&vnp_ReturnUrl=https%3A%2F%2Fdomainmerchant.vn%2FReturnUrl&vnp_TmnCode=DEMOV210&vnp_TxnRef=5&vnp_Version=2.1.0&vnp_SecureHash=3e0d61a0c0534b2e36680b3f7277743e8784cc4e1d68fa7d276e79c23be7d6318d338b477910a27992f5057bb1582bd44bd82ae8009ffaf6d141219218625c42
+```
+
+### Danh sách tham số - Thông tin gửi sang VNPAY (`vnp_Command=pay`)
+
+| Tham số | Kiểu dữ liệu | Bắt buộc/Tùy chọn | Mô tả |
+|---|---|---|---|
+| `vnp_Version` | Alphanumeric[1,8] | Bắt buộc | Phiên bản api mà merchant kết nối. Phiên bản hiện tại là : 2.1.0 |
+| `vnp_Command` | Alpha[1,16] | Bắt buộc | Mã API sử dụng, mã cho giao dịch thanh toán là: `pay` |
+| `vnp_TmnCode` | Alphanumeric[8] | Bắt buộc | Mã website của merchant trên hệ thống của VNPAY. Ví dụ: `2QXUI4J4` |
+| `vnp_Amount` | Numeric[1,12] | Bắt buộc | Số tiền thanh toán. Số tiền không mang các ký tự phân tách. Để gửi 10,000 VND thì merchant cần nhân thêm 100 lần (khử phần thập phân), gửi sang VNPAY là: `1000000` |
+| `vnp_BankCode` | Alphanumeric[3,20] | Tùy chọn | Mã phương thức thanh toán. Nếu không gửi, Cổng thanh toán sẽ cho KH chọn. (VD: `VNPAYQR`, `VNBANK`, `INTCARD`) |
+| `vnp_CreateDate` | Numeric[14] | Bắt buộc | Thời gian phát sinh giao dịch định dạng `yyyyMMddHHmmss` (Time zone GMT+7) |
+| `vnp_CurrCode` | Alpha[3] | Bắt buộc | Đơn vị tiền tệ sử dụng thanh toán. Hiện tại chỉ hỗ trợ `VND` |
+| `vnp_IpAddr` | Alphanumeric[7,45] | Bắt buộc | Địa chỉ IP của khách hàng thực hiện giao dịch |
+| `vnp_Locale` | Alpha[2,5] | Bắt buộc | Ngôn ngữ hiển thị. Hỗ trợ Tiếng Việt (`vn`), Tiếng Anh (`en`) |
+| `vnp_OrderInfo` | Alphanumeric[1,255] | Bắt buộc | Thông tin mô tả nội dung thanh toán (Tiếng Việt không dấu, không ký tự đặc biệt) |
+| `vnp_OrderType` | Alpha[1,100] | Bắt buộc | Mã danh mục hàng hóa do VNPAY quy định |
+| `vnp_ReturnUrl` | Alphanumeric[10,255] | Bắt buộc | URL thông báo kết quả giao dịch khi Khách hàng kết thúc thanh toán |
+| `vnp_ExpireDate` | Numeric[14] | Bắt buộc | Thời gian hết hạn thanh toán GMT+7, định dạng: `yyyyMMddHHmmss` |
+| `vnp_TxnRef` | Alphanumeric[1,100] | Bắt buộc | Mã tham chiếu duy nhất của giao dịch tại hệ thống của merchant. Không được trùng lặp trong ngày. |
+| `vnp_SecureHash` | Alphanumeric[32,256] | Bắt buộc | Mã kiểm tra (checksum). Phiên bản hiện tại hỗ trợ SHA256, HMACSHA512. |
+
+**Lưu ý:**
+- Dữ liệu checksum được thành lập dựa trên việc sắp xếp tăng dần của tên tham số (QueryString).
+- Số tiền cần thanh toán nhân với 100 để triệt tiêu phần thập phân trước khi gửi sang VNPAY.
+- Tham khảo mã BankCode tại: `https://sandbox.vnpayment.vn/qrpayauth/api/merchant/get_bank_list`
+
+## Code cài đặt mẫu (C#)
+
+```csharp
+private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+protected void Page_Load(object sender, EventArgs e)
+{
+    if (!IsPostBack)
+    {
+        txtOrderDesc.Text = "Nhap noi dung thanh toan";
+        txtExpire.Text = DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss");
+    }
+}
+
+protected void btnPay_Click(object sender, EventArgs e)
+{
+    // Get Config Info
+    string vnp_Returnurl = ConfigurationManager.AppSettings["vnp_Returnurl"]; 
+    string vnp_Url = ConfigurationManager.AppSettings["vnp_Url"]; 
+    string vnp_TmnCode = ConfigurationManager.AppSettings["vnp_TmnCode"]; 
+    string vnp_HashSecret = ConfigurationManager.AppSettings["vnp_HashSecret"]; 
+
+    if (string.IsNullOrEmpty(vnp_TmnCode) || string.IsNullOrEmpty(vnp_HashSecret))
+    {
+        lblMessage.Text = "Vui lòng cấu hình các tham số: vnp_TmnCode, vnp_HashSecret trong file web.config";
+        return;
+    }
+
+    // Get payment input & Save order to db
+    OrderInfo order = new OrderInfo();
+    order.OrderId = DateTime.Now.Ticks; 
+    order.Amount = 100000; // Giả lập 100,000 VND
+    order.Status = "0"; 
+    order.OrderDesc = txtOrderDesc.Text;
+    order.CreatedDate = DateTime.Now;
+
+    string locale = cboLanguage.SelectedItem.Value;
+
+    // Build URL for VNPAY
+    VnPayLibrary vnpay = new VnPayLibrary();
+
+    vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
+    vnpay.AddRequestData("vnp_Command", "pay");
+    vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+    // Số tiền nhân 100
+    vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString()); 
+
+    if (cboBankCode.SelectedItem != null && !string.IsNullOrEmpty(cboBankCode.SelectedItem.Value))
+    {
+        vnpay.AddRequestData("vnp_BankCode", cboBankCode.SelectedItem.Value);
+    }
+    
+    vnpay.AddRequestData("vnp_CreateDate", order.CreatedDate.ToString("yyyyMMddHHmmss"));
+    vnpay.AddRequestData("vnp_CurrCode", "VND");
+    vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress());
+
+    if (!string.IsNullOrEmpty(locale))
+    {
+        vnpay.AddRequestData("vnp_Locale", locale);
+    }
+    else
+    {
+        vnpay.AddRequestData("vnp_Locale", "vn");
+    }
+
+    vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
+    vnpay.AddRequestData("vnp_OrderType", orderCategory.SelectedItem.Value); // default value: other
+    vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+    vnpay.AddRequestData("vnp_TxnRef", order.OrderId.ToString()); 
+    
+    // Add Params of 2.1.0 Version
+    vnpay.AddRequestData("vnp_ExpireDate", txtExpire.Text);
+
+    // Billing & Invoice logic omitted for brevity...
+
+    string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+    log.InfoFormat("VNPAY URL: {0}", paymentUrl);
+    Response.Redirect(paymentUrl);
+}
+```

@@ -73,7 +73,8 @@ namespace PhucNguyenResort.Controllers
                 {
                     CategoryName = model.CategoryName,
                     Description = model.Description,
-                    Capacity = model.Capacity,
+                    MaxAdults = model.MaxAdults,
+                    MaxChildren = model.MaxChildren,
                     PricePerNight = model.PricePerNight,
                     ImageUrl = uniqueFileName != null ? "/images/rooms/" + uniqueFileName : null
                 };
@@ -128,7 +129,8 @@ namespace PhucNguyenResort.Controllers
                 CategoryId = roomCategory.CategoryId,
                 CategoryName = roomCategory.CategoryName,
                 Description = roomCategory.Description,
-                Capacity = roomCategory.Capacity,
+                MaxAdults = roomCategory.MaxAdults,
+                MaxChildren = roomCategory.MaxChildren,
                 PricePerNight = roomCategory.PricePerNight,
                 ImageUrl = roomCategory.ImageUrl,
                 ExistingGalleryImages = roomCategory.Images.ToList()
@@ -181,7 +183,8 @@ namespace PhucNguyenResort.Controllers
 
                 roomCategory.CategoryName = model.CategoryName;
                 roomCategory.Description = model.Description;
-                roomCategory.Capacity = model.Capacity;
+                roomCategory.MaxAdults = model.MaxAdults;
+                roomCategory.MaxChildren = model.MaxChildren;
                 roomCategory.PricePerNight = model.PricePerNight;
 
                 // Process Gallery Images

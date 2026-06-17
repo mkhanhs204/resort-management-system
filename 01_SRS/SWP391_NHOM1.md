@@ -99,7 +99,7 @@ PhucNguyen Resort & Tour Hub is a web-based integrated resort management system 
 | UC23 | Payment                             | Customer           | As a customer, I want to pay deposits and service fees online so that my bookings can be confirmed.                                                                   |
 | UC24 | Reserve Restaurant Table            | Customer           | As a customer, I want to reserve a restaurant table so that I can dine at my preferred time.                                                                          |
 | UC25 | Order Food To Room                  | Customer           | As a customer, I want to order food to my room so that I can enjoy room service.                                                                                      |
-| UC26 | Book Tour                           | Customer           | As a customer, I want to book a tour so that I can participate in resort activities.                                                                                  |
+| UC26 | Book Tour                           | Customer           | As a customer, I want to book a tour and choose to pay immediately online OR charge to my room bill so that I can participate in resort activities.                   |
 | UC27 | View Personal Invoice               | Customer           | As a customer, I want to view my invoices so that I can track my expenses.                                                                                            |
 | UC28 | View Booking History                | Customer           | As a customer, I want to view my booking history so that I can review past reservations.                                                                              |
 | UC29 | Submit Reviews                      | Customer           | As a customer, I want to submit reviews so that I can share my experience.                                                                                            |
@@ -130,7 +130,7 @@ PhucNguyen Resort & Tour Hub is a web-based integrated resort management system 
 | UC54 | Assign Room                         | Receptionist       | As a receptionist, I want to assign rooms to guests during check-in.                                                                                                  |
 | UC55 | Submit Stay Registration            | Receptionist       | As a receptionist, I want to submit guest stay registration information to comply with regulations.                                                                   |
 | UC56 | Perform Customer Check-out          | Receptionist       | As a receptionist, I want to check guests out so that their stay can be completed.                                                                                    |
-| UC57 | Generate Consolidated Invoice       | Receptionist       | As a receptionist, I want to generate consolidated invoices including room, food, and tour charges.                                                                   |
+| UC57 | Generate Consolidated Invoice       | Receptionist       | As a receptionist, I want to generate consolidated invoices including room, food, and unpaid "charge to room" tour charges.                                           |
 | UC58 | Process Final Payment               | Receptionist       | As a receptionist, I want to process final payments so that invoices can be settled.                                                                                  |
 | UC59 | Update Room Operational Status      | Receptionist       | As a receptionist, I want to update room statuses so that room availability is accurate.                                                                              |
 | UC60 | Create Cleaning Task                | Receptionist       | As a receptionist, I want to create cleaning tasks after guest check-out.                                                                                             |
@@ -209,12 +209,12 @@ PhucNguyen Resort & Tour Hub is a web-based integrated resort management system 
 | 14 | KOT | ● Primary keys: KotId <br> ● Foreign keys: FoodOrderId → FoodOrders(FoodOrderId) <br> ● Unique keys: FoodOrderId |
 | 15 | Tours | ● Primary keys: TourId <br> ● Foreign keys: None <br> ● Unique keys: None |
 | 16 | TourSchedules | ● Primary keys: ScheduleId <br> ● Foreign keys: TourId → Tours(TourId), GuideId → Users(UserId) <br> ● Unique keys: None |
-| 17 | TourBookings | ● Primary keys: TourBookingId <br> ● Foreign keys: BookingId → Bookings(BookingId), ScheduleId → TourSchedules(ScheduleId) <br> ● Unique keys: None |
+| 17 | TourBookings | ● Primary keys: TourBookingId <br> ● Foreign keys: UserId → Users(UserId), BookingId (Nullable) → Bookings(BookingId), ScheduleId → TourSchedules(ScheduleId) <br> ● Unique keys: None |
 | 18 | Reviews | ● Primary keys: ReviewId <br> ● Foreign keys: UserId → Users(UserId) |
 | 19 | GuestFolios | ● Primary keys: FolioId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: BookingId |
 | 20 | FolioTransactions | ● Primary keys: TransactionId <br> ● Foreign keys: FolioId → GuestFolios(FolioId) <br> ● Unique keys: None |
 | 21 | Invoices | ● Primary keys: InvoiceId <br> ● Foreign keys: FolioId → GuestFolios(FolioId) <br> ● Unique keys: FolioId |
-| 22 | Payments | ● Primary keys: PaymentId <br> ● Foreign keys: InvoiceId → Invoices(InvoiceId) <br> ● Unique keys: None |
+| 22 | Payments | ● Primary keys: PaymentId <br> ● Foreign keys: InvoiceId (Nullable) → Invoices(InvoiceId), TourBookingId (Nullable) → TourBookings(TourBookingId) <br> ● Unique keys: None |
 | 23 | Refunds | ● Primary keys: RefundId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: None |
 | 24 | Notifications | ● Primary keys: NotificationId <br> ● Foreign keys: UserId → Users(UserId) <br> ● Unique keys: None |
 

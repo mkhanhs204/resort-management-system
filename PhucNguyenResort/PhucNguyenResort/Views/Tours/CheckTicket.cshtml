@@ -1,0 +1,75 @@
+@model PhucNguyenResort.Models.TourBooking
+@using PhucNguyenResort.Enums
+
+@{
+    ViewData["Title"] = "Kiểm Tra Vé Tour";
+    Layout = "_Layout"; // Or null if you want a standalone page, but _Layout is fine
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="mb-0"><i class="fa fa-ticket mr-2"></i> Trạng Thái Vé Tour</h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        @if (Model.BookingStatus == TourBookingStatus.Confirmed)
+                        {
+                            <div class="display-1 text-success mb-3"><i class="fa fa-check-circle"></i></div>
+                            <h2 class="text-success fw-bold">VÉ HỢP LỆ</h2>
+                            <p class="text-muted">Vé có thể sử dụng được</p>
+                        }
+                        else if (Model.BookingStatus == TourBookingStatus.Cancelled)
+                        {
+                            <div class="display-1 text-danger mb-3"><i class="fa fa-times-circle"></i></div>
+                            <h2 class="text-danger fw-bold">VÉ ĐÃ HỦY</h2>
+                            <p class="text-muted">Vé này không còn giá trị sử dụng</p>
+                        }
+                        else if (Model.BookingStatus == TourBookingStatus.Completed)
+                        {
+                            <div class="display-1 text-secondary mb-3"><i class="fa fa-history"></i></div>
+                            <h2 class="text-secondary fw-bold">VÉ ĐÃ SỬ DỤNG</h2>
+                            <p class="text-muted">Khách hàng đã tham gia tour này</p>
+                        }
+                        else
+                        {
+                            <div class="display-1 text-warning mb-3"><i class="fa fa-exclamation-circle"></i></div>
+                            <h2 class="text-warning fw-bold">ĐANG XỬ LÝ</h2>
+                            <p class="text-muted">Vé chưa được thanh toán hoặc xác nhận</p>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <dl class="row mb-0 mt-4 text-left">
+                        <dt class="col-sm-5 text-muted">Mã vé:</dt>
+                        <dd class="col-sm-7 fw-bold">#@Model.TourBookingId</dd>
+
+                        <dt class="col-sm-5 text-muted">Tên khách hàng:</dt>
+                        <dd class="col-sm-7">@(Model.User?.FullName ?? "N/A")</dd>
+
+                        <dt class="col-sm-5 text-muted">Tên Tour:</dt>
+                        <dd class="col-sm-7 fw-bold text-primary">@(Model.Schedule?.Tour?.TourName ?? "N/A")</dd>
+
+                        <dt class="col-sm-5 text-muted">Số người tham gia:</dt>
+                        <dd class="col-sm-7">@Model.Participants người</dd>
+
+                        <dt class="col-sm-5 text-muted">Ngày đi:</dt>
+                        <dd class="col-sm-7">@(Model.Schedule?.TourDate?.ToString("dd/MM/yyyy") ?? "N/A")</dd>
+
+                        <dt class="col-sm-5 text-muted">Giờ xuất phát:</dt>
+                        <dd class="col-sm-7">@(Model.Schedule?.StartTime?.ToString(@"hh\:mm") ?? "N/A")</dd>
+                        
+                        <dt class="col-sm-5 text-muted">Thời lượng:</dt>
+                        <dd class="col-sm-7">@(Model.Schedule?.Tour?.DurationHours?.ToString() ?? "N/A") giờ</dd>
+                    </dl>
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <p class="text-muted small mb-0">Hệ thống soát vé tự động - PhucNguyen Resort</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

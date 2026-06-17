@@ -7,7 +7,8 @@ namespace PhucNguyenResort.Models;
 public class Payment
 {
     public int PaymentId { get; set; }
-    public int InvoiceId { get; set; }
+    public int? InvoiceId { get; set; }
+    public int? TourBookingId { get; set; }
     public PaymentMethod? PaymentMethod { get; set; }
 
     [Range(0, 999999999)]
@@ -21,4 +22,5 @@ public class Payment
     public DateTime? PaidAt { get; set; }
 
     public Invoice? Invoice { get; set; }
+    public TourBooking? TourBooking { get; set; }
 }

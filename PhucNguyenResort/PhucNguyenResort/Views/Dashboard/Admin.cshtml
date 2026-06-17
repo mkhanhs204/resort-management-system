@@ -1,0 +1,116 @@
+@{
+    ViewData["Title"] = "System Admin Dashboard";
+    Layout = "_DashboardLayout";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-cogs mr-2" style="color: #dfa974;"></i> System Administrator
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Manage staff accounts, system roles, and security configurations.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #1a1a1a;">
+            <h4 style="color: #1a1a1a;"><i class="fa fa-users"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Total Staff Accounts</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
+            <h4 style="color: #28a745;"><i class="fa fa-check-circle"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Active Accounts</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #007bff;">
+            <h4 style="color: #007bff;"><i class="fa fa-shield"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">System Roles</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545;">
+            <h4 style="color: #dc3545;"><i class="fa fa-ban"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Inactive Accounts</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-box" style="border-left: 5px solid #1a1a1a;">
+            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
+                <i class="fa fa-bolt mr-2" style="color: #dfa974;"></i> Quick Actions
+            </h5>
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <a asp-controller="StaffAccounts" asp-action="Create" class="btn btn-outline-dark btn-block" style="font-family: 'Cabin', sans-serif;">
+                        <i class="fa fa-user-plus mr-2"></i> Register New Staff
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a asp-controller="StaffAccounts" asp-action="Index" class="btn btn-outline-dark btn-block" style="font-family: 'Cabin', sans-serif;">
+                        <i class="fa fa-list mr-2"></i> Manage All Accounts
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <button class="btn btn-dark btn-block" style="font-family: 'Cabin', sans-serif;" disabled>
+                        <i class="fa fa-database mr-2"></i> Backup System
+                    </button>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <button class="btn btn-outline-danger btn-block" style="font-family: 'Cabin', sans-serif;" disabled>
+                        <i class="fa fa-history mr-2"></i> Restore Backup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Staff Registrations (Placeholder Table) -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card-box">
+            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
+                <i class="fa fa-clock-o mr-2" style="color: #dfa974;"></i> Recent Staff Registrations
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover" style="font-family: 'Cabin', sans-serif;">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="fa fa-info-circle mr-2"></i> Data will be loaded when backend is connected.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
