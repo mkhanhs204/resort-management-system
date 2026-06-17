@@ -7,9 +7,36 @@
 <div class="container-fluid refund-container py-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
-        <a asp-action="Create" class="btn btn-premium-action btn-primary shadow-sm">
-            <i class="fa fa-plus-circle"></i> Create New
-        </a>
+        @if (User.IsInRole("Business Manager"))
+        {
+            <a asp-action="Create" class="btn btn-premium-action btn-primary shadow-sm">
+                <i class="fa fa-plus-circle"></i> Create New
+            </a>
+        }
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card premium-card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" name="searchString" class="form-control" placeholder="Search by Room or Floor..." value="@ViewBag.SearchString">
+                </div>
+                <div class="col-md-3">
+                    <select name="categoryId" class="form-control" asp-items="ViewBag.Categories">
+                        <option value="">-- All Categories --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="statusFilter" class="form-control" asp-items="Html.GetEnumSelectList<PhucNguyenResort.Enums.RoomStatus>()">
+                        <option value="">-- All Statuses --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fa fa-filter"></i> Filter</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="card premium-card mb-4">
@@ -53,7 +80,10 @@
                                 <td class="pr-4 text-end">
                                     <a asp-action="Edit" asp-route-id="@item.RoomId" class="btn-action-icon edit" title="Sửa"><i class="fa fa-pencil"></i></a>
                                     <a asp-action="Details" asp-route-id="@item.RoomId" class="btn-action-icon view" title="Xem chi tiết"><i class="fa fa-eye"></i></a>
-                                    <a asp-action="Delete" asp-route-id="@item.RoomId" class="btn-action-icon delete" title="Xóa"><i class="fa fa-trash"></i></a>
+                                    @if (User.IsInRole("Business Manager"))
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@item.RoomId" class="btn-action-icon delete" title="Xóa"><i class="fa fa-trash"></i></a>
+                                    }
                                 </td>
                             </tr>
                         }
