@@ -12,7 +12,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">Food Order #@Model.FoodOrderId</h1>
-        <a asp-action="RoomService" asp-route-bookingId="@Model.BookingId" class="btn btn-outline-secondary">Back to room service</a>
+        <a asp-action="RoomService" asp-route-bookingId="@Model.BookingId" class="btn btn-outline-secondary">Back to room service order</a>
     </div>
 
     <div class="card mb-4">
@@ -30,8 +30,8 @@
                 <dt class="col-sm-3">Ordered at</dt>
                 <dd class="col-sm-9">@Model.OrderedAt.ToString("yyyy-MM-dd HH:mm")</dd>
 
-                <dt class="col-sm-3">Total</dt>
-                <dd class="col-sm-9">@Model.TotalAmount.ToString("N0")</dd>
+                <dt class="col-sm-3">Total amount</dt>
+                <dd class="col-sm-9">@Model.TotalAmount.ToString("N0") VND</dd>
             </dl>
         </div>
     </div>
@@ -53,8 +53,8 @@
                     <td>@item.ItemName</td>
                     <td>@item.CategoryName</td>
                     <td class="text-end">@item.Quantity</td>
-                    <td class="text-end">@item.UnitPrice.ToString("N0")</td>
-                    <td class="text-end">@item.LineTotal.ToString("N0")</td>
+                    <td class="text-end">@item.UnitPrice.ToString("N0") VND</td>
+                    <td class="text-end">@item.LineTotal.ToString("N0") VND</td>
                 </tr>
             }
         </tbody>

@@ -1,14 +1,11 @@
 @model PhucNguyenResort.ViewModels.FoodOrders.RoomServiceOrderViewModel
 
 @{
-    ViewData["Title"] = "Room Service";
+    ViewData["Title"] = "Room Service Food Order";
 }
 
 <div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Room Service</h1>
-        <a asp-controller="RestaurantMenus" asp-action="Index" class="btn btn-outline-secondary">Manage menu</a>
-    </div>
+    <h1 class="h3 mb-4">Room Service Food Order</h1>
 
     <form asp-action="RoomService" method="get" class="row g-2 align-items-end mb-4">
         <div class="col-md-4">
@@ -21,7 +18,10 @@
         </div>
     </form>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div asp-validation-summary="All" class="alert alert-danger mb-3"></div>
+    }
 
     @if (Model.BookingId > 0)
     {
@@ -73,15 +73,35 @@
                                 {
                                     <tr>
                                         <td>
-                                            @entry.Item.ItemName
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="bg-light border rounded d-flex align-items-center justify-content-center overflow-hidden"
+                                                     style="width: 88px; height: 66px; flex: 0 0 88px;">
+                                                    @if (string.IsNullOrWhiteSpace(entry.Item.ImageUrl))
+                                                    {
+                                                        <span class="small text-muted">No image</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="@entry.Item.ImageUrl"
+                                                             alt="@entry.Item.ItemName"
+                                                             style="width: 100%; height: 100%; object-fit: cover;"
+                                                             onerror="this.replaceWith(document.createTextNode('No image'));" />
+                                                    }
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold">@entry.Item.ItemName</div>
+                                                    <div class="small text-muted">@entry.Item.CategoryName</div>
+                                                </div>
+                                            </div>
                                             <input name="MenuItems[@entry.Index].MenuItemId" value="@entry.Item.MenuItemId" type="hidden" />
                                             <input name="MenuItems[@entry.Index].ItemName" value="@entry.Item.ItemName" type="hidden" />
                                             <input name="MenuItems[@entry.Index].CategoryName" value="@entry.Item.CategoryName" type="hidden" />
+                                            <input name="MenuItems[@entry.Index].ImageUrl" value="@entry.Item.ImageUrl" type="hidden" />
                                             <input name="MenuItems[@entry.Index].Price" value="@entry.Item.Price" type="hidden" />
                                         </td>
                                         <td class="text-end">@entry.Item.Price.ToString("N0")</td>
                                         <td>
-                                            <input name="MenuItems[@entry.Index].Quantity" value="@entry.Item.Quantity" class="form-control" type="number" min="0" />
+                                            <input name="MenuItems[@entry.Index].Quantity" value="@entry.Item.Quantity" class="form-control" type="number" min="0" max="1000" />
                                         </td>
                                     </tr>
                                 }

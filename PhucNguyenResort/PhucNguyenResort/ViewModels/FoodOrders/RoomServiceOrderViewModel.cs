@@ -22,6 +22,7 @@ public class RoomServiceMenuItemViewModel
     public int MenuItemId { get; set; }
     public string ItemName { get; set; } = string.Empty;
     public string CategoryName { get; set; } = "Uncategorized";
+    public string? ImageUrl { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }
 }

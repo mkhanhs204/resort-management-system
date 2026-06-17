@@ -14,6 +14,8 @@ public class FoodOrder
     public decimal? TotalAmount { get; set; }
 
     public DateTime OrderedAt { get; set; } = DateTime.Now;
+    public bool IsChargedToRoom { get; set; } = false;
+    public DateTime? ChargedAt { get; set; }
 
     public Booking? Booking { get; set; }
     public ICollection<FoodOrderItem> FoodOrderItems { get; set; } = new List<FoodOrderItem>();

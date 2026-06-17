@@ -356,7 +356,9 @@ namespace PhucNguyenResort.Web.Migrations
                     BookingId = table.Column<int>(type: "int", nullable: false),
                     OrderStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "Pending"),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    OrderedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    OrderedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    IsChargedToRoom = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    ChargedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -904,48 +906,48 @@ namespace PhucNguyenResort.Web.Migrations
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 1, 1, 8, 30, 0, 0, DateTimeKind.Unspecified), "user01@phucnguyenresort.test", "Nguyen Van An", true, "hashed-password-01", "0900000001", 1 },
-                    { 2, new DateTime(2026, 1, 2, 8, 30, 0, 0, DateTimeKind.Unspecified), "user02@phucnguyenresort.test", "Tran Thi Binh", true, "hashed-password-02", "0900000002", 2 },
-                    { 3, new DateTime(2026, 1, 3, 8, 30, 0, 0, DateTimeKind.Unspecified), "user03@phucnguyenresort.test", "Le Minh Chau", true, "hashed-password-03", "0900000003", 3 },
-                    { 4, new DateTime(2026, 1, 4, 8, 30, 0, 0, DateTimeKind.Unspecified), "user04@phucnguyenresort.test", "Pham Quoc Dung", true, "hashed-password-04", "0900000004", 4 },
-                    { 5, new DateTime(2026, 2, 5, 8, 30, 0, 0, DateTimeKind.Unspecified), "user05@phucnguyenresort.test", "Hoang Thu Ha", true, "hashed-password-05", "0900000005", 5 },
-                    { 6, new DateTime(2026, 2, 6, 8, 30, 0, 0, DateTimeKind.Unspecified), "user06@phucnguyenresort.test", "Vo Tuan Kiet", true, "hashed-password-06", "0900000006", 6 },
-                    { 7, new DateTime(2026, 2, 7, 8, 30, 0, 0, DateTimeKind.Unspecified), "user07@phucnguyenresort.test", "Dang Ngoc Linh", true, "hashed-password-07", "0900000007", 7 },
-                    { 8, new DateTime(2026, 2, 8, 8, 30, 0, 0, DateTimeKind.Unspecified), "user08@phucnguyenresort.test", "Bui Gia Minh", true, "hashed-password-08", "0900000008", 8 }
+                    { 1, new DateTime(2026, 1, 1, 8, 30, 0, 0, DateTimeKind.Unspecified), "user01@phucnguyenresort.test", "Nguyen Van An", true, "AQAAAAIAAYagAAAAEAPfHpZqsicuzNWwEz2A+27fHA4T7jfsm+ZJVi/FMknonhnS15owgiKdE/xqvZZHvA==", "0900000001", 1 },
+                    { 2, new DateTime(2026, 1, 2, 8, 30, 0, 0, DateTimeKind.Unspecified), "user02@phucnguyenresort.test", "Tran Thi Binh", true, "AQAAAAIAAYagAAAAEMqJfvDTu1nRZ1tWnVSdC2TxoksCbzZBG0Z5+hSqJBH6ubpqvEb9ytkmbnjrBlCJNQ==", "0900000002", 2 },
+                    { 3, new DateTime(2026, 1, 3, 8, 30, 0, 0, DateTimeKind.Unspecified), "user03@phucnguyenresort.test", "Le Minh Chau", true, "AQAAAAIAAYagAAAAEL7OmuUdZtRjIWsMK4GpOru5NwFTcgkWIMT0XsKM12jVPo5pBAI3n0mPC42TwT4gQA==", "0900000003", 3 },
+                    { 4, new DateTime(2026, 1, 4, 8, 30, 0, 0, DateTimeKind.Unspecified), "user04@phucnguyenresort.test", "Pham Quoc Dung", true, "AQAAAAIAAYagAAAAEPpO/sBlLtEog0z9muGuZ9dJU2By/al3/9rnCHHgIHGaUn3cCQxp8+rOHVNo771raA==", "0900000004", 4 },
+                    { 5, new DateTime(2026, 2, 5, 8, 30, 0, 0, DateTimeKind.Unspecified), "user05@phucnguyenresort.test", "Hoang Thu Ha", true, "AQAAAAIAAYagAAAAELLhWKBA7UEbgmc/qhu3mxKfNo1Y1UI6zVG4H6XqUfwyhBZIvWkZmDZrkXQK/KaAXQ==", "0900000005", 5 },
+                    { 6, new DateTime(2026, 2, 6, 8, 30, 0, 0, DateTimeKind.Unspecified), "user06@phucnguyenresort.test", "Vo Tuan Kiet", true, "AQAAAAIAAYagAAAAEMos2lHKwL8xBwVjMAzlIWjtRXvVolAJDK4aTarDmRFhEgqc2mtMqB16Gvi4Y7hd7g==", "0900000006", 6 },
+                    { 7, new DateTime(2026, 2, 7, 8, 30, 0, 0, DateTimeKind.Unspecified), "user07@phucnguyenresort.test", "Dang Ngoc Linh", true, "AQAAAAIAAYagAAAAEENQal0elXTjB9MuTiDqZw+Ju1XFx+c6PHLzlv+vB49TGulgOELiwxVLzBLR3zWcsA==", "0900000007", 7 },
+                    { 8, new DateTime(2026, 2, 8, 8, 30, 0, 0, DateTimeKind.Unspecified), "user08@phucnguyenresort.test", "Bui Gia Minh", true, "AQAAAAIAAYagAAAAEJT25/CCK5rCrhV6iqZaRiccHs5/2PjxovAkY33vQQnePVOlNtFItn9Ej8hl8/GaVg==", "0900000008", 8 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "PasswordHash", "PhoneNumber", "RoleId" },
-                values: new object[] { 9, new DateTime(2026, 3, 9, 8, 30, 0, 0, DateTimeKind.Unspecified), "user09@phucnguyenresort.test", "Do Phuong Nam", "hashed-password-09", "0900000009", 9 });
+                values: new object[] { 9, new DateTime(2026, 3, 9, 8, 30, 0, 0, DateTimeKind.Unspecified), "user09@phucnguyenresort.test", "Do Phuong Nam", "AQAAAAIAAYagAAAAEP/y/42LBSamtT9RhWTarQ8Arul0XOAu1F1fy0D9x/QhZvsyBZsXcw4BK2FianAmlQ==", "0900000009", 9 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 10, new DateTime(2026, 3, 10, 8, 30, 0, 0, DateTimeKind.Unspecified), "user10@phucnguyenresort.test", "Ngo Thanh Oanh", true, "hashed-password-10", "0900000010", 3 },
-                    { 11, new DateTime(2026, 3, 11, 8, 30, 0, 0, DateTimeKind.Unspecified), "user11@phucnguyenresort.test", "Huynh Duc Phat", true, "hashed-password-11", "0900000011", 3 },
-                    { 12, new DateTime(2026, 3, 12, 8, 30, 0, 0, DateTimeKind.Unspecified), "user12@phucnguyenresort.test", "Phan My Quyen", true, "hashed-password-12", "0900000012", 3 },
-                    { 13, new DateTime(2026, 4, 13, 8, 30, 0, 0, DateTimeKind.Unspecified), "user13@phucnguyenresort.test", "Vu Khanh Son", true, "hashed-password-13", "0900000013", 3 },
-                    { 14, new DateTime(2026, 4, 14, 8, 30, 0, 0, DateTimeKind.Unspecified), "user14@phucnguyenresort.test", "Truong Hai Tam", true, "hashed-password-14", "0900000014", 3 },
-                    { 15, new DateTime(2026, 4, 15, 8, 30, 0, 0, DateTimeKind.Unspecified), "user15@phucnguyenresort.test", "Ly Bao Uyen", true, "hashed-password-15", "0900000015", 3 },
-                    { 16, new DateTime(2026, 4, 16, 8, 30, 0, 0, DateTimeKind.Unspecified), "user16@phucnguyenresort.test", "Mai Hoai Viet", true, "hashed-password-16", "0900000016", 3 },
-                    { 17, new DateTime(2026, 5, 17, 8, 30, 0, 0, DateTimeKind.Unspecified), "user17@phucnguyenresort.test", "Dinh Nhat Vy", true, "hashed-password-17", "0900000017", 3 }
+                    { 10, new DateTime(2026, 3, 10, 8, 30, 0, 0, DateTimeKind.Unspecified), "user10@phucnguyenresort.test", "Ngo Thanh Oanh", true, "AQAAAAIAAYagAAAAEHhfJbFM/03T1KAicxYcV1bTBoKZiD9CS841SnAOmTfifLMab/d2Ler9troq3w/uxQ==", "0900000010", 3 },
+                    { 11, new DateTime(2026, 3, 11, 8, 30, 0, 0, DateTimeKind.Unspecified), "user11@phucnguyenresort.test", "Huynh Duc Phat", true, "AQAAAAIAAYagAAAAEPaitqXlGlPfjdR10IkWztfw5bkaSETVCtiz1raV6zzlXBjpPzIMqeY4bfviE6e3Wg==", "0900000011", 3 },
+                    { 12, new DateTime(2026, 3, 12, 8, 30, 0, 0, DateTimeKind.Unspecified), "user12@phucnguyenresort.test", "Phan My Quyen", true, "AQAAAAIAAYagAAAAEDGl1/D1FrIqtwdXMp4MHKTcKLhrgp0BM7tRkmCJKU4CLs78GCzRBm6BNMw2g5wsMg==", "0900000012", 3 },
+                    { 13, new DateTime(2026, 4, 13, 8, 30, 0, 0, DateTimeKind.Unspecified), "user13@phucnguyenresort.test", "Vu Khanh Son", true, "AQAAAAIAAYagAAAAEOUNXbZx/sSqOf8XhutyA8c0i1jpPfwprTXZMpZ+ddTO0eZ6DeGC6SappK1tnuLQtQ==", "0900000013", 3 },
+                    { 14, new DateTime(2026, 4, 14, 8, 30, 0, 0, DateTimeKind.Unspecified), "user14@phucnguyenresort.test", "Truong Hai Tam", true, "AQAAAAIAAYagAAAAEJJGfYgjY5DIU1LvrA7IqfQ9N0dG1VIKmKczDlrjsfeYlLZMV3uGZM3KB8t7jPVC0g==", "0900000014", 3 },
+                    { 15, new DateTime(2026, 4, 15, 8, 30, 0, 0, DateTimeKind.Unspecified), "user15@phucnguyenresort.test", "Ly Bao Uyen", true, "AQAAAAIAAYagAAAAELC/3eh2uKrbHlslXEaKmDbBCqjLTpF7KJkmuTokz/4ZZtRftNGdc1r18mlfAWJ/zg==", "0900000015", 3 },
+                    { 16, new DateTime(2026, 4, 16, 8, 30, 0, 0, DateTimeKind.Unspecified), "user16@phucnguyenresort.test", "Mai Hoai Viet", true, "AQAAAAIAAYagAAAAEK8Tu2bzYxEFkVglibJ2FMF/v+tZLjtO8PlvonraPzVigrXUv+ezf6txnN9tzmUKRg==", "0900000016", 3 },
+                    { 17, new DateTime(2026, 5, 17, 8, 30, 0, 0, DateTimeKind.Unspecified), "user17@phucnguyenresort.test", "Dinh Nhat Vy", true, "AQAAAAIAAYagAAAAEEu1vtHH1DPKJyipEF9CLiGKB5nlEfAALCHhcLHUl6Gj7930Z5fC8qFxmwbLTbFcnA==", "0900000017", 3 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "PasswordHash", "PhoneNumber", "RoleId" },
-                values: new object[] { 18, new DateTime(2026, 5, 18, 8, 30, 0, 0, DateTimeKind.Unspecified), "user18@phucnguyenresort.test", "Cao Tien Dat", "hashed-password-18", "0900000018", 3 });
+                values: new object[] { 18, new DateTime(2026, 5, 18, 8, 30, 0, 0, DateTimeKind.Unspecified), "user18@phucnguyenresort.test", "Cao Tien Dat", "AQAAAAIAAYagAAAAEBfvYhV6RZ4eaYPLilejiLRhlW1+Yc+NqGZ5EBekRqifvfY6ys/tZUV/GwRQrpr9sw==", "0900000018", 3 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 19, new DateTime(2026, 5, 19, 8, 30, 0, 0, DateTimeKind.Unspecified), "user19@phucnguyenresort.test", "Ta Minh Anh", true, "hashed-password-19", "0900000019", 3 },
-                    { 20, new DateTime(2026, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), "user20@phucnguyenresort.test", "Lam Gia Bao", true, "hashed-password-20", "0900000020", 3 }
+                    { 19, new DateTime(2026, 5, 19, 8, 30, 0, 0, DateTimeKind.Unspecified), "user19@phucnguyenresort.test", "Ta Minh Anh", true, "AQAAAAIAAYagAAAAEGtWiO8pUkr97O2XfZppC3E24zWNciBmmNkqv/H5mHZXU64zaC04ozH9WwBorN8/WA==", "0900000019", 3 },
+                    { 20, new DateTime(2026, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), "user20@phucnguyenresort.test", "Lam Gia Bao", true, "AQAAAAIAAYagAAAAEOWoOu1dgyXSeUHjo7zAm5WWbYnrLWNWkMpjSUCTsJ3Vlznm0hcvxtyPQ/7cgwZNng==", "0900000020", 3 }
                 });
 
             migrationBuilder.InsertData(
@@ -1313,67 +1315,91 @@ namespace PhucNguyenResort.Web.Migrations
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 1, 1, new DateTime(2026, 6, 3, 13, 15, 0, 0, DateTimeKind.Unspecified), 170000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 1, 1, null, new DateTime(2026, 6, 3, 13, 15, 0, 0, DateTimeKind.Unspecified), 170000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 2, 2, new DateTime(2026, 6, 18, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Preparing", new DateTime(2026, 6, 4, 14, 15, 0, 0, DateTimeKind.Unspecified), 330000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 2, 2, "Preparing", new DateTime(2026, 6, 4, 14, 15, 0, 0, DateTimeKind.Unspecified), 330000.00m },
-                    { 3, 3, "Ready", new DateTime(2026, 6, 5, 15, 15, 0, 0, DateTimeKind.Unspecified), 540000.00m },
-                    { 4, 4, "Served", new DateTime(2026, 6, 6, 16, 15, 0, 0, DateTimeKind.Unspecified), 160000.00m },
-                    { 5, 5, "Cancelled", new DateTime(2026, 6, 7, 17, 15, 0, 0, DateTimeKind.Unspecified), 370000.00m }
+                    { 3, 3, null, "Ready", new DateTime(2026, 6, 5, 15, 15, 0, 0, DateTimeKind.Unspecified), 540000.00m },
+                    { 4, 4, null, "Served", new DateTime(2026, 6, 6, 16, 15, 0, 0, DateTimeKind.Unspecified), 160000.00m },
+                    { 5, 5, null, "Cancelled", new DateTime(2026, 6, 7, 17, 15, 0, 0, DateTimeKind.Unspecified), 370000.00m }
                 });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 6, 6, new DateTime(2026, 6, 8, 18, 15, 0, 0, DateTimeKind.Unspecified), 630000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 6, 6, null, new DateTime(2026, 6, 8, 18, 15, 0, 0, DateTimeKind.Unspecified), 630000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 7, 7, null, "Preparing", new DateTime(2026, 6, 9, 19, 15, 0, 0, DateTimeKind.Unspecified), 940000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 8, 8, new DateTime(2026, 6, 24, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Ready", new DateTime(2026, 6, 10, 12, 15, 0, 0, DateTimeKind.Unspecified), 260000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 7, 7, "Preparing", new DateTime(2026, 6, 9, 19, 15, 0, 0, DateTimeKind.Unspecified), 940000.00m },
-                    { 8, 8, "Ready", new DateTime(2026, 6, 10, 12, 15, 0, 0, DateTimeKind.Unspecified), 260000.00m },
-                    { 9, 9, "Served", new DateTime(2026, 6, 11, 13, 15, 0, 0, DateTimeKind.Unspecified), 570000.00m },
-                    { 10, 10, "Cancelled", new DateTime(2026, 6, 12, 14, 15, 0, 0, DateTimeKind.Unspecified), 930000.00m }
+                    { 9, 9, null, "Served", new DateTime(2026, 6, 11, 13, 15, 0, 0, DateTimeKind.Unspecified), 570000.00m },
+                    { 10, 10, null, "Cancelled", new DateTime(2026, 6, 12, 14, 15, 0, 0, DateTimeKind.Unspecified), 930000.00m }
                 });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 11, 11, new DateTime(2026, 6, 13, 15, 15, 0, 0, DateTimeKind.Unspecified), 1340000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 11, 11, null, new DateTime(2026, 6, 13, 15, 15, 0, 0, DateTimeKind.Unspecified), 1340000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 12, 12, "Preparing", new DateTime(2026, 6, 14, 16, 15, 0, 0, DateTimeKind.Unspecified), 360000.00m },
-                    { 13, 13, "Ready", new DateTime(2026, 6, 15, 17, 15, 0, 0, DateTimeKind.Unspecified), 770000.00m },
-                    { 14, 14, "Served", new DateTime(2026, 6, 16, 18, 15, 0, 0, DateTimeKind.Unspecified), 1230000.00m },
-                    { 15, 15, "Cancelled", new DateTime(2026, 6, 17, 19, 15, 0, 0, DateTimeKind.Unspecified), 1740000.00m }
+                    { 12, 12, null, "Preparing", new DateTime(2026, 6, 14, 16, 15, 0, 0, DateTimeKind.Unspecified), 360000.00m },
+                    { 13, 13, null, "Ready", new DateTime(2026, 6, 15, 17, 15, 0, 0, DateTimeKind.Unspecified), 770000.00m }
                 });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 16, 16, new DateTime(2026, 6, 18, 12, 15, 0, 0, DateTimeKind.Unspecified), 460000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 14, 14, new DateTime(2026, 6, 30, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Served", new DateTime(2026, 6, 16, 18, 15, 0, 0, DateTimeKind.Unspecified), 1230000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 15, 15, null, "Cancelled", new DateTime(2026, 6, 17, 19, 15, 0, 0, DateTimeKind.Unspecified), 1740000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 16, 16, null, new DateTime(2026, 6, 18, 12, 15, 0, 0, DateTimeKind.Unspecified), 460000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 17, 17, "Preparing", new DateTime(2026, 6, 19, 13, 15, 0, 0, DateTimeKind.Unspecified), 970000.00m },
-                    { 18, 18, "Ready", new DateTime(2026, 6, 20, 14, 15, 0, 0, DateTimeKind.Unspecified), 1530000.00m },
-                    { 19, 19, "Served", new DateTime(2026, 6, 21, 15, 15, 0, 0, DateTimeKind.Unspecified), 2140000.00m },
-                    { 20, 20, "Cancelled", new DateTime(2026, 6, 22, 16, 15, 0, 0, DateTimeKind.Unspecified), 560000.00m }
+                    { 17, 17, null, "Preparing", new DateTime(2026, 6, 19, 13, 15, 0, 0, DateTimeKind.Unspecified), 970000.00m },
+                    { 18, 18, null, "Ready", new DateTime(2026, 6, 20, 14, 15, 0, 0, DateTimeKind.Unspecified), 1530000.00m },
+                    { 19, 19, null, "Served", new DateTime(2026, 6, 21, 15, 15, 0, 0, DateTimeKind.Unspecified), 2140000.00m }
                 });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 20, 20, new DateTime(2026, 7, 6, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Cancelled", new DateTime(2026, 6, 22, 16, 15, 0, 0, DateTimeKind.Unspecified), 560000.00m });
 
             migrationBuilder.InsertData(
                 table: "GuestFolios",
