@@ -11,9 +11,9 @@ namespace PhucNguyenResort.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHomeService _homeService;
-        private readonly ITourService _tourService;
+        private readonly ITourCatalogService _tourService;
 
-        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourService tourService)
+        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourCatalogService tourService)
         {
             _logger = logger;
             _homeService = homeService;
