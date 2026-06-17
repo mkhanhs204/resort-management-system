@@ -232,6 +232,7 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function() {
             $('.btn-cancel-booking').click(function() {
                 var bookingId = $(this).data('id');
                 var isRefund = $(this).data('refund');
