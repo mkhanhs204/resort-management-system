@@ -22,8 +22,8 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                                                                                 |
 | ---------- | ------------------- | ---------------------------------------------------------------------------------------------------- |
-| 2026-06-13 | AI BA               | Tạo tài liệu lần đầu - Tích hợp VNPAY                                                        |
-| 2026-06-13 | AI BA               | Cập nhật chi tiết các phần (Mermaid, Error Codes, Deployment) cho giống chuẩn EDS_RoomBooking |
+| 2026-06-13 | Cuong               | Tạo tài liệu lần đầu - Tích hợp VNPAY                                                        |
+| 2026-06-13 | Cuong               | Cập nhật chi tiết các phần (Mermaid, Error Codes, Deployment) cho giống chuẩn EDS_RoomBooking |
 
 ## MỤC LỤC
 
