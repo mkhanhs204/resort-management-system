@@ -16,6 +16,10 @@ body {
     background-color: #1a1a1a; /* Dark theme to match professional dashboard */
     color: #fff;
     transition: all 0.3s;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 #sidebar .sidebar-header {

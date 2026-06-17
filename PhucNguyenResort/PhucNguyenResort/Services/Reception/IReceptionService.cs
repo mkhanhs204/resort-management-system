@@ -6,7 +6,7 @@ namespace PhucNguyenResort.Services.Reception
 {
     public interface IReceptionService
     {
-        Task<List<Booking>> GetBookingsAsync(string? searchString, BookingStatus? statusFilter);
+        Task<List<Booking>> GetBookingsAsync(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter = null);
         Task<Booking?> GetBookingByIdAsync(int id);
         Task<PreCheckinViewModel?> PrepareCheckInViewModelAsync(int id);
         Task<(bool Success, string ErrorMessage)> ProcessCheckInAsync(PreCheckinViewModel model);

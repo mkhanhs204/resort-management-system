@@ -18,22 +18,22 @@ namespace PhucNguyenResort.Services.Reception
             _bookingGuestService = bookingGuestService;
         }
 
-        public async Task<List<Booking>> GetBookingsAsync(string? searchString, BookingStatus? statusFilter)
+        public async Task<List<Booking>> GetBookingsAsync(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter = null)
         {
             var query = _context.Bookings
                 .Include(b => b.User)
                 .Include(b => b.Room)
-                    .ThenInclude(r => r.Category)
+                .ThenInclude(r => r.Category)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                var lowerSearch = searchString.ToLower();
                 query = query.Where(b => 
-                    b.BookingId.ToString() == lowerSearch ||
-                    (b.User != null && b.User.FullName != null && b.User.FullName.ToLower().Contains(lowerSearch)) ||
-                    (b.User != null && b.User.Email != null && b.User.Email.ToLower().Contains(lowerSearch)) ||
-                    (b.Room != null && b.Room.RoomNumber != null && b.Room.RoomNumber.ToLower().Contains(lowerSearch)));
+                    b.BookingId.ToString() == searchString ||
+                    (b.User != null && b.User.FullName != null && b.User.FullName.Contains(searchString)) ||
+                    (b.User != null && b.User.Email != null && b.User.Email.Contains(searchString)) ||
+                    (b.Room != null && b.Room.RoomNumber != null && b.Room.RoomNumber.Contains(searchString))
+                );
             }
 
             if (statusFilter.HasValue)
@@ -41,8 +41,16 @@ namespace PhucNguyenResort.Services.Reception
                 query = query.Where(b => b.BookingStatus == statusFilter.Value);
             }
 
+            if (dateFilter.HasValue)
+            {
+                var targetDate = dateFilter.Value.Date;
+                // Lọc những booking có CheckInDate HOẶC CheckOutDate nằm trong ngày được chọn
+                query = query.Where(b => b.CheckInDate.Date == targetDate || b.CheckOutDate.Date == targetDate);
+            }
+
+            // Sắp xếp: Giảm dần theo mã Booking (Booking mới tạo lên đầu)
             return await query
-                .OrderByDescending(b => b.CreatedAt)
+                .OrderByDescending(b => b.BookingId)
                 .ToListAsync();
         }
 

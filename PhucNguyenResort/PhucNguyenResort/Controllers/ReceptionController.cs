@@ -18,9 +18,20 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: /Reception/Index
-        public async Task<IActionResult> Index(string? searchString, BookingStatus? statusFilter)
+        public async Task<IActionResult> Index(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter, bool clearFilter = false)
         {
-            var bookings = await _receptionService.GetBookingsAsync(searchString, statusFilter);
+            if (clearFilter)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Nếu là lần đầu tiên truy cập trang (không có query string nào), thì mặc định lấy hôm nay
+            if (Request.Query.Count == 0)
+            {
+                dateFilter = DateTime.Today;
+            }
+
+            var bookings = await _receptionService.GetBookingsAsync(searchString, statusFilter, dateFilter);
 
             var tokens = new Dictionary<int, string>();
             foreach (var b in bookings)
@@ -30,6 +41,7 @@ namespace PhucNguyenResort.Controllers
             ViewBag.PreCheckinTokens = tokens;
             ViewBag.CurrentSearch = searchString;
             ViewBag.CurrentStatus = statusFilter;
+            ViewBag.CurrentDate = dateFilter?.ToString("yyyy-MM-dd");
 
             return View(bookings);
         }

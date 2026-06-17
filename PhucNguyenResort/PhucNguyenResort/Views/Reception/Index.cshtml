@@ -34,7 +34,7 @@
         <div class="card-body p-3">
             <form asp-action="Index" method="get" class="m-0">
                 <div class="row gx-2 gy-2 align-items-center">
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text bg-white text-muted"><i class="fa fa-search"></i></span>
@@ -42,7 +42,15 @@
                             <input type="text" name="searchString" value="@ViewBag.CurrentSearch" class="form-control border-left-0" placeholder="Mã BKG, Khách hàng, Email, Phòng..." />
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white text-muted"><i class="fa fa-calendar"></i></span>
+                            </div>
+                            <input type="date" name="dateFilter" value="@ViewBag.CurrentDate" class="form-control border-left-0" title="Lọc theo ngày Check-in" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <select name="statusFilter" class="form-control custom-select">
                             <option value="">-- Tất cả trạng thái --</option>
                             @foreach (PhucNguyenResort.Enums.BookingStatus status in Enum.GetValues(typeof(PhucNguyenResort.Enums.BookingStatus)))
@@ -60,7 +68,7 @@
                     </div>
                     <div class="col-md-3 d-flex" style="gap: 10px;">
                         <button type="submit" class="btn btn-primary flex-grow-1"><i class="fa fa-filter"></i> Lọc</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary" title="Xóa bộ lọc"><i class="fa fa-refresh"></i></a>
+                        <a asp-action="Index" asp-route-clearFilter="true" class="btn btn-outline-secondary" title="Xóa bộ lọc (Xem tất cả)"><i class="fa fa-refresh"></i></a>
                     </div>
                 </div>
             </form>
