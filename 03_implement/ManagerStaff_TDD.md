@@ -48,7 +48,7 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 ### MANAGERSTAFF-TC-001 — Happy path Create Staff Account
 **Severity**: CRITICAL
 **Feature Under Test**: `StaffService.CreateStaffAccountAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 
 **Preconditions**:
 - Chưa tồn tại Email `newstaff@resort.com` trong hệ thống.
@@ -63,14 +63,14 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 - Method trả về thông tin User.
 - Dữ liệu mật khẩu lưu ở DB là mã Hash (không phải plain text).
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢 Passing
 
 ---
 
 ### MANAGERSTAFF-TC-002 — Prevent Duplicate Email
 **Severity**: CRITICAL
 **Feature Under Test**: `StaffService.CreateStaffAccountAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 
 **Preconditions**:
 - DB đã có sẵn User với Email `admin@resort.com`.
@@ -83,14 +83,14 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 - Quăng lỗi "Email already exists" (Code: STF-001).
 - Không có user nào mới được chèn vào DB.
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢 Passing
 
 ---
 
 ### MANAGERSTAFF-TC-003 — Block Account Successfully
 **Severity**: HIGH
 **Feature Under Test**: `StaffService.ToggleAccountStatusAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢 GREEN
 
 **Preconditions**:
 - Tồn tại User A có `IsBlocked` = false.
@@ -103,13 +103,13 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 - Cập nhật thành công.
 - `IsBlocked` của User A trong DB chuyển thành `true`.
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢 Passing
 
 ---
 
 ## 5. Red-Green-Refactor Tracker
 | TC ID | Test File | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
 | --- | --- | --- | --- | --- |
-| `MANAGERSTAFF-TC-001` | `StaffServiceTests.cs` | `[ ]` | `[ ]` | |
-| `MANAGERSTAFF-TC-002` | `StaffServiceTests.cs` | `[ ]` | `[ ]` | |
-| `MANAGERSTAFF-TC-003` | `StaffServiceTests.cs` | `[ ]` | `[ ]` | |
+| `MANAGERSTAFF-TC-001` | `StaffServiceTests.cs` | `[x]` | `[x]` | |
+| `MANAGERSTAFF-TC-002` | `StaffServiceTests.cs` | `[x]` | `[x]` | |
+| `MANAGERSTAFF-TC-003` | `StaffServiceTests.cs` | `[x]` | `[x]` | |
