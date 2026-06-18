@@ -62,7 +62,8 @@ namespace PhucNguyenResort.Web.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CategoryName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Capacity = table.Column<int>(type: "int", nullable: true),
+                    MaxAdults = table.Column<int>(type: "int", nullable: true),
+                    MaxChildren = table.Column<int>(type: "int", nullable: true),
                     PricePerNight = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
                 },
@@ -301,11 +302,14 @@ namespace PhucNguyenResort.Web.Migrations
                     RoomId = table.Column<int>(type: "int", nullable: false),
                     CheckInDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CheckOutDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    GuestCount = table.Column<int>(type: "int", nullable: true),
+                    NumberOfAdults = table.Column<int>(type: "int", nullable: true),
+                    NumberOfChildren = table.Column<int>(type: "int", nullable: true),
                     BookingStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "Reserved"),
                     DepositAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    PdpdConsentChecked = table.Column<bool>(type: "bit", nullable: false),
+                    ConsentTimestamp = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -333,8 +337,10 @@ namespace PhucNguyenResort.Web.Migrations
                     BookingId = table.Column<int>(type: "int", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PassportNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Nationality = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    PassportNumber = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Nationality = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Gender = table.Column<int>(type: "int", nullable: true),
+                    IsPrimaryBooker = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -356,7 +362,9 @@ namespace PhucNguyenResort.Web.Migrations
                     BookingId = table.Column<int>(type: "int", nullable: false),
                     OrderStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "Pending"),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    OrderedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    OrderedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    IsChargedToRoom = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    ChargedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -402,6 +410,7 @@ namespace PhucNguyenResort.Web.Migrations
                     BookingId = table.Column<int>(type: "int", nullable: true),
                     RefundAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     RefundReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankDetails = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     RefundStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
@@ -459,7 +468,8 @@ namespace PhucNguyenResort.Web.Migrations
                 {
                     TourBookingId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BookingId = table.Column<int>(type: "int", nullable: false),
+                    BookingId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true),
                     ScheduleId = table.Column<int>(type: "int", nullable: false),
                     Participants = table.Column<int>(type: "int", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
@@ -473,12 +483,18 @@ namespace PhucNguyenResort.Web.Migrations
                         column: x => x.BookingId,
                         principalTable: "Bookings",
                         principalColumn: "BookingId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_TourBookings_TourSchedules_ScheduleId",
                         column: x => x.ScheduleId,
                         principalTable: "TourSchedules",
                         principalColumn: "ScheduleId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TourBookings_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -585,7 +601,8 @@ namespace PhucNguyenResort.Web.Migrations
                 {
                     PaymentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    InvoiceId = table.Column<int>(type: "int", nullable: false),
+                    InvoiceId = table.Column<int>(type: "int", nullable: true),
+                    TourBookingId = table.Column<int>(type: "int", nullable: true),
                     PaymentMethod = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     PaymentStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -600,7 +617,13 @@ namespace PhucNguyenResort.Web.Migrations
                         column: x => x.InvoiceId,
                         principalTable: "Invoices",
                         principalColumn: "InvoiceId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Payments_TourBookings_TourBookingId",
+                        column: x => x.TourBookingId,
+                        principalTable: "TourBookings",
+                        principalColumn: "TourBookingId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -723,29 +746,29 @@ namespace PhucNguyenResort.Web.Migrations
 
             migrationBuilder.InsertData(
                 table: "RoomCategories",
-                columns: new[] { "CategoryId", "Capacity", "CategoryName", "Description", "ImageUrl", "PricePerNight" },
+                columns: new[] { "CategoryId", "CategoryName", "Description", "ImageUrl", "MaxAdults", "MaxChildren", "PricePerNight" },
                 values: new object[,]
                 {
-                    { 1, 2, "Standard Garden", "Standard Garden category with capacity 2 guest(s).", "/images/rooms/category-01.jpg", 1080000.00m },
-                    { 2, 2, "Superior Sea View", "Superior Sea View category with capacity 2 guest(s).", "/images/rooms/category-02.jpg", 1260000.00m },
-                    { 3, 2, "Deluxe Pool View", "Deluxe Pool View category with capacity 2 guest(s).", "/images/rooms/category-03.jpg", 1440000.00m },
-                    { 4, 3, "Premium Ocean", "Premium Ocean category with capacity 3 guest(s).", "/images/rooms/category-04.jpg", 1620000.00m },
-                    { 5, 4, "Family Suite", "Family Suite category with capacity 4 guest(s).", "/images/rooms/category-05.jpg", 1800000.00m },
-                    { 6, 4, "Executive Suite", "Executive Suite category with capacity 4 guest(s).", "/images/rooms/category-06.jpg", 1980000.00m },
-                    { 7, 6, "Presidential Villa", "Presidential Villa category with capacity 6 guest(s).", "/images/rooms/category-07.jpg", 2160000.00m },
-                    { 8, 2, "Honeymoon Villa", "Honeymoon Villa category with capacity 2 guest(s).", "/images/rooms/category-08.jpg", 2340000.00m },
-                    { 9, 2, "Bungalow Garden", "Bungalow Garden category with capacity 2 guest(s).", "/images/rooms/category-09.jpg", 2520000.00m },
-                    { 10, 3, "Bungalow Beach", "Bungalow Beach category with capacity 3 guest(s).", "/images/rooms/category-10.jpg", 2700000.00m },
-                    { 11, 2, "Twin Standard", "Twin Standard category with capacity 2 guest(s).", "/images/rooms/category-11.jpg", 2880000.00m },
-                    { 12, 3, "Triple Deluxe", "Triple Deluxe category with capacity 3 guest(s).", "/images/rooms/category-12.jpg", 3060000.00m },
-                    { 13, 2, "Accessible Room", "Accessible Room category with capacity 2 guest(s).", "/images/rooms/category-13.jpg", 3240000.00m },
-                    { 14, 4, "Connecting Room", "Connecting Room category with capacity 4 guest(s).", "/images/rooms/category-14.jpg", 3420000.00m },
-                    { 15, 2, "Long Stay Studio", "Long Stay Studio category with capacity 2 guest(s).", "/images/rooms/category-15.jpg", 3600000.00m },
-                    { 16, 2, "Business Room", "Business Room category with capacity 2 guest(s).", "/images/rooms/category-16.jpg", 3780000.00m },
-                    { 17, 4, "Penthouse Suite", "Penthouse Suite category with capacity 4 guest(s).", "/images/rooms/category-17.jpg", 3960000.00m },
-                    { 18, 5, "Lagoon Villa", "Lagoon Villa category with capacity 5 guest(s).", "/images/rooms/category-18.jpg", 4140000.00m },
-                    { 19, 2, "Mountain View", "Mountain View category with capacity 2 guest(s).", "/images/rooms/category-19.jpg", 4320000.00m },
-                    { 20, 2, "Budget Room", "Budget Room category with capacity 2 guest(s).", "/images/rooms/category-20.jpg", 4500000.00m }
+                    { 1, "Deluxe Ocean View", "Phòng cao cấp hướng biển", "/img/room/room-1.jpg", 2, 1, 1200000m },
+                    { 2, "Premium Garden View", "Phòng view vườn yên tĩnh", "/img/room/room-2.jpg", 2, 1, 1000000m },
+                    { 3, "Family Suite", "Suite rộng rãi cho gia đình", "/img/room/room-3.jpg", 4, 2, 2500000m },
+                    { 4, "Presidential Villa", "Biệt thự siêu cấp sang trọng", "/img/room/room-4.jpg", 6, 4, 8000000m },
+                    { 5, "Family Suite", "Family Suite category with capacity 4 guest(s).", "/images/rooms/category-05.jpg", 4, 0, 1800000.00m },
+                    { 6, "Executive Suite", "Executive Suite category with capacity 4 guest(s).", "/images/rooms/category-06.jpg", 4, 0, 1980000.00m },
+                    { 7, "Presidential Villa", "Presidential Villa category with capacity 6 guest(s).", "/images/rooms/category-07.jpg", 6, 0, 2160000.00m },
+                    { 8, "Honeymoon Villa", "Honeymoon Villa category with capacity 2 guest(s).", "/images/rooms/category-08.jpg", 2, 0, 2340000.00m },
+                    { 9, "Bungalow Garden", "Bungalow Garden category with capacity 2 guest(s).", "/images/rooms/category-09.jpg", 2, 0, 2520000.00m },
+                    { 10, "Bungalow Beach", "Bungalow Beach category with capacity 3 guest(s).", "/images/rooms/category-10.jpg", 3, 0, 2700000.00m },
+                    { 11, "Twin Standard", "Twin Standard category with capacity 2 guest(s).", "/images/rooms/category-11.jpg", 2, 0, 2880000.00m },
+                    { 12, "Triple Deluxe", "Triple Deluxe category with capacity 3 guest(s).", "/images/rooms/category-12.jpg", 3, 0, 3060000.00m },
+                    { 13, "Accessible Room", "Accessible Room category with capacity 2 guest(s).", "/images/rooms/category-13.jpg", 2, 0, 3240000.00m },
+                    { 14, "Connecting Room", "Connecting Room category with capacity 4 guest(s).", "/images/rooms/category-14.jpg", 4, 0, 3420000.00m },
+                    { 15, "Long Stay Studio", "Long Stay Studio category with capacity 2 guest(s).", "/images/rooms/category-15.jpg", 2, 0, 3600000.00m },
+                    { 16, "Business Room", "Business Room category with capacity 2 guest(s).", "/images/rooms/category-16.jpg", 2, 0, 3780000.00m },
+                    { 17, "Penthouse Suite", "Penthouse Suite category with capacity 4 guest(s).", "/images/rooms/category-17.jpg", 4, 0, 3960000.00m },
+                    { 18, "Lagoon Villa", "Lagoon Villa category with capacity 5 guest(s).", "/images/rooms/category-18.jpg", 5, 0, 4140000.00m },
+                    { 19, "Mountain View", "Mountain View category with capacity 2 guest(s).", "/images/rooms/category-19.jpg", 2, 0, 4320000.00m },
+                    { 20, "Budget Room", "Budget Room category with capacity 2 guest(s).", "/images/rooms/category-20.jpg", 2, 0, 4500000.00m }
                 });
 
             migrationBuilder.InsertData(
@@ -904,112 +927,116 @@ namespace PhucNguyenResort.Web.Migrations
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 1, 1, 8, 30, 0, 0, DateTimeKind.Unspecified), "user01@phucnguyenresort.test", "Nguyen Van An", true, "hashed-password-01", "0900000001", 1 },
-                    { 2, new DateTime(2026, 1, 2, 8, 30, 0, 0, DateTimeKind.Unspecified), "user02@phucnguyenresort.test", "Tran Thi Binh", true, "hashed-password-02", "0900000002", 2 },
-                    { 3, new DateTime(2026, 1, 3, 8, 30, 0, 0, DateTimeKind.Unspecified), "user03@phucnguyenresort.test", "Le Minh Chau", true, "hashed-password-03", "0900000003", 3 },
-                    { 4, new DateTime(2026, 1, 4, 8, 30, 0, 0, DateTimeKind.Unspecified), "user04@phucnguyenresort.test", "Pham Quoc Dung", true, "hashed-password-04", "0900000004", 4 },
-                    { 5, new DateTime(2026, 2, 5, 8, 30, 0, 0, DateTimeKind.Unspecified), "user05@phucnguyenresort.test", "Hoang Thu Ha", true, "hashed-password-05", "0900000005", 5 },
-                    { 6, new DateTime(2026, 2, 6, 8, 30, 0, 0, DateTimeKind.Unspecified), "user06@phucnguyenresort.test", "Vo Tuan Kiet", true, "hashed-password-06", "0900000006", 6 },
-                    { 7, new DateTime(2026, 2, 7, 8, 30, 0, 0, DateTimeKind.Unspecified), "user07@phucnguyenresort.test", "Dang Ngoc Linh", true, "hashed-password-07", "0900000007", 7 },
-                    { 8, new DateTime(2026, 2, 8, 8, 30, 0, 0, DateTimeKind.Unspecified), "user08@phucnguyenresort.test", "Bui Gia Minh", true, "hashed-password-08", "0900000008", 8 }
+                    { 1, new DateTime(2026, 1, 1, 8, 30, 0, 0, DateTimeKind.Unspecified), "user01@phucnguyenresort.test", "Nguyen Van An", true, "AQAAAAIAAYagAAAAEAPfHpZqsicuzNWwEz2A+27fHA4T7jfsm+ZJVi/FMknonhnS15owgiKdE/xqvZZHvA==", "0900000001", 1 },
+                    { 2, new DateTime(2026, 1, 2, 8, 30, 0, 0, DateTimeKind.Unspecified), "user02@phucnguyenresort.test", "Tran Thi Binh", true, "AQAAAAIAAYagAAAAEMqJfvDTu1nRZ1tWnVSdC2TxoksCbzZBG0Z5+hSqJBH6ubpqvEb9ytkmbnjrBlCJNQ==", "0900000002", 2 },
+                    { 3, new DateTime(2026, 1, 3, 8, 30, 0, 0, DateTimeKind.Unspecified), "user03@phucnguyenresort.test", "Le Minh Chau", true, "AQAAAAIAAYagAAAAEL7OmuUdZtRjIWsMK4GpOru5NwFTcgkWIMT0XsKM12jVPo5pBAI3n0mPC42TwT4gQA==", "0900000003", 3 },
+                    { 4, new DateTime(2026, 1, 4, 8, 30, 0, 0, DateTimeKind.Unspecified), "user04@phucnguyenresort.test", "Pham Quoc Dung", true, "AQAAAAIAAYagAAAAEPpO/sBlLtEog0z9muGuZ9dJU2By/al3/9rnCHHgIHGaUn3cCQxp8+rOHVNo771raA==", "0900000004", 4 },
+                    { 5, new DateTime(2026, 2, 5, 8, 30, 0, 0, DateTimeKind.Unspecified), "user05@phucnguyenresort.test", "Hoang Thu Ha", true, "AQAAAAIAAYagAAAAELLhWKBA7UEbgmc/qhu3mxKfNo1Y1UI6zVG4H6XqUfwyhBZIvWkZmDZrkXQK/KaAXQ==", "0900000005", 5 },
+                    { 6, new DateTime(2026, 2, 6, 8, 30, 0, 0, DateTimeKind.Unspecified), "user06@phucnguyenresort.test", "Vo Tuan Kiet", true, "AQAAAAIAAYagAAAAEMos2lHKwL8xBwVjMAzlIWjtRXvVolAJDK4aTarDmRFhEgqc2mtMqB16Gvi4Y7hd7g==", "0900000006", 6 },
+                    { 7, new DateTime(2026, 2, 7, 8, 30, 0, 0, DateTimeKind.Unspecified), "user07@phucnguyenresort.test", "Dang Ngoc Linh", true, "AQAAAAIAAYagAAAAEENQal0elXTjB9MuTiDqZw+Ju1XFx+c6PHLzlv+vB49TGulgOELiwxVLzBLR3zWcsA==", "0900000007", 7 },
+                    { 8, new DateTime(2026, 2, 8, 8, 30, 0, 0, DateTimeKind.Unspecified), "user08@phucnguyenresort.test", "Bui Gia Minh", true, "AQAAAAIAAYagAAAAEJT25/CCK5rCrhV6iqZaRiccHs5/2PjxovAkY33vQQnePVOlNtFItn9Ej8hl8/GaVg==", "0900000008", 8 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "PasswordHash", "PhoneNumber", "RoleId" },
-                values: new object[] { 9, new DateTime(2026, 3, 9, 8, 30, 0, 0, DateTimeKind.Unspecified), "user09@phucnguyenresort.test", "Do Phuong Nam", "hashed-password-09", "0900000009", 9 });
+                values: new object[] { 9, new DateTime(2026, 3, 9, 8, 30, 0, 0, DateTimeKind.Unspecified), "user09@phucnguyenresort.test", "Do Phuong Nam", "AQAAAAIAAYagAAAAEP/y/42LBSamtT9RhWTarQ8Arul0XOAu1F1fy0D9x/QhZvsyBZsXcw4BK2FianAmlQ==", "0900000009", 9 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 10, new DateTime(2026, 3, 10, 8, 30, 0, 0, DateTimeKind.Unspecified), "user10@phucnguyenresort.test", "Ngo Thanh Oanh", true, "hashed-password-10", "0900000010", 3 },
-                    { 11, new DateTime(2026, 3, 11, 8, 30, 0, 0, DateTimeKind.Unspecified), "user11@phucnguyenresort.test", "Huynh Duc Phat", true, "hashed-password-11", "0900000011", 3 },
-                    { 12, new DateTime(2026, 3, 12, 8, 30, 0, 0, DateTimeKind.Unspecified), "user12@phucnguyenresort.test", "Phan My Quyen", true, "hashed-password-12", "0900000012", 3 },
-                    { 13, new DateTime(2026, 4, 13, 8, 30, 0, 0, DateTimeKind.Unspecified), "user13@phucnguyenresort.test", "Vu Khanh Son", true, "hashed-password-13", "0900000013", 3 },
-                    { 14, new DateTime(2026, 4, 14, 8, 30, 0, 0, DateTimeKind.Unspecified), "user14@phucnguyenresort.test", "Truong Hai Tam", true, "hashed-password-14", "0900000014", 3 },
-                    { 15, new DateTime(2026, 4, 15, 8, 30, 0, 0, DateTimeKind.Unspecified), "user15@phucnguyenresort.test", "Ly Bao Uyen", true, "hashed-password-15", "0900000015", 3 },
-                    { 16, new DateTime(2026, 4, 16, 8, 30, 0, 0, DateTimeKind.Unspecified), "user16@phucnguyenresort.test", "Mai Hoai Viet", true, "hashed-password-16", "0900000016", 3 },
-                    { 17, new DateTime(2026, 5, 17, 8, 30, 0, 0, DateTimeKind.Unspecified), "user17@phucnguyenresort.test", "Dinh Nhat Vy", true, "hashed-password-17", "0900000017", 3 }
+                    { 10, new DateTime(2026, 3, 10, 8, 30, 0, 0, DateTimeKind.Unspecified), "user10@phucnguyenresort.test", "Ngo Thanh Oanh", true, "AQAAAAIAAYagAAAAEHhfJbFM/03T1KAicxYcV1bTBoKZiD9CS841SnAOmTfifLMab/d2Ler9troq3w/uxQ==", "0900000010", 3 },
+                    { 11, new DateTime(2026, 3, 11, 8, 30, 0, 0, DateTimeKind.Unspecified), "user11@phucnguyenresort.test", "Huynh Duc Phat", true, "AQAAAAIAAYagAAAAEPaitqXlGlPfjdR10IkWztfw5bkaSETVCtiz1raV6zzlXBjpPzIMqeY4bfviE6e3Wg==", "0900000011", 3 },
+                    { 12, new DateTime(2026, 3, 12, 8, 30, 0, 0, DateTimeKind.Unspecified), "user12@phucnguyenresort.test", "Phan My Quyen", true, "AQAAAAIAAYagAAAAEDGl1/D1FrIqtwdXMp4MHKTcKLhrgp0BM7tRkmCJKU4CLs78GCzRBm6BNMw2g5wsMg==", "0900000012", 3 },
+                    { 13, new DateTime(2026, 4, 13, 8, 30, 0, 0, DateTimeKind.Unspecified), "user13@phucnguyenresort.test", "Vu Khanh Son", true, "AQAAAAIAAYagAAAAEOUNXbZx/sSqOf8XhutyA8c0i1jpPfwprTXZMpZ+ddTO0eZ6DeGC6SappK1tnuLQtQ==", "0900000013", 3 },
+                    { 14, new DateTime(2026, 4, 14, 8, 30, 0, 0, DateTimeKind.Unspecified), "user14@phucnguyenresort.test", "Truong Hai Tam", true, "AQAAAAIAAYagAAAAEJJGfYgjY5DIU1LvrA7IqfQ9N0dG1VIKmKczDlrjsfeYlLZMV3uGZM3KB8t7jPVC0g==", "0900000014", 3 },
+                    { 15, new DateTime(2026, 4, 15, 8, 30, 0, 0, DateTimeKind.Unspecified), "user15@phucnguyenresort.test", "Ly Bao Uyen", true, "AQAAAAIAAYagAAAAELC/3eh2uKrbHlslXEaKmDbBCqjLTpF7KJkmuTokz/4ZZtRftNGdc1r18mlfAWJ/zg==", "0900000015", 3 },
+                    { 16, new DateTime(2026, 4, 16, 8, 30, 0, 0, DateTimeKind.Unspecified), "user16@phucnguyenresort.test", "Mai Hoai Viet", true, "AQAAAAIAAYagAAAAEK8Tu2bzYxEFkVglibJ2FMF/v+tZLjtO8PlvonraPzVigrXUv+ezf6txnN9tzmUKRg==", "0900000016", 3 },
+                    { 17, new DateTime(2026, 5, 17, 8, 30, 0, 0, DateTimeKind.Unspecified), "user17@phucnguyenresort.test", "Dinh Nhat Vy", true, "AQAAAAIAAYagAAAAEEu1vtHH1DPKJyipEF9CLiGKB5nlEfAALCHhcLHUl6Gj7930Z5fC8qFxmwbLTbFcnA==", "0900000017", 3 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "PasswordHash", "PhoneNumber", "RoleId" },
-                values: new object[] { 18, new DateTime(2026, 5, 18, 8, 30, 0, 0, DateTimeKind.Unspecified), "user18@phucnguyenresort.test", "Cao Tien Dat", "hashed-password-18", "0900000018", 3 });
+                values: new object[] { 18, new DateTime(2026, 5, 18, 8, 30, 0, 0, DateTimeKind.Unspecified), "user18@phucnguyenresort.test", "Cao Tien Dat", "AQAAAAIAAYagAAAAEBfvYhV6RZ4eaYPLilejiLRhlW1+Yc+NqGZ5EBekRqifvfY6ys/tZUV/GwRQrpr9sw==", "0900000018", 3 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "PhoneNumber", "RoleId" },
                 values: new object[,]
                 {
-                    { 19, new DateTime(2026, 5, 19, 8, 30, 0, 0, DateTimeKind.Unspecified), "user19@phucnguyenresort.test", "Ta Minh Anh", true, "hashed-password-19", "0900000019", 3 },
-                    { 20, new DateTime(2026, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), "user20@phucnguyenresort.test", "Lam Gia Bao", true, "hashed-password-20", "0900000020", 3 }
+                    { 19, new DateTime(2026, 5, 19, 8, 30, 0, 0, DateTimeKind.Unspecified), "user19@phucnguyenresort.test", "Ta Minh Anh", true, "AQAAAAIAAYagAAAAEGtWiO8pUkr97O2XfZppC3E24zWNciBmmNkqv/H5mHZXU64zaC04ozH9WwBorN8/WA==", "0900000019", 3 },
+                    { 20, new DateTime(2026, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), "user20@phucnguyenresort.test", "Lam Gia Bao", true, "AQAAAAIAAYagAAAAEOWoOu1dgyXSeUHjo7zAm5WWbYnrLWNWkMpjSUCTsJ3Vlznm0hcvxtyPQ/7cgwZNng==", "0900000020", 3 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
-                values: new object[] { 1, new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 2, 9, 0, 0, 0, DateTimeKind.Unspecified), 550000.00m, 2, 1, 2050000.00m, 1 });
+                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
+                values: new object[] { 1, "CheckedOut", new DateTime(2026, 6, 8, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7234), new DateTime(2026, 6, 10, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7239), null, new DateTime(2026, 6, 3, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7242), 1200000m, 2, 0, false, 1, 2400000m, 2 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
+                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
+                values: new object[] { 2, new DateTime(2026, 6, 23, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7244), new DateTime(2026, 6, 26, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7244), null, new DateTime(2026, 6, 16, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7246), 1500000m, 2, 0, false, 2, 3000000m, 2 });
+
+            migrationBuilder.InsertData(
+                table: "Bookings",
+                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 2, "CheckedIn", new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 3, 9, 0, 0, 0, DateTimeKind.Unspecified), 600000.00m, 3, 2, 2300000.00m, 2 },
-                    { 3, "CheckedOut", new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 4, 9, 0, 0, 0, DateTimeKind.Unspecified), 650000.00m, 4, 3, 2550000.00m, 3 },
-                    { 4, "Cancelled", new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 5, 9, 0, 0, 0, DateTimeKind.Unspecified), 700000.00m, 5, 4, 2800000.00m, 4 },
-                    { 5, "NoShow", new DateTime(2026, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 6, 9, 0, 0, 0, DateTimeKind.Unspecified), 750000.00m, 1, 5, 3050000.00m, 5 }
+                    { 3, "PendingPayment", new DateTime(2026, 6, 28, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7249), new DateTime(2026, 6, 30, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7249), null, new DateTime(2026, 6, 17, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7251), 2500000m, 4, 0, false, 10, 5000000m, 3 },
+                    { 4, "Cancelled", new DateTime(2026, 6, 13, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7282), new DateTime(2026, 6, 15, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7282), null, new DateTime(2026, 6, 8, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7284), 1000000m, 2, 0, false, 11, 2000000m, 3 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
-                values: new object[] { 6, new DateTime(2026, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 7, 9, 0, 0, 0, DateTimeKind.Unspecified), 800000.00m, 2, 6, 3300000.00m, 6 });
+                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
+                values: new object[] { 5, new DateTime(2026, 6, 19, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7286), new DateTime(2026, 6, 22, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7287), null, new DateTime(2026, 6, 13, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7288), 12000000m, 6, 0, false, 13, 24000000m, 2 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
+                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 7, "CheckedIn", new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 8, 9, 0, 0, 0, DateTimeKind.Unspecified), 850000.00m, 3, 7, 3550000.00m, 7 },
-                    { 8, "CheckedOut", new DateTime(2026, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 9, 9, 0, 0, 0, DateTimeKind.Unspecified), 900000.00m, 4, 8, 3800000.00m, 8 },
-                    { 9, "Cancelled", new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 10, 9, 0, 0, 0, DateTimeKind.Unspecified), 950000.00m, 5, 9, 4050000.00m, 9 },
-                    { 10, "NoShow", new DateTime(2026, 6, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 11, 9, 0, 0, 0, DateTimeKind.Unspecified), 1000000.00m, 1, 10, 4300000.00m, 10 }
+                    { 6, "CheckedOut", new DateTime(2026, 5, 18, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7290), new DateTime(2026, 5, 20, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7293), null, new DateTime(2026, 5, 13, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7295), 1200000m, 2, 0, false, 1, 2400000m, 2 },
+                    { 7, "CheckedOut", new DateTime(2026, 4, 18, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7298), new DateTime(2026, 4, 21, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7298), null, new DateTime(2026, 4, 8, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7300), 1500000m, 2, 0, false, 2, 3000000m, 3 },
+                    { 8, "Cancelled", new DateTime(2026, 5, 29, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7302), new DateTime(2026, 5, 31, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7303), null, new DateTime(2026, 5, 24, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7304), 1200000m, 2, 0, false, 4, 2400000m, 3 },
+                    { 9, "CheckedOut", new DateTime(2026, 6, 3, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7305), new DateTime(2026, 6, 8, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7306), null, new DateTime(2026, 5, 29, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7308), 3000000m, 2, 0, false, 5, 6000000m, 2 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
-                values: new object[] { 11, new DateTime(2026, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 12, 9, 0, 0, 0, DateTimeKind.Unspecified), 1050000.00m, 2, 11, 4550000.00m, 11 });
+                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
+                values: new object[] { 10, new DateTime(2026, 7, 8, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7310), new DateTime(2026, 7, 10, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7310), null, new DateTime(2026, 6, 17, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7312), 8000000m, 5, 0, false, 13, 16000000m, 3 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
+                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 12, "CheckedIn", new DateTime(2026, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 13, 9, 0, 0, 0, DateTimeKind.Unspecified), 1100000.00m, 3, 12, 4800000.00m, 12 },
-                    { 13, "CheckedOut", new DateTime(2026, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 14, 9, 0, 0, 0, DateTimeKind.Unspecified), 1150000.00m, 4, 13, 5050000.00m, 13 },
-                    { 14, "Cancelled", new DateTime(2026, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 15, 9, 0, 0, 0, DateTimeKind.Unspecified), 1200000.00m, 5, 14, 5300000.00m, 14 },
-                    { 15, "NoShow", new DateTime(2026, 6, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 16, 9, 0, 0, 0, DateTimeKind.Unspecified), 1250000.00m, 1, 15, 5550000.00m, 15 }
+                    { 11, "PendingPayment", new DateTime(2026, 7, 3, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7313), new DateTime(2026, 7, 6, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7314), null, new DateTime(2026, 6, 18, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7316), 12000000m, 6, 0, false, 14, 24000000m, 2 },
+                    { 12, "CheckedOut", new DateTime(2026, 2, 18, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7317), new DateTime(2026, 2, 23, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7318), null, new DateTime(2026, 2, 8, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7319), 3000000m, 2, 0, false, 6, 6000000m, 3 },
+                    { 13, "CheckedOut", new DateTime(2026, 1, 18, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7321), new DateTime(2026, 1, 19, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7322), null, new DateTime(2026, 1, 15, 7, 54, 53, 812, DateTimeKind.Local).AddTicks(7323), 600000m, 1, 0, false, 1, 1200000m, 3 },
+                    { 14, "Cancelled", new DateTime(2026, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2026, 5, 15, 9, 0, 0, 0, DateTimeKind.Unspecified), 1200000.00m, 2, 0, false, 14, 5300000.00m, 14 },
+                    { 15, "NoShow", new DateTime(2026, 6, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2026, 5, 16, 9, 0, 0, 0, DateTimeKind.Unspecified), 1250000.00m, 2, 0, false, 15, 5550000.00m, 15 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
-                values: new object[] { 16, new DateTime(2026, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 17, 9, 0, 0, 0, DateTimeKind.Unspecified), 1300000.00m, 2, 16, 5800000.00m, 16 });
+                columns: new[] { "BookingId", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
+                values: new object[] { 16, new DateTime(2026, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2026, 5, 17, 9, 0, 0, 0, DateTimeKind.Unspecified), 1300000.00m, 2, 0, false, 16, 5800000.00m, 16 });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
-                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "CreatedAt", "DepositAmount", "GuestCount", "RoomId", "TotalAmount", "UserId" },
+                columns: new[] { "BookingId", "BookingStatus", "CheckInDate", "CheckOutDate", "ConsentTimestamp", "CreatedAt", "DepositAmount", "NumberOfAdults", "NumberOfChildren", "PdpdConsentChecked", "RoomId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 17, "CheckedIn", new DateTime(2026, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 18, 9, 0, 0, 0, DateTimeKind.Unspecified), 1350000.00m, 3, 17, 6050000.00m, 17 },
-                    { 18, "CheckedOut", new DateTime(2026, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 19, 9, 0, 0, 0, DateTimeKind.Unspecified), 1400000.00m, 4, 18, 6300000.00m, 18 },
-                    { 19, "Cancelled", new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 20, 9, 0, 0, 0, DateTimeKind.Unspecified), 1450000.00m, 5, 19, 6550000.00m, 19 },
-                    { 20, "NoShow", new DateTime(2026, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 21, 9, 0, 0, 0, DateTimeKind.Unspecified), 1500000.00m, 1, 20, 6800000.00m, 20 }
+                    { 17, "CheckedIn", new DateTime(2026, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2026, 5, 18, 9, 0, 0, 0, DateTimeKind.Unspecified), 1350000.00m, 2, 0, false, 17, 6050000.00m, 17 },
+                    { 18, "CheckedOut", new DateTime(2026, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2026, 5, 19, 9, 0, 0, 0, DateTimeKind.Unspecified), 1400000.00m, 2, 0, false, 18, 6300000.00m, 18 },
+                    { 19, "Cancelled", new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2026, 5, 20, 9, 0, 0, 0, DateTimeKind.Unspecified), 1450000.00m, 2, 0, false, 19, 6550000.00m, 19 },
+                    { 20, "NoShow", new DateTime(2026, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2026, 5, 21, 9, 0, 0, 0, DateTimeKind.Unspecified), 1500000.00m, 2, 0, false, 20, 6800000.00m, 20 }
                 });
 
             migrationBuilder.InsertData(
@@ -1286,94 +1313,118 @@ namespace PhucNguyenResort.Web.Migrations
 
             migrationBuilder.InsertData(
                 table: "BookingGuests",
-                columns: new[] { "BookingGuestId", "BookingId", "DateOfBirth", "FullName", "Nationality", "PassportNumber" },
+                columns: new[] { "BookingGuestId", "BookingId", "DateOfBirth", "FullName", "Gender", "IsPrimaryBooker", "Nationality", "PassportNumber" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(1991, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 01", "Korean", "P20260001" },
-                    { 2, 2, new DateTime(1992, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 02", "Japanese", "P20260002" },
-                    { 3, 3, new DateTime(1993, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 03", "American", "P20260003" },
-                    { 4, 4, new DateTime(1994, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 04", "French", "P20260004" },
-                    { 5, 5, new DateTime(1995, 8, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 05", "German", "P20260005" },
-                    { 6, 6, new DateTime(1996, 9, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 06", "Australian", "P20260006" },
-                    { 7, 7, new DateTime(1997, 10, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 07", "Singaporean", "P20260007" },
-                    { 8, 8, new DateTime(1998, 11, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 08", "Thai", "P20260008" },
-                    { 9, 9, new DateTime(1999, 12, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 09", "Malaysian", "P20260009" },
-                    { 10, 10, new DateTime(2000, 1, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 10", "British", "P20260010" },
-                    { 11, 11, new DateTime(2001, 2, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 11", "Canadian", "P20260011" },
-                    { 12, 12, new DateTime(2002, 3, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 12", "Indian", "P20260012" },
-                    { 13, 13, new DateTime(2003, 4, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 13", "Vietnamese", "P20260013" },
-                    { 14, 14, new DateTime(2004, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 14", "Vietnamese", "P20260014" },
-                    { 15, 15, new DateTime(1990, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 15", "Vietnamese", "P20260015" },
-                    { 16, 16, new DateTime(1991, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 16", "Vietnamese", "P20260016" },
-                    { 17, 17, new DateTime(1992, 8, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 17", "Vietnamese", "P20260017" },
-                    { 18, 18, new DateTime(1993, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 18", "Vietnamese", "P20260018" },
-                    { 19, 19, new DateTime(1994, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 19", "Vietnamese", "P20260019" },
-                    { 20, 20, new DateTime(1995, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 20", "Vietnamese", "P20260020" }
+                    { 1, 1, new DateTime(1991, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 01", null, false, "Korean", "P20260001" },
+                    { 2, 2, new DateTime(1992, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 02", null, false, "Japanese", "P20260002" },
+                    { 3, 3, new DateTime(1993, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 03", null, false, "American", "P20260003" },
+                    { 4, 4, new DateTime(1994, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 04", null, false, "French", "P20260004" },
+                    { 5, 5, new DateTime(1995, 8, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 05", null, false, "German", "P20260005" },
+                    { 6, 6, new DateTime(1996, 9, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 06", null, false, "Australian", "P20260006" },
+                    { 7, 7, new DateTime(1997, 10, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 07", null, false, "Singaporean", "P20260007" },
+                    { 8, 8, new DateTime(1998, 11, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 08", null, false, "Thai", "P20260008" },
+                    { 9, 9, new DateTime(1999, 12, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 09", null, false, "Malaysian", "P20260009" },
+                    { 10, 10, new DateTime(2000, 1, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 10", null, false, "British", "P20260010" },
+                    { 11, 11, new DateTime(2001, 2, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 11", null, false, "Canadian", "P20260011" },
+                    { 12, 12, new DateTime(2002, 3, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 12", null, false, "Indian", "P20260012" },
+                    { 13, 13, new DateTime(2003, 4, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 13", null, false, "Vietnamese", "P20260013" },
+                    { 14, 14, new DateTime(2004, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 14", null, false, "Vietnamese", "P20260014" },
+                    { 15, 15, new DateTime(1990, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 15", null, false, "Vietnamese", "P20260015" },
+                    { 16, 16, new DateTime(1991, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 16", null, false, "Vietnamese", "P20260016" },
+                    { 17, 17, new DateTime(1992, 8, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 17", null, false, "Vietnamese", "P20260017" },
+                    { 18, 18, new DateTime(1993, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 18", null, false, "Vietnamese", "P20260018" },
+                    { 19, 19, new DateTime(1994, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 19", null, false, "Vietnamese", "P20260019" },
+                    { 20, 20, new DateTime(1995, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), "Guest Companion 20", null, false, "Vietnamese", "P20260020" }
                 });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 1, 1, new DateTime(2026, 6, 3, 13, 15, 0, 0, DateTimeKind.Unspecified), 170000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 1, 1, null, new DateTime(2026, 6, 3, 13, 15, 0, 0, DateTimeKind.Unspecified), 170000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 2, 2, new DateTime(2026, 6, 18, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Cooking", new DateTime(2026, 6, 4, 14, 15, 0, 0, DateTimeKind.Unspecified), 330000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 2, 2, "Preparing", new DateTime(2026, 6, 4, 14, 15, 0, 0, DateTimeKind.Unspecified), 330000.00m },
-                    { 3, 3, "Ready", new DateTime(2026, 6, 5, 15, 15, 0, 0, DateTimeKind.Unspecified), 540000.00m },
-                    { 4, 4, "Served", new DateTime(2026, 6, 6, 16, 15, 0, 0, DateTimeKind.Unspecified), 160000.00m },
-                    { 5, 5, "Cancelled", new DateTime(2026, 6, 7, 17, 15, 0, 0, DateTimeKind.Unspecified), 370000.00m }
+                    { 3, 3, null, "Cooking", new DateTime(2026, 6, 5, 15, 15, 0, 0, DateTimeKind.Unspecified), 540000.00m },
+                    { 4, 4, null, "Delivered", new DateTime(2026, 6, 6, 16, 15, 0, 0, DateTimeKind.Unspecified), 160000.00m },
+                    { 5, 5, null, "Cancelled", new DateTime(2026, 6, 7, 17, 15, 0, 0, DateTimeKind.Unspecified), 370000.00m }
                 });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 6, 6, new DateTime(2026, 6, 8, 18, 15, 0, 0, DateTimeKind.Unspecified), 630000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 6, 6, null, new DateTime(2026, 6, 8, 18, 15, 0, 0, DateTimeKind.Unspecified), 630000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 7, 7, null, "Cooking", new DateTime(2026, 6, 9, 19, 15, 0, 0, DateTimeKind.Unspecified), 940000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 8, 8, new DateTime(2026, 6, 24, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Cooking", new DateTime(2026, 6, 10, 12, 15, 0, 0, DateTimeKind.Unspecified), 260000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 7, 7, "Preparing", new DateTime(2026, 6, 9, 19, 15, 0, 0, DateTimeKind.Unspecified), 940000.00m },
-                    { 8, 8, "Ready", new DateTime(2026, 6, 10, 12, 15, 0, 0, DateTimeKind.Unspecified), 260000.00m },
-                    { 9, 9, "Served", new DateTime(2026, 6, 11, 13, 15, 0, 0, DateTimeKind.Unspecified), 570000.00m },
-                    { 10, 10, "Cancelled", new DateTime(2026, 6, 12, 14, 15, 0, 0, DateTimeKind.Unspecified), 930000.00m }
+                    { 9, 9, null, "Delivered", new DateTime(2026, 6, 11, 13, 15, 0, 0, DateTimeKind.Unspecified), 570000.00m },
+                    { 10, 10, null, "Cancelled", new DateTime(2026, 6, 12, 14, 15, 0, 0, DateTimeKind.Unspecified), 930000.00m }
                 });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 11, 11, new DateTime(2026, 6, 13, 15, 15, 0, 0, DateTimeKind.Unspecified), 1340000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 11, 11, null, new DateTime(2026, 6, 13, 15, 15, 0, 0, DateTimeKind.Unspecified), 1340000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 12, 12, "Preparing", new DateTime(2026, 6, 14, 16, 15, 0, 0, DateTimeKind.Unspecified), 360000.00m },
-                    { 13, 13, "Ready", new DateTime(2026, 6, 15, 17, 15, 0, 0, DateTimeKind.Unspecified), 770000.00m },
-                    { 14, 14, "Served", new DateTime(2026, 6, 16, 18, 15, 0, 0, DateTimeKind.Unspecified), 1230000.00m },
-                    { 15, 15, "Cancelled", new DateTime(2026, 6, 17, 19, 15, 0, 0, DateTimeKind.Unspecified), 1740000.00m }
+                    { 12, 12, null, "Cooking", new DateTime(2026, 6, 14, 16, 15, 0, 0, DateTimeKind.Unspecified), 360000.00m },
+                    { 13, 13, null, "Cooking", new DateTime(2026, 6, 15, 17, 15, 0, 0, DateTimeKind.Unspecified), 770000.00m }
                 });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderedAt", "TotalAmount" },
-                values: new object[] { 16, 16, new DateTime(2026, 6, 18, 12, 15, 0, 0, DateTimeKind.Unspecified), 460000.00m });
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 14, 14, new DateTime(2026, 6, 30, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Delivered", new DateTime(2026, 6, 16, 18, 15, 0, 0, DateTimeKind.Unspecified), 1230000.00m });
 
             migrationBuilder.InsertData(
                 table: "FoodOrders",
-                columns: new[] { "FoodOrderId", "BookingId", "OrderStatus", "OrderedAt", "TotalAmount" },
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 15, 15, null, "Cancelled", new DateTime(2026, 6, 17, 19, 15, 0, 0, DateTimeKind.Unspecified), 1740000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderedAt", "TotalAmount" },
+                values: new object[] { 16, 16, null, new DateTime(2026, 6, 18, 12, 15, 0, 0, DateTimeKind.Unspecified), 460000.00m });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "OrderStatus", "OrderedAt", "TotalAmount" },
                 values: new object[,]
                 {
-                    { 17, 17, "Preparing", new DateTime(2026, 6, 19, 13, 15, 0, 0, DateTimeKind.Unspecified), 970000.00m },
-                    { 18, 18, "Ready", new DateTime(2026, 6, 20, 14, 15, 0, 0, DateTimeKind.Unspecified), 1530000.00m },
-                    { 19, 19, "Served", new DateTime(2026, 6, 21, 15, 15, 0, 0, DateTimeKind.Unspecified), 2140000.00m },
-                    { 20, 20, "Cancelled", new DateTime(2026, 6, 22, 16, 15, 0, 0, DateTimeKind.Unspecified), 560000.00m }
+                    { 17, 17, null, "Cooking", new DateTime(2026, 6, 19, 13, 15, 0, 0, DateTimeKind.Unspecified), 970000.00m },
+                    { 18, 18, null, "Cooking", new DateTime(2026, 6, 20, 14, 15, 0, 0, DateTimeKind.Unspecified), 1530000.00m },
+                    { 19, 19, null, "Delivered", new DateTime(2026, 6, 21, 15, 15, 0, 0, DateTimeKind.Unspecified), 2140000.00m }
                 });
+
+            migrationBuilder.InsertData(
+                table: "FoodOrders",
+                columns: new[] { "FoodOrderId", "BookingId", "ChargedAt", "IsChargedToRoom", "OrderStatus", "OrderedAt", "TotalAmount" },
+                values: new object[] { 20, 20, new DateTime(2026, 7, 6, 10, 30, 0, 0, DateTimeKind.Unspecified), true, "Cancelled", new DateTime(2026, 6, 22, 16, 15, 0, 0, DateTimeKind.Unspecified), 560000.00m });
 
             migrationBuilder.InsertData(
                 table: "GuestFolios",
@@ -1441,29 +1492,29 @@ namespace PhucNguyenResort.Web.Migrations
 
             migrationBuilder.InsertData(
                 table: "Refunds",
-                columns: new[] { "RefundId", "BookingId", "CreatedAt", "RefundAmount", "RefundReason", "RefundStatus" },
+                columns: new[] { "RefundId", "BankDetails", "BookingId", "CreatedAt", "RefundAmount", "RefundReason", "RefundStatus" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2026, 6, 21, 11, 0, 0, 0, DateTimeKind.Unspecified), 125000.00m, "Room issue compensation", "Pending" },
-                    { 2, 2, new DateTime(2026, 6, 22, 11, 0, 0, 0, DateTimeKind.Unspecified), 150000.00m, "Tour cancelled by weather", "Approved" },
-                    { 3, 3, new DateTime(2026, 6, 23, 11, 0, 0, 0, DateTimeKind.Unspecified), 175000.00m, "Payment duplicate", "Rejected" },
-                    { 4, 4, new DateTime(2026, 6, 24, 11, 0, 0, 0, DateTimeKind.Unspecified), 200000.00m, "Guest cancelled early", "Completed" },
-                    { 5, 5, new DateTime(2026, 6, 25, 11, 0, 0, 0, DateTimeKind.Unspecified), 225000.00m, "Room issue compensation", "Pending" },
-                    { 6, 6, new DateTime(2026, 6, 26, 11, 0, 0, 0, DateTimeKind.Unspecified), 250000.00m, "Tour cancelled by weather", "Approved" },
-                    { 7, 7, new DateTime(2026, 6, 27, 11, 0, 0, 0, DateTimeKind.Unspecified), 275000.00m, "Payment duplicate", "Rejected" },
-                    { 8, 8, new DateTime(2026, 6, 28, 11, 0, 0, 0, DateTimeKind.Unspecified), 300000.00m, "Guest cancelled early", "Completed" },
-                    { 9, 9, new DateTime(2026, 6, 29, 11, 0, 0, 0, DateTimeKind.Unspecified), 325000.00m, "Room issue compensation", "Pending" },
-                    { 10, 10, new DateTime(2026, 6, 30, 11, 0, 0, 0, DateTimeKind.Unspecified), 350000.00m, "Tour cancelled by weather", "Approved" },
-                    { 11, 11, new DateTime(2026, 7, 1, 11, 0, 0, 0, DateTimeKind.Unspecified), 375000.00m, "Payment duplicate", "Rejected" },
-                    { 12, 12, new DateTime(2026, 7, 2, 11, 0, 0, 0, DateTimeKind.Unspecified), 400000.00m, "Guest cancelled early", "Completed" },
-                    { 13, 13, new DateTime(2026, 7, 3, 11, 0, 0, 0, DateTimeKind.Unspecified), 425000.00m, "Room issue compensation", "Pending" },
-                    { 14, 14, new DateTime(2026, 7, 4, 11, 0, 0, 0, DateTimeKind.Unspecified), 450000.00m, "Tour cancelled by weather", "Approved" },
-                    { 15, 15, new DateTime(2026, 7, 5, 11, 0, 0, 0, DateTimeKind.Unspecified), 475000.00m, "Payment duplicate", "Rejected" },
-                    { 16, 16, new DateTime(2026, 7, 6, 11, 0, 0, 0, DateTimeKind.Unspecified), 500000.00m, "Guest cancelled early", "Completed" },
-                    { 17, 17, new DateTime(2026, 7, 7, 11, 0, 0, 0, DateTimeKind.Unspecified), 525000.00m, "Room issue compensation", "Pending" },
-                    { 18, 18, new DateTime(2026, 7, 8, 11, 0, 0, 0, DateTimeKind.Unspecified), 550000.00m, "Tour cancelled by weather", "Approved" },
-                    { 19, 19, new DateTime(2026, 7, 9, 11, 0, 0, 0, DateTimeKind.Unspecified), 575000.00m, "Payment duplicate", "Rejected" },
-                    { 20, 20, new DateTime(2026, 7, 10, 11, 0, 0, 0, DateTimeKind.Unspecified), 600000.00m, "Guest cancelled early", "Completed" }
+                    { 1, null, 1, new DateTime(2026, 6, 21, 11, 0, 0, 0, DateTimeKind.Unspecified), 125000.00m, "Room issue compensation", "Pending" },
+                    { 2, null, 2, new DateTime(2026, 6, 22, 11, 0, 0, 0, DateTimeKind.Unspecified), 150000.00m, "Tour cancelled by weather", "Approved" },
+                    { 3, null, 3, new DateTime(2026, 6, 23, 11, 0, 0, 0, DateTimeKind.Unspecified), 175000.00m, "Payment duplicate", "Rejected" },
+                    { 4, null, 4, new DateTime(2026, 6, 24, 11, 0, 0, 0, DateTimeKind.Unspecified), 200000.00m, "Guest cancelled early", "Completed" },
+                    { 5, null, 5, new DateTime(2026, 6, 25, 11, 0, 0, 0, DateTimeKind.Unspecified), 225000.00m, "Room issue compensation", "Pending" },
+                    { 6, null, 6, new DateTime(2026, 6, 26, 11, 0, 0, 0, DateTimeKind.Unspecified), 250000.00m, "Tour cancelled by weather", "Approved" },
+                    { 7, null, 7, new DateTime(2026, 6, 27, 11, 0, 0, 0, DateTimeKind.Unspecified), 275000.00m, "Payment duplicate", "Rejected" },
+                    { 8, null, 8, new DateTime(2026, 6, 28, 11, 0, 0, 0, DateTimeKind.Unspecified), 300000.00m, "Guest cancelled early", "Completed" },
+                    { 9, null, 9, new DateTime(2026, 6, 29, 11, 0, 0, 0, DateTimeKind.Unspecified), 325000.00m, "Room issue compensation", "Pending" },
+                    { 10, null, 10, new DateTime(2026, 6, 30, 11, 0, 0, 0, DateTimeKind.Unspecified), 350000.00m, "Tour cancelled by weather", "Approved" },
+                    { 11, null, 11, new DateTime(2026, 7, 1, 11, 0, 0, 0, DateTimeKind.Unspecified), 375000.00m, "Payment duplicate", "Rejected" },
+                    { 12, null, 12, new DateTime(2026, 7, 2, 11, 0, 0, 0, DateTimeKind.Unspecified), 400000.00m, "Guest cancelled early", "Completed" },
+                    { 13, null, 13, new DateTime(2026, 7, 3, 11, 0, 0, 0, DateTimeKind.Unspecified), 425000.00m, "Room issue compensation", "Pending" },
+                    { 14, null, 14, new DateTime(2026, 7, 4, 11, 0, 0, 0, DateTimeKind.Unspecified), 450000.00m, "Tour cancelled by weather", "Approved" },
+                    { 15, null, 15, new DateTime(2026, 7, 5, 11, 0, 0, 0, DateTimeKind.Unspecified), 475000.00m, "Payment duplicate", "Rejected" },
+                    { 16, null, 16, new DateTime(2026, 7, 6, 11, 0, 0, 0, DateTimeKind.Unspecified), 500000.00m, "Guest cancelled early", "Completed" },
+                    { 17, null, 17, new DateTime(2026, 7, 7, 11, 0, 0, 0, DateTimeKind.Unspecified), 525000.00m, "Room issue compensation", "Pending" },
+                    { 18, null, 18, new DateTime(2026, 7, 8, 11, 0, 0, 0, DateTimeKind.Unspecified), 550000.00m, "Tour cancelled by weather", "Approved" },
+                    { 19, null, 19, new DateTime(2026, 7, 9, 11, 0, 0, 0, DateTimeKind.Unspecified), 575000.00m, "Payment duplicate", "Rejected" },
+                    { 20, null, 20, new DateTime(2026, 7, 10, 11, 0, 0, 0, DateTimeKind.Unspecified), 600000.00m, "Guest cancelled early", "Completed" }
                 });
 
             migrationBuilder.InsertData(
@@ -1496,77 +1547,77 @@ namespace PhucNguyenResort.Web.Migrations
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount" },
-                values: new object[] { 1, 1, 2, 1, 850000.00m });
+                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount", "UserId" },
+                values: new object[] { 1, 1, 2, 1, 850000.00m, null });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount" },
+                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 2, 2, "Confirmed", 3, 2, 1500000.00m },
-                    { 3, 3, "Completed", 4, 3, 2300000.00m },
-                    { 4, 4, "Cancelled", 5, 4, 3250000.00m }
+                    { 2, 2, "Confirmed", 3, 2, 1500000.00m, null },
+                    { 3, 3, "Completed", 4, 3, 2300000.00m, null },
+                    { 4, 4, "Cancelled", 5, 4, 3250000.00m, null }
                 });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount" },
-                values: new object[] { 5, 5, 1, 5, 725000.00m });
+                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount", "UserId" },
+                values: new object[] { 5, 5, 1, 5, 725000.00m, null });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount" },
+                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 6, 6, "Confirmed", 2, 6, 1600000.00m },
-                    { 7, 7, "Completed", 3, 7, 2625000.00m },
-                    { 8, 8, "Cancelled", 4, 8, 3800000.00m }
+                    { 6, 6, "Confirmed", 2, 6, 1600000.00m, null },
+                    { 7, 7, "Completed", 3, 7, 2625000.00m, null },
+                    { 8, 8, "Cancelled", 4, 8, 3800000.00m, null }
                 });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount" },
-                values: new object[] { 9, 9, 5, 9, 5125000.00m });
+                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount", "UserId" },
+                values: new object[] { 9, 9, 5, 9, 5125000.00m, null });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount" },
+                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 10, 10, "Confirmed", 1, 10, 1100000.00m },
-                    { 11, 11, "Completed", 2, 11, 2350000.00m },
-                    { 12, 12, "Cancelled", 3, 12, 3750000.00m }
+                    { 10, 10, "Confirmed", 1, 10, 1100000.00m, null },
+                    { 11, 11, "Completed", 2, 11, 2350000.00m, null },
+                    { 12, 12, "Cancelled", 3, 12, 3750000.00m, null }
                 });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount" },
-                values: new object[] { 13, 13, 4, 13, 5300000.00m });
+                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount", "UserId" },
+                values: new object[] { 13, 13, 4, 13, 5300000.00m, null });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount" },
+                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 14, 14, "Confirmed", 5, 14, 7000000.00m },
-                    { 15, 15, "Completed", 1, 15, 1475000.00m },
-                    { 16, 16, "Cancelled", 2, 16, 3100000.00m }
+                    { 14, 14, "Confirmed", 5, 14, 7000000.00m, null },
+                    { 15, 15, "Completed", 1, 15, 1475000.00m, null },
+                    { 16, 16, "Cancelled", 2, 16, 3100000.00m, null }
                 });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount" },
-                values: new object[] { 17, 17, 3, 17, 4875000.00m });
+                columns: new[] { "TourBookingId", "BookingId", "Participants", "ScheduleId", "TotalAmount", "UserId" },
+                values: new object[] { 17, 17, 3, 17, 4875000.00m, null });
 
             migrationBuilder.InsertData(
                 table: "TourBookings",
-                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount" },
+                columns: new[] { "TourBookingId", "BookingId", "BookingStatus", "Participants", "ScheduleId", "TotalAmount", "UserId" },
                 values: new object[,]
                 {
-                    { 18, 18, "Confirmed", 4, 18, 6800000.00m },
-                    { 19, 19, "Completed", 5, 19, 8875000.00m },
-                    { 20, 20, "Cancelled", 1, 20, 1850000.00m }
+                    { 18, 18, "Confirmed", 4, 18, 6800000.00m, null },
+                    { 19, 19, "Completed", 5, 19, 8875000.00m, null },
+                    { 20, 20, "Cancelled", 1, 20, 1850000.00m, null }
                 });
 
             migrationBuilder.InsertData(
@@ -1764,29 +1815,29 @@ namespace PhucNguyenResort.Web.Migrations
 
             migrationBuilder.InsertData(
                 table: "Payments",
-                columns: new[] { "PaymentId", "Amount", "InvoiceId", "PaidAt", "PaymentMethod", "PaymentStatus", "TransactionCode" },
+                columns: new[] { "PaymentId", "Amount", "InvoiceId", "PaidAt", "PaymentMethod", "PaymentStatus", "TourBookingId", "TransactionCode" },
                 values: new object[,]
                 {
-                    { 1, 1150000.00m, 1, null, "Cash", "Pending", "TXN202600001" },
-                    { 2, 1300000.00m, 2, new DateTime(2026, 6, 21, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Success", "TXN202600002" },
-                    { 3, 1450000.00m, 3, new DateTime(2026, 6, 22, 14, 45, 0, 0, DateTimeKind.Unspecified), "DebitCard", "Failed", "TXN202600003" },
-                    { 4, 1600000.00m, 4, new DateTime(2026, 6, 23, 14, 45, 0, 0, DateTimeKind.Unspecified), "VNPay", "Refunded", "TXN202600004" },
-                    { 5, 1750000.00m, 5, null, "MoMo", "Pending", "TXN202600005" },
-                    { 6, 1900000.00m, 6, new DateTime(2026, 6, 25, 14, 45, 0, 0, DateTimeKind.Unspecified), "BankTransfer", "Success", "TXN202600006" },
-                    { 7, 2050000.00m, 7, new DateTime(2026, 6, 26, 14, 45, 0, 0, DateTimeKind.Unspecified), "Cash", "Failed", "TXN202600007" },
-                    { 8, 2200000.00m, 8, new DateTime(2026, 6, 27, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Refunded", "TXN202600008" },
-                    { 9, 2350000.00m, 9, null, "DebitCard", "Pending", "TXN202600009" },
-                    { 10, 2500000.00m, 10, new DateTime(2026, 6, 29, 14, 45, 0, 0, DateTimeKind.Unspecified), "VNPay", "Success", "TXN202600010" },
-                    { 11, 2650000.00m, 11, new DateTime(2026, 6, 30, 14, 45, 0, 0, DateTimeKind.Unspecified), "MoMo", "Failed", "TXN202600011" },
-                    { 12, 2800000.00m, 12, new DateTime(2026, 7, 1, 14, 45, 0, 0, DateTimeKind.Unspecified), "BankTransfer", "Refunded", "TXN202600012" },
-                    { 13, 2950000.00m, 13, null, "Cash", "Pending", "TXN202600013" },
-                    { 14, 3100000.00m, 14, new DateTime(2026, 7, 3, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Success", "TXN202600014" },
-                    { 15, 3250000.00m, 15, new DateTime(2026, 7, 4, 14, 45, 0, 0, DateTimeKind.Unspecified), "DebitCard", "Failed", "TXN202600015" },
-                    { 16, 3400000.00m, 16, new DateTime(2026, 7, 5, 14, 45, 0, 0, DateTimeKind.Unspecified), "VNPay", "Refunded", "TXN202600016" },
-                    { 17, 3550000.00m, 17, null, "MoMo", "Pending", "TXN202600017" },
-                    { 18, 3700000.00m, 18, new DateTime(2026, 7, 7, 14, 45, 0, 0, DateTimeKind.Unspecified), "BankTransfer", "Success", "TXN202600018" },
-                    { 19, 3850000.00m, 19, new DateTime(2026, 7, 8, 14, 45, 0, 0, DateTimeKind.Unspecified), "Cash", "Failed", "TXN202600019" },
-                    { 20, 4000000.00m, 20, new DateTime(2026, 7, 9, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Refunded", "TXN202600020" }
+                    { 1, 1150000.00m, 1, null, "Cash", "Pending", null, "TXN202600001" },
+                    { 2, 1300000.00m, 2, new DateTime(2026, 6, 21, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Success", null, "TXN202600002" },
+                    { 3, 1450000.00m, 3, new DateTime(2026, 6, 22, 14, 45, 0, 0, DateTimeKind.Unspecified), "DebitCard", "Failed", null, "TXN202600003" },
+                    { 4, 1600000.00m, 4, new DateTime(2026, 6, 23, 14, 45, 0, 0, DateTimeKind.Unspecified), "VNPay", "Refunded", null, "TXN202600004" },
+                    { 5, 1750000.00m, 5, null, "MoMo", "Pending", null, "TXN202600005" },
+                    { 6, 1900000.00m, 6, new DateTime(2026, 6, 25, 14, 45, 0, 0, DateTimeKind.Unspecified), "BankTransfer", "Success", null, "TXN202600006" },
+                    { 7, 2050000.00m, 7, new DateTime(2026, 6, 26, 14, 45, 0, 0, DateTimeKind.Unspecified), "Cash", "Failed", null, "TXN202600007" },
+                    { 8, 2200000.00m, 8, new DateTime(2026, 6, 27, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Refunded", null, "TXN202600008" },
+                    { 9, 2350000.00m, 9, null, "DebitCard", "Pending", null, "TXN202600009" },
+                    { 10, 2500000.00m, 10, new DateTime(2026, 6, 29, 14, 45, 0, 0, DateTimeKind.Unspecified), "VNPay", "Success", null, "TXN202600010" },
+                    { 11, 2650000.00m, 11, new DateTime(2026, 6, 30, 14, 45, 0, 0, DateTimeKind.Unspecified), "MoMo", "Failed", null, "TXN202600011" },
+                    { 12, 2800000.00m, 12, new DateTime(2026, 7, 1, 14, 45, 0, 0, DateTimeKind.Unspecified), "BankTransfer", "Refunded", null, "TXN202600012" },
+                    { 13, 2950000.00m, 13, null, "Cash", "Pending", null, "TXN202600013" },
+                    { 14, 3100000.00m, 14, new DateTime(2026, 7, 3, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Success", null, "TXN202600014" },
+                    { 15, 3250000.00m, 15, new DateTime(2026, 7, 4, 14, 45, 0, 0, DateTimeKind.Unspecified), "DebitCard", "Failed", null, "TXN202600015" },
+                    { 16, 3400000.00m, 16, new DateTime(2026, 7, 5, 14, 45, 0, 0, DateTimeKind.Unspecified), "VNPay", "Refunded", null, "TXN202600016" },
+                    { 17, 3550000.00m, 17, null, "MoMo", "Pending", null, "TXN202600017" },
+                    { 18, 3700000.00m, 18, new DateTime(2026, 7, 7, 14, 45, 0, 0, DateTimeKind.Unspecified), "BankTransfer", "Success", null, "TXN202600018" },
+                    { 19, 3850000.00m, 19, new DateTime(2026, 7, 8, 14, 45, 0, 0, DateTimeKind.Unspecified), "Cash", "Failed", null, "TXN202600019" },
+                    { 20, 4000000.00m, 20, new DateTime(2026, 7, 9, 14, 45, 0, 0, DateTimeKind.Unspecified), "CreditCard", "Refunded", null, "TXN202600020" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1867,6 +1918,11 @@ namespace PhucNguyenResort.Web.Migrations
                 column: "InvoiceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Payments_TourBookingId",
+                table: "Payments",
+                column: "TourBookingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Refunds_BookingId",
                 table: "Refunds",
                 column: "BookingId");
@@ -1930,6 +1986,11 @@ namespace PhucNguyenResort.Web.Migrations
                 column: "ScheduleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TourBookings_UserId",
+                table: "TourBookings",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TourSchedules_GuideId",
                 table: "TourSchedules",
                 column: "GuideId");
@@ -1991,9 +2052,6 @@ namespace PhucNguyenResort.Web.Migrations
                 name: "TableReservations");
 
             migrationBuilder.DropTable(
-                name: "TourBookings");
-
-            migrationBuilder.DropTable(
                 name: "UserProfiles");
 
             migrationBuilder.DropTable(
@@ -2006,10 +2064,10 @@ namespace PhucNguyenResort.Web.Migrations
                 name: "Invoices");
 
             migrationBuilder.DropTable(
-                name: "DiningTables");
+                name: "TourBookings");
 
             migrationBuilder.DropTable(
-                name: "TourSchedules");
+                name: "DiningTables");
 
             migrationBuilder.DropTable(
                 name: "MenuCategories");
@@ -2018,10 +2076,13 @@ namespace PhucNguyenResort.Web.Migrations
                 name: "GuestFolios");
 
             migrationBuilder.DropTable(
-                name: "Tours");
+                name: "TourSchedules");
 
             migrationBuilder.DropTable(
                 name: "Bookings");
+
+            migrationBuilder.DropTable(
+                name: "Tours");
 
             migrationBuilder.DropTable(
                 name: "Rooms");
