@@ -50,7 +50,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int adultsCount = 2, int childrenCount = 0, int roomCount = 1)
+        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int adultsCount = 2, int childrenCount = 0, int roomCount = 1, int? preselectId = null, int? preselectQty = null)
         {
             bool isFiltered = !string.IsNullOrEmpty(checkIn) && !string.IsNullOrEmpty(checkOut);
             IEnumerable<RoomCategory> availableCategories;
@@ -100,6 +100,8 @@ namespace PhucNguyenResort.Controllers
             ViewBag.ChildrenCount = childrenCount;
             ViewBag.RoomCount = roomCount;
             ViewBag.IsFiltered = true;
+            ViewBag.PreselectId = preselectId;
+            ViewBag.PreselectQty = preselectQty;
 
             return View(availableCategories);
         }

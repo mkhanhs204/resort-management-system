@@ -47,7 +47,8 @@ namespace PhucNguyenResort.Controllers
 
             var checkedInBookings = await _context.Bookings
                 .AsNoTracking()
-                .Include(booking => booking.Room)
+                .Include(booking => booking.BookingDetails)
+                    .ThenInclude(bd => bd.Room)
                 .Where(booking =>
                     booking.UserId == currentUserId
                     && booking.BookingStatus == BookingStatus.CheckedIn)
@@ -55,9 +56,10 @@ namespace PhucNguyenResort.Controllers
                 .Select(booking => new ProfileBookingVM
                 {
                     BookingId = booking.BookingId,
-                    RoomNumber = booking.Room != null && booking.Room.RoomNumber != null
-                        ? booking.Room.RoomNumber
-                        : string.Empty,
+                    RoomNumber = booking.BookingDetails
+                        .Where(bd => bd.Room != null && bd.Room.RoomNumber != null)
+                        .Select(bd => bd.Room!.RoomNumber!)
+                        .FirstOrDefault() ?? string.Empty,
                     CheckInDate = booking.CheckInDate,
                     CheckOutDate = booking.CheckOutDate
                 })
@@ -161,7 +163,8 @@ namespace PhucNguyenResort.Controllers
         {
             return await _context.Bookings
                 .AsNoTracking()
-                .Include(booking => booking.Room)
+                .Include(booking => booking.BookingDetails)
+                    .ThenInclude(bd => bd.Room)
                 .Where(booking =>
                     booking.UserId == currentUserId
                     && booking.BookingStatus == BookingStatus.CheckedIn)
@@ -169,9 +172,10 @@ namespace PhucNguyenResort.Controllers
                 .Select(booking => new ProfileBookingVM
                 {
                     BookingId = booking.BookingId,
-                    RoomNumber = booking.Room != null && booking.Room.RoomNumber != null
-                        ? booking.Room.RoomNumber
-                        : string.Empty,
+                    RoomNumber = booking.BookingDetails
+                        .Where(bd => bd.Room != null && bd.Room.RoomNumber != null)
+                        .Select(bd => bd.Room!.RoomNumber!)
+                        .FirstOrDefault() ?? string.Empty,
                     CheckInDate = booking.CheckInDate,
                     CheckOutDate = booking.CheckOutDate
                 })

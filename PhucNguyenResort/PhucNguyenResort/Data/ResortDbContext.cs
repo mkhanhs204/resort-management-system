@@ -16,6 +16,7 @@ public class ResortDbContext : DbContext
     public DbSet<RoomCategoryImage> RoomCategoryImages => Set<RoomCategoryImage>();
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Booking> Bookings => Set<Booking>();
+    public DbSet<BookingDetail> BookingDetails => Set<BookingDetail>();
     public DbSet<BookingGuest> BookingGuests => Set<BookingGuest>();
     public DbSet<MenuCategory> MenuCategories => Set<MenuCategory>();
     public DbSet<MenuItem> MenuItems => Set<MenuItem>();
