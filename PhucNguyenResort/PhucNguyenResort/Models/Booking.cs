@@ -7,7 +7,6 @@ public class Booking
 {
     public int BookingId { get; set; }
     public int UserId { get; set; }
-    public int RoomId { get; set; }
 
     [Required, DataType(DataType.Date)]
     public DateTime CheckInDate { get; set; }
@@ -35,7 +34,7 @@ public class Booking
     public DateTime? ConsentTimestamp { get; set; }
 
     public User? User { get; set; }
-    public Room? Room { get; set; }
+    public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
     public ICollection<BookingGuest> BookingGuests { get; set; } = new List<BookingGuest>();
     public ICollection<FoodOrder> FoodOrders { get; set; } = new List<FoodOrder>();
     public ICollection<TourBooking> TourBookings { get; set; } = new List<TourBooking>();

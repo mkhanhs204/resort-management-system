@@ -16,6 +16,5 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.Property(x => x.TotalAmount).HasPrecision(18, 2);
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
         builder.HasOne(x => x.User).WithMany(x => x.Bookings).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(x => x.Room).WithMany(x => x.Bookings).HasForeignKey(x => x.RoomId).OnDelete(DeleteBehavior.Restrict);
     }
 }

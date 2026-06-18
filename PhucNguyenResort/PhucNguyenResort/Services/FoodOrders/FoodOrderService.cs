@@ -20,7 +20,8 @@ public class FoodOrderService : IFoodOrderService
         var booking = await _context.Bookings
             .AsNoTracking()
             .Include(b => b.User)
-            .Include(b => b.Room)
+            .Include(b => b.BookingDetails)
+            .ThenInclude(bd => bd.Room)
             .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
         if (booking == null)
@@ -32,7 +33,7 @@ public class FoodOrderService : IFoodOrderService
         {
             BookingId = booking.BookingId,
             CustomerName = booking.User?.FullName ?? string.Empty,
-            RoomNumber = booking.Room?.RoomNumber ?? string.Empty,
+            RoomNumber = booking.BookingDetails != null ? string.Join(", ", booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : string.Empty,
             BookingStatus = booking.BookingStatus,
             CanPlaceOrder = booking.BookingStatus == BookingStatus.CheckedIn
         };
@@ -175,7 +176,8 @@ public class FoodOrderService : IFoodOrderService
             .Include(order => order.Booking)
                 .ThenInclude(booking => booking!.User)
             .Include(order => order.Booking)
-                .ThenInclude(booking => booking!.Room)
+                .ThenInclude(booking => booking!.BookingDetails)
+                    .ThenInclude(bd => bd.Room)
             .Include(order => order.Kot)
             .Include(order => order.FoodOrderItems)
                 .ThenInclude(orderItem => orderItem.MenuItem)
@@ -192,7 +194,7 @@ public class FoodOrderService : IFoodOrderService
             FoodOrderId = foodOrder.FoodOrderId,
             BookingId = foodOrder.BookingId,
             CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
-            RoomNumber = foodOrder.Booking?.Room?.RoomNumber ?? string.Empty,
+            RoomNumber = foodOrder.Booking?.BookingDetails != null ? string.Join(", ", foodOrder.Booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : string.Empty,
             OrderStatus = foodOrder.OrderStatus,
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
