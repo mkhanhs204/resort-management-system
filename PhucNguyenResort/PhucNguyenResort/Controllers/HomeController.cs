@@ -50,7 +50,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int guestCount = 2, int roomCount = 1)
+        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int adultsCount = 2, int childrenCount = 0, int roomCount = 1)
         {
             bool isFiltered = !string.IsNullOrEmpty(checkIn) && !string.IsNullOrEmpty(checkOut);
             IEnumerable<RoomCategory> availableCategories;
@@ -61,7 +61,8 @@ namespace PhucNguyenResort.Controllers
                 
                 ViewBag.CheckIn = "";
                 ViewBag.CheckOut = "";
-                ViewBag.GuestCount = guestCount;
+                ViewBag.AdultsCount = adultsCount;
+                ViewBag.ChildrenCount = childrenCount;
                 ViewBag.RoomCount = roomCount;
                 ViewBag.IsFiltered = false;
 
@@ -91,11 +92,12 @@ namespace PhucNguyenResort.Controllers
                 if (checkOutDate <= checkInDate) checkOutDate = checkInDate.AddDays(1);
             }
 
-            availableCategories = await _homeService.SearchAvailableCategoriesAsync(checkInDate, checkOutDate, guestCount, roomCount);
+            availableCategories = await _homeService.SearchAvailableCategoriesAsync(checkInDate, checkOutDate, adultsCount, childrenCount, roomCount);
 
             ViewBag.CheckIn = checkInDate.ToString("dd/MM/yyyy");
             ViewBag.CheckOut = checkOutDate.ToString("dd/MM/yyyy");
-            ViewBag.GuestCount = guestCount;
+            ViewBag.AdultsCount = adultsCount;
+            ViewBag.ChildrenCount = childrenCount;
             ViewBag.RoomCount = roomCount;
             ViewBag.IsFiltered = true;
 

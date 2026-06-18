@@ -6,9 +6,11 @@ using PhucNguyenResort.Enums;
 using PhucNguyenResort.Services.Rooms;
 using PhucNguyenResort.Services.RoomCategories;
 using PhucNguyenResort.ViewModels.Rooms;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhucNguyenResort.Controllers
 {
+    [Authorize(Roles = "Business Manager, Receptionist, Housekeeping Staff")]
     public class RoomsController : Controller
     {
         private readonly IRoomService _roomService;
@@ -21,9 +23,31 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Rooms
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, RoomStatus? statusFilter, int? categoryId)
         {
             var rooms = await _roomService.GetAllRoomsAsync();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                rooms = rooms.Where(r => (r.RoomNumber != null && r.RoomNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase)) || 
+                                         r.FloorNumber.ToString() == searchString);
+            }
+
+            if (statusFilter.HasValue)
+            {
+                rooms = rooms.Where(r => r.Status == statusFilter.Value);
+            }
+
+            if (categoryId.HasValue)
+            {
+                rooms = rooms.Where(r => r.CategoryId == categoryId.Value);
+            }
+
+            var categories = await _roomCategoryService.GetAllAsync();
+            ViewBag.Categories = new SelectList(categories, "CategoryId", "CategoryName", categoryId);
+            ViewBag.SearchString = searchString;
+            ViewBag.StatusFilter = statusFilter;
+
             return View(rooms);
         }
 
@@ -45,6 +69,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Rooms/Create
+        [Authorize(Roles = "Business Manager")]
         public async Task<IActionResult> Create()
         {
             var categories = await _roomCategoryService.GetAllAsync();
@@ -58,6 +83,7 @@ namespace PhucNguyenResort.Controllers
         // POST: Rooms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Business Manager")]
         public async Task<IActionResult> Create(RoomCreateVM model)
         {
             if (ModelState.IsValid)
@@ -140,6 +166,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Rooms/Delete/5
+        [Authorize(Roles = "Business Manager")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -159,6 +186,7 @@ namespace PhucNguyenResort.Controllers
         // POST: Rooms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Business Manager")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var room = await _roomService.GetRoomByIdAsync(id);

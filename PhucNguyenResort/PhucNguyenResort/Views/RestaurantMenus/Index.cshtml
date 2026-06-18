@@ -4,80 +4,103 @@
     ViewData["Title"] = "Restaurant Menu";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Restaurant Menu</h1>
-    <a asp-action="Create" class="btn btn-primary">Add menu item</a>
+<div class="container-fluid refund-container py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
+        <a asp-action="Create" class="btn btn-premium-action btn-primary shadow-sm">
+            <i class="fa fa-plus-circle"></i> Add menu item
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card premium-card mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label asp-for="SearchTerm" class="form-label fw-bold">Search by name</label>
+                    <input asp-for="SearchTerm" class="form-control" placeholder="Menu item name" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="CategoryId" class="form-label fw-bold">Category</label>
+                    <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+                        <option value="">All categories</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="IsAvailable" class="form-label fw-bold">Selling status</label>
+                    <select asp-for="IsAvailable" class="form-select">
+                        <option value="">All statuses</option>
+                        <option value="true">Selling</option>
+                        <option value="false">Out of stock</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill"><i class="fa fa-filter"></i> Filter</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fa fa-refresh"></i> Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card premium-card mb-4">
+        <div class="premium-card-header d-flex align-items-center">
+            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;">
+                <i class="fa fa-coffee"></i>
+            </div>
+            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Menu Items List</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table premium-table mb-0" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="pl-4">Name</th>
+                            <th>Category</th>
+                            <th class="text-end">Price</th>
+                            <th>Selling status</th>
+                            <th class="pr-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="pl-4 fw-bold">@item.ItemName</td>
+                                <td><span class="badge badge-light border p-2">@(string.IsNullOrEmpty(item.CategoryName) ? "None" : item.CategoryName)</span></td>
+                                <td class="text-end font-weight-bold">@item.Price.ToString("N0")</td>
+                                <td>
+                                    @if (item.IsAvailable)
+                                    {
+                                        <span class="badge badge-pastel-success">Selling</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-pastel-warning">Out of stock</span>
+                                    }
+                                </td>
+                                <td class="pr-4 text-end">
+                                    <a asp-action="Edit" asp-route-id="@item.MenuItemId" class="btn-action-icon edit" title="Edit"><i class="fa fa-pencil"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.MenuItemId" class="btn-action-icon view" title="Details"><i class="fa fa-eye"></i></a>
+                                    <a asp-action="Discontinue" asp-route-id="@item.MenuItemId" class="btn-action-icon delete" title="Discontinue"><i class="fa fa-ban"></i></a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Items.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No menu items found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
-
-<form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
-    <div class="col-md-4">
-        <label asp-for="SearchTerm" class="form-label">Search by name</label>
-        <input asp-for="SearchTerm" class="form-control" placeholder="Menu item name" />
-    </div>
-    <div class="col-md-3">
-        <label asp-for="CategoryId" class="form-label">Category</label>
-        <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
-            <option value="">All categories</option>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label asp-for="IsAvailable" class="form-label">Selling status</label>
-        <select asp-for="IsAvailable" class="form-select">
-            <option value="">All statuses</option>
-            <option value="true">Selling</option>
-            <option value="false">Out of stock</option>
-        </select>
-    </div>
-    <div class="col-md-2 d-flex gap-2">
-        <button type="submit" class="btn btn-primary flex-fill">Filter</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
-    </div>
-</form>
-
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th class="text-end">Price</th>
-            <th>Selling status</th>
-            <th class="text-end">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
-            <tr>
-                <td>@item.ItemName</td>
-                <td>@item.CategoryName</td>
-                <td class="text-end">@item.Price.ToString("N0")</td>
-                <td>
-                    @if (item.IsAvailable)
-                    {
-                        <span class="badge bg-success">Selling</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning text-dark">Out of stock</span>
-                    }
-                </td>
-                <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-secondary">Details</a>
-                    <a asp-action="Edit" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-primary">Edit</a>
-                    <a asp-action="Discontinue" asp-route-id="@item.MenuItemId" class="btn btn-sm btn-outline-danger">Discontinue</a>
-                </td>
-            </tr>
-        }
-        @if (!Model.Items.Any())
-        {
-            <tr>
-                <td colspan="5" class="text-center text-muted py-4">No menu items found.</td>
-            </tr>
-        }
-    </tbody>
-</table>

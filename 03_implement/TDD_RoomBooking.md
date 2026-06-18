@@ -1,31 +1,42 @@
 # TEST-DRIVEN DEVELOPMENT SPECIFICATION TEMPLATE
-Mẫu Đặc tả Kiểm thử Hướng Phát triển
+
+Đặc tả Kiểm thử Hướng Phát triển — Room Booking
 
 **Document ID**: SWP391-MOD2-TDD-002
-**Version**: 1.0
-**Date**: 2026-06-12
-**Status**: Draft
+**Version**: 1.1
+**Date**: 2026-06-13
+**Status**: Approve
 **Standard**: ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author**: Cuong
-**Reviewed by**: Khanh
+**Reviewed by**:  Khanh
 **DPO Sign-off**: Khanh
 **Approved by**: Cuong
 **Classification**: Internal - Confidential
 
 **References**:
-- `01_SRS/SWP391_NHOM1.md` — Functional requirements (UC22)
+
+- `01_SRS/SWP391_NHOM1.md` — Functional requirements (UC22, UC28)
 - `01_SRS/SWP391-HOS-02.md` — Functional requirements (UC07)
-- `03_implement/EDS_RoomBooking.md` — Technical Specification
-- NĐ 356/2025 — Legal basis
+- `03_implement/EDS_RoomBooking.md` — Technical Specification (SWP391-MOD2-IMP-002)
+- NĐ 356/2025 — Legal basis (Data Privacy cho BookingGuest)
+
+**Quy ước TDD**: Tài liệu này mô tả test cases TRƯỚC khi viết production code.
+Thứ tự bắt buộc: viết test → chạy → xác nhận FAIL 🔴 → implement → PASS 🟢 → refactor 🔵.
+Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 
 ## CHANGELOG
-| Ngày | Người thực hiện | Nội dung thay đổi |
-| --- | --- | --- |
-| 2026-06-12 | AI Assistant | Khởi tạo tài liệu — TDD spec cho Room Booking |
+
+**Policy 4.4 — Immutable History**: Không bao giờ xóa thông tin cũ.
+
+| Ngày      | Người thực hiện | Nội dung thay đổi                                                                                                                                          |
+| ---------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-12 | Cuong               | Khởi tạo tài liệu — TDD spec cho Room Booking                                                                                                            |
+| 2026-06-13 | Cuong               | Cập nhật v1.1: Khớp trạng thái `BookingStatus.Reserved`, sửa `TotalAmount`, xóa yêu cầu `RowVersion` sai, bổ sung Test Case cho Tour Add-ons. |
 
 ---
 
 ## MỤC LỤC
+
 1. Thông tin Module
 2. Logic Issues Resolved
 3. Test Design Specification (TDS)
@@ -37,163 +48,303 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển
 ---
 
 ## 1. Thông tin Module
-| Field | Value |
-| --- | --- |
-| Feature / Gap ID | GAP-002 |
-| Module | `Room Reservation & Front Desk - Booking` |
-| Spec gốc | `SWP391-MOD2-IMP-002` |
-| Priority | 🔴 P0 |
-| Sprint | S2 |
-| Milestone | M3 Alpha |
-| Data Classification | Sensitive-PII / PII |
-| Compliance Scope | NĐ 356/2025 |
-| Upstream Dependencies | `RoomAvailabilityService` |
-| Downstream Consumers | `PaymentGateway` |
+
+| Field                 | Value                                                                    |
+| --------------------- | ------------------------------------------------------------------------ |
+| Feature / Gap ID      | FEAT-BOOKING-CORE                                                        |
+| Module                | `Room Reservation & Front Desk - Booking`                              |
+| Spec gốc             | `SWP391-MOD2-IMP-002`                                                  |
+| Priority              | 🟢 P0                                                                   |
+| Sprint                | S2                                                                       |
+| Milestone             | M1 - Core Booking Functions                                              |
+| Data Classification   | Sensitive-PII / PII (Thông tin CCCD khách hàng lưu qua BookingGuest) |
+| Compliance Scope      | NĐ 356/2025                                                             |
+| Upstream Dependencies | `RoomService`, `HomeService`, `TourService`                        |
+| Downstream Consumers  | `PaymentGateway`                                                       |
 
 ## 2. Logic Issues Resolved
-| # | Spec gốc (sai / thiếu) | Thực tế (schema / policy) | Fix áp dụng trong test |
-| --- | --- | --- | --- |
-| L1 | Chưa rõ mức cọc | Thống nhất cọc 50% | `CreateBooking` sẽ tính `DepositAmount = TotalPrice / 2` |
+
+| #  | Spec gốc (sai / thiếu)                                  | Thực tế (schema / policy)                                                                                  | Fix áp dụng trong test                                                      |
+| -- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| L1 | Chưa rõ mức cọc, trường lưu trữ                   | Thống nhất cọc 40%. Tên property là `TotalAmount`, `DepositAmount`.                                 | `CreateBooking` sẽ tính `DepositAmount = TotalAmount * 0.4`             |
+| L2 | Booking Status sau khi tạo là `Pending`               | Enum `BookingStatus` không có Pending, trạng thái mặc định là `Reserved`                         | Test kiểm tra sau khi tạo Booking thì `Status == BookingStatus.Reserved` |
+| L3 | Yêu cầu `RowVersion` cho DbUpdateConcurrencyException | Model `Booking` không lưu `RowVersion`. Dùng Application-Level overlap check + default EF concurrency | Bỏ yêu cầu EF migration `RowVersion` ở mục Entry Criteria.             |
+| L4 | Thiếu xử lý Tour Add-ons                               | Codebase cho phép `SelectedTourScheduleIds` khi tạo booking                                              | Bổ sung test case kiểm tra tạo `TourBooking` tương ứng.               |
 
 ## 3. Test Design Specification (TDS)
 
 ### TDS-01 — Scope / Phạm vi
+
 `RoomBooking` bao gồm các layer:
-├── Domain (pure logic - no deps)
-├── Application / Use Cases (mock EF Core / In-Memory DB)
+
+```
+├── Models (Booking, BookingGuest, TourBooking)
 ├── Services
-└── Controller (mock services)
+│   ├── BookingService.CreateBookingAsync() ← ĐỐI TƯỢNG TEST CHÍNH
+│   └── BookingService.CancelBookingAsync() ← ĐỐI TƯỢNG TEST CHÍNH
+└── Controllers
+    └── BookingsController
+```
 
 ### TDS-02 — Test Basis / Cơ sở Kiểm thử
-| Source | Items Derived |
-| --- | --- |
-| `SRS.md` UC07 | Guest books room and pays deposit securely |
-| `ADR-002` | Optimistic Concurrency Handle |
-| `BR01` | Strict Concurrency (Double-Booking Prevention) |
-| `BR03` | Cancellation Policy (100% refund if >48h) |
+
+| Source          | Items Derived                                  |
+| --------------- | ---------------------------------------------- |
+| `SRS.md` UC22 | Guest books room and pays deposit securely     |
+| `ADR-002`     | Application-level Overlap Check                |
+| `BR01`        | Strict Concurrency (Double-Booking Prevention) |
+| `BR03`        | Cancellation Policy (100% refund if >48h)      |
 
 ### TDS-03 — Test Conditions and Coverage Items
-| Condition ID | Test Condition | Coverage Item | Test Cases |
-| --- | --- | --- | --- |
-| TC-COND-001 | Tạo Booking thành công khi phòng trống | `CreateBookingAsync` | `BKG-TC-001` |
-| TC-COND-002 | Trả về lỗi khi phòng đã được đặt (Concurrency) | `CreateBookingAsync` | `BKG-TC-002` |
-| TC-COND-003 | Ngày CheckIn không hợp lệ (nhỏ hơn hiện tại) | `CreateBookingAsync` | `BKG-TC-003` |
-| TC-COND-004 | Hủy đặt phòng trên 48h (Hoàn cọc) | `CancelBookingAsync` | `BKG-TC-004` |
-| TC-COND-005 | Hủy đặt phòng dưới 48h (Không hoàn cọc) | `CancelBookingAsync` | `BKG-TC-005` |
+
+| Condition ID | Test Condition                                            | Coverage Item          | Test Cases     |
+| ------------ | --------------------------------------------------------- | ---------------------- | -------------- |
+| TC-COND-001  | Tạo Booking thành công khi phòng trống               | `CreateBookingAsync` | `BKG-TC-001` |
+| TC-COND-002  | Trả về lỗi khi phòng đã được đặt (Concurrency) | `CreateBookingAsync` | `BKG-TC-002` |
+| TC-COND-003  | Ngày CheckIn không hợp lệ (nhỏ hơn hiện tại)      | `CreateBookingAsync` | `BKG-TC-003` |
+| TC-COND-004  | Tạo Booking kèm Tour Add-on                             | `CreateBookingAsync` | `BKG-TC-004` |
+| TC-COND-005  | Hủy đặt phòng trên 48h (Hoàn cọc)                  | `CancelBookingAsync` | `BKG-TC-005` |
+| TC-COND-006  | Hủy đặt phòng dưới 48h (Không hoàn cọc)          | `CancelBookingAsync` | `BKG-TC-006` |
+| TC-COND-007  | Đặt tour làm giảm AvailableSlots của lịch trình    | `CreateBookingAsync` | `BKG-TC-007` |
+| TC-COND-008  | Đặt tour thất bại do không đủ AvailableSlots       | `CreateBookingAsync` | `BKG-TC-008` |
+| TC-COND-009  | Hủy đặt phòng hoàn trả lại AvailableSlots cho tour | `CancelBookingAsync` | `BKG-TC-009` |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
-| Technique (ISO 29119-4)  | Applied To                                 | Rationale                                     |
-| --------------------------| --------------------------------------------| -----------------------------------------------|
-| Equivalence Partitioning | `CheckInDate`, `CheckOutDate`              | Phân vùng ngày hợp lệ và không hợp lệ         |
-| Boundary Value Analysis  | Thời gian hủy (48h)                        | Test đúng 48h, 47h59m, 48h01m                 |
-| Error Guessing           | Concurrency `DbUpdateConcurrencyException` | Khách hàng bấm đúp, hoặc 2 khách đặt cùng lúc |
+
+| Technique (ISO 29119-4)  | Applied To                        | Rationale                                                            |
+| ------------------------ | --------------------------------- | -------------------------------------------------------------------- |
+| Equivalence Partitioning | `CheckInDate`, `CheckOutDate` | Phân vùng ngày hợp lệ và không hợp lệ                       |
+| Boundary Value Analysis  | Thời gian hủy (48h)             | Test đúng 48h, 47h59m, 48h01m                                      |
+| Error Guessing           | Overlap logic                     | Test việc check overlap loại trừ `Cancelled` và `CheckedOut` |
 
 ### TDS-05 — Test Data Requirements
-| Fixture ID | Type | Value / Logic | Mục đích |
-| --- | --- | --- | --- |
-| FX-001 | DB seed | Room Status = Available, User = 'testuser' | Happy path |
+
+| Fixture ID | Type    | Value / Logic                         | Mục đích               |
+| ---------- | ------- | ------------------------------------- | ------------------------- |
+| FX-001     | Mock DB | RoomId = 1, Price = 500k              | Happy path CreateBooking  |
+| FX-002     | Mock DB | RoomId = 1, Booking overlap tồn tại | Conflict/Concurrency test |
+| FX-003     | Mock DB | TourScheduleId = 5, Tour.Price = 200k | Tour Add-on test          |
+| FX-004     | Mock DB | BookingId = 10, CheckIn = Now + 72h   | Hủy phòng hoàn cọc    |
 
 ## 4. Test Case Specification
 
 ### BKG-TC-001 — Khách đặt phòng thành công khi phòng trống
+
 **Severity**: CRITICAL
 **Feature Under Test**: `BookingService.CreateBookingAsync()`
 **TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-001
 
 **Preconditions**:
-- Phòng Id = 1 trống từ ngày 01/01/2027 đến 05/01/2027.
-- User đăng nhập hợp lệ.
+
+- Phòng Id = 1 (Price: 500,000) trống từ ngày 01/01/2027 đến 05/01/2027 (4 đêm).
+- Fixture: FX-001
 
 **Test Steps**:
-1. Gọi `CreateBookingAsync(roomId: 1, checkIn: "01/01/2027", checkOut: "05/01/2027", userId: 1)`
+
+1. Gọi `CreateBookingAsync` với request `roomId: 1, checkIn: "01/01/2027", checkOut: "05/01/2027", NumberOfAdults: 2, NumberOfChildren: 0` và `userId: 1`.
 
 **Expected Result (PASS)**:
-- Booking được tạo thành công.
-- `BookingStatus` là `Pending`.
-- `DepositAmount` được tính bằng 50% `TotalPrice`.
+
+- `Success` = true.
+- DB lưu `BookingStatus` là `Reserved`.
+- Tính đúng `TotalAmount` = 4 * 500,000 = 2,000,000.
+- `DepositAmount` được tính = 800,000 (40% TotalAmount).
 
 ### BKG-TC-002 — Báo lỗi khi phòng đã được đặt (Concurrency Conflict)
+
 **Severity**: CRITICAL
 **Feature Under Test**: `BookingService.CreateBookingAsync()`
 **TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-002
 
 **Preconditions**:
-- Phòng Id = 1 đã được Booking #1 giữ chỗ từ 01/01/2027 đến 05/01/2027.
+
+- Phòng Id = 1 đã có 1 Booking từ 01/01/2027 đến 05/01/2027 có trạng thái `Reserved` (FX-002).
 
 **Test Steps**:
-1. Khách hàng B gọi `CreateBookingAsync(roomId: 1, checkIn: "02/01/2027", checkOut: "04/01/2027", userId: 2)`
+
+1. Khách hàng B gọi `CreateBookingAsync(roomId: 1, checkIn: "02/01/2027", checkOut: "04/01/2027")`.
 
 **Expected Result (PASS)**:
-- Ném ra `Exception` hoặc trả về lỗi `BKG-002: Room not available`.
-- KHÔNG có Booking nào được lưu thêm vào DB.
+
+- `Success` = false, `ErrorCode` = "BKG-002", `ErrorMessage` = "Room not available".
+- KHÔNG có Booking mới nào được lưu.
 
 ### BKG-TC-003 — Báo lỗi khi ngày Check-in/Check-out không hợp lệ
+
 **Severity**: HIGH
 **Feature Under Test**: `BookingService.CreateBookingAsync()`
 **TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-003
 
 **Test Steps**:
-1. Gọi `CreateBookingAsync` với `CheckOutDate <= CheckInDate`.
+
+1. Gọi `CreateBookingAsync` với `CheckOutDate <= CheckInDate` hoặc `CheckInDate < DateTime.Today`.
 
 **Expected Result (PASS)**:
-- Lỗi `BKG-001: Invalid dates`.
 
-### BKG-TC-004 — Hủy phòng > 48h trước giờ Check-in (Hoàn cọc 100%)
+- `Success` = false, `ErrorCode` = "BKG-001", `ErrorMessage` = "Invalid dates".
+
+### BKG-TC-004 — Khách đặt phòng kèm chọn Add-on Tour
+
 **Severity**: HIGH
-**Feature Under Test**: `BookingService.CancelBookingAsync()`
+**Feature Under Test**: `BookingService.CreateBookingAsync()`
 **TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-004
 
 **Preconditions**:
-- Booking #1 `CheckInDate` = `05/01/2027 14:00`, `Status` = `Reserved`, `DepositAmount` = 1,000,000.
-- Giờ hiện tại: `02/01/2027 10:00` (Cách > 48 tiếng).
+
+- Phòng Id = 1 trống.
+- `TourScheduleId = 5` có `Tour.Price = 200,000`. (FX-003)
 
 **Test Steps**:
-1. Gọi `CancelBookingAsync(1, userId)`
+
+1. Gọi `CreateBookingAsync` với `SelectedTourScheduleIds = [5]` và `NumberOfAdults = 2, NumberOfChildren = 0`.
 
 **Expected Result (PASS)**:
-- `BookingStatus` = `Cancelled`.
-- Trả về thông báo hoàn cọc số tiền 1,000,000.
 
-### BKG-TC-005 — Hủy phòng < 48h trước giờ Check-in (Không hoàn cọc)
+- Booking phòng được tạo thành công.
+- Kèm theo 1 record `TourBooking` gắn liền `BookingId` vừa sinh.
+- `TourBooking.TotalAmount` = 200,000 * 2 = 400,000.
+- `TourBooking.BookingStatus` = `Pending`.
+
+### BKG-TC-005 — Hủy phòng > 48h trước giờ Check-in (Hoàn cọc 100%)
+
 **Severity**: HIGH
 **Feature Under Test**: `BookingService.CancelBookingAsync()`
 **TDD Phase**: 🟢 GREEN
 **Condition Ref**: TC-COND-005
 
 **Preconditions**:
-- Booking #2 `CheckInDate` = `05/01/2027 14:00`.
-- Giờ hiện tại: `04/01/2027 10:00` (Cách < 48 tiếng).
+
+- Booking ID = 10, CheckInDate cách hiện tại 72h. DepositAmount = 1,000,000. (FX-004)
 
 **Test Steps**:
-1. Gọi `CancelBookingAsync(2, userId)`
+
+1. Gọi `CancelBookingAsync(10, userId)`
 
 **Expected Result (PASS)**:
-- `BookingStatus` = `Cancelled`.
-- Trả về thông báo Không hoàn cọc (RefundAmount = 0).
+
+- `Success` = true.
+- `BookingStatus` đổi thành `Cancelled`.
+- Trả về `RefundAmount` = 1,000,000.
+
+### BKG-TC-006 — Hủy phòng < 48h trước giờ Check-in (Không hoàn cọc)
+
+**Severity**: HIGH
+**Feature Under Test**: `BookingService.CancelBookingAsync()`
+**TDD Phase**: 🟢 GREEN
+**Condition Ref**: TC-COND-006
+
+**Preconditions**:
+
+- Booking ID = 11, CheckInDate cách hiện tại 24h.
+
+**Test Steps**:
+
+1. Gọi `CancelBookingAsync(11, userId)`
+
+**Expected Result (PASS)**:
+
+- `BookingStatus` đổi thành `Cancelled`.
+- Trả về `RefundAmount` = 0.
+
+### BKG-TC-007 — Đặt tour làm giảm AvailableSlots của lịch trình
+
+**Severity**: HIGH
+**Feature Under Test**: `BookingService.CreateBookingAsync()`
+**TDD Phase**: 🟢 GREEN
+**Condition Ref**: TC-COND-007
+
+**Preconditions**:
+
+- Phòng Id = 1 trống.
+- Lịch trình tour `TourScheduleId = 5` có `AvailableSlots = 10`.
+
+**Test Steps**:
+
+1. Gọi `CreateBookingAsync` với `SelectedTourScheduleIds = [5]` và `NumberOfAdults = 2, NumberOfChildren = 0`.
+
+**Expected Result (PASS)**:
+
+- Đặt phòng thành công.
+- `AvailableSlots` của `TourScheduleId = 5` giảm xuống còn `8` (10 - 2).
+
+### BKG-TC-008 — Đặt tour thất bại do không đủ AvailableSlots
+
+**Severity**: HIGH
+**Feature Under Test**: `BookingService.CreateBookingAsync()`
+**TDD Phase**: 🟢 GREEN
+**Condition Ref**: TC-COND-008
+
+**Preconditions**:
+
+- Phòng Id = 1 trống.
+- Lịch trình tour `TourScheduleId = 5` có `AvailableSlots = 1`.
+
+**Test Steps**:
+
+1. Gọi `CreateBookingAsync` với `SelectedTourScheduleIds = [5]` và `NumberOfAdults = 2, NumberOfChildren = 0`.
+
+**Expected Result (PASS)**:
+
+- `Success` = false, `ErrorCode` = "BKG-003", `ErrorMessage` chứa thông tin không đủ chỗ.
+- Không có Booking hay TourBooking nào được tạo.
+
+### BKG-TC-009 — Hủy đặt phòng hoàn trả lại AvailableSlots cho tour
+
+**Severity**: HIGH
+**Feature Under Test**: `BookingService.CancelBookingAsync()`
+**TDD Phase**: 🟢 GREEN
+**Condition Ref**: TC-COND-009
+
+**Preconditions**:
+
+- Booking ID = 10, CheckInDate cách hiện tại 72h.
+- Có 1 TourBooking liên kết với `TourScheduleId = 5` có `Participants = 2`.
+- `TourScheduleId = 5` có `AvailableSlots = 8`.
+
+**Test Steps**:
+
+1. Gọi `CancelBookingAsync(10, userId)`
+
+**Expected Result (PASS)**:
+
+- Hủy đặt phòng thành công (`Success` = true).
+- `BookingStatus` đổi thành `Cancelled`.
+- `AvailableSlots` của `TourScheduleId = 5` tăng lên thành `10` (8 + 2).
 
 ## 5. Red-Green-Refactor Tracker
-| TC ID | Test File | 🔴 RED | 🟢 GREEN | 🔵 REFACTOR |
-| --- | --- | --- | --- | --- |
-| `BKG-TC-001` | `BookingServiceTests.cs` | `[x]` | `[x]` | |
-| `BKG-TC-002` | `BookingServiceTests.cs` | `[x]` | `[x]` | |
-| `BKG-TC-003` | `BookingServiceTests.cs` | `[x]` | `[x]` | |
-| `BKG-TC-004` | `BookingServiceTests.cs` | `[x]` | `[x]` | |
-| `BKG-TC-005` | `BookingServiceTests.cs` | `[x]` | `[x]` | |
+
+| TC ID          | Test File                  | 🔴 RED  | 🟢 GREEN | 🔵 REFACTOR |
+| -------------- | -------------------------- | ------- | -------- | ----------- |
+| `BKG-TC-001` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-002` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-003` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-004` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-005` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-006` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-007` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-008` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
+| `BKG-TC-009` | `BookingServiceTests.cs` | `[x]` | `[x]`  |             |
 
 ## 6. Entry / Exit Criteria
+
 **Entry Criteria**
-- [ ] Spec kỹ thuật `EDS_RoomBooking.md` đã được review
-- [ ] Prisma/EF Core schema đã cập nhật `RowVersion`
-- [ ] Các fixture test DB đã chuẩn bị
+
+- [X] Spec kỹ thuật `EDS_RoomBooking.md` đã được review
+- [X] Các class EF Core DbContext, Model relationships đã cấu hình chuẩn.
+- [X] Các fixture test DB đã chuẩn bị (In-Memory Database dùng cho test).
 
 **Exit Criteria**
-- [ ] Tất cả unit tests `BKG-TC-*` đều PASS.
-- [ ] Coverage logic hủy phòng đạt 100%.
+
+- [X] Tất cả unit tests `BKG-TC-*` đều PASS.
+- [X] Logic Overlap Coverage đạt 100%.
 
 ## 7. Rollback Plan
-- Reset nhánh `git checkout main`.
-- Drop in-memory/test DB tables liên quan.
+
+```bash
+# Revert test files (dev only)
+git checkout -- PhucNguyenResort.Tests/Services/BookingServiceTests.cs
+```

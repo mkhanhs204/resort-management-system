@@ -6,5 +6,6 @@ public enum BookingStatus
     CheckedIn,
     CheckedOut,
     Cancelled,
-    NoShow 
+    NoShow,
+    PendingPayment
 }

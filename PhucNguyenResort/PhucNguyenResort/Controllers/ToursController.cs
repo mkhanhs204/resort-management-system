@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.ViewModels.Tours;
+using Microsoft.EntityFrameworkCore;
+using PhucNguyenResort.Data;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -12,10 +14,12 @@ namespace PhucNguyenResort.Controllers
     public class ToursController : Controller
     {
         private readonly ITourService _tourService;
+        private readonly ResortDbContext _context;
 
-        public ToursController(ITourService tourService)
+        public ToursController(ITourService tourService, ResortDbContext context)
         {
             _tourService = tourService;
+            _context = context;
         }
 
         // GET: Tours
@@ -67,7 +71,7 @@ namespace PhucNguyenResort.Controllers
                 };
 
                 await _tourService.AddTourAsync(tour);
-                TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been created successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -129,7 +133,7 @@ namespace PhucNguyenResort.Controllers
                 tour.ImageUrl      = model.ImageUrl;
 
                 await _tourService.UpdateTourAsync(tour);
-                TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been updated successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -165,20 +169,38 @@ namespace PhucNguyenResort.Controllers
                 var tour = await _tourService.GetTourByIdAsync(id);
                 if (tour == null)
                 {
-                    return NotFound();
+                    return RedirectToAction(nameof(Index));
                 }
 
                 string tourName = tour.TourName ?? $"Tour #{id}";
                 await _tourService.DeleteTourAsync(id);
-                TempData["SuccessMessage"] = $"Tour \"{tourName}\" has been deleted successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tourName}\" has been deleted successfully.";
             }
             catch (InvalidOperationException ex) when (ex.Message.StartsWith("TOUR-003"))
             {
                 // BR-TOUR-005: Tour has active TourSchedules — refuse delete
-                TempData["ErrorMessage"] = "Cannot delete this tour because it has active schedules (TourSchedules). Please remove all schedules first.";
+                if (TempData != null) TempData["ErrorMessage"] = "Cannot delete this tour because it has active schedules (TourSchedules). Please remove all schedules first.";
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Tours/CheckTicket?ticketId=123
+        [HttpGet]
+        public async Task<IActionResult> CheckTicket(int ticketId)
+        {
+            var ticket = await _context.TourBookings
+                .Include(tb => tb.User)
+                .Include(tb => tb.Schedule)
+                    .ThenInclude(s => s.Tour)
+                .FirstOrDefaultAsync(tb => tb.TourBookingId == ticketId);
+
+            if (ticket == null)
+            {
+                return NotFound("Không tìm thấy mã vé này trong hệ thống.");
+            }
+
+            return View(ticket);
         }
     }
 }

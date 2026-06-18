@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Kitchen Staff Dashboard";
+    Layout = "_DashboardLayout";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-fire mr-2" style="color: #fd7e14;"></i> Kitchen Staff — KOT Monitor
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">View Kitchen Order Tickets, update cooking status, and mark dishes as ready.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row mb-4">
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107;">
+            <h4 style="color: #ffc107;"><i class="fa fa-clock-o"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Pending Orders</p>
+            <small class="text-muted">Waiting to start cooking</small>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #fd7e14;">
+            <h4 style="color: #fd7e14;"><i class="fa fa-fire"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Now Preparing</p>
+            <small class="text-muted">Currently being cooked</small>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
+            <h4 style="color: #28a745;"><i class="fa fa-check-circle"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Ready to Serve</p>
+            <small class="text-muted">Waiting for pickup</small>
+        </div>
+    </div>
+</div>
+
+<!-- Active KOT Cards (Placeholder) -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card-box" style="border-left: 5px solid #fd7e14;">
+            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
+                <i class="fa fa-list-alt mr-2" style="color: #fd7e14;"></i> Active Kitchen Order Tickets
+            </h5>
+            <div class="row">
+                <!-- Placeholder KOT Cards -->
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm rounded" style="border-top: 3px solid #ffc107;">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: #fff8e1; font-family: 'Cabin', sans-serif;">
+                            <strong>KOT #--</strong>
+                            <small class="text-muted"><i class="fa fa-clock-o mr-1"></i> --:--</small>
+                        </div>
+                        <div class="card-body p-3 text-center text-muted" style="font-family: 'Cabin', sans-serif;">
+                            <i class="fa fa-info-circle fa-2x mb-2 d-block"></i>
+                            <p class="mb-0" style="font-size: 13px;">KOT data will be loaded when backend is connected.</p>
+                        </div>
+                        <div class="card-footer p-2 text-center">
+                            <button class="btn btn-sm btn-outline-warning btn-block" disabled>
+                                <i class="fa fa-play mr-1"></i> Start Cooking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm rounded" style="border-top: 3px solid #fd7e14;">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: #fff3e0; font-family: 'Cabin', sans-serif;">
+                            <strong>KOT #--</strong>
+                            <small class="text-muted"><i class="fa fa-clock-o mr-1"></i> --:--</small>
+                        </div>
+                        <div class="card-body p-3 text-center text-muted" style="font-family: 'Cabin', sans-serif;">
+                            <i class="fa fa-fire fa-2x mb-2 d-block" style="color: #fd7e14;"></i>
+                            <p class="mb-0" style="font-size: 13px;">Currently being prepared...</p>
+                        </div>
+                        <div class="card-footer p-2 text-center">
+                            <button class="btn btn-sm btn-success btn-block" disabled>
+                                <i class="fa fa-check mr-1"></i> Mark Ready to Serve
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm rounded" style="border-top: 3px solid #28a745;">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: #e8f5e9; font-family: 'Cabin', sans-serif;">
+                            <strong>KOT #--</strong>
+                            <small class="text-muted"><i class="fa fa-clock-o mr-1"></i> --:--</small>
+                        </div>
+                        <div class="card-body p-3 text-center" style="font-family: 'Cabin', sans-serif; color: #28a745;">
+                            <i class="fa fa-check-circle fa-2x mb-2 d-block"></i>
+                            <p class="mb-0 font-weight-bold" style="font-size: 13px;">Ready to Serve!</p>
+                        </div>
+                        <div class="card-footer p-2 text-center">
+                            <span class="badge badge-success py-2 px-3">Awaiting Pickup</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,261 @@
+@model IEnumerable<PhucNguyenResort.Models.Booking>
+
+@{
+    ViewData["Title"] = "Lịch Sử Đặt Phòng";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/booking-cards.css" />
+}
+
+<div class="breadcrumb-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-text">
+                    <h2>Lịch Sử Đặt Phòng</h2>
+                    <div class="bt-option">
+                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
+                        <span>Lịch Sử Đặt Phòng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="booking-history-section">
+    <div class="container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; font-size: 0.95rem;">
+                @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+        
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; font-size: 0.95rem;">
+                @TempData["Error"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="no-bookings-card">
+                <i class="fa fa-folder-open-o"></i>
+                <h4>Bạn chưa có lượt đặt phòng nào.</h4>
+                <p>Hãy trải nghiệm các phòng ngủ sang trọng tại Phúc Nguyên Resort và lên kế hoạch cho kỳ nghỉ của bạn ngay hôm nay!</p>
+                <a asp-controller="Home" asp-action="SearchRooms" class="btn-primary-custom">Tìm Phòng Ngay</a>
+            </div>
+        }
+        else
+        {
+            <div class="booking-list-container">
+                @foreach (var booking in Model)
+                {
+                    var tokens = ViewBag.PreCheckinTokens as Dictionary<int, string>;
+                    var token = (tokens != null && tokens.ContainsKey(booking.BookingId)) ? tokens[booking.BookingId] : string.Empty;
+                    var shareLink = Url.Action("PreCheckin", "Bookings", new { id = booking.BookingId, token = token }, Context.Request.Scheme);
+                    
+                    <div class="booking-card">
+                        <!-- Status Pill Badge -->
+                        @switch (booking.BookingStatus)
+                        {
+                            case PhucNguyenResort.Enums.BookingStatus.Reserved:
+                                <span class="status-badge status-reserved">Đã Đặt</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.CheckedIn:
+                                <span class="status-badge status-checkedin">Đang Lưu Trú</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.CheckedOut:
+                                <span class="status-badge status-checkedout">Đã Trả Phòng</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.Cancelled:
+                                <span class="status-badge status-cancelled">Đã Hủy</span>
+                                break;
+                            case PhucNguyenResort.Enums.BookingStatus.NoShow:
+                                <span class="status-badge status-noshow">Không Đến</span>
+                                break;
+                        }
+
+                        <!-- Left: Image Section -->
+                        <div class="booking-card-image">
+                            @if (!string.IsNullOrEmpty(booking.Room?.Category?.ImageUrl))
+                            {
+                                <img src="@booking.Room.Category.ImageUrl" alt="@booking.Room.Category.CategoryName" />
+                            }
+                            else
+                            {
+                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Resort Room" />
+                            }
+                        </div>
+
+                        <!-- Middle: Details -->
+                        <div class="booking-card-info">
+                            <div>
+                                <div class="booking-id">Mã BKG: #@booking.BookingId</div>
+                                <h3>@booking.Room?.Category?.CategoryName <span style="font-size: 1rem; color: var(--text-muted); font-weight: normal;">(Phòng @booking.Room?.RoomNumber)</span></h3>
+                                
+                                <div class="stay-timeline">
+                                    <div class="timeline-node">
+                                        <span>Check-In</span>
+                                        <strong>@booking.CheckInDate.ToString("dd/MM/yyyy")</strong>
+                                    </div>
+                                    <div class="timeline-arrow">
+                                        <i class="fa fa-long-arrow-right"></i>
+                                    </div>
+                                    <div class="timeline-node">
+                                        <span>Check-Out</span>
+                                        <strong>@booking.CheckOutDate.ToString("dd/MM/yyyy")</strong>
+                                    </div>
+                                </div>
+
+                                <div class="booking-meta-row">
+                                    <div class="booking-meta-item">
+                                        <i class="fa fa-users"></i>
+                                        <span>@booking.NumberOfAdults NL, @booking.NumberOfChildren TE</span>
+                                    </div>
+                                    <div class="booking-meta-item">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span>@((booking.CheckOutDate - booking.CheckInDate).Days) đêm nghỉ</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (booking.TourBookings != null && booking.TourBookings.Any())
+                            {
+                                <div class="addons-section">
+                                    <span class="addons-title">Trải Nghiệm Đã Chọn</span>
+                                    <div class="addon-tags-list">
+                                        @foreach (var tb in booking.TourBookings)
+                                        {
+                                            <span class="addon-tag"><i class="fa fa-compass mr-1"></i> @tb.Schedule?.Tour?.TourName (+@tb.TotalAmount?.ToString("N0")đ)</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Right: Pricing & Actions -->
+                        <div class="booking-card-actions">
+                            <div class="pricing-summary">
+                                <div class="price-row">
+                                    <span>Tổng chi phí:</span>
+                                    <strong>@booking.TotalAmount?.ToString("N0") VNĐ</strong>
+                                </div>
+                                <div class="price-row deposit">
+                                    <span>Đã đặt cọc:</span>
+                                    <strong>@booking.DepositAmount?.ToString("N0") VNĐ</strong>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons-group">
+                                @if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
+                                {
+                                    <a asp-action="PreCheckin" asp-route-id="@booking.BookingId" class="btn-action-premium btn-action-primary"><i class="fa fa-id-card-o"></i> Khai Báo Tạm Trú</a>
+
+                                    @if (booking.CheckInDate > DateTime.Now)
+                                    {
+                                        var isMoreThan48h = (booking.CheckInDate - DateTime.Now).TotalHours > 48;
+                                        var refundAmount = booking.DepositAmount?.ToString("N0") ?? "0";
+                                        <button type="button" class="btn-action-premium btn-action-danger btn-cancel-booking" 
+                                                data-id="@booking.BookingId" 
+                                                data-refund="@(isMoreThan48h ? "true" : "false")"
+                                                data-amount="@refundAmount">
+                                            <i class="fa fa-times-circle"></i> Hủy Phòng
+                                        </button>
+                                    }
+                                }
+                                else if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedIn)
+                                {
+                                    <a asp-action="PreCheckin" asp-route-id="@booking.BookingId" class="btn-action-premium btn-action-primary"><i class="fa fa-id-card-o"></i> Xem Khai Báo</a>
+                                }
+                                else
+                                {
+                                    <span class="text-center text-muted small py-2" style="border: 1px dashed var(--border-color); border-radius: 8px; font-weight: 500;">
+                                        Không có hành động
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Cancel Booking Modal -->
+<div class="modal fade" id="cancelBookingModal" tabindex="-1" role="dialog" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden;">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelBookingModalLabel"><i class="fa fa-exclamation-triangle"></i> Hủy Đặt Phòng</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="Cancel" method="post" id="cancelBookingForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="cancelBookingId" name="id" value="" />
+                    
+                    <div id="refundNotice" class="alert mb-3" style="border-radius: 8px;">
+                        <!-- Will be populated by JS -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cancelReason" class="font-weight-bold">Lý do hủy (Không bắt buộc)</label>
+                        <textarea class="form-control" id="cancelReason" name="reason" rows="2" placeholder="Ví dụ: Thay đổi kế hoạch..."></textarea>
+                    </div>
+
+                    <div class="form-group" id="bankDetailsGroup" style="display: none;">
+                        <label for="bankDetails" class="font-weight-bold">Thông tin tài khoản nhận tiền hoàn <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="bankDetails" name="bankDetails" rows="2" placeholder="Tên Ngân Hàng - Số Tài Khoản - Tên Chủ Tài Khoản"></textarea>
+                        <small class="form-text text-muted">Vui lòng nhập chính xác để chúng tôi tiến hành hoàn tiền.</small>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius: 8px;">Đóng</button>
+                    <button type="submit" class="btn btn-danger" id="btnConfirmCancel" style="border-radius: 8px;">Xác Nhận Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.btn-cancel-booking').click(function() {
+                var bookingId = $(this).data('id');
+                var isRefund = $(this).data('refund');
+                var amount = $(this).data('amount');
+
+                $('#cancelBookingId').val(bookingId);
+                $('#cancelReason').val('');
+                $('#bankDetails').val('');
+
+                if (isRefund) {
+                    $('#refundNotice').removeClass('alert-danger').addClass('alert-success');
+                    $('#refundNotice').html('<strong>Hoàn 100% cọc:</strong> Bạn đã hủy trước 48 giờ. Bạn sẽ được hoàn lại <strong>' + amount + ' VNĐ</strong>.');
+                    $('#bankDetailsGroup').show();
+                    $('#bankDetails').prop('required', true);
+                } else {
+                    $('#refundNotice').removeClass('alert-success').addClass('alert-danger');
+                    $('#refundNotice').html('<strong>CẢNH BÁO:</strong> Bạn hủy phòng dưới 48 giờ trước thời điểm Check-in. Theo quy định, bạn sẽ <strong>không được hoàn lại tiền cọc</strong>.');
+                    $('#bankDetailsGroup').hide();
+                    $('#bankDetails').prop('required', false);
+                }
+
+                $('#cancelBookingModal').modal('show');
+            });
+        });
+    </script>
+}

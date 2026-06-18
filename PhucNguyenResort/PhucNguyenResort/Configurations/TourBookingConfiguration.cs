@@ -13,7 +13,8 @@ public class TourBookingConfiguration : IEntityTypeConfiguration<TourBooking>
         builder.HasKey(x => x.TourBookingId);
         builder.Property(x => x.TotalAmount).HasPrecision(18, 2);
         builder.Property(x => x.BookingStatus).HasConversion<string>().HasMaxLength(50).HasDefaultValue(TourBookingStatus.Pending);
-        builder.HasOne(x => x.Booking).WithMany(x => x.TourBookings).HasForeignKey(x => x.BookingId).OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.Booking).WithMany(x => x.TourBookings).HasForeignKey(x => x.BookingId).OnDelete(DeleteBehavior.SetNull);
         builder.HasOne(x => x.Schedule).WithMany(x => x.TourBookings).HasForeignKey(x => x.ScheduleId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.User).WithMany(x => x.TourBookings).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
     }
 }

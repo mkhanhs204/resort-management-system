@@ -37,11 +37,11 @@ namespace PhucNguyenResort.Tests
             };
 
             // It should call SearchAvailableCategoriesAsync with checkInDate = Today and checkOutDate = Today + 1
-            _mockHomeService.Setup(s => s.SearchAvailableCategoriesAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>()))
+            _mockHomeService.Setup(s => s.SearchAvailableCategoriesAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(categories);
 
             // Act
-            var result = await _controller.SearchRooms("invalid-date", "invalid-date", 2, 1) as ViewResult;
+            var result = await _controller.SearchRooms("invalid-date", "invalid-date", 2, 0, 1) as ViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -65,11 +65,11 @@ namespace PhucNguyenResort.Tests
                 new RoomCategory { CategoryId = 1, CategoryName = "Standard" }
             };
 
-            _mockHomeService.Setup(s => s.SearchAvailableCategoriesAsync(expectedCheckInDate, expectedCheckOutDate, 2, 1))
+            _mockHomeService.Setup(s => s.SearchAvailableCategoriesAsync(expectedCheckInDate, expectedCheckOutDate, 2, 0, 1))
                 .ReturnsAsync(categories);
 
             // Act
-            var result = await _controller.SearchRooms(checkIn, checkOut, 2, 1) as ViewResult;
+            var result = await _controller.SearchRooms(checkIn, checkOut, 2, 0, 1) as ViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -78,7 +78,7 @@ namespace PhucNguyenResort.Tests
             Assert.Equal(checkOut, _controller.ViewData["CheckOut"]);
             Assert.True((bool)_controller.ViewData["IsFiltered"]!);
             
-            _mockHomeService.Verify(s => s.SearchAvailableCategoriesAsync(expectedCheckInDate, expectedCheckOutDate, 2, 1), Times.Once);
+            _mockHomeService.Verify(s => s.SearchAvailableCategoriesAsync(expectedCheckInDate, expectedCheckOutDate, 2, 0, 1), Times.Once);
         }
     }
 }

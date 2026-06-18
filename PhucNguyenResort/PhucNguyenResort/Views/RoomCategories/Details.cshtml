@@ -60,8 +60,11 @@
                         <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.CategoryName)</dt>
                         <dd class="col-sm-9 fw-bold fs-5">@Html.DisplayFor(model => model.CategoryName)</dd>
 
-                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.Capacity)</dt>
-                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Capacity) Persons</dd>
+                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.MaxAdults)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.MaxAdults) Người lớn</dd>
+                        
+                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.MaxChildren)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.MaxChildren) Trẻ em</dd>
 
                         <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.PricePerNight)</dt>
                         <dd class="col-sm-9 text-success fw-bold">@Model.PricePerNight?.ToString("N0") VND / Night</dd>

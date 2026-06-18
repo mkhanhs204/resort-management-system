@@ -7,7 +7,8 @@ namespace PhucNguyenResort.Models;
 public class TourBooking
 {
     public int TourBookingId { get; set; }
-    public int BookingId { get; set; }
+    public int? BookingId { get; set; }
+    public int? UserId { get; set; }
     public int ScheduleId { get; set; }
 
     [Range(1, 1000)]
@@ -20,4 +21,6 @@ public class TourBooking
 
     public Booking? Booking { get; set; }
     public TourSchedule? Schedule { get; set; }
+    public User? User { get; set; }
+    public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

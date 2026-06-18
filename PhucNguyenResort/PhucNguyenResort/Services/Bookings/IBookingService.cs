@@ -6,7 +6,7 @@ namespace PhucNguyenResort.Services.Bookings
     public interface IBookingService
     {
         Task<BookingResult> CreateBookingAsync(CreateBookingViewModel request, int userId);
-        Task<CancelBookingResult> CancelBookingAsync(int bookingId, int userId);
+        Task<CancelBookingResult> CancelBookingAsync(int bookingId, int userId, string? reason = null, string? bankDetails = null);
     }
 
     public class BookingResult

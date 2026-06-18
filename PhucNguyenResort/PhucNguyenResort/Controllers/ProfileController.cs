@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization; // Dùng để chặn truy cập bừa bãi
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.ViewModels.Users;
-using System.Security.Claims; // Thư viện bắt buộc để đọc dữ liệu từ Cookie đăng nhập
+using System.Security.Claims;
 using System.Text;
 
 namespace PhucNguyenResort.Controllers
 {
-    [Authorize] // Bổ sung: Chỉ những ai đã đăng nhập thành công mới được phép gọi vào Controller này
+    [Authorize]
     public class ProfileController : Controller
     {
         private readonly ResortDbContext _context;
@@ -24,13 +24,10 @@ namespace PhucNguyenResort.Controllers
         // GET: /Profile
         public async Task<IActionResult> Index()
         {
-            // 1. Đọc UserId động từ các mảnh thông tin (Claims) lưu trong Cookie đăng nhập
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int currentUserId))
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentUserId))
             {
-                // Nếu Cookie lỗi hoặc không tìm thấy ID hợp lệ, yêu cầu đăng nhập lại
-                return RedirectToAction("Login", "Account");
+                return Unauthorized();
             }
 
             // 2. Truy vấn dữ liệu từ DB theo ID tài khoản vừa lấy động
@@ -82,6 +79,12 @@ namespace PhucNguyenResort.Controllers
             if (!ModelState.IsValid)
             {
                 return View("Index", model);
+            }
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentUserId) || currentUserId != model.UserId)
+            {
+                return Unauthorized();
             }
 
             var user = await _context.Users

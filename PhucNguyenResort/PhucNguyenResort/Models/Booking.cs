@@ -15,8 +15,11 @@ public class Booking
     [Required, DataType(DataType.Date)]
     public DateTime CheckOutDate { get; set; }
 
-    [Range(1, 50)]
-    public int? GuestCount { get; set; }
+    [Range(1, 20)]
+    public int? NumberOfAdults { get; set; }
+
+    [Range(0, 10)]
+    public int? NumberOfChildren { get; set; }
 
     public BookingStatus BookingStatus { get; set; } = BookingStatus.Reserved;
 
@@ -27,6 +30,9 @@ public class Booking
     public decimal? TotalAmount { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    public bool PdpdConsentChecked { get; set; }
+    public DateTime? ConsentTimestamp { get; set; }
 
     public User? User { get; set; }
     public Room? Room { get; set; }

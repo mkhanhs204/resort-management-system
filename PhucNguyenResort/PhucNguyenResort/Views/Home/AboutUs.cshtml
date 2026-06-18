@@ -2,17 +2,21 @@
     ViewData["Title"] = "Về Chúng Tôi";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/aboutus-premium.css" asp-append-version="true" />
+}
+
 <!-- Hero Section Begin -->
-<section class="breadcrumb-section set-bg" data-setbg="/img/room/room-b2.jpg" style="background-image: url('/img/room/room-b2.jpg'); padding: 150px 0; position: relative;">
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);"></div>
-    <div class="container" style="position: relative; z-index: 1;">
+<section class="about-hero" style="background-image: url('/img/room/room-b2.jpg');">
+    <div class="about-hero-overlay"></div>
+    <div class="container about-hero-content">
         <div class="row">
             <div class="col-lg-12 text-center">
                 <div class="breadcrumb-text">
-                    <h2 style="color: #fff; font-size: 50px; font-weight: 700; margin-bottom: 15px; letter-spacing: 2px;">Câu Chuyện Của Chúng Tôi</h2>
-                    <div class="bt-option">
-                        <a asp-controller="Home" asp-action="Index" style="color: #dfa974; text-transform: uppercase; letter-spacing: 2px; font-weight: 500; margin-right: 15px;">Trang Chủ</a>
-                        <span style="color: #fff; text-transform: uppercase; letter-spacing: 2px; font-weight: 500;">/ Về Chúng Tôi</span>
+                    <h2 class="about-hero-title">Câu Chuyện Của Chúng Tôi</h2>
+                    <div class="about-hero-breadcrumb">
+                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
+                        <span>/ Về Chúng Tôi</span>
                     </div>
                 </div>
             </div>
@@ -22,32 +26,32 @@
 <!-- Hero Section End -->
 
 <!-- Our Story Section Begin -->
-<section class="aboutus-page-section spad" style="padding-top: 100px; padding-bottom: 80px;">
+<section class="aboutus-page-section about-section-padding">
     <div class="container">
         <div class="row align-items-center">
             <!-- Text Column -->
             <div class="col-lg-5 mb-5 mb-lg-0">
                 <div class="ap-title">
-                    <span style="color: #dfa974; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; display: block; margin-bottom: 10px;">Chào Mừng Đến Với Phúc Nguyên</span>
-                    <h2 style="color: #19191a; font-family: 'Lora', serif; font-size: 40px; line-height: 1.3; font-weight: 700; margin-bottom: 30px;">
-                        Nơi Giao Thoa Giữa <br /> <span style="color: #8f3636;">Thiên Nhiên & Đẳng Cấp</span>
+                    <span class="about-subtitle">Chào Mừng Đến Với Phúc Nguyên</span>
+                    <h2 class="about-title">
+                        Nơi Giao Thoa Giữa <br /> <span class="about-title-highlight">Thiên Nhiên & Đẳng Cấp</span>
                     </h2>
-                    <p style="color: #666; font-size: 16px; line-height: 1.8; margin-bottom: 25px;">
+                    <p class="about-text">
                         Nằm ẩn mình trên bờ biển thơ mộng với dải cát trắng mịn, Phúc Nguyên Resort là điểm đến lý tưởng cho những ai đang tìm kiếm sự bình yên. Được thiết kế với sự kết hợp hoàn hảo giữa kiến trúc truyền thống Indochine và nét hiện đại sang trọng, chúng tôi mang đến một không gian nghỉ dưỡng tuyệt vời.
                     </p>
-                    <p style="color: #666; font-size: 16px; line-height: 1.8; margin-bottom: 40px;">
+                    <p class="about-text">
                         Được thành lập vào năm 2010, Phúc Nguyên Resort tự hào phục vụ hàng ngàn du khách trong và ngoài nước. Chúng tôi luôn cam kết mang lại trải nghiệm độc bản, từ các phòng nghỉ tiện nghi, hồ bơi vô cực nhìn ra đại dương, đến dịch vụ ẩm thực địa phương tinh tế.
                     </p>
-                    <a asp-controller="Home" asp-action="Index" class="primary-btn" style="background-color: #8f3636; color: white; padding: 14px 30px; letter-spacing: 2px; border-radius: 4px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#7a2e2e'" onmouseout="this.style.backgroundColor='#8f3636'">KHÁM PHÁ PHÒNG NGAY</a>
+                    <a asp-controller="Home" asp-action="Index" class="about-btn">KHÁM PHÁ PHÒNG NGAY</a>
                 </div>
             </div>
             <!-- Image Column -->
             <div class="col-lg-6 offset-lg-1">
-                <div style="position: relative;">
-                    <img src="/img/about/about-p1.jpg" alt="About Us" style="width: 100%; border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);">
-                    <div style="position: absolute; bottom: -30px; left: -30px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-left: 4px solid #8f3636;">
-                        <h4 style="color: #19191a; font-family: 'Lora', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px;">15+ Năm</h4>
-                        <p style="margin: 0; color: #666; font-size: 15px;">Kinh nghiệm phục vụ &<br> kiến tạo kỳ nghỉ hoàn hảo.</p>
+                <div class="story-img-wrapper">
+                    <img src="/img/about/about-p1.jpg" alt="About Us" class="story-img">
+                    <div class="story-badge">
+                        <h4>15+ Năm</h4>
+                        <p>Kinh nghiệm phục vụ &<br> kiến tạo kỳ nghỉ hoàn hảo.</p>
                     </div>
                 </div>
             </div>
@@ -57,34 +61,34 @@
 <!-- Our Story Section End -->
 
 <!-- Core Values Section Begin -->
-<section style="background-color: #fdfbf9; padding: 100px 0;">
+<section class="core-values-section">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col-lg-12">
-                <span style="color: #dfa974; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; display: block; margin-bottom: 10px;">Giá Trị Cốt Lõi</span>
-                <h2 style="color: #19191a; font-family: 'Lora', serif; font-size: 36px; font-weight: 700;">Tại Sao Chọn Chúng Tôi?</h2>
+                <span class="about-subtitle">Giá Trị Cốt Lõi</span>
+                <h2 class="about-title">Tại Sao Chọn Chúng Tôi?</h2>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-4 col-md-6 mb-4">
-                <div style="background: white; padding: 40px 30px; border-radius: 8px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.03); height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <i class="fa fa-building-o" style="font-size: 50px; color: #8f3636; margin-bottom: 25px; display: inline-block;"></i>
-                    <h4 style="font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: #19191a; margin-bottom: 15px;">Kiến Trúc Độc Bản</h4>
-                    <p style="color: #666; line-height: 1.6; margin: 0;">Sự giao thoa hoàn mỹ giữa nét văn hóa truyền thống Indochine và phong cách sống hiện đại, mang lại không gian lưu trú kiệt tác.</p>
+                <div class="value-card">
+                    <i class="fa fa-building-o value-icon"></i>
+                    <h4 class="value-title">Kiến Trúc Độc Bản</h4>
+                    <p class="value-text">Sự giao thoa hoàn mỹ giữa nét văn hóa truyền thống Indochine và phong cách sống hiện đại, mang lại không gian lưu trú kiệt tác.</p>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6 mb-4">
-                <div style="background: white; padding: 40px 30px; border-radius: 8px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.03); height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <i class="fa fa-heart-o" style="font-size: 50px; color: #8f3636; margin-bottom: 25px; display: inline-block;"></i>
-                    <h4 style="font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: #19191a; margin-bottom: 15px;">Dịch Vụ Tận Tâm</h4>
-                    <p style="color: #666; line-height: 1.6; margin: 0;">Đội ngũ nhân viên chuyên nghiệp, thân thiện, luôn sẵn sàng đáp ứng mọi nhu cầu để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>
+                <div class="value-card">
+                    <i class="fa fa-heart-o value-icon"></i>
+                    <h4 class="value-title">Dịch Vụ Tận Tâm</h4>
+                    <p class="value-text">Đội ngũ nhân viên chuyên nghiệp, thân thiện, luôn sẵn sàng đáp ứng mọi nhu cầu để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6 mb-4">
-                <div style="background: white; padding: 40px 30px; border-radius: 8px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.03); height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <i class="fa fa-leaf" style="font-size: 50px; color: #8f3636; margin-bottom: 25px; display: inline-block;"></i>
-                    <h4 style="font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: #19191a; margin-bottom: 15px;">Gần Gũi Thiên Nhiên</h4>
-                    <p style="color: #666; line-height: 1.6; margin: 0;">Bao quanh bởi biển xanh và những khu vườn nhiệt đới xanh mát, mang bạn đến gần hơn với sự tĩnh lặng của thiên nhiên.</p>
+                <div class="value-card">
+                    <i class="fa fa-leaf value-icon"></i>
+                    <h4 class="value-title">Gần Gũi Thiên Nhiên</h4>
+                    <p class="value-text">Bao quanh bởi biển xanh và những khu vườn nhiệt đới xanh mát, mang bạn đến gần hơn với sự tĩnh lặng của thiên nhiên.</p>
                 </div>
             </div>
         </div>
@@ -93,40 +97,40 @@
 <!-- Core Values Section End -->
 
 <!-- Signature Experiences Section Begin -->
-<section class="aboutus-page-section spad" style="padding-top: 100px; padding-bottom: 80px;">
+<section class="aboutus-page-section about-section-padding">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col-lg-12">
-                <span style="color: #dfa974; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; display: block; margin-bottom: 10px;">Trải Nghiệm</span>
-                <h2 style="color: #19191a; font-family: 'Lora', serif; font-size: 36px; font-weight: 700;">Dịch Vụ Đẳng Cấp</h2>
+                <span class="about-subtitle">Trải Nghiệm</span>
+                <h2 class="about-title">Dịch Vụ Đẳng Cấp</h2>
             </div>
         </div>
         <div class="about-page-services">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <div class="ap-service-item set-bg" data-setbg="/img/about/about-p1.jpg" style="background-image: url('/img/about/about-p1.jpg'); border-radius: 8px; height: 350px; position: relative; overflow: hidden; cursor: pointer;">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);"></div>
-                        <div class="api-text" style="position: absolute; bottom: 30px; left: 30px; text-align: left;">
-                            <h3 style="color: white; font-family: 'Lora', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px;">Nhà Hàng & Bar</h3>
-                            <p style="color: #eee; font-size: 15px; margin: 0; opacity: 0; transition: 0.3s; transform: translateY(20px);" class="hover-text">Thưởng thức tinh hoa ẩm thực địa phương và quốc tế.</p>
+                    <div class="experience-card" style="background-image: url('/img/about/about-p1.jpg');">
+                        <div class="experience-overlay"></div>
+                        <div class="experience-content">
+                            <h3 class="experience-title">Nhà Hàng & Bar</h3>
+                            <p class="experience-desc">Thưởng thức tinh hoa ẩm thực địa phương và quốc tế.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
-                    <div class="ap-service-item set-bg" data-setbg="/img/about/about-p2.jpg" style="background-image: url('/img/about/about-p2.jpg'); border-radius: 8px; height: 350px; position: relative; overflow: hidden; cursor: pointer;">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);"></div>
-                        <div class="api-text" style="position: absolute; bottom: 30px; left: 30px; text-align: left;">
-                            <h3 style="color: white; font-family: 'Lora', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px;">Hồ Bơi Vô Cực</h3>
-                            <p style="color: #eee; font-size: 15px; margin: 0; opacity: 0; transition: 0.3s; transform: translateY(20px);" class="hover-text">Thư giãn tuyệt đối giữa làn nước trong xanh ngắm đại dương.</p>
+                    <div class="experience-card" style="background-image: url('/img/about/about-p2.jpg');">
+                        <div class="experience-overlay"></div>
+                        <div class="experience-content">
+                            <h3 class="experience-title">Hồ Bơi Vô Cực</h3>
+                            <p class="experience-desc">Thư giãn tuyệt đối giữa làn nước trong xanh ngắm đại dương.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
-                    <div class="ap-service-item set-bg" data-setbg="/img/about/about-p3.jpg" style="background-image: url('/img/about/about-p3.jpg'); border-radius: 8px; height: 350px; position: relative; overflow: hidden; cursor: pointer;">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);"></div>
-                        <div class="api-text" style="position: absolute; bottom: 30px; left: 30px; text-align: left;">
-                            <h3 style="color: white; font-family: 'Lora', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px;">Spa & Trị Liệu</h3>
-                            <p style="color: #eee; font-size: 15px; margin: 0; opacity: 0; transition: 0.3s; transform: translateY(20px);" class="hover-text">Đánh thức mọi giác quan với các liệu trình spa độc quyền.</p>
+                    <div class="experience-card" style="background-image: url('/img/about/about-p3.jpg');">
+                        <div class="experience-overlay"></div>
+                        <div class="experience-content">
+                            <h3 class="experience-title">Spa & Trị Liệu</h3>
+                            <p class="experience-desc">Đánh thức mọi giác quan với các liệu trình spa độc quyền.</p>
                         </div>
                     </div>
                 </div>
@@ -137,15 +141,15 @@
 <!-- Signature Experiences Section End -->
 
 <!-- Video Section Begin -->
-<section class="video-section set-bg" data-setbg="/img/video-bg.jpg" style="background-image: url('/img/video-bg.jpg'); padding: 150px 0; position: relative;">
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);"></div>
-    <div class="container" style="position: relative; z-index: 1;">
+<section class="about-video-section" style="background-image: url('/img/video-bg.jpg');">
+    <div class="about-hero-overlay"></div>
+    <div class="container about-hero-content">
         <div class="row">
             <div class="col-lg-12 text-center">
-                <div class="video-text">
-                    <h2 style="color: white; font-family: 'Lora', serif; font-size: 40px; font-weight: 700; margin-bottom: 20px;">Khám Phá Khu Nghỉ Dưỡng Của Chúng Tôi</h2>
-                    <p style="color: #eee; font-size: 18px; margin-bottom: 50px;">Cảm nhận sự sang trọng, thiên nhiên tươi đẹp và dịch vụ hoàn hảo qua từng góc nhìn.</p>
-                    <a href="https://www.youtube.com/watch?v=EzKkl64rRbM" class="play-btn video-popup" style="display: inline-block; width: 80px; height: 80px; background: white; border-radius: 50%; line-height: 80px; text-align: center; color: #8f3636; font-size: 30px; padding-left: 5px; transition: 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                <div class="about-video-text">
+                    <h2>Khám Phá Khu Nghỉ Dưỡng Của Chúng Tôi</h2>
+                    <p>Cảm nhận sự sang trọng, thiên nhiên tươi đẹp và dịch vụ hoàn hảo qua từng góc nhìn.</p>
+                    <a href="https://www.youtube.com/watch?v=EzKkl64rRbM" class="about-play-btn video-popup">
                         <i class="fa fa-play"></i>
                     </a>
                 </div>
@@ -154,12 +158,3 @@
     </div>
 </section>
 <!-- Video Section End -->
-
-@section Scripts {
-    <style>
-        .ap-service-item:hover .hover-text {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-    </style>
-}

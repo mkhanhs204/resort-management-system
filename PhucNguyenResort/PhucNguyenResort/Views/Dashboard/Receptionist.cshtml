@@ -1,0 +1,127 @@
+@{
+    ViewData["Title"] = "Front Desk Dashboard";
+    Layout = "_DashboardLayout";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-calendar-check-o mr-2" style="color: #dfa974;"></i> Receptionist — Front Desk
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Manage bookings, check-in/check-out guests, update room status.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #dfa974;">
+            <h4 style="color: #dfa974;"><i class="fa fa-sign-in"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Today's Arrivals</p>
+            <small class="text-muted">Guests expected to check-in</small>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #007bff;">
+            <h4 style="color: #007bff;"><i class="fa fa-bed"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Active Stay Guests</p>
+            <small class="text-muted">Currently checked-in</small>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545;">
+            <h4 style="color: #dc3545;"><i class="fa fa-sign-out"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Today's Departures</p>
+            <small class="text-muted">Guests expected to check-out</small>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
+            <h4 style="color: #28a745;"><i class="fa fa-check-circle"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Available Rooms</p>
+            <small class="text-muted">Ready for assignment</small>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-box" style="border-left: 5px solid #dfa974;">
+            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 15px;">
+                <i class="fa fa-bolt mr-2" style="color: #dfa974;"></i> Front Desk Quick Actions
+            </h5>
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <a asp-controller="Home" asp-action="SearchRooms" class="btn btn-outline-dark btn-block" style="font-family: 'Cabin', sans-serif;">
+                        <i class="fa fa-plus mr-2"></i> Walk-in Booking
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a asp-controller="Bookings" asp-action="Index" class="btn btn-outline-dark btn-block" style="font-family: 'Cabin', sans-serif;">
+                        <i class="fa fa-list mr-2"></i> All Bookings
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a asp-controller="Rooms" asp-action="Index" class="btn btn-outline-dark btn-block" style="font-family: 'Cabin', sans-serif;">
+                        <i class="fa fa-bed mr-2"></i> Room Status
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <button class="btn btn-outline-dark btn-block" style="font-family: 'Cabin', sans-serif;" disabled>
+                        <i class="fa fa-file-text mr-2"></i> Export Tạm Trú
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Bookings Table (Placeholder) -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0;">
+                    <i class="fa fa-clock-o mr-2" style="color: #dfa974;"></i> Recent Bookings
+                </h5>
+                <a asp-controller="Bookings" asp-action="Index" class="btn btn-sm btn-dark" style="font-family: 'Cabin', sans-serif;">
+                    View All <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="font-family: 'Cabin', sans-serif;">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Booking ID</th>
+                            <th>Guest Name</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Status</th>
+                            <th>Room</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fa fa-info-circle mr-2"></i> Booking data will be loaded when backend is connected.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -49,7 +49,7 @@ namespace PhucNguyenResort.Services.Bookings
             int nights = (request.CheckOutDate - request.CheckInDate).Days;
             decimal pricePerNight = room.Category.PricePerNight ?? 0;
             decimal totalPrice = nights * pricePerNight;
-            decimal depositAmount = totalPrice * 0.5m;
+            decimal depositAmount = totalPrice * 0.4m;
 
             var booking = new Booking
             {
@@ -57,12 +57,63 @@ namespace PhucNguyenResort.Services.Bookings
                 UserId = userId,
                 CheckInDate = request.CheckInDate,
                 CheckOutDate = request.CheckOutDate,
+                NumberOfAdults = request.NumberOfAdults,
+                NumberOfChildren = request.NumberOfChildren,
                 TotalAmount = totalPrice,
                 DepositAmount = depositAmount,
-                BookingStatus = BookingStatus.Reserved
+                BookingStatus = BookingStatus.PendingPayment
             };
 
             _context.Bookings.Add(booking);
+
+            // Xử lý tạo TourBookings nếu khách có chọn Add-on
+            if (request.SelectedTourScheduleIds != null && request.SelectedTourScheduleIds.Any())
+            {
+                // Lấy thông tin các Schedule để tính tiền
+                var schedules = await _context.TourSchedules
+                    .Include(s => s.Tour)
+                    .Where(s => request.SelectedTourScheduleIds.Contains(s.ScheduleId))
+                    .ToListAsync();
+
+                int requestedSlots = request.NumberOfAdults + request.NumberOfChildren;
+
+                foreach (var schedule in schedules)
+                {
+                    if (schedule.Tour != null)
+                    {
+                        if (schedule.AvailableSlots.HasValue && schedule.AvailableSlots.Value < requestedSlots)
+                        {
+                            return new BookingResult
+                            {
+                                Success = false,
+                                ErrorCode = "BKG-003",
+                                ErrorMessage = $"Not enough slots available for tour: {schedule.Tour.TourName}"
+                            };
+                        }
+
+                        decimal tourTotal = (schedule.Tour.Price ?? 0) * requestedSlots;
+                        var tourBooking = new TourBooking
+                        {
+                            Booking = booking, // EF Core sẽ tự link BookingId khi booking được save
+                            UserId = userId,
+                            ScheduleId = schedule.ScheduleId,
+                            Participants = requestedSlots,
+                            TotalAmount = tourTotal,
+                            BookingStatus = TourBookingStatus.Pending
+                        };
+                        _context.TourBookings.Add(tourBooking);
+                        
+                        if (schedule.AvailableSlots.HasValue)
+                        {
+                            schedule.AvailableSlots -= requestedSlots;
+                        }
+
+                        // Cập nhật lại tổng tiền phòng và tiền cọc bao gồm cả Tour
+                        booking.TotalAmount += tourTotal;
+                        booking.DepositAmount += tourTotal * 0.4m;
+                    }
+                }
+            }
             
             try
             {
@@ -75,7 +126,7 @@ namespace PhucNguyenResort.Services.Bookings
             }
         }
 
-        public async Task<CancelBookingResult> CancelBookingAsync(int bookingId, int userId)
+        public async Task<CancelBookingResult> CancelBookingAsync(int bookingId, int userId, string? reason = null, string? bankDetails = null)
         {
             var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.BookingId == bookingId && b.UserId == userId);
             if (booking == null)
@@ -95,6 +146,38 @@ namespace PhucNguyenResort.Services.Bookings
             }
 
             booking.BookingStatus = BookingStatus.Cancelled;
+            
+            if (refundAmount > 0)
+            {
+                var refund = new Refund
+                {
+                    BookingId = booking.BookingId,
+                    RefundAmount = refundAmount,
+                    RefundReason = reason,
+                    BankDetails = bankDetails,
+                    RefundStatus = RefundStatus.Pending,
+                    CreatedAt = DateTime.Now
+                };
+                _context.Refunds.Add(refund);
+            }
+
+            // Cancel all associated tour bookings and restore slots
+            var tourBookings = await _context.TourBookings
+                .Include(tb => tb.Schedule)
+                .Where(tb => tb.BookingId == bookingId)
+                .ToListAsync();
+            foreach (var tb in tourBookings)
+            {
+                if (tb.BookingStatus != TourBookingStatus.Cancelled)
+                {
+                    tb.BookingStatus = TourBookingStatus.Cancelled;
+                    if (tb.Schedule != null && tb.Schedule.AvailableSlots.HasValue)
+                    {
+                        tb.Schedule.AvailableSlots += tb.Participants ?? 0;
+                    }
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return new CancelBookingResult { Success = true, RefundAmount = refundAmount };

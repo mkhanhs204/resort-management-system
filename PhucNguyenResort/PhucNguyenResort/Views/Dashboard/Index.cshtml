@@ -1,74 +1,20 @@
 @{
-    ViewData["Title"] = "Dashboard Overview";
+    ViewData["Title"] = "Dashboard";
     Layout = "_DashboardLayout";
 }
 
 <div class="row">
-    <div class="col-lg-12">
-        <h2 style="font-family: 'Lora', serif; margin-bottom: 20px;">Welcome back, Staff Member!</h2>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Quick Stats -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card-box text-center">
-            <h4 style="color: #dfa974;"><i class="fa fa-bed"></i></h4>
-            <h3 class="mt-2">15</h3>
-            <p class="text-muted mb-0">Rooms Available</p>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="card-box text-center">
-            <h4 style="color: #dfa974;"><i class="fa fa-book"></i></h4>
-            <h3 class="mt-2">24</h3>
-            <p class="text-muted mb-0">Today's Bookings</p>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="card-box text-center">
-            <h4 style="color: #dfa974;"><i class="fa fa-cutlery"></i></h4>
-            <h3 class="mt-2">12</h3>
-            <p class="text-muted mb-0">Pending Orders</p>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="card-box text-center">
-            <h4 style="color: #dfa974;"><i class="fa fa-wrench"></i></h4>
-            <h3 class="mt-2">3</h3>
-            <p class="text-muted mb-0">Service Requests</p>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card-box">
-            <h5 class="mb-4">Recent Activity</h5>
-            <ul class="list-unstyled">
-                <li class="mb-3 border-bottom pb-2">
-                    <strong>Booking #1024</strong> confirmed by Receptionist. <span class="text-muted float-right">10 mins ago</span>
-                </li>
-                <li class="mb-3 border-bottom pb-2">
-                    <strong>Room 204</strong> marked as Clean by Housekeeping. <span class="text-muted float-right">1 hour ago</span>
-                </li>
-                <li class="mb-3 border-bottom pb-2">
-                    <strong>AC Repair</strong> requested for Room 301. <span class="text-muted float-right">2 hours ago</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card-box">
-            <h5 class="mb-4">Role Quick Links</h5>
-            <ul class="list-unstyled">
-                <li class="mb-2"><a href="#" style="color: #dfa974;">Generate Revenue Report (Admin)</a></li>
-                <li class="mb-2"><a href="#" style="color: #dfa974;">New Walk-in Booking (Receptionist)</a></li>
-                <li class="mb-2"><a href="#" style="color: #dfa974;">Update Room Status (Housekeeping)</a></li>
-            </ul>
-        </div>
+    <div class="col-lg-12 text-center" style="padding: 80px 20px;">
+        <i class="fa fa-dashboard fa-4x mb-4 d-block" style="color: #dfa974;"></i>
+        <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a;">
+            Welcome, @(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Staff Member")!
+        </h2>
+        <p class="text-muted mt-3" style="font-family: 'Cabin', sans-serif; font-size: 16px;">
+            Your role does not have a dedicated dashboard page configured yet.<br/>
+            Please contact the System Administrator if you believe this is an error.
+        </p>
+        <a href="/" class="btn btn-outline-dark mt-3" style="font-family: 'Cabin', sans-serif;">
+            <i class="fa fa-globe mr-2"></i> Return to Website
+        </a>
     </div>
 </div>
