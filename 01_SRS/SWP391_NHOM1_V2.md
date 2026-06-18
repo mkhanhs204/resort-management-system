@@ -497,32 +497,33 @@ From context diagram to use case modeling
 
 **Entities Description**
 
-| No | Table | Description |
-| ----- | :---- | :---- |
-| 1 | Roles | Primary keys: RoleId Foreign keys: None Unique keys: RoleName |
-| 2 | Users | Primary keys: UserId Foreign keys: RoleId → Roles(RoleId) Unique keys: Email |
-| 3 | UserProfiles | Primary keys: ProfileId Foreign keys: UserId → Users(UserId) Unique keys: UserId |
-| 4 | RoomCategories | Primary keys: CategoryId Foreign keys: None Unique keys: None |
-| 5 | Rooms | Primary keys: RoomId Foreign keys: CategoryId → RoomCategories(CategoryId) Unique keys: RoomNumber |
-| 6 | Bookings | Primary keys: BookingId Foreign keys: UserId → Users(UserId), RoomId → Rooms(RoomId) Unique keys: None |
-| 7 | BookingGuests | Primary keys: BookingGuestId Foreign keys: BookingId → Bookings(BookingId) Unique keys: None |
-| 8 | MenuCategories | Primary keys: CategoryId Foreign keys: None Unique keys: None |
-| 9 | MenuItems | Primary keys: MenuItemId Foreign keys: CategoryId → MenuCategories(CategoryId) Unique keys: None |
-| 10 | DiningTables | Primary keys: TableId Foreign keys: None Unique keys: None |
-| 11 | TableReservations | Primary keys: ReservationId Foreign keys: UserId → Users(UserId), TableId → DiningTables(TableId) Unique keys: None |
-| 12 | FoodOrders | Primary keys: FoodOrderId Foreign keys: BookingId → Bookings(BookingId) Unique keys: None |
-| 13 | FoodOrderItems | Primary keys: OrderItemId Foreign keys: FoodOrderId → FoodOrders(FoodOrderId), MenuItemId → MenuItems(MenuItemId) Unique keys: None |
-| 14 | KOT | Primary keys: KotId Foreign keys: FoodOrderId → FoodOrders(FoodOrderId) Unique keys: FoodOrderId |
-| 15 | Tours | Primary keys: TourId Foreign keys: None Unique keys: None |
-| 16 | TourSchedules | Primary keys: ScheduleId Foreign keys: TourId → Tours(TourId), GuideId → Users(UserId) Unique keys: None |
-| 17 | TourBookings | Primary keys: TourBookingId Foreign keys: UserId → Users(UserId), BookingId (Nullable) → Bookings(BookingId), ScheduleId → TourSchedules(ScheduleId)  Unique keys: None |
-| 18 | Reviews | Primary keys: ReviewId Foreign keys: UserId → Users(UserId) Unique keys: None |
-| 19 | GuestFolios | Primary keys: FolioId Foreign keys: BookingId → Bookings(BookingId) Unique keys: BookingId |
-| 20 | FolioTransactions | Primary keys: TransactionId Foreign keys: FolioId → GuestFolios(FolioId) Unique keys: None |
-| 21 | Invoices | Primary keys: InvoiceId Foreign keys: FolioId → GuestFolios(FolioId) Unique keys: FolioId |
-| 22 | Payments | Primary keys: PaymentId Foreign keys: InvoiceId (Nullable) → Invoices(InvoiceId), TourBookingId (Nullable) → TourBookings(TourBookingId)  Unique keys: None |
-| 23 | Refunds | Primary keys: RefundId Foreign keys: BookingId → Bookings(BookingId) Unique keys: None |
-| 24 | Notifications | Primary keys: NotificationId Foreign keys: UserId → Users(UserId) Unique keys: None |
+| No  | Table             | Description                                                                                                                                                                   |
+| -----| :------------------| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1   | Roles             | Primary keys: RoleId Foreign keys: None Unique keys: RoleName                                                                                                                 |
+| 2   | Users             | Primary keys: UserId Foreign keys: RoleId → Roles(RoleId) Unique keys: Email                                                                                                  |
+| 3   | UserProfiles      | Primary keys: ProfileId Foreign keys: UserId → Users(UserId) Unique keys: UserId                                                                                              |
+| 4   | RoomCategories    | Primary keys: CategoryId Foreign keys: None Unique keys: None                                                                                                                 |
+| 5   | Rooms             | Primary keys: RoomId Foreign keys: CategoryId → RoomCategories(CategoryId) Unique keys: RoomNumber                                                                            |
+| 6   | Bookings          | Primary keys: BookingId Foreign keys: UserId → Users(UserId) Unique keys: None                                                                                                |
+| 7   | BookingDetails    | Primary keys: BookingDetailId Foreign keys: BookingId → Bookings(BookingId), RoomCategoryId → RoomCategories(CategoryId), RoomId (Nullable) → Rooms(RoomId) Unique keys: None |
+| 8   | BookingGuests     | Primary keys: BookingGuestId Foreign keys: BookingId → Bookings(BookingId) Unique keys: None                                                                                  |
+| 9   | MenuCategories    | Primary keys: CategoryId Foreign keys: None Unique keys: None                                                                                                                 |
+| 10  | MenuItems         | Primary keys: MenuItemId Foreign keys: CategoryId → MenuCategories(CategoryId) Unique keys: None                                                                              |
+| 11  | DiningTables      | Primary keys: TableId Foreign keys: None Unique keys: None                                                                                                                    |
+| 12  | TableReservations | Primary keys: ReservationId Foreign keys: UserId → Users(UserId), TableId → DiningTables(TableId) Unique keys: None                                                           |
+| 13  | FoodOrders        | Primary keys: FoodOrderId Foreign keys: BookingId → Bookings(BookingId) Unique keys: None                                                                                     |
+| 14  | FoodOrderItems    | Primary keys: OrderItemId Foreign keys: FoodOrderId → FoodOrders(FoodOrderId), MenuItemId → MenuItems(MenuItemId) Unique keys: None                                           |
+| 15  | KOT               | Primary keys: KotId Foreign keys: FoodOrderId → FoodOrders(FoodOrderId) Unique keys: FoodOrderId                                                                              |
+| 16  | Tours             | Primary keys: TourId Foreign keys: None Unique keys: None                                                                                                                     |
+| 17  | TourSchedules     | Primary keys: ScheduleId Foreign keys: TourId → Tours(TourId), GuideId → Users(UserId) Unique keys: None                                                                      |
+| 18  | TourBookings      | Primary keys: TourBookingId Foreign keys: UserId → Users(UserId), BookingId (Nullable) → Bookings(BookingId), ScheduleId → TourSchedules(ScheduleId)  Unique keys: None       |
+| 19  | Reviews           | Primary keys: ReviewId Foreign keys: UserId → Users(UserId) Unique keys: None                                                                                                 |
+| 20  | GuestFolios       | Primary keys: FolioId Foreign keys: BookingId → Bookings(BookingId) Unique keys: BookingId                                                                                    |
+| 21  | FolioTransactions | Primary keys: TransactionId Foreign keys: FolioId → GuestFolios(FolioId) Unique keys: None                                                                                    |
+| 22  | Invoices          | Primary keys: InvoiceId Foreign keys: FolioId → GuestFolios(FolioId) Unique keys: FolioId                                                                                     |
+| 23  | Payments          | Primary keys: PaymentId Foreign keys: InvoiceId (Nullable) → Invoices(InvoiceId), TourBookingId (Nullable) → TourBookings(TourBookingId)  Unique keys: None                   |
+| 24  | Refunds           | Primary keys: RefundId Foreign keys: BookingId → Bookings(BookingId) Unique keys: None                                                                                        |
+| 25  | Notifications     | Primary keys: NotificationId Foreign keys: UserId → Users(UserId) Unique keys: None                                                                                           |
 
  
 
