@@ -43,5 +43,15 @@ namespace PhucNguyenResort.ViewModels.Users
         // Thuộc tính bổ sung để nhận file upload từ form chỉnh sửa
         [Display(Name = "Tải lên ảnh hộ chiếu mới")]
         public IFormFile? PassportImageFile { get; set; }
+
+        public List<ProfileBookingVM> CheckedInBookings { get; set; } = new();
+    }
+
+    public class ProfileBookingVM
+    {
+        public int BookingId { get; set; }
+        public string RoomNumber { get; set; } = string.Empty;
+        public DateTime CheckInDate { get; set; }
+        public DateTime CheckOutDate { get; set; }
     }
 }

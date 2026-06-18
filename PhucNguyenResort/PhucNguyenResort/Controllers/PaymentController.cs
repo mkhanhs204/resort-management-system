@@ -32,7 +32,7 @@ namespace PhucNguyenResort.Controllers
             var response = _vnPayService.ExecutePayment(Request.Query);
             if (!response.Success)
             {
-                // Optionally handle fail
+                var paymentDescription = $"Thanh toan dat phong #{response.OrderId}";
                 TempData["Error"] = "Thanh toán không thành công. Mã lỗi: " + response.VnPayResponseCode;
             }
             else
@@ -42,7 +42,8 @@ namespace PhucNguyenResort.Controllers
                 {
                     var booking = _context.Bookings
                         .Include(b => b.User)
-                        .Include(b => b.Room)
+                        .Include(b => b.BookingDetails)
+                            .ThenInclude(bd => bd.Room)
                         .Include(b => b.TourBookings)
                             .ThenInclude(tb => tb.Schedule)
                                 .ThenInclude(s => s.Tour)
@@ -92,7 +93,7 @@ namespace PhucNguyenResort.Controllers
                                 var htmlBody = System.IO.File.ReadAllText(templatePath);
                                 htmlBody = htmlBody.Replace("{{CustomerName}}", booking.User.FullName)
                                                    .Replace("{{BookingId}}", booking.BookingId.ToString())
-                                                   .Replace("{{RoomName}}", booking.Room?.RoomNumber ?? "N/A")
+                                                   .Replace("{{RoomName}}", booking.BookingDetails != null && booking.BookingDetails.Any(bd => bd.Room != null) ? string.Join(", ", booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : "Chưa xếp phòng")
                                                    .Replace("{{CheckInDate}}", booking.CheckInDate.ToString("dd/MM/yyyy"))
                                                    .Replace("{{CheckOutDate}}", booking.CheckOutDate.ToString("dd/MM/yyyy"))
                                                    .Replace("{{TotalAmount}}", (booking.TotalAmount ?? 0).ToString("N0"))

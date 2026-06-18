@@ -64,9 +64,6 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<bool>("PdpdConsentChecked")
                         .HasColumnType("bit");
 
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("TotalAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -75,8 +72,6 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("BookingId");
-
-                    b.HasIndex("RoomId");
 
                     b.HasIndex("UserId");
 
@@ -87,14 +82,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 1,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 6, 5, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7729),
-                            CheckOutDate = new DateTime(2026, 6, 7, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7736),
-                            CreatedAt = new DateTime(2026, 5, 31, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7740),
+                            CheckInDate = new DateTime(2026, 6, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3575),
+                            CheckOutDate = new DateTime(2026, 6, 10, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3582),
+                            CreatedAt = new DateTime(2026, 6, 3, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3586),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 1,
                             TotalAmount = 2400000m,
                             UserId = 2
                         },
@@ -102,14 +96,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 2,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 20, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7743),
-                            CheckOutDate = new DateTime(2026, 6, 23, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7744),
-                            CreatedAt = new DateTime(2026, 6, 13, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7746),
+                            CheckInDate = new DateTime(2026, 6, 23, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3589),
+                            CheckOutDate = new DateTime(2026, 6, 26, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3590),
+                            CreatedAt = new DateTime(2026, 6, 16, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3591),
                             DepositAmount = 1500000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 2,
                             TotalAmount = 3000000m,
                             UserId = 2
                         },
@@ -117,14 +110,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 3,
                             BookingStatus = "PendingPayment",
-                            CheckInDate = new DateTime(2026, 6, 25, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7747),
-                            CheckOutDate = new DateTime(2026, 6, 27, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7748),
-                            CreatedAt = new DateTime(2026, 6, 14, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7749),
+                            CheckInDate = new DateTime(2026, 6, 28, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3593),
+                            CheckOutDate = new DateTime(2026, 6, 30, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3594),
+                            CreatedAt = new DateTime(2026, 6, 17, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3596),
                             DepositAmount = 2500000m,
                             NumberOfAdults = 4,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 10,
                             TotalAmount = 5000000m,
                             UserId = 3
                         },
@@ -132,14 +124,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 4,
                             BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 6, 10, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7752),
-                            CheckOutDate = new DateTime(2026, 6, 12, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7753),
-                            CreatedAt = new DateTime(2026, 6, 5, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7755),
+                            CheckInDate = new DateTime(2026, 6, 13, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3597),
+                            CheckOutDate = new DateTime(2026, 6, 15, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3598),
+                            CreatedAt = new DateTime(2026, 6, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3600),
                             DepositAmount = 1000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 11,
                             TotalAmount = 2000000m,
                             UserId = 3
                         },
@@ -147,14 +138,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 5,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 16, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7757),
-                            CheckOutDate = new DateTime(2026, 6, 19, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7757),
-                            CreatedAt = new DateTime(2026, 6, 10, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7759),
+                            CheckInDate = new DateTime(2026, 6, 19, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3602),
+                            CheckOutDate = new DateTime(2026, 6, 22, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3602),
+                            CreatedAt = new DateTime(2026, 6, 13, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3604),
                             DepositAmount = 12000000m,
                             NumberOfAdults = 6,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 13,
                             TotalAmount = 24000000m,
                             UserId = 2
                         },
@@ -162,14 +152,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 6,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 5, 15, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7761),
-                            CheckOutDate = new DateTime(2026, 5, 17, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7766),
-                            CreatedAt = new DateTime(2026, 5, 10, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7768),
+                            CheckInDate = new DateTime(2026, 5, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3606),
+                            CheckOutDate = new DateTime(2026, 5, 20, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3614),
+                            CreatedAt = new DateTime(2026, 5, 13, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3616),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 1,
                             TotalAmount = 2400000m,
                             UserId = 2
                         },
@@ -177,14 +166,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 7,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 4, 15, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7770),
-                            CheckOutDate = new DateTime(2026, 4, 18, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7770),
-                            CreatedAt = new DateTime(2026, 4, 5, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7772),
+                            CheckInDate = new DateTime(2026, 4, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3618),
+                            CheckOutDate = new DateTime(2026, 4, 21, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3619),
+                            CreatedAt = new DateTime(2026, 4, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3622),
                             DepositAmount = 1500000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 2,
                             TotalAmount = 3000000m,
                             UserId = 3
                         },
@@ -192,14 +180,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 8,
                             BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 5, 26, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7774),
-                            CheckOutDate = new DateTime(2026, 5, 28, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7774),
-                            CreatedAt = new DateTime(2026, 5, 21, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7777),
+                            CheckInDate = new DateTime(2026, 5, 29, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3624),
+                            CheckOutDate = new DateTime(2026, 5, 31, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3624),
+                            CreatedAt = new DateTime(2026, 5, 24, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3626),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 4,
                             TotalAmount = 2400000m,
                             UserId = 3
                         },
@@ -207,14 +194,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 9,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 5, 31, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7778),
-                            CheckOutDate = new DateTime(2026, 6, 5, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7779),
-                            CreatedAt = new DateTime(2026, 5, 26, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7780),
+                            CheckInDate = new DateTime(2026, 6, 3, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3628),
+                            CheckOutDate = new DateTime(2026, 6, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3628),
+                            CreatedAt = new DateTime(2026, 5, 29, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3630),
                             DepositAmount = 3000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 5,
                             TotalAmount = 6000000m,
                             UserId = 2
                         },
@@ -222,14 +208,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 10,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 7, 5, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7782),
-                            CheckOutDate = new DateTime(2026, 7, 7, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7784),
-                            CreatedAt = new DateTime(2026, 6, 14, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7785),
+                            CheckInDate = new DateTime(2026, 7, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3654),
+                            CheckOutDate = new DateTime(2026, 7, 10, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3654),
+                            CreatedAt = new DateTime(2026, 6, 17, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3656),
                             DepositAmount = 8000000m,
                             NumberOfAdults = 5,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 13,
                             TotalAmount = 16000000m,
                             UserId = 3
                         },
@@ -237,14 +222,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 11,
                             BookingStatus = "PendingPayment",
-                            CheckInDate = new DateTime(2026, 6, 30, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7787),
-                            CheckOutDate = new DateTime(2026, 7, 3, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7788),
-                            CreatedAt = new DateTime(2026, 6, 15, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7790),
+                            CheckInDate = new DateTime(2026, 7, 3, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3658),
+                            CheckOutDate = new DateTime(2026, 7, 6, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3659),
+                            CreatedAt = new DateTime(2026, 6, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3660),
                             DepositAmount = 12000000m,
                             NumberOfAdults = 6,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 14,
                             TotalAmount = 24000000m,
                             UserId = 2
                         },
@@ -252,14 +236,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 12,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 2, 15, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7792),
-                            CheckOutDate = new DateTime(2026, 2, 20, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7792),
-                            CreatedAt = new DateTime(2026, 2, 5, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7794),
+                            CheckInDate = new DateTime(2026, 2, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3662),
+                            CheckOutDate = new DateTime(2026, 2, 23, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3662),
+                            CreatedAt = new DateTime(2026, 2, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3665),
                             DepositAmount = 3000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 6,
                             TotalAmount = 6000000m,
                             UserId = 3
                         },
@@ -267,14 +250,13 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 13,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 1, 15, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7796),
-                            CheckOutDate = new DateTime(2026, 1, 16, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7796),
-                            CreatedAt = new DateTime(2026, 1, 12, 16, 49, 45, 7, DateTimeKind.Local).AddTicks(7798),
+                            CheckInDate = new DateTime(2026, 1, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3667),
+                            CheckOutDate = new DateTime(2026, 1, 19, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3668),
+                            CreatedAt = new DateTime(2026, 1, 15, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3670),
                             DepositAmount = 600000m,
                             NumberOfAdults = 1,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 1,
                             TotalAmount = 1200000m,
                             UserId = 3
                         },
@@ -289,7 +271,6 @@ namespace PhucNguyenResort.Web.Migrations
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 14,
                             TotalAmount = 5300000.00m,
                             UserId = 14
                         },
@@ -304,7 +285,6 @@ namespace PhucNguyenResort.Web.Migrations
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 15,
                             TotalAmount = 5550000.00m,
                             UserId = 15
                         },
@@ -319,7 +299,6 @@ namespace PhucNguyenResort.Web.Migrations
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 16,
                             TotalAmount = 5800000.00m,
                             UserId = 16
                         },
@@ -334,7 +313,6 @@ namespace PhucNguyenResort.Web.Migrations
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 17,
                             TotalAmount = 6050000.00m,
                             UserId = 17
                         },
@@ -349,7 +327,6 @@ namespace PhucNguyenResort.Web.Migrations
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 18,
                             TotalAmount = 6300000.00m,
                             UserId = 18
                         },
@@ -364,7 +341,6 @@ namespace PhucNguyenResort.Web.Migrations
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 19,
                             TotalAmount = 6550000.00m,
                             UserId = 19
                         },
@@ -379,9 +355,202 @@ namespace PhucNguyenResort.Web.Migrations
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
                             PdpdConsentChecked = false,
-                            RoomId = 20,
                             TotalAmount = 6800000.00m,
                             UserId = 20
+                        });
+                });
+
+            modelBuilder.Entity("PhucNguyenResort.Models.BookingDetail", b =>
+                {
+                    b.Property<int>("BookingDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingDetailId"));
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RoomCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BookingDetailId");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("RoomCategoryId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("BookingDetails", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BookingDetailId = 1,
+                            BookingId = 1,
+                            Price = 1200000m,
+                            RoomCategoryId = 1,
+                            RoomId = 1
+                        },
+                        new
+                        {
+                            BookingDetailId = 2,
+                            BookingId = 2,
+                            Price = 1200000m,
+                            RoomCategoryId = 1,
+                            RoomId = 2
+                        },
+                        new
+                        {
+                            BookingDetailId = 3,
+                            BookingId = 3,
+                            Price = 1200000m,
+                            RoomCategoryId = 1,
+                            RoomId = 3
+                        },
+                        new
+                        {
+                            BookingDetailId = 4,
+                            BookingId = 4,
+                            Price = 1200000m,
+                            RoomCategoryId = 1,
+                            RoomId = 4
+                        },
+                        new
+                        {
+                            BookingDetailId = 5,
+                            BookingId = 5,
+                            Price = 1000000m,
+                            RoomCategoryId = 2,
+                            RoomId = 5
+                        },
+                        new
+                        {
+                            BookingDetailId = 6,
+                            BookingId = 6,
+                            Price = 1000000m,
+                            RoomCategoryId = 2,
+                            RoomId = 6
+                        },
+                        new
+                        {
+                            BookingDetailId = 7,
+                            BookingId = 7,
+                            Price = 1000000m,
+                            RoomCategoryId = 2,
+                            RoomId = 7
+                        },
+                        new
+                        {
+                            BookingDetailId = 8,
+                            BookingId = 8,
+                            Price = 1000000m,
+                            RoomCategoryId = 2,
+                            RoomId = 8
+                        },
+                        new
+                        {
+                            BookingDetailId = 9,
+                            BookingId = 9,
+                            Price = 2500000m,
+                            RoomCategoryId = 3,
+                            RoomId = 9
+                        },
+                        new
+                        {
+                            BookingDetailId = 10,
+                            BookingId = 10,
+                            Price = 2500000m,
+                            RoomCategoryId = 3,
+                            RoomId = 10
+                        },
+                        new
+                        {
+                            BookingDetailId = 11,
+                            BookingId = 11,
+                            Price = 2500000m,
+                            RoomCategoryId = 3,
+                            RoomId = 11
+                        },
+                        new
+                        {
+                            BookingDetailId = 12,
+                            BookingId = 12,
+                            Price = 2500000m,
+                            RoomCategoryId = 3,
+                            RoomId = 12
+                        },
+                        new
+                        {
+                            BookingDetailId = 13,
+                            BookingId = 13,
+                            Price = 8000000m,
+                            RoomCategoryId = 4,
+                            RoomId = 13
+                        },
+                        new
+                        {
+                            BookingDetailId = 14,
+                            BookingId = 14,
+                            Price = 8000000m,
+                            RoomCategoryId = 4,
+                            RoomId = 14
+                        },
+                        new
+                        {
+                            BookingDetailId = 15,
+                            BookingId = 15,
+                            Price = 8000000m,
+                            RoomCategoryId = 4,
+                            RoomId = 15
+                        },
+                        new
+                        {
+                            BookingDetailId = 16,
+                            BookingId = 16,
+                            Price = 8000000m,
+                            RoomCategoryId = 4,
+                            RoomId = 16
+                        },
+                        new
+                        {
+                            BookingDetailId = 17,
+                            BookingId = 17,
+                            Price = 3500000m,
+                            RoomCategoryId = 5,
+                            RoomId = 17
+                        },
+                        new
+                        {
+                            BookingDetailId = 18,
+                            BookingId = 18,
+                            Price = 3500000m,
+                            RoomCategoryId = 5,
+                            RoomId = 18
+                        },
+                        new
+                        {
+                            BookingDetailId = 19,
+                            BookingId = 19,
+                            Price = 3500000m,
+                            RoomCategoryId = 5,
+                            RoomId = 19
+                        },
+                        new
+                        {
+                            BookingDetailId = 20,
+                            BookingId = 20,
+                            Price = 3500000m,
+                            RoomCategoryId = 5,
+                            RoomId = 20
                         });
                 });
 
@@ -1022,6 +1191,14 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ChargedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsChargedToRoom")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("OrderStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -1049,6 +1226,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 1,
                             BookingId = 1,
+                            IsChargedToRoom = false,
                             OrderStatus = "Pending",
                             OrderedAt = new DateTime(2026, 6, 3, 13, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 170000.00m
@@ -1057,7 +1235,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 2,
                             BookingId = 2,
-                            OrderStatus = "Preparing",
+                            ChargedAt = new DateTime(2026, 6, 18, 10, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsChargedToRoom = true,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 4, 14, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 330000.00m
                         },
@@ -1065,7 +1245,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 3,
                             BookingId = 3,
-                            OrderStatus = "Ready",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 5, 15, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 540000.00m
                         },
@@ -1073,7 +1254,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 4,
                             BookingId = 4,
-                            OrderStatus = "Served",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Delivered",
                             OrderedAt = new DateTime(2026, 6, 6, 16, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 160000.00m
                         },
@@ -1081,6 +1263,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 5,
                             BookingId = 5,
+                            IsChargedToRoom = false,
                             OrderStatus = "Cancelled",
                             OrderedAt = new DateTime(2026, 6, 7, 17, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 370000.00m
@@ -1089,6 +1272,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 6,
                             BookingId = 6,
+                            IsChargedToRoom = false,
                             OrderStatus = "Pending",
                             OrderedAt = new DateTime(2026, 6, 8, 18, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 630000.00m
@@ -1097,7 +1281,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 7,
                             BookingId = 7,
-                            OrderStatus = "Preparing",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 9, 19, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 940000.00m
                         },
@@ -1105,7 +1290,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 8,
                             BookingId = 8,
-                            OrderStatus = "Ready",
+                            ChargedAt = new DateTime(2026, 6, 24, 10, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsChargedToRoom = true,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 10, 12, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 260000.00m
                         },
@@ -1113,7 +1300,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 9,
                             BookingId = 9,
-                            OrderStatus = "Served",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Delivered",
                             OrderedAt = new DateTime(2026, 6, 11, 13, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 570000.00m
                         },
@@ -1121,6 +1309,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 10,
                             BookingId = 10,
+                            IsChargedToRoom = false,
                             OrderStatus = "Cancelled",
                             OrderedAt = new DateTime(2026, 6, 12, 14, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 930000.00m
@@ -1129,6 +1318,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 11,
                             BookingId = 11,
+                            IsChargedToRoom = false,
                             OrderStatus = "Pending",
                             OrderedAt = new DateTime(2026, 6, 13, 15, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 1340000.00m
@@ -1137,7 +1327,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 12,
                             BookingId = 12,
-                            OrderStatus = "Preparing",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 14, 16, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 360000.00m
                         },
@@ -1145,7 +1336,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 13,
                             BookingId = 13,
-                            OrderStatus = "Ready",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 15, 17, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 770000.00m
                         },
@@ -1153,7 +1345,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 14,
                             BookingId = 14,
-                            OrderStatus = "Served",
+                            ChargedAt = new DateTime(2026, 6, 30, 10, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsChargedToRoom = true,
+                            OrderStatus = "Delivered",
                             OrderedAt = new DateTime(2026, 6, 16, 18, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 1230000.00m
                         },
@@ -1161,6 +1355,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 15,
                             BookingId = 15,
+                            IsChargedToRoom = false,
                             OrderStatus = "Cancelled",
                             OrderedAt = new DateTime(2026, 6, 17, 19, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 1740000.00m
@@ -1169,6 +1364,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 16,
                             BookingId = 16,
+                            IsChargedToRoom = false,
                             OrderStatus = "Pending",
                             OrderedAt = new DateTime(2026, 6, 18, 12, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 460000.00m
@@ -1177,7 +1373,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 17,
                             BookingId = 17,
-                            OrderStatus = "Preparing",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 19, 13, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 970000.00m
                         },
@@ -1185,7 +1382,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 18,
                             BookingId = 18,
-                            OrderStatus = "Ready",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Cooking",
                             OrderedAt = new DateTime(2026, 6, 20, 14, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 1530000.00m
                         },
@@ -1193,7 +1391,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 19,
                             BookingId = 19,
-                            OrderStatus = "Served",
+                            IsChargedToRoom = false,
+                            OrderStatus = "Delivered",
                             OrderedAt = new DateTime(2026, 6, 21, 15, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 2140000.00m
                         },
@@ -1201,6 +1400,8 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             FoodOrderId = 20,
                             BookingId = 20,
+                            ChargedAt = new DateTime(2026, 7, 6, 10, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsChargedToRoom = true,
                             OrderStatus = "Cancelled",
                             OrderedAt = new DateTime(2026, 6, 22, 16, 15, 0, 0, DateTimeKind.Unspecified),
                             TotalAmount = 560000.00m
@@ -3525,7 +3726,7 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             RoomId = 2,
-                            CategoryId = 2,
+                            CategoryId = 1,
                             FloorNumber = 1,
                             RoomNumber = "102",
                             Status = "Occupied"
@@ -3533,145 +3734,145 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             RoomId = 3,
-                            CategoryId = 3,
+                            CategoryId = 1,
                             FloorNumber = 1,
                             RoomNumber = "103",
-                            Status = "Maintenance"
+                            Status = "Available"
                         },
                         new
                         {
                             RoomId = 4,
-                            CategoryId = 4,
+                            CategoryId = 1,
                             FloorNumber = 1,
                             RoomNumber = "104",
-                            Status = "NeedsCleaning"
+                            Status = "Available"
                         },
                         new
                         {
                             RoomId = 5,
-                            CategoryId = 5,
-                            FloorNumber = 1,
-                            RoomNumber = "105",
+                            CategoryId = 2,
+                            FloorNumber = 2,
+                            RoomNumber = "201",
                             Status = "Available"
                         },
                         new
                         {
                             RoomId = 6,
-                            CategoryId = 6,
+                            CategoryId = 2,
                             FloorNumber = 2,
-                            RoomNumber = "106",
-                            Status = "Occupied"
-                        },
-                        new
-                        {
-                            RoomId = 7,
-                            CategoryId = 7,
-                            FloorNumber = 2,
-                            RoomNumber = "107",
+                            RoomNumber = "202",
                             Status = "Maintenance"
                         },
                         new
                         {
-                            RoomId = 8,
-                            CategoryId = 8,
+                            RoomId = 7,
+                            CategoryId = 2,
                             FloorNumber = 2,
-                            RoomNumber = "108",
-                            Status = "NeedsCleaning"
+                            RoomNumber = "203",
+                            Status = "Available"
+                        },
+                        new
+                        {
+                            RoomId = 8,
+                            CategoryId = 2,
+                            FloorNumber = 2,
+                            RoomNumber = "204",
+                            Status = "Occupied"
                         },
                         new
                         {
                             RoomId = 9,
-                            CategoryId = 9,
-                            FloorNumber = 2,
-                            RoomNumber = "109",
+                            CategoryId = 3,
+                            FloorNumber = 3,
+                            RoomNumber = "301",
                             Status = "Available"
                         },
                         new
                         {
                             RoomId = 10,
-                            CategoryId = 10,
-                            FloorNumber = 2,
-                            RoomNumber = "110",
-                            Status = "Occupied"
+                            CategoryId = 3,
+                            FloorNumber = 3,
+                            RoomNumber = "302",
+                            Status = "Available"
                         },
                         new
                         {
                             RoomId = 11,
-                            CategoryId = 11,
+                            CategoryId = 3,
                             FloorNumber = 3,
-                            RoomNumber = "111",
-                            Status = "Maintenance"
-                        },
-                        new
-                        {
-                            RoomId = 12,
-                            CategoryId = 12,
-                            FloorNumber = 3,
-                            RoomNumber = "112",
+                            RoomNumber = "303",
                             Status = "NeedsCleaning"
                         },
                         new
                         {
-                            RoomId = 13,
-                            CategoryId = 13,
+                            RoomId = 12,
+                            CategoryId = 3,
                             FloorNumber = 3,
-                            RoomNumber = "113",
+                            RoomNumber = "304",
+                            Status = "Available"
+                        },
+                        new
+                        {
+                            RoomId = 13,
+                            CategoryId = 4,
+                            FloorNumber = 4,
+                            RoomNumber = "401",
                             Status = "Available"
                         },
                         new
                         {
                             RoomId = 14,
-                            CategoryId = 14,
-                            FloorNumber = 3,
-                            RoomNumber = "114",
+                            CategoryId = 4,
+                            FloorNumber = 4,
+                            RoomNumber = "402",
                             Status = "Occupied"
                         },
                         new
                         {
                             RoomId = 15,
-                            CategoryId = 15,
-                            FloorNumber = 3,
-                            RoomNumber = "115",
-                            Status = "Maintenance"
+                            CategoryId = 4,
+                            FloorNumber = 4,
+                            RoomNumber = "403",
+                            Status = "Available"
                         },
                         new
                         {
                             RoomId = 16,
-                            CategoryId = 16,
+                            CategoryId = 4,
                             FloorNumber = 4,
-                            RoomNumber = "116",
-                            Status = "NeedsCleaning"
+                            RoomNumber = "404",
+                            Status = "Available"
                         },
                         new
                         {
                             RoomId = 17,
-                            CategoryId = 17,
-                            FloorNumber = 4,
-                            RoomNumber = "117",
+                            CategoryId = 5,
+                            FloorNumber = 5,
+                            RoomNumber = "501",
                             Status = "Available"
                         },
                         new
                         {
                             RoomId = 18,
-                            CategoryId = 18,
-                            FloorNumber = 4,
-                            RoomNumber = "118",
-                            Status = "Occupied"
+                            CategoryId = 5,
+                            FloorNumber = 5,
+                            RoomNumber = "502",
+                            Status = "Available"
                         },
                         new
                         {
                             RoomId = 19,
-                            CategoryId = 19,
-                            FloorNumber = 4,
-                            RoomNumber = "119",
-                            Status = "Maintenance"
+                            CategoryId = 5,
+                            FloorNumber = 5,
+                            RoomNumber = "503",
+                            Status = "Available"
                         },
                         new
                         {
                             RoomId = 20,
-                            CategoryId = 20,
-                            FloorNumber = 4,
-                            RoomNumber = "120",
+                            CategoryId = 5,
+                            FloorNumber = 5,
+                            RoomNumber = "504",
                             Status = "NeedsCleaning"
                         });
                 });
@@ -3753,162 +3954,12 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             CategoryId = 5,
-                            CategoryName = "Family Suite",
-                            Description = "Family Suite category with capacity 4 guest(s).",
-                            ImageUrl = "/images/rooms/category-05.jpg",
-                            MaxAdults = 4,
-                            MaxChildren = 0,
-                            PricePerNight = 1800000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 6,
-                            CategoryName = "Executive Suite",
-                            Description = "Executive Suite category with capacity 4 guest(s).",
-                            ImageUrl = "/images/rooms/category-06.jpg",
-                            MaxAdults = 4,
-                            MaxChildren = 0,
-                            PricePerNight = 1980000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 7,
-                            CategoryName = "Presidential Villa",
-                            Description = "Presidential Villa category with capacity 6 guest(s).",
-                            ImageUrl = "/images/rooms/category-07.jpg",
-                            MaxAdults = 6,
-                            MaxChildren = 0,
-                            PricePerNight = 2160000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 8,
                             CategoryName = "Honeymoon Villa",
-                            Description = "Honeymoon Villa category with capacity 2 guest(s).",
+                            Description = "Biệt thự lãng mạn cho cặp đôi",
                             ImageUrl = "/images/rooms/category-08.jpg",
                             MaxAdults = 2,
                             MaxChildren = 0,
-                            PricePerNight = 2340000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 9,
-                            CategoryName = "Bungalow Garden",
-                            Description = "Bungalow Garden category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-09.jpg",
-                            MaxAdults = 2,
-                            MaxChildren = 0,
-                            PricePerNight = 2520000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 10,
-                            CategoryName = "Bungalow Beach",
-                            Description = "Bungalow Beach category with capacity 3 guest(s).",
-                            ImageUrl = "/images/rooms/category-10.jpg",
-                            MaxAdults = 3,
-                            MaxChildren = 0,
-                            PricePerNight = 2700000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 11,
-                            CategoryName = "Twin Standard",
-                            Description = "Twin Standard category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-11.jpg",
-                            MaxAdults = 2,
-                            MaxChildren = 0,
-                            PricePerNight = 2880000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 12,
-                            CategoryName = "Triple Deluxe",
-                            Description = "Triple Deluxe category with capacity 3 guest(s).",
-                            ImageUrl = "/images/rooms/category-12.jpg",
-                            MaxAdults = 3,
-                            MaxChildren = 0,
-                            PricePerNight = 3060000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 13,
-                            CategoryName = "Accessible Room",
-                            Description = "Accessible Room category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-13.jpg",
-                            MaxAdults = 2,
-                            MaxChildren = 0,
-                            PricePerNight = 3240000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 14,
-                            CategoryName = "Connecting Room",
-                            Description = "Connecting Room category with capacity 4 guest(s).",
-                            ImageUrl = "/images/rooms/category-14.jpg",
-                            MaxAdults = 4,
-                            MaxChildren = 0,
-                            PricePerNight = 3420000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 15,
-                            CategoryName = "Long Stay Studio",
-                            Description = "Long Stay Studio category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-15.jpg",
-                            MaxAdults = 2,
-                            MaxChildren = 0,
-                            PricePerNight = 3600000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 16,
-                            CategoryName = "Business Room",
-                            Description = "Business Room category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-16.jpg",
-                            MaxAdults = 2,
-                            MaxChildren = 0,
-                            PricePerNight = 3780000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 17,
-                            CategoryName = "Penthouse Suite",
-                            Description = "Penthouse Suite category with capacity 4 guest(s).",
-                            ImageUrl = "/images/rooms/category-17.jpg",
-                            MaxAdults = 4,
-                            MaxChildren = 0,
-                            PricePerNight = 3960000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 18,
-                            CategoryName = "Lagoon Villa",
-                            Description = "Lagoon Villa category with capacity 5 guest(s).",
-                            ImageUrl = "/images/rooms/category-18.jpg",
-                            MaxAdults = 5,
-                            MaxChildren = 0,
-                            PricePerNight = 4140000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 19,
-                            CategoryName = "Mountain View",
-                            Description = "Mountain View category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-19.jpg",
-                            MaxAdults = 2,
-                            MaxChildren = 0,
-                            PricePerNight = 4320000.00m
-                        },
-                        new
-                        {
-                            CategoryId = 20,
-                            CategoryName = "Budget Room",
-                            Description = "Budget Room category with capacity 2 guest(s).",
-                            ImageUrl = "/images/rooms/category-20.jpg",
-                            MaxAdults = 2,
-                            MaxChildren = 0,
-                            PricePerNight = 4500000.00m
+                            PricePerNight = 3500000m
                         });
                 });
 
@@ -4457,6 +4508,10 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<int?>("Participants")
                         .HasColumnType("int");
 
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");
 
@@ -4931,7 +4986,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user01@phucnguyenresort.test",
                             FullName = "Nguyen Van An",
                             IsActive = true,
-                            PasswordHash = "hashed-password-01",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAPfHpZqsicuzNWwEz2A+27fHA4T7jfsm+ZJVi/FMknonhnS15owgiKdE/xqvZZHvA==",
                             PhoneNumber = "0900000001",
                             RoleId = 1
                         },
@@ -4942,7 +4997,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user02@phucnguyenresort.test",
                             FullName = "Tran Thi Binh",
                             IsActive = true,
-                            PasswordHash = "hashed-password-02",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMqJfvDTu1nRZ1tWnVSdC2TxoksCbzZBG0Z5+hSqJBH6ubpqvEb9ytkmbnjrBlCJNQ==",
                             PhoneNumber = "0900000002",
                             RoleId = 2
                         },
@@ -4953,7 +5008,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user03@phucnguyenresort.test",
                             FullName = "Le Minh Chau",
                             IsActive = true,
-                            PasswordHash = "hashed-password-03",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL7OmuUdZtRjIWsMK4GpOru5NwFTcgkWIMT0XsKM12jVPo5pBAI3n0mPC42TwT4gQA==",
                             PhoneNumber = "0900000003",
                             RoleId = 3
                         },
@@ -4964,7 +5019,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user04@phucnguyenresort.test",
                             FullName = "Pham Quoc Dung",
                             IsActive = true,
-                            PasswordHash = "hashed-password-04",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPpO/sBlLtEog0z9muGuZ9dJU2By/al3/9rnCHHgIHGaUn3cCQxp8+rOHVNo771raA==",
                             PhoneNumber = "0900000004",
                             RoleId = 4
                         },
@@ -4975,7 +5030,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user05@phucnguyenresort.test",
                             FullName = "Hoang Thu Ha",
                             IsActive = true,
-                            PasswordHash = "hashed-password-05",
+                            PasswordHash = "AQAAAAIAAYagAAAAELLhWKBA7UEbgmc/qhu3mxKfNo1Y1UI6zVG4H6XqUfwyhBZIvWkZmDZrkXQK/KaAXQ==",
                             PhoneNumber = "0900000005",
                             RoleId = 5
                         },
@@ -4986,7 +5041,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user06@phucnguyenresort.test",
                             FullName = "Vo Tuan Kiet",
                             IsActive = true,
-                            PasswordHash = "hashed-password-06",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMos2lHKwL8xBwVjMAzlIWjtRXvVolAJDK4aTarDmRFhEgqc2mtMqB16Gvi4Y7hd7g==",
                             PhoneNumber = "0900000006",
                             RoleId = 6
                         },
@@ -4997,7 +5052,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user07@phucnguyenresort.test",
                             FullName = "Dang Ngoc Linh",
                             IsActive = true,
-                            PasswordHash = "hashed-password-07",
+                            PasswordHash = "AQAAAAIAAYagAAAAEENQal0elXTjB9MuTiDqZw+Ju1XFx+c6PHLzlv+vB49TGulgOELiwxVLzBLR3zWcsA==",
                             PhoneNumber = "0900000007",
                             RoleId = 7
                         },
@@ -5008,7 +5063,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user08@phucnguyenresort.test",
                             FullName = "Bui Gia Minh",
                             IsActive = true,
-                            PasswordHash = "hashed-password-08",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJT25/CCK5rCrhV6iqZaRiccHs5/2PjxovAkY33vQQnePVOlNtFItn9Ej8hl8/GaVg==",
                             PhoneNumber = "0900000008",
                             RoleId = 8
                         },
@@ -5019,7 +5074,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user09@phucnguyenresort.test",
                             FullName = "Do Phuong Nam",
                             IsActive = false,
-                            PasswordHash = "hashed-password-09",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP/y/42LBSamtT9RhWTarQ8Arul0XOAu1F1fy0D9x/QhZvsyBZsXcw4BK2FianAmlQ==",
                             PhoneNumber = "0900000009",
                             RoleId = 9
                         },
@@ -5030,7 +5085,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user10@phucnguyenresort.test",
                             FullName = "Ngo Thanh Oanh",
                             IsActive = true,
-                            PasswordHash = "hashed-password-10",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHhfJbFM/03T1KAicxYcV1bTBoKZiD9CS841SnAOmTfifLMab/d2Ler9troq3w/uxQ==",
                             PhoneNumber = "0900000010",
                             RoleId = 3
                         },
@@ -5041,7 +5096,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user11@phucnguyenresort.test",
                             FullName = "Huynh Duc Phat",
                             IsActive = true,
-                            PasswordHash = "hashed-password-11",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPaitqXlGlPfjdR10IkWztfw5bkaSETVCtiz1raV6zzlXBjpPzIMqeY4bfviE6e3Wg==",
                             PhoneNumber = "0900000011",
                             RoleId = 3
                         },
@@ -5052,7 +5107,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user12@phucnguyenresort.test",
                             FullName = "Phan My Quyen",
                             IsActive = true,
-                            PasswordHash = "hashed-password-12",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDGl1/D1FrIqtwdXMp4MHKTcKLhrgp0BM7tRkmCJKU4CLs78GCzRBm6BNMw2g5wsMg==",
                             PhoneNumber = "0900000012",
                             RoleId = 3
                         },
@@ -5063,7 +5118,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user13@phucnguyenresort.test",
                             FullName = "Vu Khanh Son",
                             IsActive = true,
-                            PasswordHash = "hashed-password-13",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOUNXbZx/sSqOf8XhutyA8c0i1jpPfwprTXZMpZ+ddTO0eZ6DeGC6SappK1tnuLQtQ==",
                             PhoneNumber = "0900000013",
                             RoleId = 3
                         },
@@ -5074,7 +5129,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user14@phucnguyenresort.test",
                             FullName = "Truong Hai Tam",
                             IsActive = true,
-                            PasswordHash = "hashed-password-14",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJJGfYgjY5DIU1LvrA7IqfQ9N0dG1VIKmKczDlrjsfeYlLZMV3uGZM3KB8t7jPVC0g==",
                             PhoneNumber = "0900000014",
                             RoleId = 3
                         },
@@ -5085,7 +5140,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user15@phucnguyenresort.test",
                             FullName = "Ly Bao Uyen",
                             IsActive = true,
-                            PasswordHash = "hashed-password-15",
+                            PasswordHash = "AQAAAAIAAYagAAAAELC/3eh2uKrbHlslXEaKmDbBCqjLTpF7KJkmuTokz/4ZZtRftNGdc1r18mlfAWJ/zg==",
                             PhoneNumber = "0900000015",
                             RoleId = 3
                         },
@@ -5096,7 +5151,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user16@phucnguyenresort.test",
                             FullName = "Mai Hoai Viet",
                             IsActive = true,
-                            PasswordHash = "hashed-password-16",
+                            PasswordHash = "AQAAAAIAAYagAAAAEK8Tu2bzYxEFkVglibJ2FMF/v+tZLjtO8PlvonraPzVigrXUv+ezf6txnN9tzmUKRg==",
                             PhoneNumber = "0900000016",
                             RoleId = 3
                         },
@@ -5107,7 +5162,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user17@phucnguyenresort.test",
                             FullName = "Dinh Nhat Vy",
                             IsActive = true,
-                            PasswordHash = "hashed-password-17",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEu1vtHH1DPKJyipEF9CLiGKB5nlEfAALCHhcLHUl6Gj7930Z5fC8qFxmwbLTbFcnA==",
                             PhoneNumber = "0900000017",
                             RoleId = 3
                         },
@@ -5118,7 +5173,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user18@phucnguyenresort.test",
                             FullName = "Cao Tien Dat",
                             IsActive = false,
-                            PasswordHash = "hashed-password-18",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBfvYhV6RZ4eaYPLilejiLRhlW1+Yc+NqGZ5EBekRqifvfY6ys/tZUV/GwRQrpr9sw==",
                             PhoneNumber = "0900000018",
                             RoleId = 3
                         },
@@ -5129,7 +5184,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user19@phucnguyenresort.test",
                             FullName = "Ta Minh Anh",
                             IsActive = true,
-                            PasswordHash = "hashed-password-19",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGtWiO8pUkr97O2XfZppC3E24zWNciBmmNkqv/H5mHZXU64zaC04ozH9WwBorN8/WA==",
                             PhoneNumber = "0900000019",
                             RoleId = 3
                         },
@@ -5140,7 +5195,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user20@phucnguyenresort.test",
                             FullName = "Lam Gia Bao",
                             IsActive = true,
-                            PasswordHash = "hashed-password-20",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOWoOu1dgyXSeUHjo7zAm5WWbYnrLWNWkMpjSUCTsJ3Vlznm0hcvxtyPQ/7cgwZNng==",
                             PhoneNumber = "0900000020",
                             RoleId = 3
                         });
@@ -5437,21 +5492,39 @@ namespace PhucNguyenResort.Web.Migrations
 
             modelBuilder.Entity("PhucNguyenResort.Models.Booking", b =>
                 {
-                    b.HasOne("PhucNguyenResort.Models.Room", "Room")
-                        .WithMany("Bookings")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("PhucNguyenResort.Models.User", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PhucNguyenResort.Models.BookingDetail", b =>
+                {
+                    b.HasOne("PhucNguyenResort.Models.Booking", "Booking")
+                        .WithMany("BookingDetails")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PhucNguyenResort.Models.RoomCategory", "RoomCategory")
+                        .WithMany()
+                        .HasForeignKey("RoomCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhucNguyenResort.Models.Room", "Room")
+                        .WithMany("BookingDetails")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Booking");
+
                     b.Navigation("Room");
 
-                    b.Navigation("User");
+                    b.Navigation("RoomCategory");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.BookingGuest", b =>
@@ -5715,6 +5788,8 @@ namespace PhucNguyenResort.Web.Migrations
 
             modelBuilder.Entity("PhucNguyenResort.Models.Booking", b =>
                 {
+                    b.Navigation("BookingDetails");
+
                     b.Navigation("BookingGuests");
 
                     b.Navigation("FoodOrders");
@@ -5769,7 +5844,7 @@ namespace PhucNguyenResort.Web.Migrations
 
             modelBuilder.Entity("PhucNguyenResort.Models.Room", b =>
                 {
-                    b.Navigation("Bookings");
+                    b.Navigation("BookingDetails");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.RoomCategory", b =>

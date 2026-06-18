@@ -14,6 +14,8 @@ public class FoodOrderConfiguration : IEntityTypeConfiguration<FoodOrder>
         builder.Property(x => x.OrderStatus).HasConversion<string>().HasMaxLength(50).HasDefaultValue(FoodOrderStatus.Pending);
         builder.Property(x => x.TotalAmount).HasPrecision(18, 2);
         builder.Property(x => x.OrderedAt).HasDefaultValueSql("GETDATE()");
+        builder.Property(x => x.IsChargedToRoom).HasDefaultValue(false);
+        builder.Property(x => x.ChargedAt);
         builder.HasOne(x => x.Booking).WithMany(x => x.FoodOrders).HasForeignKey(x => x.BookingId).OnDelete(DeleteBehavior.Cascade);
     }
 }

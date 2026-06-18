@@ -7,9 +7,8 @@ namespace PhucNguyenResort.ViewModels.Bookings
 {
     public class CreateBookingViewModel
     {
-        [Required]
-        public int RoomId { get; set; }
-        
+        public List<RoomSelectionViewModel> RoomSelections { get; set; } = new List<RoomSelectionViewModel>();
+
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Ngày nhận phòng")]

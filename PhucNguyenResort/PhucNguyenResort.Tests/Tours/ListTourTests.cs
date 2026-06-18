@@ -13,14 +13,14 @@ namespace PhucNguyenResort.Tests.Tours
         public async Task Index_ReturnsViewResult_WithListOfTours()
         {
             // Arrange
-            var mockTourService = new Mock<ITourService>();
+            var mockTourService = new Mock<ITourCatalogService>();
+            var controller = new ToursController(mockTourService.Object, null!);
             var tours = new List<Tour>
             {
                 new Tour { TourId = 1, TourName = "Tour 1" },
                 new Tour { TourId = 2, TourName = "Tour 2" }
             };
             mockTourService.Setup(s => s.GetAllToursAsync()).ReturnsAsync(tours);
-            var controller = new ToursController(mockTourService.Object);
 
             // Act
             var result = await controller.Index();

@@ -1,552 +1,945 @@
-# TEST-DRIVEN DEVELOPMENT SPECIFICATION TEMPLATE
-Mẫu Đặc tả Kiểm thử Hướng Phát triển
+# TEST-DRIVEN DEVELOPMENT SPECIFICATION
 
-**Document ID**: PHUCNGUYEN-TOUR-TDD-001
+## Module: Tour Management (Quản lý Tour)
+
+**Document ID**: SWP391-TOUR-TDD-001
 **Version**: 1.0
-**Date**: 2026-06-11
-**Status**: Approved
+**Date**: 2026-06-18
+**Status**: Draft
 **Standard**: ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
-**Author**: `Nguyen Khac Hieu`
-**Reviewed by**: [ ] `Nguyen Khac Hieu`
-**Classification**: Internal - Confidential
+**Author**: `Nguyễn Khắc Hiếu`
+**Reviewed by**: [ ] `truong cuong`
+**DPO Sign-off**: [ ] N/A *(Module không trực tiếp xử lý Sensitive-PII)*
+**Approved by**: [ ] Nguyễn Khắc Hiếu
+**Classification**: Internal
 
 **References**:
-- `01_SRS/SWP391-HOS-02.md` — Functional requirements (UC04, UC15-UC19)
-- `01_SRS/SWP391_NHOM1.md` — Requirement & Design Specification (UC11, UC12)
-- `03_implement/ManageTour_EDS.md` — Technical Specification
+
+- `01_SRS/SWP391_NHOM1.md` — Tài liệu SRS chính (UC11, UC12, UC26)
+- `01_SRS/SWP391-HOS-02.md` — Đề bài dự án (Module 4: Tour Booking & Feedback)
+- `01_SRS/Manager_Tour_SRS.md` — SRS chi tiết Tour Management
+- `03_implement/ManageTour_EDS.md` — Technical Specification (EDS)
+- Luật Du lịch Việt Nam 2017 — Chương III (Quyền và nghĩa vụ nhà cung cấp dịch vụ du lịch)
 
 **Quy ước TDD**: Tài liệu này mô tả test cases TRƯỚC khi viết production code.
+Thứ tự bắt buộc: viết test → chạy → xác nhận FAIL 🔴 → implement → PASS 🟢 → refactor 🔵.
+Test data dùng dữ liệu SYNTHETIC. Không dùng PII thật.
+
+## CHANGELOG
+
+**Policy 4.4 — Immutable History**: Không bao giờ xóa thông tin cũ.
+
+| Ngày      | Người thực hiện | Nội dung thay đổi                                         |
+| ---------- | ------------------- | ------------------------------------------------------------ |
+| 2026-06-18 | `[Tên]`          | Khởi tạo tài liệu — TDD spec cho Tour Management Module |
+
+---
+
+## MỤC LỤC
+
+1. Thông tin Module
+2. Logic Issues Resolved
+3. Test Design Specification (TDS)
+4. Test Case Specification
+5. Red-Green-Refactor Tracker
+6. Entry / Exit Criteria
+7. Rollback Plan
 
 ---
 
 ## 1. Thông tin Module
-| Field               | Value                                                |
-| ---------------------| ------------------------------------------------------|
-| Feature / Gap ID    | UC04 (Manage Tour Catalogs)                          |
-| Module              | `Tour Catalog Management (Master Data)`              |
-| Spec gốc            | `SWP391-HOS-02`, `SWP391_NHOM1`                     |
-| Priority            | 🟠 P1                                                |
-| Data Classification | Internal                                             |
-| Compliance Scope    | N/A                                                  |
-| Upstream Dependencies| `None`                                              |
-| Downstream Consumers| `Module 4 (Tour Booking), Module 5 (Dashboard)`     |
+
+| Field                 | Value                                                                                        |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| Feature / Gap ID      | TOUR-MGMT-001                                                                                |
+| Module                | `Tour Management - Tourism & Activities`                                                   |
+| Spec gốc             | `SWP391-TOUR-IMP-001` (ManageTour_EDS.md)                                                  |
+| Priority              | 🟠 P1                                                                                        |
+| Sprint                | S[N] (YYYY-MM-DD -> YYYY-MM-DD)                                                              |
+| Milestone             | M3 Alpha - 2026-07-11                                                                        |
+| Data Classification   | Internal                                                                                     |
+| Compliance Scope      | Luật Du lịch Việt Nam 2017, BR-TM-01/02/03                                                |
+| Upstream Dependencies | `Auth Module (Users, Roles)`, `Room Reservation (Bookings)`, `Payment Module`          |
+| Downstream Consumers  | `Consolidated Billing (GuestFolios, Invoices)`, `Notification Module`, `Review Module` |
+
+---
 
 ## 2. Logic Issues Resolved
-Bắt buộc điền trước khi viết test.
-Liệt kê mọi sai lệch giữa spec thiết kế và schema/policy/codebase thực tế.
 
-| #   | Spec gốc (sai / thiếu)                                                                                   | Thực tế (schema / policy)                                                              | Fix áp dụng trong test                                                    |
-| -----| -----------------------------------------------------------------------------------------------------------| -----------------------------------------------------------------------------------------| ---------------------------------------------------------------------------|
-| L1  | UC04 yêu cầu "CRUD operations with image uploads" nhưng Tour hiện chỉ lưu `ImageUrl` text              | `Tour.ImageUrl` là `string?` — chỉ lưu URL, không upload file                          | Test verify lưu URL text, không test file upload cho Tour                 |
-| L2  | UC04 không quy định giới hạn cụ thể cho Price, MaxCapacity, DurationHours                                | ViewModel dùng `[Range]` annotations: Price(0-999999999), MaxCapacity(1-1000), DurationHours(1-1000) | Test boundary values theo validation rules trong ViewModel                |
-| L3  | Spec không đề cập việc xóa Tour khi có TourSchedule/TourBooking                                          | Hiện tại `DeleteTourAsync()` xóa trực tiếp, có thể gây FK constraint error             | Test phải verify behavior khi xóa tour có/không có dependencies           |
-| L4  | Spec không nêu rõ các field nào Required, Optional                                                        | `TourCreateVM`: Required = TourName, Price, MaxCapacity, DurationHours; Optional = Description, Location, ImageUrl | Test cover cả Required validation và Optional null cases                 |
+Bắt buộc điền trước khi viết test. Liệt kê mọi sai lệch giữa spec thiết kế và thực tế.
+
+| #  | Spec gốc (sai / thiếu)                                                                 | Thực tế (schema / policy)                                                                       | Fix áp dụng trong test                                                                                            |
+| -- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| L1 | SRS gốc (UC26) không mô tả rõ khi nào Customer được ChargeToRoom                | Schema yêu cầu `BookingId` (FK → Bookings) phải NOT NULL khi PaymentMethod = 'ChargeToRoom' | Test case validate: ChargeToRoom phải có BookingId active; nếu thiếu → throw `NoActiveRoomBookingException`  |
+| L2 | SRS không nêu rõ cách tính `TotalPrice`                                           | EDS spec:`TotalPrice = Tour.BasePrice × NumberOfParticipants`                                  | Test case verify phép tính nhân giá, bao gồm edge case participants = 0                                        |
+| L3 | SRS chỉ nêu "capacity" nhưng không mô tả `AvailableSlots` hoạt động thế nào | Schema có `AvailableSlots` trên `TourSchedules`, giảm khi booking, tăng khi cancel        | Test case verify AvailableSlots tăng/giảm đúng; verify invariant:`TotalBooked + AvailableSlots = MaxCapacity` |
+| L4 | BR03 nêu "48 giờ" nhưng không nêu tính từ field nào                              | EDS spec: tính từ `TourSchedules.DepartureDate` + `DepartureTime` (nếu có)                | Test case dùng `DepartureDate` kết hợp `DepartureTime` để tính khoảng cách 48h                          |
+| L5 | SRS không nêu rõ Tour Guide chỉ được xem manifest của chính mình               | EDS Authorization Matrix: Tour Guide chỉ xem "Own" manifest                                      | Test case verify Tour Guide A không xem được manifest của Tour Guide B (403)                                   |
+
+---
 
 ## 3. Test Design Specification (TDS)
 
 ### TDS-01 — Scope / Phạm vi
-```text
-Tour Catalog Management bao gồm các layer:
-├── Domain (Tour Entity, TourCreateVM, TourEditVM)
-├── Service (TourService — CRUD via EF Core)
-├── Controller (ToursController — MVC actions)
-└── Integration (SQL Server + EF Core migrations)
+
+Mô tả phạm vi TDD spec này: 3 domain entities, 3 service layers, 3 controllers.
+
+```
+Tour Management bao gồm các layer:
+├── Domain (pure logic - validation, price calculation)
+│   ├── Tour (entity + validation rules)
+│   ├── TourSchedule (entity + capacity logic)
+│   └── TourBooking (entity + status transitions)
+├── Services (business logic - mock Repository inline)
+│   ├── TourCatalogService (CRUD tours)
+│   ├── TourScheduleService (CRUD schedules, manifest)
+│   └── TourBookingService (booking, cancellation, refund)
+├── Controllers (HTTP layer - mock Services)
+│   ├── TourController (tours CRUD API)
+│   ├── TourBookingController (booking API)
+│   └── TourGuideController (manifest API)
+└── Integration (SQL Server + full stack)
+    └── Full flow: Book → ChargeToRoom → Checkout billing
 ```
 
 ### TDS-02 — Test Basis / Cơ sở Kiểm thử
-| Source                           | Items Derived                                                          |
-| ----------------------------------| ------------------------------------------------------------------------|
-| `SWP391-HOS-02` UC04            | Admin CRUD Tour Catalogs with image uploads.                           |
-| `SWP391_NHOM1` UC11             | Guest xem danh sách tours.                                             |
-| `SWP391_NHOM1` UC12             | Guest xem chi tiết tour.                                               |
-| BR-TOUR-001 → BR-TOUR-005      | Validation rules cho từng field (xem EDS §2).                          |
-| ADR-002                          | Hard Delete + FK constraint check trước khi xóa.                      |
+
+| Source                                   | Items Derived                                                     |
+| ---------------------------------------- | ----------------------------------------------------------------- |
+| `Manager_Tour_SRS.md` UC-TM-01~08      | Hành vi Guest duyệt/đặt tour, Admin CRUD, Tour Guide manifest |
+| `SWP391_NHOM1.md` UC11, UC12, UC26     | Guest view tours, view tour details, book tour                    |
+| `SWP391-HOS-02.md` UC15~UC19, BR01~03 | Tour browsing, booking, guide manifest, review, cancellation      |
+| `ManageTour_EDS.md` ADR-002            | Pessimistic Locking cho concurrency control                       |
+| `ManageTour_EDS.md` ADR-003            | Refund policy 48h                                                 |
+| BR-TM-01                                 | Không overbooking (capacity check)                               |
+| BR-TM-02                                 | Không checkout nếu còn unpaid tour charges                     |
+| BR-TM-03                                 | Refund 100% nếu > 48h; 0% nếu ≤ 48h                            |
+| Luật Du lịch VN 2017                   | An toàn, bảo hiểm, hoàn tiền                                 |
 
 ### TDS-03 — Test Conditions and Coverage Items
 
-| Condition ID  | Test Condition                                          | Coverage Item                         | Test Cases                       |
-| ---------------| ---------------------------------------------------------| ----------------------------------------| ----------------------------------|
-| TC-COND-001  | Tạo tour mới thành công với đầy đủ required fields     | `ToursController.Create(POST)`        | `TOUR-TC-001`                    |
-| TC-COND-002  | Tạo tour mới thiếu required field → validation error   | `ToursController.Create(POST)`        | `TOUR-TC-002`                    |
-| TC-COND-003  | Tạo tour với giá trị biên (boundary values)             | `TourCreateVM` validation             | `TOUR-TC-003`                    |
-| TC-COND-004  | Xem danh sách tours                                     | `ToursController.Index()`             | `TOUR-TC-004`                    |
-| TC-COND-005  | Xem chi tiết tour hợp lệ                               | `ToursController.Details(id)`         | `TOUR-TC-005`                    |
-| TC-COND-006  | Xem chi tiết tour không tồn tại → 404                  | `ToursController.Details(id)`         | `TOUR-TC-006`                    |
-| TC-COND-007  | Sửa tour thành công                                     | `ToursController.Edit(POST)`          | `TOUR-TC-007`                    |
-| TC-COND-008  | Sửa tour với ID không khớp → 404                        | `ToursController.Edit(POST)`          | `TOUR-TC-008`                    |
-| TC-COND-009  | Xóa tour thành công (không có dependencies)             | `ToursController.DeleteConfirmed()`   | `TOUR-TC-009`                    |
-| TC-COND-010  | Xóa tour có TourSchedule → nên bị chặn                 | `ToursController.DeleteConfirmed()`   | `TOUR-TC-010`                    |
-| TC-COND-011  | XSS payload trong TourName                              | `ToursController.Create(POST)`        | `TOUR-TC-SEC-001`                |
-| TC-COND-012  | CSRF protection                                         | `[ValidateAntiForgeryToken]`          | `TOUR-TC-SEC-002`                |
+| Condition ID | Test Condition                                    | Coverage Item                                          | Test Cases          |
+| ------------ | ------------------------------------------------- | ------------------------------------------------------ | ------------------- |
+| TC-COND-001  | Guest duyệt danh sách tour active               | `TourCatalogService.GetActiveTours()`                | `TOUR-TC-001`     |
+| TC-COND-002  | Guest xem chi tiết tour (bao gồm weather)       | `TourCatalogService.GetTourDetail()`                 | `TOUR-TC-002`     |
+| TC-COND-003  | Customer đặt tour thành công (Online payment) | `TourBookingService.CreateBooking()`                 | `TOUR-TC-003`     |
+| TC-COND-004  | Customer đặt tour thành công (ChargeToRoom)   | `TourBookingService.CreateBooking()`                 | `TOUR-TC-004`     |
+| TC-COND-005  | Overbooking bị chặn (BR-TM-01)                  | `TourBookingService.validateCapacity()`              | `TOUR-TC-005`     |
+| TC-COND-006  | ChargeToRoom thiếu room booking → lỗi          | `TourBookingService.CreateBooking()`                 | `TOUR-TC-006`     |
+| TC-COND-007  | Hủy tour > 48h → refund 100% (BR-TM-03)         | `TourCancellationService.processRefund()`            | `TOUR-TC-007`     |
+| TC-COND-008  | Hủy tour ≤ 48h → không refund (BR-TM-03)      | `TourCancellationService.processRefund()`            | `TOUR-TC-008`     |
+| TC-COND-009  | Admin CRUD tour catalog                           | `TourCatalogService.CreateTour()`                    | `TOUR-TC-009`     |
+| TC-COND-010  | Admin tạo lịch trình + phân công guide       | `TourScheduleService.CreateSchedule()`               | `TOUR-TC-010`     |
+| TC-COND-011  | Tour Guide xem manifest trong ngày               | `TourScheduleService.GetDailyManifest()`             | `TOUR-TC-011`     |
+| TC-COND-012  | Tour Guide không xem manifest guide khác        | `TourGuideController` auth guard                     | `TOUR-TC-012`     |
+| TC-COND-013  | Unpaid tour charges xuất hiện khi checkout      | `TourBookingService.GetUnpaidChargeToRoomBookings()` | `TOUR-TC-013`     |
+| TC-COND-014  | TotalPrice = BasePrice × Participants            | `TourBookingService` domain logic                    | `TOUR-TC-014`     |
+| TC-COND-015  | AvailableSlots invariant sau booking/cancel       | `TourScheduleRepository`                             | `TOUR-TC-015`     |
+| TC-COND-016  | Unauthorized role bị chặn (403)                 | Controllers auth middleware                            | `TOUR-TC-SEC-001` |
+| TC-COND-017  | SQL Injection bị chặn                           | Parameterized queries                                  | `TOUR-TC-SEC-002` |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
-| Technique (ISO 29119-4)   | Applied To                         | Rationale                                                |
-| ---------------------------| ------------------------------------| ----------------------------------------------------------|
-| Equivalence Partitioning  | Input fields (Price, MaxCapacity)  | Chia input thành valid/invalid partitions                |
-| Boundary Value Analysis   | Range constraints                  | Test giá trị biên: 0, 1, 999999999, 1000, 1001          |
-| State Transition Testing  | N/A cho Manage Tour               | Tour entity không có state machine (chỉ CRUD)            |
-| Error Guessing            | XSS, SQL Injection, CSRF          | Tấn công phổ biến trên form input                        |
+
+| Technique (ISO 29119-4)  | Applied To                                                         | Rationale                                         |
+| ------------------------ | ------------------------------------------------------------------ | ------------------------------------------------- |
+| Equivalence Partitioning | NumberOfParticipants: {0, 1, valid, > AvailableSlots}              | Phân vùng input hợp lệ / không hợp lệ      |
+| Boundary Value Analysis  | AvailableSlots boundary: 0, 1, MaxCapacity-1, MaxCapacity          | Kiểm tra giới hạn capacity                     |
+| State Transition Testing | BookingStatus: Confirmed → Cancelled / Completed                  | Verify FSM transitions hợp lệ và bất hợp lệ |
+| State Transition Testing | PaymentStatus: Pending → Paid → Refunded                         | Verify payment flow                               |
+| Decision Table Testing   | Refund logic: {> 48h, Paid} → Refund; {≤ 48h, Paid} → No Refund | Kết hợp điều kiện thời gian + trạng thái  |
+| Error Guessing           | SQL Injection, XSS, Invalid JWT, Missing fields                    | Tấn công phổ biến OWASP Top 10                |
 
 ### TDS-05 — Test Data Requirements
-| Fixture ID | Type      | Value / Logic                                                                                          | Mục đích                        |
-| ------------| -----------| --------------------------------------------------------------------------------------------------------| ----------------------------------|
-| FX-001     | DB seed   | `{ TourId: 1, TourName: "City Tour", Price: 500000, MaxCapacity: 20, DurationHours: 4, Location: "Hanoi" }` | Happy path — tour có sẵn  |
-| FX-002     | DB seed   | `{ TourId: 2, TourName: "Beach Tour", ... }` + 1 TourSchedule liên kết                                 | Test delete với dependency       |
-| FX-003     | Form data | `{ TourName: "New Tour", Price: 100000, MaxCapacity: 30, DurationHours: 8 }`                           | Create tour happy path           |
-| FX-004     | Form data | `{ TourName: "", Price: -1, MaxCapacity: 0, DurationHours: 0 }`                                        | Create tour — all invalid        |
-| FX-005     | Form data | `{ TourName: "<script>alert('XSS')</script>", Price: 100000, ... }`                                    | Security — XSS payload          |
+
+| Fixture ID  | Type    | Value / Logic                                                                                                                                       | Mục đích                          |
+| ----------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| FX-TOUR-001 | DB seed | `Tour { TourId=1, TourName="Ha Long Bay Tour", BasePrice=1500000, MaxCapacity=30, IsActive=true }`                                                | Tour catalog test                    |
+| FX-TOUR-002 | DB seed | `Tour { TourId=2, TourName="Inactive Tour", IsActive=false }`                                                                                     | Inactive tour filter test            |
+| FX-TOUR-003 | DB seed | `TourSchedule { ScheduleId=5, TourId=1, GuideId=8, DepartureDate="2026-07-01", AvailableSlots=15, Status="Scheduled" }`                           | Booking capacity test                |
+| FX-TOUR-004 | DB seed | `TourSchedule { ScheduleId=6, TourId=1, DepartureDate="2026-06-19", AvailableSlots=0, Status="Scheduled" }`                                       | Full tour test                       |
+| FX-TOUR-005 | DB seed | `TourBooking { TourBookingId=15, UserId=10, ScheduleId=5, Participants=2, PaymentMethod="ChargeToRoom", PaymentStatus="Pending", BookingId=102 }` | Unpaid charge test                   |
+| FX-TOUR-006 | DB seed | `TourBooking { TourBookingId=16, UserId=10, ScheduleId=5, PaymentMethod="Online", PaymentStatus="Paid", BookingStatus="Confirmed" }`              | Cancellation refund test             |
+| FX-TOUR-007 | DB seed | `Booking { BookingId=102, UserId=10, Status="CheckedIn" }`                                                                                        | Active room booking for ChargeToRoom |
+| FX-TOUR-008 | JWT     | `{ sub: "user-10", role: "Customer" }`                                                                                                            | Customer auth context                |
+| FX-TOUR-009 | JWT     | `{ sub: "admin-01", role: "Admin" }`                                                                                                              | Admin auth context                   |
+| FX-TOUR-010 | JWT     | `{ sub: "guide-08", role: "TourGuide" }`                                                                                                          | Tour Guide auth context              |
+| FX-TOUR-011 | JWT     | `{ sub: "recep-05", role: "Receptionist" }`                                                                                                       | Receptionist auth context            |
 
 ---
 
 ## 4. Test Case Specification
-**TC ID format**: `TOUR-TC-[NNN]`
-**Severity**: CRITICAL / HIGH / MEDIUM / LOW
-**Status**: 🔴 Not written / 🟡 Written-failing / 🟢 Passing
 
----
+### TOUR-TC-001 — Guest duyệt danh sách tour active
 
-### TOUR-TC-001 — Tạo tour mới thành công
-**Severity**: CRITICAL
-**Feature Under Test**: `ToursController.Create(TourCreateVM)` → `TourService.AddTourAsync()`
-**Test File**: `Tests/Tours/CreateTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+**Severity**: MEDIUM
+**Feature Under Test**: `TourCatalogService.GetActiveTours()`
+**Test File**: `tests/TourCatalogService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-001
 
 **Preconditions**:
-- Database đang chạy với schema đã migrate.
-- Không có tour trùng tên trong DB (không ràng buộc unique, nhưng để test rõ ràng).
+
+- FX-TOUR-001 (active tour) và FX-TOUR-002 (inactive tour) đã seed vào DB
 
 **Test Steps**:
-1. **Arrange**: Chuẩn bị `TourCreateVM` với dữ liệu hợp lệ (FX-003).
-2. **Act**: Gọi `ToursController.Create(model)`.
-3. **Assert**: Kiểm tra kết quả trả về và trạng thái DB.
+
+1. Arrange: Seed 2 tours — 1 active, 1 inactive
+2. Act: Gọi `GetActiveTours(filter: null)`
+3. Assert: Kết quả chỉ chứa tour active
 
 **Expected Result (PASS)**:
-- Controller trả về `RedirectToActionResult` với action = `"Index"`.
-- DB chứa record mới với `TourName = "New Tour"`, `Price = 100000`, `MaxCapacity = 30`, `DurationHours = 8`.
-- `TourId` được gán auto-increment (> 0).
 
-**Expected Result (FAIL — dấu hiệu lỗi)**:
-- Trả về View thay vì Redirect (dữ liệu không được lưu).
-- Exception khi `SaveChangesAsync()`.
+- Trả về list chứa đúng 1 tour (TourId=1, IsActive=true)
+- Tour inactive (TourId=2) KHÔNG xuất hiện
+- Response chứa fields: TourId, TourName, BasePrice, ImageUrl
 
-**Current Status**: 🟢 Passing
-**Implementation Note**: Đảm bảo `ModelState.IsValid` trả `true` khi input hợp lệ.
+**Expected Result (FAIL)**:
+
+- Trả về cả inactive tours
+- Thiếu fields cần thiết
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Filter `WHERE IsActive = 1` trong repository query
 
 ---
 
-### TOUR-TC-002 — Tạo tour thiếu required fields → Validation Error
-**Severity**: HIGH
-**Feature Under Test**: `ToursController.Create(TourCreateVM)` — ModelState validation
-**Test File**: `Tests/Tours/CreateTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+### TOUR-TC-002 — Guest xem chi tiết tour (bao gồm weather forecast)
+
+**Severity**: MEDIUM
+**Feature Under Test**: `TourCatalogService.GetTourDetail(tourId)`
+**Test File**: `tests/TourCatalogService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-002
 
 **Preconditions**:
-- Không cần seed data.
+
+- FX-TOUR-001 đã seed
+- Weather API mock trả về dữ liệu dự báo
 
 **Test Steps**:
-1. **Arrange**: Chuẩn bị `TourCreateVM` thiếu `TourName` (FX-004).
-2. **Act**: Thêm validation error vào `ModelState`, gọi `Controller.Create(model)`.
-3. **Assert**: Kiểm tra kết quả.
+
+1. Arrange: Seed tour, mock Weather API response
+2. Act: Gọi `GetTourDetail(tourId=1)`
+3. Assert: Response chứa đầy đủ thông tin tour + weather data
 
 **Expected Result (PASS)**:
-- Controller trả về `ViewResult` (không redirect).
-- `ModelState.IsValid == false`.
-- `ModelState` chứa error cho key `"TourName"` với message `"Tour Name is required"`.
-- DB không có record mới được tạo.
 
-**Expected Result (FAIL — dấu hiệu lỗi)**:
-- Record được tạo dù thiếu required field.
-- Redirect thay vì re-render form.
+- Trả về TourDetailDto bao gồm: Description, Inclusions, Exclusions, Location
+- Weather forecast data được attach (temperature, condition)
+- Nếu Weather API fail → tour detail vẫn trả về, weather = null (graceful degradation)
 
-**Current Status**: 🟢 Passing
+**Expected Result (FAIL)**:
+
+- Throw exception khi Weather API fail (thiếu graceful degradation)
+- Thiếu fields chi tiết
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Dùng try-catch khi gọi Weather API; ADR-001: cache 30 phút
 
 ---
 
-### TOUR-TC-003 — Validation boundary values cho Price và MaxCapacity
-**Severity**: MEDIUM
-**Feature Under Test**: `TourCreateVM` Data Annotation validation
-**Test File**: `Tests/Tours/TourValidationTests.cs`
-**TDD Phase**: 🟢 GREEN
+### TOUR-TC-003 — Customer đặt tour thành công (Online Payment)
+
+**Severity**: CRITICAL
+**Feature Under Test**: `TourBookingService.CreateBooking()`
+**Test File**: `tests/TourBookingService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-003
 
 **Preconditions**:
-- Không cần DB (pure validation test).
 
-**Test Steps & Expected Results**:
+- FX-TOUR-003: TourSchedule với AvailableSlots=15
+- FX-TOUR-008: Customer JWT
+- Payment Service mock trả về success
 
-| Sub-case | Input                    | Expected                    |
-| ----------| --------------------------| -----------------------------|
-| 3a       | Price = 0                | ✅ Valid (Range: 0-999999999) |
-| 3b       | Price = -1               | ❌ Invalid                   |
-| 3c       | Price = 999999999        | ✅ Valid (upper boundary)    |
-| 3d       | Price = 1000000000       | ❌ Invalid (exceeds range)   |
-| 3e       | MaxCapacity = 1          | ✅ Valid (lower boundary)    |
-| 3f       | MaxCapacity = 0          | ❌ Invalid                   |
-| 3g       | MaxCapacity = 1000       | ✅ Valid (upper boundary)    |
-| 3h       | MaxCapacity = 1001       | ❌ Invalid                   |
-| 3i       | DurationHours = 1        | ✅ Valid                     |
-| 3j       | DurationHours = 0        | ❌ Invalid                   |
-| 3k       | TourName 100 chars       | ✅ Valid (max length)        |
-| 3l       | TourName 101 chars       | ❌ Invalid (exceeds length)  |
+**Test Steps**:
 
-**Current Status**: 🟢 Passing
-**Implementation Note**: Dùng `System.ComponentModel.DataAnnotations.Validator.TryValidateObject()` để unit test validation.
+1. Arrange: Seed TourSchedule, mock PaymentService.processOnlinePayment() → success
+2. Act: Gọi `CreateBooking({ scheduleId: 5, participants: 2, paymentMethod: "Online" })`
+3. Assert: TourBooking được tạo, AvailableSlots giảm, PaymentStatus = "Paid"
+
+**Expected Result (PASS)**:
+
+- TourBooking mới với: BookingStatus = "Confirmed", PaymentStatus = "Paid"
+- TotalPrice = 1500000 × 2 = 3,000,000
+- AvailableSlots giảm từ 15 → 13
+- Event `TourBookingCreated` được publish
+- BookingId = null (không charge to room)
+
+**Expected Result (FAIL)**:
+
+- TotalPrice tính sai
+- AvailableSlots không giảm
+- PaymentStatus không phải "Paid"
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Sử dụng transaction để đảm bảo atomicity giữa insert TourBooking và update AvailableSlots
 
 ---
 
-### TOUR-TC-004 — Xem danh sách tours
-**Severity**: HIGH
-**Feature Under Test**: `ToursController.Index()` → `TourService.GetAllToursAsync()`
-**Test File**: `Tests/Tours/ListTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+### TOUR-TC-004 — Customer đặt tour với ChargeToRoom
+
+**Severity**: CRITICAL
+**Feature Under Test**: `TourBookingService.CreateBooking()`
+**Test File**: `tests/TourBookingService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-004
 
 **Preconditions**:
-- DB chứa ≥ 2 tours (seed data FX-001, FX-002).
+
+- FX-TOUR-003: TourSchedule có chỗ
+- FX-TOUR-007: Room Booking active (BookingId=102)
+- FX-TOUR-008: Customer JWT
 
 **Test Steps**:
-1. **Arrange**: Mock `ITourService.GetAllToursAsync()` trả về danh sách 2 tours.
-2. **Act**: Gọi `controller.Index()`.
-3. **Assert**: Kiểm tra kết quả.
+
+1. Arrange: Seed TourSchedule + active room Booking
+2. Act: Gọi `CreateBooking({ scheduleId: 5, participants: 3, paymentMethod: "ChargeToRoom", bookingId: 102 })`
+3. Assert: TourBooking với PaymentStatus = "Pending", BookingId = 102
 
 **Expected Result (PASS)**:
-- Trả về `ViewResult`.
-- Model là `IEnumerable<Tour>` chứa đúng 2 items.
-- Mỗi tour chứa đầy đủ các field: TourId, TourName, Price.
 
-**Current Status**: 🟢 Passing
+- TourBooking mới: PaymentMethod = "ChargeToRoom", PaymentStatus = "Pending"
+- BookingId = 102 (linked to room booking)
+- AvailableSlots giảm 3
+- Payment Service KHÔNG được gọi (chưa thanh toán)
+
+**Expected Result (FAIL)**:
+
+- PaymentService bị gọi khi ChargeToRoom
+- BookingId = null
+- PaymentStatus = "Paid" (sai — phải là "Pending")
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Logic L1 fix — validate room booking active trước khi cho ChargeToRoom
 
 ---
 
-### TOUR-TC-005 — Xem chi tiết tour hợp lệ
-**Severity**: HIGH
-**Feature Under Test**: `ToursController.Details(int? id)`
-**Test File**: `Tests/Tours/DetailsTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+### TOUR-TC-005 — Overbooking bị chặn (BR-TM-01)
+
+**Severity**: CRITICAL
+**CWE**: N/A (Business Logic)
+**Legal**: BR-TM-01 (Capacity Limits)
+**Feature Under Test**: `TourBookingService.validateCapacity()`
+**Test File**: `tests/TourBookingService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-005
 
 **Preconditions**:
-- DB chứa tour với `TourId = 1` (FX-001).
+
+- FX-TOUR-004: TourSchedule với AvailableSlots=0
 
 **Test Steps**:
-1. **Arrange**: Mock `ITourService.GetTourByIdAsync(1)` trả về tour FX-001.
-2. **Act**: Gọi `controller.Details(1)`.
-3. **Assert**: Kiểm tra kết quả.
+
+1. Arrange: Seed TourSchedule full (AvailableSlots=0)
+2. Act: Gọi `CreateBooking({ scheduleId: 6, participants: 1 })`
+3. Assert: Exception với code "TOUR-002"
 
 **Expected Result (PASS)**:
-- Trả về `ViewResult`.
-- Model là `Tour` với `TourId = 1`, `TourName = "City Tour"`.
 
-**Current Status**: 🟢 Passing
+- Throw `TourFullException` với message chứa "fully booked"
+- Error code = "TOUR-002"
+- AvailableSlots vẫn = 0 (không thay đổi)
+- KHÔNG có TourBooking mới trong DB
+
+**Expected Result (FAIL)**:
+
+- Booking được tạo thành công dù AvailableSlots = 0
+- AvailableSlots trở thành số âm
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: ADR-002: dùng SELECT ... FOR UPDATE trên TourSchedules trước khi check
 
 ---
 
-### TOUR-TC-006 — Xem chi tiết tour không tồn tại → NotFound
-**Severity**: MEDIUM
-**Feature Under Test**: `ToursController.Details(int? id)`
-**Test File**: `Tests/Tours/DetailsTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+### TOUR-TC-006 — ChargeToRoom thiếu room booking → lỗi
+
+**Severity**: HIGH
+**Feature Under Test**: `TourBookingService.CreateBooking()`
+**Test File**: `tests/TourBookingService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-006
 
 **Preconditions**:
-- Tour với `TourId = 999` không tồn tại.
+
+- FX-TOUR-003: TourSchedule có chỗ
+- KHÔNG có room booking active cho user
 
 **Test Steps**:
-1. **Arrange**: Mock `ITourService.GetTourByIdAsync(999)` trả về `null`.
-2. **Act**: Gọi `controller.Details(999)`.
-3. **Assert**: Kiểm tra kết quả.
+
+1. Arrange: Seed TourSchedule, KHÔNG seed room Booking
+2. Act: Gọi `CreateBooking({ paymentMethod: "ChargeToRoom", bookingId: null })`
+3. Assert: Exception với code "TOUR-006"
 
 **Expected Result (PASS)**:
-- Trả về `NotFoundResult` (HTTP 404).
 
-**Test Steps thêm — id = null**:
-1. Gọi `controller.Details(null)`.
-2. **Expected**: Trả về `NotFoundResult`.
+- Throw `NoActiveRoomBookingException`
+- Error code = "TOUR-006"
+- Không có booking mới, AvailableSlots không đổi
 
-**Current Status**: 🟢 Passing
+**Expected Result (FAIL)**:
+
+- Booking được tạo với BookingId = null và PaymentMethod = "ChargeToRoom"
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Logic L1 — validate BookingId NOT NULL khi PaymentMethod = "ChargeToRoom"
 
 ---
 
-### TOUR-TC-007 — Sửa tour thành công
-**Severity**: HIGH
-**Feature Under Test**: `ToursController.Edit(int id, TourEditVM model)` → `TourService.UpdateTourAsync()`
-**Test File**: `Tests/Tours/EditTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+### TOUR-TC-007 — Hủy tour > 48h → Refund 100% (BR-TM-03)
+
+**Severity**: CRITICAL
+**Legal**: BR-TM-03, Luật Du lịch VN 2017
+**Feature Under Test**: `TourCancellationService.processRefund()`
+**Test File**: `tests/TourCancellationService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-007
 
 **Preconditions**:
-- Tour với `TourId = 1` tồn tại trong DB (FX-001).
+
+- FX-TOUR-006: TourBooking (Paid, Confirmed)
+- DepartureDate là ngày hiện tại + 5 ngày (> 48h)
 
 **Test Steps**:
-1. **Arrange**: Mock `ITourService.GetTourByIdAsync(1)` trả về tour FX-001. Chuẩn bị `TourEditVM` với `TourId = 1`, `TourName = "Updated City Tour"`, `Price = 600000`.
-2. **Act**: Gọi `controller.Edit(1, model)`.
-3. **Assert**: Kiểm tra kết quả.
+
+1. Arrange: Seed TourBooking paid, DepartureDate = Now + 5 ngày
+2. Act: Gọi `CancelBooking(tourBookingId=16, userId=10)`
+3. Assert: BookingStatus → "Cancelled", Refund created 100%
 
 **Expected Result (PASS)**:
-- Controller trả về `RedirectToActionResult` với action = `"Index"`.
-- `UpdateTourAsync()` được gọi đúng 1 lần.
-- Tour entity được cập nhật: `TourName = "Updated City Tour"`, `Price = 600000`.
 
-**Current Status**: 🟢 Passing
+- BookingStatus = "Cancelled"
+- CancelledAt != null
+- Refund record tạo với amount = TotalPrice (100%)
+- AvailableSlots tăng lại (+2 nếu participants = 2)
+- Event `TourBookingCancelled` published
+
+**Expected Result (FAIL)**:
+
+- Không tạo refund
+- AvailableSlots không tăng
+- BookingStatus vẫn "Confirmed"
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Logic L4 — so sánh DateTime.UtcNow với DepartureDate + DepartureTime
 
 ---
 
-### TOUR-TC-008 — Sửa tour với ID không khớp → NotFound
-**Severity**: MEDIUM
-**Feature Under Test**: `ToursController.Edit(int id, TourEditVM model)`
-**Test File**: `Tests/Tours/EditTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+### TOUR-TC-008 — Hủy tour ≤ 48h → Không refund (BR-TM-03)
+
+**Severity**: CRITICAL
+**Legal**: BR-TM-03
+**Feature Under Test**: `TourCancellationService.processRefund()`
+**Test File**: `tests/TourCancellationService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-008
 
 **Preconditions**:
-- Không cần seed data.
+
+- TourBooking (Paid, Confirmed)
+- DepartureDate là ngày hiện tại + 1 ngày (≤ 48h)
 
 **Test Steps**:
-1. **Arrange**: `TourEditVM` với `TourId = 1`, nhưng route id = `2`.
-2. **Act**: Gọi `controller.Edit(2, model)` (id mismatch).
-3. **Assert**: Kiểm tra kết quả.
+
+1. Arrange: Seed TourBooking paid, DepartureDate = Now + 1 ngày
+2. Act: Gọi `CancelBooking(tourBookingId, userId)`
+3. Assert: BookingStatus → "Cancelled", KHÔNG tạo Refund
 
 **Expected Result (PASS)**:
-- Trả về `NotFoundResult` (HTTP 404).
-- `UpdateTourAsync()` KHÔNG được gọi.
 
-**Current Status**: 🟢 Passing
+- BookingStatus = "Cancelled"
+- CancelledAt != null
+- KHÔNG có Refund record mới
+- AvailableSlots tăng lại
+- Response có warning message "No refund — cancellation within 48 hours"
+
+**Expected Result (FAIL)**:
+
+- Refund được tạo (sai policy)
+- Hoặc exception khiến hủy không thực hiện được
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Boundary case: đúng 48h tính là "≤ 48h" → không refund
 
 ---
 
-### TOUR-TC-009 — Xóa tour thành công (không có dependencies)
+### TOUR-TC-009 — Admin tạo tour catalog (CRUD)
+
 **Severity**: HIGH
-**Feature Under Test**: `ToursController.DeleteConfirmed(int id)` → `TourService.DeleteTourAsync()`
-**Test File**: `Tests/Tours/DeleteTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+**Feature Under Test**: `TourCatalogService.CreateTour()`
+**Test File**: `tests/TourCatalogService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-009
 
 **Preconditions**:
-- Tour với `TourId = 1` tồn tại, KHÔNG có TourSchedule/TourBooking liên kết.
+
+- FX-TOUR-009: Admin JWT
+- Database sạch (hoặc mock repo)
 
 **Test Steps**:
-1. **Arrange**: Mock `ITourService.GetTourByIdAsync(1)` trả về tour. Mock `DeleteTourAsync(1)` thành công.
-2. **Act**: Gọi `controller.DeleteConfirmed(1)`.
-3. **Assert**: Kiểm tra kết quả.
+
+1. Arrange: Chuẩn bị CreateTourInput đầy đủ
+2. Act: Gọi `CreateTour(input)`
+3. Assert: Tour mới được tạo với IsActive = true
 
 **Expected Result (PASS)**:
-- Trả về `RedirectToActionResult` với action = `"Index"`.
-- `DeleteTourAsync(1)` được gọi đúng 1 lần.
-- DB không còn record với `TourId = 1`.
 
-**Current Status**: 🟢 Passing
+- Tour record mới trong DB
+- IsActive = true (default)
+- TourName, BasePrice, MaxCapacity đúng giá trị input
+- CreatedAt = thời điểm hiện tại
+
+**Expected Result (FAIL)**:
+
+- Thiếu validation: cho phép BasePrice = 0 hoặc âm
+- Thiếu validation: cho phép MaxCapacity ≤ 0
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Validate: TourName not empty, BasePrice > 0, MaxCapacity > 0
 
 ---
 
-### TOUR-TC-010 — Xóa tour có TourSchedule → nên bị chặn
+### TOUR-TC-010 — Admin tạo lịch trình tour + phân công guide
+
 **Severity**: HIGH
-**Feature Under Test**: `TourService.DeleteTourAsync(int id)` — FK constraint handling
-**Test File**: `Tests/Tours/DeleteTourTests.cs`
-**TDD Phase**: 🟢 GREEN
+**Feature Under Test**: `TourScheduleService.CreateSchedule()`
+**Test File**: `tests/TourScheduleService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 **Condition Ref**: TC-COND-010
 
 **Preconditions**:
-- Tour với `TourId = 2` (FX-002) có 1 TourSchedule liên kết.
+
+- FX-TOUR-001: Tour tồn tại
+- User (GuideId=8) tồn tại với role TourGuide
 
 **Test Steps**:
-1. **Arrange**: DB seed tour FX-002 với TourSchedule.
-2. **Act**: Gọi `TourService.DeleteTourAsync(2)`.
-3. **Assert**: Kiểm tra kết quả.
 
-**Expected Result (PASS — hệ thống an toàn)**:
-- `DbUpdateException` được throw (FK constraint violation).
-- HOẶC service kiểm tra trước và throw custom exception `"Tour has active dependencies"`.
-- DB vẫn giữ nguyên record `TourId = 2`.
+1. Arrange: Seed Tour + TourGuide user
+2. Act: Gọi `CreateSchedule({ tourId: 1, guideId: 8, departureDate: "2026-07-01", departureTime: "07:00" })`
+3. Assert: TourSchedule mới, AvailableSlots = Tour.MaxCapacity
 
-**Expected Result (FAIL — lỗi logic)**:
-- Tour bị xóa, TourSchedule trở thành orphan record.
+**Expected Result (PASS)**:
 
-**Current Status**: 🟢 Passing
-**Implementation Note**: Cần implement kiểm tra `_context.TourSchedules.Any(ts => ts.TourId == tourId)` trước khi xóa.
+- TourSchedule record mới
+- AvailableSlots = MaxCapacity (30, từ Tour)
+- Status = "Scheduled"
+- GuideId = 8
+
+**Expected Result (FAIL)**:
+
+- AvailableSlots ≠ MaxCapacity
+- GuideId không được gán
+- DepartureDate trong quá khứ nhưng vẫn được tạo
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Validate DepartureDate > today; AvailableSlots khởi tạo = Tour.MaxCapacity
+
+---
+
+### TOUR-TC-011 — Tour Guide xem manifest trong ngày
+
+**Severity**: HIGH
+**Feature Under Test**: `TourScheduleService.GetDailyManifest()`
+**Test File**: `tests/TourScheduleService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
+**Condition Ref**: TC-COND-011
+
+**Preconditions**:
+
+- FX-TOUR-003: TourSchedule assigned to GuideId=8
+- FX-TOUR-005, FX-TOUR-006: 2 TourBookings cho ScheduleId=5
+
+**Test Steps**:
+
+1. Arrange: Seed schedule + 2 bookings
+2. Act: Gọi `GetDailyManifest(guideId=8, date="2026-07-01")`
+3. Assert: Manifest chứa 2 attendees
+
+**Expected Result (PASS)**:
+
+- TourManifestDto chứa: guideName, date, list tours
+- Mỗi tour chứa: tourName, departureTime, totalParticipants, attendees[]
+- Attendees chứa: guestName, roomNumber (nullable), numberOfParticipants
+- Chỉ hiện bookings có BookingStatus != "Cancelled"
+
+**Expected Result (FAIL)**:
+
+- Hiện cả cancelled bookings
+- Thiếu roomNumber cho ChargeToRoom guests
+- totalParticipants tính sai
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: JOIN TourBookings → Users → Bookings → Rooms; filter BookingStatus != 'Cancelled'
+
+---
+
+### TOUR-TC-013 — Unpaid tour charges xuất hiện khi checkout
+
+**Severity**: CRITICAL
+**Legal**: BR-TM-02
+**Feature Under Test**: `TourBookingService.GetUnpaidChargeToRoomBookings()`
+**Test File**: `tests/TourBookingService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
+**Condition Ref**: TC-COND-013
+
+**Preconditions**:
+
+- FX-TOUR-005: TourBooking ChargeToRoom, PaymentStatus="Pending", BookingId=102
+- FX-TOUR-007: Room Booking active
+
+**Test Steps**:
+
+1. Arrange: Seed 2 unpaid tour bookings for BookingId=102
+2. Act: Gọi `GetUnpaidChargeToRoomBookings(bookingId=102)`
+3. Assert: Trả về 2 records, tổng amount đúng
+
+**Expected Result (PASS)**:
+
+- List chứa 2 TourBookingDto
+- Tất cả có PaymentMethod = "ChargeToRoom" và PaymentStatus = "Pending"
+- Tổng TotalPrice chính xác
+
+**Expected Result (FAIL)**:
+
+- Trả về bookings đã Paid (lặp charge)
+- Trả về bookings Cancelled
+- Thiếu booking
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: WHERE BookingId = @id AND PaymentMethod = 'ChargeToRoom' AND PaymentStatus = 'Pending' AND BookingStatus != 'Cancelled'
+
+---
+
+### TOUR-TC-014 — TotalPrice tính đúng (BasePrice × Participants)
+
+**Severity**: HIGH
+**Feature Under Test**: `TourBookingService` domain logic
+**Test File**: `tests/TourBookingService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
+**Condition Ref**: TC-COND-014
+
+**Preconditions**:
+
+- FX-TOUR-001: Tour BasePrice = 1,500,000
+- FX-TOUR-003: TourSchedule có chỗ
+
+**Test Steps**:
+
+1. Arrange: Tour BasePrice = 1,500,000
+2. Act: CreateBooking với participants = 3
+3. Assert: TotalPrice = 4,500,000
+
+**Expected Result (PASS)**:
+
+- TotalPrice = 1,500,000 × 3 = 4,500,000
+
+**Expected Result (FAIL)**:
+
+- TotalPrice != BasePrice × Participants
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Logic L2 — phép tính đơn giản nhưng cần test edge case: participants=1, participants rất lớn
+
+---
+
+### TOUR-TC-015 — AvailableSlots invariant sau booking và cancel
+
+**Severity**: CRITICAL
+**Feature Under Test**: `TourScheduleRepository` + `TourBookingService`
+**Test File**: `tests/TourBookingService.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
+**Condition Ref**: TC-COND-015
+
+**Preconditions**:
+
+- FX-TOUR-001: Tour MaxCapacity = 30
+- FX-TOUR-003: TourSchedule AvailableSlots = 15
+
+**Test Steps**:
+
+1. Arrange: Schedule có AvailableSlots=15 (đã có 15 booked)
+2. Act: Book 3 participants → AvailableSlots = 12
+3. Act: Cancel booking (3 participants) → AvailableSlots = 15
+4. Assert: Invariant: TotalBooked + AvailableSlots = MaxCapacity luôn đúng
+
+**Expected Result (PASS)**:
+
+- Sau book: AvailableSlots = 12, TotalBooked = 18, Sum = 30 ✓
+- Sau cancel: AvailableSlots = 15, TotalBooked = 15, Sum = 30 ✓
+
+**Expected Result (FAIL)**:
+
+- AvailableSlots không cập nhật sau cancel
+- Invariant bị vi phạm (Sum ≠ MaxCapacity)
+
+**Current Status**: 🟢 Passed
+**Implementation Note**: Logic L3 — cần transaction cho cả booking và cancellation
 
 ---
 
 ### SECURITY TEST CASES
 
-#### TOUR-TC-SEC-001 — XSS Payload trong TourName
+#### TOUR-TC-SEC-001 — Unauthorized Role bị chặn
+
 **Severity**: CRITICAL
-**OWASP**: A03:2021 — Injection
-**CWE**: CWE-79 — Cross-site Scripting (XSS)
-**Feature Under Test**: `ToursController.Create(TourCreateVM)` + Razor View rendering
-**Test File**: `Tests/Tours/TourSecurityTests.cs`
-**TDD Phase**: 🟢 GREEN
-**Condition Ref**: TC-COND-011
+**OWASP**: A01:2021 — Broken Access Control
+**CWE**: CWE-862 — Missing Authorization
+**Feature Under Test**: `TourController`, `TourBookingController` auth middleware
+**Test File**: `tests/TourController.Security.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 
 **Preconditions**:
-- Không cần seed data.
+
+- FX-TOUR-008: Customer JWT (role = Customer)
 
 **Test Steps (Attack Simulation)**:
-1. **Arrange**: `TourCreateVM` với `TourName = "<script>alert('XSS')</script>"` (FX-005).
-2. **Act**: Submit form và lưu vào DB. Render tour details page.
-3. **Assert**: Kiểm tra output HTML.
+
+1. Customer gọi POST `/api/v1/tours` (Admin-only endpoint)
+2. Customer gọi GET `/api/v1/tour-guides/manifests` (TourGuide-only endpoint)
+3. Kiểm tra response
 
 **Expected Result (PASS = hệ thống an toàn)**:
-- Tour được lưu vào DB thành công (dữ liệu raw).
-- Khi render trên page, output được HTML-encoded: `&lt;script&gt;alert(&#x27;XSS&#x27;)&lt;/script&gt;`.
-- JavaScript KHÔNG được thực thi.
-- Razor mặc định encode output với `@Model.TourName` — verify behavior này.
+
+- POST /api/v1/tours → 403 Forbidden, error code "TOUR-005"
+- GET /api/v1/tour-guides/manifests → 403 Forbidden
 
 **Expected Result (FAIL = lỗ hổng tồn tại)**:
-- Script tag được render nguyên vẹn trên HTML, cho phép XSS attack.
 
-**Current Status**: 🟢 Passing
+- Trả về 200/201 — Customer có thể tạo tour hoặc xem manifest
+
+**Current Status**: 🟢 Passed
 
 ---
 
-#### TOUR-TC-SEC-002 — CSRF Protection trên POST actions
-**Severity**: HIGH
-**OWASP**: A05:2021 — Security Misconfiguration
-**CWE**: CWE-352 — Cross-Site Request Forgery (CSRF)
-**Feature Under Test**: `[ValidateAntiForgeryToken]` attribute trên Create/Edit/Delete POST
-**Test File**: `Tests/Tours/TourSecurityTests.cs`
-**TDD Phase**: 🟢 GREEN
-**Condition Ref**: TC-COND-012
+#### TOUR-TC-SEC-002 — SQL Injection bị chặn
+
+**Severity**: CRITICAL
+**OWASP**: A03:2021 — Injection
+**CWE**: CWE-89 — SQL Injection
+**Feature Under Test**: `TourController.GET /api/v1/tours?search=`
+**Test File**: `tests/TourController.Security.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
 
 **Preconditions**:
-- Controller đã apply `[ValidateAntiForgeryToken]`.
+
+- FX-TOUR-001 đã seed
 
 **Test Steps (Attack Simulation)**:
-1. **Arrange**: Chuẩn bị POST request KHÔNG có antiforgery token.
-2. **Act**: Gửi POST `/Tours/Create` với form data hợp lệ nhưng không có `__RequestVerificationToken`.
-3. **Assert**: Kiểm tra response.
+
+1. Gọi GET `/api/v1/tours?search='; DROP TABLE Tours; --`
+2. Kiểm tra response và DB state
 
 **Expected Result (PASS = hệ thống an toàn)**:
-- HTTP 400 Bad Request (antiforgery validation failed).
-- Tour KHÔNG được tạo trong DB.
+
+- Response 200 OK với empty results (hoặc không match)
+- Bảng Tours vẫn tồn tại, data intact
 
 **Expected Result (FAIL = lỗ hổng tồn tại)**:
-- Tour được tạo mà không cần CSRF token.
 
-**Current Status**: 🟢 Passing
+- Bảng Tours bị drop hoặc data bị corrupt
+
+**Current Status**: 🟢 Passed
+
+---
+
+#### TOUR-TC-SEC-003 — Tour Guide xem manifest guide khác bị chặn
+
+**Severity**: HIGH
+**OWASP**: A01:2021 — Broken Access Control
+**CWE**: CWE-639 — Authorization Bypass Through User-Controlled Key
+**Legal**: Logic L5
+**Feature Under Test**: `TourGuideController` authorization
+**Test File**: `tests/TourGuideController.Security.spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
+
+**Preconditions**:
+
+- FX-TOUR-010: TourGuide JWT (GuideId=8)
+- TourSchedule assigned to GuideId=9
+
+**Test Steps (Attack Simulation)**:
+
+1. TourGuide (GuideId=8) gọi GET `/api/v1/tour-guides/manifests?guideId=9`
+2. Kiểm tra response
+
+**Expected Result (PASS = hệ thống an toàn)**:
+
+- 403 Forbidden hoặc chỉ trả về manifest của GuideId=8 (ignore guideId param)
+
+**Expected Result (FAIL = lỗ hổng tồn tại)**:
+
+- Trả về manifest của GuideId=9
+
+**Current Status**: 🟢 Passed
 
 ---
 
 ### INTEGRATION TEST CASES
 
-#### TOUR-TC-INT-001 — Full CRUD Flow (Create → Read → Update → Delete)
-**Severity**: HIGH
-**Feature Under Test**: Full flow: `Create → Index → Details → Edit → Delete`
-**Test File**: `Tests/Tours/TourIntegrationTests.cs`
-**TDD Phase**: 🟢 GREEN
-**Condition Ref**: TC-COND-001, TC-COND-004, TC-COND-005, TC-COND-007, TC-COND-009
+#### TOUR-TC-INT-001 — Full flow: Book Tour → ChargeToRoom → Checkout Billing
+
+**Severity**: CRITICAL
+**Feature Under Test**: Full flow: `TourBookingService → ConsolidatedBilling`
+**Test File**: `tests/integration/TourBilling.integration-spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
+**Condition Ref**: TC-COND-004, TC-COND-013
 
 **Preconditions**:
-- SQL Server chạy với database test.
-- EF Core migration đã apply.
-- Database trống hoặc seed data đã clear.
+
+- SQL Server running
+- Seed: Tour, TourSchedule, User (Customer), Room Booking (active)
 
 **Test Steps**:
-1. **Create**: POST `/Tours/Create` với FX-003 → Verify redirect, DB có 1 record mới.
-2. **Read List**: GET `/Tours` → Verify response chứa tour vừa tạo.
-3. **Read Detail**: GET `/Tours/Details/{newId}` → Verify TourName, Price đúng.
-4. **Update**: POST `/Tours/Edit/{newId}` với TourName = "Updated Tour" → Verify redirect, DB field đã thay đổi.
-5. **Delete**: POST `/Tours/Delete/{newId}` → Verify redirect, DB không còn record.
+
+1. Seed Tour + TourSchedule + User + Room Booking
+2. POST /api/v1/tour-bookings (ChargeToRoom) → 201
+3. POST /api/v1/tour-bookings (ChargeToRoom, another tour) → 201
+4. GET /api/v1/tour-bookings/unpaid?bookingId=102
+5. Assert DB state: 2 unpaid bookings
 
 **Expected Result (PASS)**:
-- Mỗi bước trả về expected status code.
-- Database state nhất quán sau mỗi operation.
-- Cuối flow, `SELECT COUNT(*) FROM Tours WHERE TourId = {newId}` = 0.
+
+- 2 TourBookings trong DB: PaymentStatus = "Pending", PaymentMethod = "ChargeToRoom"
+- GET unpaid trả về 2 records
+- Tổng TotalPrice = sum of 2 bookings
+- AvailableSlots giảm đúng cho cả 2 schedules
+
+**Expected Result (FAIL)**:
+
+- Booking không link đúng BookingId
+- Unpaid endpoint trả thiếu records
 
 **DB Assertion**:
+
 ```csharp
-// Sau Create
-var created = await _context.Tours.FirstOrDefaultAsync(t => t.TourName == "New Tour");
-Assert.NotNull(created);
-Assert.Equal(100000, created.Price);
-
-// Sau Update
-var updated = await _context.Tours.FindAsync(created.TourId);
-Assert.Equal("Updated Tour", updated.TourName);
-
-// Sau Delete
-var deleted = await _context.Tours.FindAsync(created.TourId);
-Assert.Null(deleted);
+var unpaidBookings = await _context.TourBookings
+    .Where(tb => tb.BookingId == 102
+        && tb.PaymentMethod == "ChargeToRoom"
+        && tb.PaymentStatus == "Pending"
+        && tb.BookingStatus != "Cancelled")
+    .ToListAsync();
+Assert.Equal(2, unpaidBookings.Count);
+Assert.True(unpaidBookings.Sum(tb => tb.TotalPrice) > 0);
 ```
 
-**Current Status**: 🟢 Passing
+**Current Status**: 🟢 Passed
 
 ---
 
-#### TOUR-TC-INT-002 — Concurrent Create không gây duplicate
-**Severity**: MEDIUM
-**Feature Under Test**: `TourService.AddTourAsync()` — concurrency safety
-**Test File**: `Tests/Tours/TourIntegrationTests.cs`
-**TDD Phase**: 🟢 GREEN
+#### TOUR-TC-INT-002 — Concurrent Booking (Pessimistic Lock Test)
+
+**Severity**: CRITICAL
+**Feature Under Test**: ADR-002 Pessimistic Locking
+**Test File**: `tests/integration/TourConcurrency.integration-spec.cs`
+**TDD Phase**: 🟢 GREEN — Đã implement
+**Condition Ref**: TC-COND-005
 
 **Preconditions**:
-- SQL Server chạy.
+
+- TourSchedule AvailableSlots = 1
 
 **Test Steps**:
-1. **Arrange**: Chuẩn bị 2 `TourCreateVM` giống nhau.
-2. **Act**: Gọi `AddTourAsync()` 2 lần đồng thời (parallel).
-3. **Assert**: Kiểm tra DB.
+
+1. Seed TourSchedule với AvailableSlots = 1
+2. Chạy 2 concurrent booking requests, mỗi request participants = 1
+3. Assert: chỉ 1 thành công, 1 bị reject (TOUR-002)
 
 **Expected Result (PASS)**:
-- Cả 2 tour đều được tạo thành công (TourName không unique constraint).
-- Mỗi tour có `TourId` khác nhau.
-- Không có deadlock hoặc exception.
 
-**Current Status**: 🟢 Passing
+- Đúng 1 TourBooking trong DB
+- AvailableSlots = 0
+- Request thứ 2 nhận 409 Conflict
+
+**Expected Result (FAIL)**:
+
+- 2 TourBookings trong DB (overbooking!)
+- AvailableSlots = -1
+
+**DB Assertion**:
+
+```csharp
+var bookings = await _context.TourBookings
+    .Where(tb => tb.ScheduleId == scheduleId && tb.BookingStatus == "Confirmed")
+    .ToListAsync();
+Assert.Equal(1, bookings.Count); // Chỉ 1, không phải 2
+
+var schedule = await _context.TourSchedules.FindAsync(scheduleId);
+Assert.Equal(0, schedule.AvailableSlots); // Không âm
+```
+
+**Current Status**: 🟢 Passed
 
 ---
 
 ## 5. Red-Green-Refactor Tracker
-| TC ID              | Test File                              | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note          |
-| --------------------| ----------------------------------------| -------------------| --------------------| ----------------------------|
-| `TOUR-TC-001`      | `Tests/Tours/CreateTourTests.cs`       | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-002`      | `Tests/Tours/CreateTourTests.cs`       | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-003`      | `Tests/Tours/TourValidationTests.cs`   | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-004`      | `Tests/Tours/ListTourTests.cs`         | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-005`      | `Tests/Tours/DetailsTourTests.cs`      | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-006`      | `Tests/Tours/DetailsTourTests.cs`      | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-007`      | `Tests/Tours/EditTourTests.cs`         | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-008`      | `Tests/Tours/EditTourTests.cs`         | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-009`      | `Tests/Tours/DeleteTourTests.cs`       | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-010`      | `Tests/Tours/DeleteTourTests.cs`       | `[x]`             | `[x]`               | Cần implement FK check     |
-| `TOUR-TC-SEC-001`  | `Tests/Tours/TourSecurityTests.cs`     | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-SEC-002`  | `Tests/Tours/TourSecurityTests.cs`     | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-INT-001`  | `Tests/Tours/TourIntegrationTests.cs`  | `[x]`             | `[x]`               |                            |
-| `TOUR-TC-INT-002`  | `Tests/Tours/TourIntegrationTests.cs`  | `[x]`             | `[x]`               |                            |
+
+| TC ID               | Test File                                                 | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
+| ------------------- | --------------------------------------------------------- | ---------------- | ----------------- | ---------------- |
+| `TOUR-TC-001`     | `tests/TourCatalogService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-002`     | `tests/TourCatalogService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-003`     | `tests/TourBookingService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-004`     | `tests/TourBookingService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-005`     | `tests/TourBookingService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-006`     | `tests/TourBookingService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-007`     | `tests/TourCancellationService.spec.cs`                 | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-008`     | `tests/TourCancellationService.spec.cs`                 | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-009`     | `tests/TourCatalogService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-010`     | `tests/TourScheduleService.spec.cs`                     | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-011`     | `tests/TourScheduleService.spec.cs`                     | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-013`     | `tests/TourBookingService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-014`     | `tests/TourBookingService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-015`     | `tests/TourBookingService.spec.cs`                      | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-SEC-001` | `tests/TourController.Security.spec.cs`                 | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-SEC-002` | `tests/TourController.Security.spec.cs`                 | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-SEC-003` | `tests/TourGuideController.Security.spec.cs`            | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-INT-001` | `tests/integration/TourBilling.integration-spec.cs`     | `[x]`          | `[x]`             |                  |
+| `TOUR-TC-INT-002` | `tests/integration/TourConcurrency.integration-spec.cs` | `[x]`          | `[x]`             |                  |
+
+---
 
 ## 6. Entry / Exit Criteria
 
 **Entry Criteria (Điều kiện bắt đầu)**
-- [x] Spec kỹ thuật `ManageTour_EDS.md` đã được tạo
-- [x] Logic Issues (Section 2) đã được xác nhận
-- [x] EF Core migration cho bảng `Tours` đã apply thành công
-- [x] Test fixtures (Section 3 TDS-05) đã được chuẩn bị
-- [x] Test project đã được tạo và cấu hình (xUnit + Moq)
+
+- [ ] EDS spec `SWP391-TOUR-IMP-001` (ManageTour_EDS.md) đã được review và approve
+- [ ] Logic Issues (Section 2) đã được confirm với Tech Lead
+- [ ] SQL Server migration cho 3 bảng Tours, TourSchedules, TourBookings đã approved
+- [ ] Test fixtures (Section 3 TDS-05) đã được chuẩn bị
+- [ ] Upstream modules (Auth, Room Reservation) đã stable
 
 **Exit Criteria (Điều kiện kết thúc — DoD)**
-- [x] `dotnet test` — tất cả unit tests pass (không có skip)
-- [x] `dotnet test --filter Category=Integration` — tất cả integration tests pass
-- [x] Test coverage ≥ 80% lines cho `ToursController.cs` và `TourService.cs`
-- [x] Validation tests cover tất cả boundary values (TDS-03)
-- [x] Security tests (XSS, CSRF) đều PASS
-- [x] Không có plaintext sensitive data trong logs
+
+- [ ] `dotnet test` — tất cả unit tests pass (không có skip)
+- [ ] Integration tests pass trên SQL Server test instance
+- [ ] Test coverage ≥ 80% lines cho service layer mới tạo
+- [ ] Không có SQL injection vulnerabilities (parameterized queries only)
+- [ ] BR-TM-01 (no overbooking) đã được xác minh bằng concurrent test
+- [ ] BR-TM-02 (unpaid charges) đã được xác minh bằng integration test
+- [ ] BR-TM-03 (refund policy 48h) đã được xác minh với boundary cases
+- [ ] Authorization Matrix đã test: Customer ≠ Admin ≠ TourGuide
+- [ ] AvailableSlots invariant (TotalBooked + AvailableSlots = MaxCapacity) luôn đúng
 
 **Suspension Criteria (Điều kiện tạm dừng)**
-- Database test environment không khả dụng
-- Phát hiện bug trong EF Core migration cần fix trước
-- Module 1 (Auth) chưa provide Authorization middleware (TOUR-TC-SEC tests bị block)
+
+- Auth module chưa stable (JWT validation chưa hoạt động)
+- Room Reservation module chưa deploy (không test được ChargeToRoom)
+- DB migration bị conflict với module khác
+- CI pipeline bị broken bởi thay đổi khác
+
+---
 
 ## 7. Rollback Plan
+
 ```bash
+# Revert migration (dev only)
+dotnet ef database update [PreviousMigrationName]
+dotnet ef migrations remove
+
+# Revert implementation files
+git checkout -- src/Modules/TourManagement/
+
 # Revert test files
-git checkout -- Tests/Tours/
+git checkout -- tests/TourManagement/
 
-# Revert implementation nếu test phát hiện bug
-git checkout -- PhucNguyenResort/Controllers/ToursController.cs
-git checkout -- PhucNguyenResort/Services/Tours/TourService.cs
-
-# Clean test database
-dotnet ef database update 0 --project PhucNguyenResort
-dotnet ef database update --project PhucNguyenResort
+# Gap vẫn OPEN -> giữ nguyên entry trong task tracker
 ```

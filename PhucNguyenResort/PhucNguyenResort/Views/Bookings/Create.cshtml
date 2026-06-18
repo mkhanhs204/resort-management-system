@@ -2,8 +2,26 @@
 
 @{
     ViewData["Title"] = "Đặt Phòng - Phuc Nguyen Resort";
-    var room = ViewBag.Room as PhucNguyenResort.Models.Room;
+    var selectedCategories = ViewBag.SelectedCategories as List<PhucNguyenResort.Models.RoomCategory>;
     var tours = ViewBag.UpcomingTours as List<PhucNguyenResort.Models.TourSchedule>;
+
+    int maxTotalAdults = 0;
+    int maxTotalChildren = 0;
+    if (selectedCategories != null && Model.RoomSelections != null)
+    {
+        foreach (var selection in Model.RoomSelections)
+        {
+            var category = selectedCategories.FirstOrDefault(c => c.CategoryId == selection.CategoryId);
+            if (category != null)
+            {
+                maxTotalAdults += (category.MaxAdults ?? 2) * selection.Quantity;
+                maxTotalChildren += (category.MaxChildren ?? 1) * selection.Quantity;
+            }
+        }
+    }
+    // Fallback if something goes wrong
+    if (maxTotalAdults == 0) maxTotalAdults = 50;
+    if (maxTotalChildren == 0) maxTotalChildren = 50;
 }
 
 @section Styles {
@@ -33,36 +51,49 @@
 
         <form asp-action="Create" method="post" id="bookingForm">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 12px; font-size: 0.9rem;"></div>
-            <input type="hidden" asp-for="RoomId" />
+            @for (int i = 0; i < Model.RoomSelections.Count; i++)
+            {
+                <input type="hidden" name="RoomSelections[@i].CategoryId" value="@Model.RoomSelections[i].CategoryId" />
+                <input type="hidden" name="RoomSelections[@i].Quantity" value="@Model.RoomSelections[i].Quantity" />
+            }
 
             <div class="row">
                 <!-- Left Column: Input Forms -->
                 <div class="col-lg-7 col-md-12">
                     
                     <!-- Room Showcase -->
-                    <div class="room-showcase-horizontal">
-                        <div class="room-showcase-img">
-                            @if (!string.IsNullOrEmpty(room?.Category?.ImageUrl))
+                    @if (selectedCategories != null)
+                    {
+                        foreach (var selection in Model.RoomSelections)
+                        {
+                            var category = selectedCategories.FirstOrDefault(c => c.CategoryId == selection.CategoryId);
+                            if (category != null)
                             {
-                                <img src="@room.Category.ImageUrl" alt="@room.Category.CategoryName" />
+                                <div class="room-showcase-horizontal mb-3">
+                                    <div class="room-showcase-img">
+                                        @if (!string.IsNullOrEmpty(category.ImageUrl))
+                                        {
+                                            <img src="@category.ImageUrl" alt="@category.CategoryName" />
+                                        }
+                                        else
+                                        {
+                                            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Resort Room" />
+                                        }
+                                    </div>
+                                    <div class="room-showcase-details">
+                                        <h3>@category.CategoryName <span class="badge badge-warning text-white ml-2">x @selection.Quantity</span></h3>
+                                        <div class="price" data-price="@category.PricePerNight" data-qty="@selection.Quantity">
+                                            @category.PricePerNight?.ToString("N0") VNĐ <span>/ Đêm</span>
+                                        </div>
+                                        <div class="features-container mt-2">
+                                            <span class="feature-badge"><i class="fa fa-users"></i> Tối đa: @category.MaxAdults NL, @category.MaxChildren TE</span>
+                                            <span class="feature-badge"><i class="fa fa-wifi"></i> Free Wifi</span>
+                                        </div>
+                                    </div>
+                                </div>
                             }
-                            else
-                            {
-                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Resort Room" />
-                            }
-                        </div>
-                        <div class="room-showcase-details">
-                            <h3>@room?.Category?.CategoryName</h3>
-                            <div class="price">
-                                @room?.Category?.PricePerNight?.ToString("N0") VNĐ <span>/ Đêm</span>
-                            </div>
-                            <div class="features-container">
-                                <span class="feature-badge"><i class="fa fa-bed"></i> Phòng số: @room?.RoomNumber</span>
-                                <span class="feature-badge"><i class="fa fa-users"></i> Tối đa: @room?.Category?.MaxAdults NL, @room?.Category?.MaxChildren TE</span>
-                                <span class="feature-badge"><i class="fa fa-wifi"></i> Free Wifi</span>
-                            </div>
-                        </div>
-                    </div>
+                        }
+                    }
 
                     <!-- Section 1: Dates & Guests -->
                     <div class="premium-card">
@@ -86,15 +117,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group-modern">
-                                    <label asp-for="NumberOfAdults">Người Lớn</label>
-                                    <input type="number" asp-for="NumberOfAdults" class="form-control-modern" min="1" max="@(room?.Category?.MaxAdults ?? 10)" value="2" />
+                                    <label asp-for="NumberOfAdults">Người Lớn <small class="text-muted">(Tối đa: @maxTotalAdults)</small></label>
+                                    <input type="number" asp-for="NumberOfAdults" class="form-control-modern" min="1" max="@maxTotalAdults" value="@Model.NumberOfAdults" oninput="this.value = Math.min(Math.max(this.value, this.min), this.max);" />
                                     <span asp-validation-for="NumberOfAdults" class="text-danger small"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group-modern">
-                                    <label asp-for="NumberOfChildren">Trẻ Em</label>
-                                    <input type="number" asp-for="NumberOfChildren" class="form-control-modern" min="0" max="@(room?.Category?.MaxChildren ?? 10)" value="0" />
+                                    <label asp-for="NumberOfChildren">Trẻ Em <small class="text-muted">(Tối đa: @maxTotalChildren)</small></label>
+                                    <input type="number" asp-for="NumberOfChildren" class="form-control-modern" min="0" max="@maxTotalChildren" value="@Model.NumberOfChildren" oninput="this.value = Math.min(Math.max(this.value, this.min), this.max);" />
                                     <span asp-validation-for="NumberOfChildren" class="text-danger small"></span>
                                 </div>
                             </div>
@@ -193,7 +224,7 @@
                         <ul class="summary-info-list">
                             <li>
                                 <span>Phòng đặt:</span>
-                                <span>@room?.Category?.CategoryName (P.@room?.RoomNumber)</span>
+                                <span>Đã chọn @Model.RoomSelections.Sum(r => r.Quantity) phòng</span>
                             </li>
                             <li>
                                 <span>Nhận phòng:</span>
@@ -277,7 +308,7 @@
             var totalAmountVal = document.getElementById('total-amount-val');
             var depositAmountVal = document.getElementById('deposit-amount-val');
             
-            var pricePerNight = parseFloat('@(room?.Category?.PricePerNight ?? 0)');
+            var pricePerNight = 0; // Handled in JS based on selections
             
             // Format number helper (e.g. 1,000,000)
             function formatVnd(amount) {
@@ -315,7 +346,13 @@
                 summaryGuests.textContent = adults + ' Người lớn, ' + children + ' Trẻ em';
                 
                 // Calculate room total
-                var roomTotal = nights * pricePerNight;
+                var roomTotal = 0;
+                document.querySelectorAll('.room-showcase-details .price').forEach(function(el) {
+                    var p = parseFloat(el.getAttribute('data-price')) || 0;
+                    var q = parseInt(el.getAttribute('data-qty')) || 0;
+                    roomTotal += (p * q * nights);
+                });
+                
                 roomSubtotalLabel.textContent = 'Tiền phòng (' + nights + ' đêm)';
                 roomSubtotalVal.textContent = formatVnd(roomTotal);
                 

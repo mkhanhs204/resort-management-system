@@ -48,7 +48,7 @@ namespace PhucNguyenResort.Tests.Services
                 // Setup mock for SaveBookingGuestsAsync to return success
                 mockGuestService
                     .Setup(s => s.SaveBookingGuestsAsync(testBookingId, It.IsAny<List<BookingGuestDto>>(), It.IsAny<bool>()))
-                    .Returns(Task.CompletedTask);
+                    .ReturnsAsync(true);
 
                 var service = new ReceptionService(context, mockGuestService.Object);
 

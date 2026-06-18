@@ -32,14 +32,13 @@ namespace PhucNguyenResort.Services.Home
             var totalRooms = await _context.Rooms
                 .CountAsync(r => r.CategoryId == categoryId && r.Status != PhucNguyenResort.Enums.RoomStatus.Maintenance);
 
-            var bookedRooms = await _context.Bookings
-                .Where(b => b.Room!.CategoryId == categoryId &&
-                                 b.BookingStatus != PhucNguyenResort.Enums.BookingStatus.Cancelled &&
-                                 b.BookingStatus != PhucNguyenResort.Enums.BookingStatus.NoShow &&
-                                 b.CheckInDate < checkOutDate &&
-                                 b.CheckOutDate > checkInDate)
-                .Select(b => b.RoomId)
-                .Distinct()
+            var bookedRooms = await _context.BookingDetails
+                .Where(bd => bd.RoomCategoryId == categoryId &&
+                             bd.Booking != null &&
+                             bd.Booking.BookingStatus != PhucNguyenResort.Enums.BookingStatus.Cancelled &&
+                             bd.Booking.BookingStatus != PhucNguyenResort.Enums.BookingStatus.CheckedOut &&
+                             bd.Booking.CheckInDate < checkOutDate &&
+                             bd.Booking.CheckOutDate > checkInDate)
                 .CountAsync();
 
             var available = totalRooms - bookedRooms;
@@ -58,6 +57,7 @@ namespace PhucNguyenResort.Services.Home
                 var availableRooms = await CheckAvailabilityAsync(cat.CategoryId, checkInDate, checkOutDate);
                 if (availableRooms >= roomCount)
                 {
+                    cat.AvailableRoomsCount = availableRooms;
                     availableCategories.Add(cat);
                 }
             }

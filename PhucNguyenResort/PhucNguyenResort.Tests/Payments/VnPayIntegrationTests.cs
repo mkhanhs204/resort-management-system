@@ -8,6 +8,8 @@ using PhucNguyenResort.Controllers;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Helpers;
 using PhucNguyenResort.Services.Payments;
+using PhucNguyenResort.Services.Email;
+using Microsoft.AspNetCore.Hosting;
 using PhucNguyenResort.ViewModels.Payments;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Enums;
@@ -61,7 +63,9 @@ namespace PhucNguyenResort.Tests.Payments
                 .Options;
             var context = new ResortDbContext(options);
 
-            var controller = new PaymentController(mockService.Object, context);
+            var mockEmail = new Mock<IEmailSender>();
+            var mockEnv = new Mock<IWebHostEnvironment>();
+            var controller = new PaymentController(mockService.Object, context, mockEmail.Object, mockEnv.Object);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext()
@@ -117,7 +121,9 @@ namespace PhucNguyenResort.Tests.Payments
 
             using (var context = new ResortDbContext(options))
             {
-                var controller = new PaymentController(mockService.Object, context);
+                var mockEmail = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var controller = new PaymentController(mockService.Object, context, mockEmail.Object, mockEnv.Object);
                 controller.ControllerContext = new ControllerContext
                 {
                     HttpContext = new DefaultHttpContext()
@@ -133,9 +139,11 @@ namespace PhucNguyenResort.Tests.Payments
                 Assert.Equal("00", (string)rspCode);
 
                 var booking = await context.Bookings.FindAsync(99);
+                Assert.NotNull(booking);
                 Assert.Equal(BookingStatus.Reserved, booking.BookingStatus);
 
                 var tourBooking = await context.TourBookings.FindAsync(101);
+                Assert.NotNull(tourBooking);
                 Assert.Equal(TourBookingStatus.Confirmed, tourBooking.BookingStatus);
             }
         }
@@ -178,7 +186,9 @@ namespace PhucNguyenResort.Tests.Payments
 
             using (var context = new ResortDbContext(options))
             {
-                var controller = new PaymentController(mockService.Object, context);
+                var mockEmail = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var controller = new PaymentController(mockService.Object, context, mockEmail.Object, mockEnv.Object);
                 
                 var httpContext = new DefaultHttpContext();
                 var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
@@ -198,10 +208,12 @@ namespace PhucNguyenResort.Tests.Payments
                 Assert.Equal("Bookings", result.ControllerName);
 
                 var booking = await context.Bookings.FindAsync(99);
-                Assert.Equal(BookingStatus.Reserved, booking.BookingStatus);
+                Assert.NotNull(booking);
+                Assert.Equal(BookingStatus.PendingPayment, booking.BookingStatus);
 
                 var tourBooking = await context.TourBookings.FindAsync(101);
-                Assert.Equal(TourBookingStatus.Confirmed, tourBooking.BookingStatus);
+                Assert.NotNull(tourBooking);
+                Assert.Equal(TourBookingStatus.Pending, tourBooking.BookingStatus);
             }
         }
     }

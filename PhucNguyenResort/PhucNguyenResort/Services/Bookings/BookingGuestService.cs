@@ -25,8 +25,6 @@ public class BookingGuestService : IBookingGuestService
     public async Task<bool> SaveBookingGuestsAsync(int bookingId, IEnumerable<BookingGuestDto> guests, bool consentChecked)
     {
         var booking = await _context.Bookings
-            .Include(b => b.Room)
-            .ThenInclude(r => r.Category)
             .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
         if (booking == null)

@@ -85,11 +85,23 @@
                                 break;
                         }
 
+                        @{
+                            var groupedRooms = booking.BookingDetails
+                                .GroupBy(bd => bd.RoomCategory?.CategoryName)
+                                .Select(g => $"{g.Count()}x {g.Key}")
+                                .ToList();
+                            string roomsDisplay = string.Join(", ", groupedRooms);
+                            var firstDetail = booking.BookingDetails.FirstOrDefault();
+                            
+                            var assignedRooms = booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
+                            string assignedRoomsDisplay = assignedRooms.Any() ? $"(Phòng: {string.Join(", ", assignedRooms)})" : "(Chưa xếp phòng)";
+                        }
+
                         <!-- Left: Image Section -->
                         <div class="booking-card-image">
-                            @if (!string.IsNullOrEmpty(booking.Room?.Category?.ImageUrl))
+                            @if (firstDetail != null && !string.IsNullOrEmpty(firstDetail.RoomCategory?.ImageUrl))
                             {
-                                <img src="@booking.Room.Category.ImageUrl" alt="@booking.Room.Category.CategoryName" />
+                                <img src="@firstDetail.RoomCategory.ImageUrl" alt="Room" />
                             }
                             else
                             {
@@ -101,7 +113,7 @@
                         <div class="booking-card-info">
                             <div>
                                 <div class="booking-id">Mã BKG: #@booking.BookingId</div>
-                                <h3>@booking.Room?.Category?.CategoryName <span style="font-size: 1rem; color: var(--text-muted); font-weight: normal;">(Phòng @booking.Room?.RoomNumber)</span></h3>
+                                <h3>@roomsDisplay <span style="font-size: 1rem; color: var(--text-muted); font-weight: normal;">@assignedRoomsDisplay</span></h3>
                                 
                                 <div class="stay-timeline">
                                     <div class="timeline-node">

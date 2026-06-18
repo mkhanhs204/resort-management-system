@@ -153,7 +153,9 @@
                     </div>
 
                     <form id="booking-form" method="get" action="/Bookings/Create">
-                        <input type="hidden" name="categoryId" id="category-id" value="@Model.CategoryId" />
+                        <input type="hidden" name="RoomSelections[0].CategoryId" id="category-id" value="@Model.CategoryId" />
+                        <input type="hidden" name="adults" value="@(Model.MaxAdults ?? 2)" />
+                        <input type="hidden" name="children" value="@(Model.MaxChildren ?? 0)" />
                         <div class="mb-3">
                             <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Ngày Nhận Phòng</label>
                             <div style="position: relative;">
@@ -170,9 +172,16 @@
 
                         <div id="availability-msg" style="margin-bottom: 15px; font-weight: 600; text-align: center; display: none; font-size: 15px;"></div>
 
+                        <div id="qty-selector" style="display: none; margin-bottom: 15px;">
+                            <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Số lượng phòng muốn đặt</label>
+                            <input type="number" name="RoomSelections[0].Quantity" id="room-qty" class="form-control" value="1" min="1" max="1" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; text-align: center; font-weight: bold;" />
+                        </div>
+
                         <button type="button" id="check-availability-btn" class="btn" style="background-color: #8f3636; color: white; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#7a2e2e'" onmouseout="this.style.backgroundColor='#8f3636'">KIỂM TRA PHÒNG TRỐNG</button>
                         
                         <button type="submit" id="book-now-btn" class="btn" style="background-color: #dfa974; color: white; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s; display: none;" onmouseover="this.style.backgroundColor='#c99560'" onmouseout="this.style.backgroundColor='#dfa974'">TIẾN HÀNH ĐẶT PHÒNG</button>
+                        
+                        <button type="button" id="book-more-btn" class="btn mt-3" style="background-color: #f8f9fa; color: #8f3636; border: 1px solid #8f3636; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s; display: none;" onmouseover="this.style.backgroundColor='#8f3636'; this.style.color='white'" onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.color='#8f3636'" onclick="goToSearchRooms()">CHỌN THÊM PHÒNG KHÁC</button>
                     </form>
                     
                     <p style="text-align: center; font-size: 13px; color: #888; margin-top: 15px; margin-bottom: 0;">
@@ -244,16 +253,26 @@
                             if (response.availableRooms > 0) {
                                 msgDiv.css('color', '#28a745').text(response.message).show();
                                 $('#check-availability-btn').hide();
+                                
+                                $('#room-qty').attr('max', response.availableRooms);
+                                $('#room-qty').val(1);
+                                $('#qty-selector').show();
+                                
                                 $('#book-now-btn').show();
+                                $('#book-more-btn').show();
                             } else {
                                 msgDiv.css('color', '#dc3545').text(response.message).show();
                                 $('#check-availability-btn').show();
+                                $('#qty-selector').hide();
                                 $('#book-now-btn').hide();
+                                $('#book-more-btn').hide();
                             }
                         } else {
                             msgDiv.css('color', '#dc3545').text(response.message).show();
                             $('#check-availability-btn').show();
+                            $('#qty-selector').hide();
                             $('#book-now-btn').hide();
+                            $('#book-more-btn').hide();
                         }
                     },
                     error: function() {
@@ -267,9 +286,24 @@
             // Reset buttons if dates change
             $('.room-date-picker').change(function() {
                 $('#availability-msg').hide();
+                $('#qty-selector').hide();
                 $('#book-now-btn').hide();
+                $('#book-more-btn').hide();
                 $('#check-availability-btn').show();
             });
         });
+
+        function goToSearchRooms() {
+            var checkIn = $('#checkin-date').val();
+            var checkOut = $('#checkout-date').val();
+            var categoryId = $('#category-id').val();
+            var qty = $('#room-qty').val() || 1;
+            
+            var url = '/Home/SearchRooms?checkIn=' + encodeURIComponent(checkIn) + 
+                      '&checkOut=' + encodeURIComponent(checkOut) + 
+                      '&preselectId=' + categoryId + 
+                      '&preselectQty=' + qty;
+            window.location.href = url;
+        }
     </script>
 }

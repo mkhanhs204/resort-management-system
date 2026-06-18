@@ -5,6 +5,17 @@ namespace PhucNguyenResort.Web.Controllers
     [Authorize(Roles = "System Admin,Business Manager,Receptionist,F&B Staff,Kitchen Staff,Tour Guide,Housekeeping Staff,Maintenance Staff")]
     public class DashboardController : Controller
     {
+        private readonly PhucNguyenResort.Services.FoodOrders.IFoodOrderService _foodOrderService;
+        private readonly PhucNguyenResort.Services.Kots.IKotService _kotService;
+
+        public DashboardController(
+            PhucNguyenResort.Services.FoodOrders.IFoodOrderService foodOrderService,
+            PhucNguyenResort.Services.Kots.IKotService kotService)
+        {
+            _foodOrderService = foodOrderService;
+            _kotService = kotService;
+        }
+
         // Trang chính: Tự động chuyển hướng đến dashboard phù hợp với role của người dùng
         public IActionResult Index()
         {
@@ -56,11 +67,75 @@ namespace PhucNguyenResort.Web.Controllers
             return View();
         }
 
+        [Authorize(Roles = "F&B Staff")]
+        public async Task<IActionResult> FoodOrders()
+        {
+            var orders = await _foodOrderService.GetAllFoodOrdersAsync();
+            return View("~/Views/FoodOrders/FoodOrders.cshtml", orders);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateFoodOrderStatus(int foodOrderId, PhucNguyenResort.Enums.FoodOrderStatus newStatus)
+        {
+            var result = await _foodOrderService.UpdateOrderStatusAsync(foodOrderId, newStatus);
+            
+            if (result.Status == PhucNguyenResort.Services.FoodOrders.FoodOrderActionStatus.Success)
+            {
+                TempData["SuccessMessage"] = "Food order status updated successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to update food order status.";
+            }
+
+            return RedirectToAction(nameof(FoodOrders));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        public async Task<IActionResult> ChargeFoodOrderToRoom(int foodOrderId)
+        {
+            var result = await _foodOrderService.ChargeToRoomAsync(foodOrderId);
+            
+            if (result.Status == PhucNguyenResort.Services.FoodOrders.FoodOrderActionStatus.Success)
+            {
+                TempData["SuccessMessage"] = "Successfully charged the food order to the room folio.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to charge the food order.";
+            }
+
+            return RedirectToAction(nameof(FoodOrders));
+        }
+
         // 5. Kitchen Staff Dashboard
         [Authorize(Roles = "Kitchen Staff")]
-        public IActionResult Kitchen()
+        public async Task<IActionResult> Kitchen()
         {
-            return View();
+            var kots = await _kotService.GetAllKotsAsync();
+            return View("~/Views/Dashboard/Kitchen.cshtml", kots);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Kitchen Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateKotStatus(int kotId, PhucNguyenResort.Enums.KotStatus newStatus)
+        {
+            var result = await _kotService.UpdateKotStatusAsync(kotId, newStatus);
+            
+            if (result.Status == PhucNguyenResort.Services.FoodOrders.FoodOrderActionStatus.Success)
+            {
+                TempData["SuccessMessage"] = "KOT status updated successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to update KOT status.";
+            }
+
+            return RedirectToAction(nameof(Kitchen));
         }
 
         // 6. Tour Guide Dashboard
