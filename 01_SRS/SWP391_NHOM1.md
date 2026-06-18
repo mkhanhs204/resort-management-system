@@ -198,25 +198,26 @@ PhucNguyen Resort & Tour Hub is a web-based integrated resort management system 
 | 3 | UserProfiles | ● Primary keys: ProfileId <br> ● Foreign keys: UserId → Users(UserId) <br> ● Unique keys: UserId |
 | 4 | RoomCategories | ● Primary keys: CategoryId <br> ● Foreign keys: None <br> ● Unique keys: None |
 | 5 | Rooms | ● Primary keys: RoomId <br> ● Foreign keys: CategoryId → RoomCategories(CategoryId) <br> ● Unique keys: RoomNumber |
-| 6 | Bookings | ● Primary keys: BookingId <br> ● Foreign keys: UserId → Users(UserId), RoomId → Rooms(RoomId) <br> ● Unique keys: None |
-| 7 | BookingGuests | ● Primary keys: BookingGuestId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: None |
-| 8 | MenuCategories | ● Primary keys: CategoryId <br> ● Foreign keys: None <br> ● Unique keys: None |
-| 9 | MenuItems | ● Primary keys: MenuItemId <br> ● Foreign keys: CategoryId → MenuCategories(CategoryId) <br> ● Unique keys: None |
-| 10 | DiningTables | ● Primary keys: TableId <br> ● Foreign keys: None <br> ● Unique keys: None |
-| 11 | TableReservations | ● Primary keys: ReservationId <br> ● Foreign keys: UserId → Users(UserId), TableId → DiningTables(TableId) <br> ● Unique keys: None |
-| 12 | FoodOrders | ● Primary keys: FoodOrderId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: None |
-| 13 | FoodOrderItems | ● Primary keys: OrderItemId <br> ● Foreign keys: FoodOrderId → FoodOrders(FoodOrderId), MenuItemId → MenuItems(MenuItemId) <br> ● Unique keys: None |
-| 14 | KOT | ● Primary keys: KotId <br> ● Foreign keys: FoodOrderId → FoodOrders(FoodOrderId) <br> ● Unique keys: FoodOrderId |
-| 15 | Tours | ● Primary keys: TourId <br> ● Foreign keys: None <br> ● Unique keys: None |
-| 16 | TourSchedules | ● Primary keys: ScheduleId <br> ● Foreign keys: TourId → Tours(TourId), GuideId → Users(UserId) <br> ● Unique keys: None |
-| 17 | TourBookings | ● Primary keys: TourBookingId <br> ● Foreign keys: UserId → Users(UserId), BookingId (Nullable) → Bookings(BookingId), ScheduleId → TourSchedules(ScheduleId) <br> ● Unique keys: None |
-| 18 | Reviews | ● Primary keys: ReviewId <br> ● Foreign keys: UserId → Users(UserId) |
-| 19 | GuestFolios | ● Primary keys: FolioId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: BookingId |
-| 20 | FolioTransactions | ● Primary keys: TransactionId <br> ● Foreign keys: FolioId → GuestFolios(FolioId) <br> ● Unique keys: None |
-| 21 | Invoices | ● Primary keys: InvoiceId <br> ● Foreign keys: FolioId → GuestFolios(FolioId) <br> ● Unique keys: FolioId |
-| 22 | Payments | ● Primary keys: PaymentId <br> ● Foreign keys: InvoiceId (Nullable) → Invoices(InvoiceId), TourBookingId (Nullable) → TourBookings(TourBookingId) <br> ● Unique keys: None |
-| 23 | Refunds | ● Primary keys: RefundId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: None |
-| 24 | Notifications | ● Primary keys: NotificationId <br> ● Foreign keys: UserId → Users(UserId) <br> ● Unique keys: None |
+| 6 | Bookings | ● Primary keys: BookingId <br> ● Foreign keys: UserId → Users(UserId) <br> ● Unique keys: None |
+| 7 | BookingDetails | ● Primary keys: BookingDetailId <br> ● Foreign keys: BookingId → Bookings(BookingId), RoomCategoryId → RoomCategories(CategoryId), RoomId (Nullable) → Rooms(RoomId) <br> ● Unique keys: None |
+| 8 | BookingGuests | ● Primary keys: BookingGuestId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: None |
+| 9 | MenuCategories | ● Primary keys: CategoryId <br> ● Foreign keys: None <br> ● Unique keys: None |
+| 10 | MenuItems | ● Primary keys: MenuItemId <br> ● Foreign keys: CategoryId → MenuCategories(CategoryId) <br> ● Unique keys: None |
+| 11 | DiningTables | ● Primary keys: TableId <br> ● Foreign keys: None <br> ● Unique keys: None |
+| 12 | TableReservations | ● Primary keys: ReservationId <br> ● Foreign keys: UserId → Users(UserId), TableId → DiningTables(TableId) <br> ● Unique keys: None |
+| 13 | FoodOrders | ● Primary keys: FoodOrderId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: None |
+| 14 | FoodOrderItems | ● Primary keys: OrderItemId <br> ● Foreign keys: FoodOrderId → FoodOrders(FoodOrderId), MenuItemId → MenuItems(MenuItemId) <br> ● Unique keys: None |
+| 15 | KOT | ● Primary keys: KotId <br> ● Foreign keys: FoodOrderId → FoodOrders(FoodOrderId) <br> ● Unique keys: FoodOrderId |
+| 16 | Tours | ● Primary keys: TourId <br> ● Foreign keys: None <br> ● Unique keys: None |
+| 17 | TourSchedules | ● Primary keys: ScheduleId <br> ● Foreign keys: TourId → Tours(TourId), GuideId → Users(UserId) <br> ● Unique keys: None |
+| 18 | TourBookings | ● Primary keys: TourBookingId <br> ● Foreign keys: UserId → Users(UserId), BookingId (Nullable) → Bookings(BookingId), ScheduleId → TourSchedules(ScheduleId) <br> ● Unique keys: None |
+| 19 | Reviews | ● Primary keys: ReviewId <br> ● Foreign keys: UserId → Users(UserId) |
+| 20 | GuestFolios | ● Primary keys: FolioId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: BookingId |
+| 21 | FolioTransactions | ● Primary keys: TransactionId <br> ● Foreign keys: FolioId → GuestFolios(FolioId) <br> ● Unique keys: None |
+| 22 | Invoices | ● Primary keys: InvoiceId <br> ● Foreign keys: FolioId → GuestFolios(FolioId) <br> ● Unique keys: FolioId |
+| 23 | Payments | ● Primary keys: PaymentId <br> ● Foreign keys: InvoiceId (Nullable) → Invoices(InvoiceId), TourBookingId (Nullable) → TourBookings(TourBookingId) <br> ● Unique keys: None |
+| 24 | Refunds | ● Primary keys: RefundId <br> ● Foreign keys: BookingId → Bookings(BookingId) <br> ● Unique keys: None |
+| 25 | Notifications | ● Primary keys: NotificationId <br> ● Foreign keys: UserId → Users(UserId) <br> ● Unique keys: None |
 
 ### 2. Code Packages
 #### 2.1 Package Diagram

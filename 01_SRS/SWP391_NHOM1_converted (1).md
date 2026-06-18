@@ -2252,8 +2252,13 @@ CategoryId
 RoomNumber <<unique>> }
 entity Bookings { *BookingId
 --
-UserId
-RoomId }
+UserId }
+entity BookingDetails { *BookingDetailId
+--
+BookingId
+RoomCategoryId
+RoomId (Nullable)
+Price }
 entity BookingGuests { *BookingGuestId
 --
 BookingId }
@@ -2310,7 +2315,9 @@ Roles ||--o{ Users
 Users ||--|| UserProfiles
 RoomCategories ||--o{ Rooms
 Users ||--o{ Bookings
-Rooms ||--o{ Bookings
+Bookings ||--o{ BookingDetails
+RoomCategories ||--o{ BookingDetails
+Rooms ||--o{ BookingDetails
 Bookings ||--o{ BookingGuests
 MenuCategories ||--o{ MenuItems
 Users ||--o{ TableReservations
@@ -2347,38 +2354,45 @@ Unique keys: RoomNumber
 ●​
 Primary keys: BookingId 
 ●​
-Foreign keys: UserId → Users(UserId), RoomId → Rooms(RoomId) 
+Foreign keys: UserId → Users(UserId) 
 ●​
 Unique keys: None 
-7 BookingGuests 
+7 BookingDetails 
+●​
+Primary keys: BookingDetailId 
+●​
+Foreign keys: BookingId → Bookings(BookingId), RoomCategoryId → RoomCategories(CategoryId), RoomId (Nullable) → Rooms(RoomId) 
+●​
+Unique keys: None 
+8 BookingGuests 
 ●​
 Primary keys: BookingGuestId 
 ●​
 Foreign keys: BookingId → Bookings(BookingId) 
 ●​
 Unique keys: None 
-8 MenuCategories 
+9 MenuCategories 
 ●​
 Primary keys: CategoryId 
 ●​
 Foreign keys: None 
 ●​
 Unique keys: None 
-9 MenuItems 
+10 MenuItems 
 ●​
 Primary keys: MenuItemId 
 ●​
 Foreign keys: CategoryId → MenuCategories(CategoryId) 
 ●​
 Unique keys: None 
-10 DiningTables 
+11 DiningTables 
 ●​
 Primary keys: TableId 
 ●​
 Foreign keys: None 
 ●​
 Unique keys: None 
-11 TableReservations 
+12 TableReservations 
 ●​
 Primary keys: ReservationId 
 ●​
@@ -2386,14 +2400,14 @@ Foreign keys: UserId → Users(UserId), TableId →
 DiningTables(TableId) 
 ●​
 Unique keys: None 
-12 FoodOrders 
+13 FoodOrders 
 ●​
 Primary keys: FoodOrderId 
 ●​
 Foreign keys: BookingId → Bookings(BookingId) 
 ●​
 Unique keys: None 
-13 FoodOrderItems 
+14 FoodOrderItems 
 ●​
 Primary keys: OrderItemId 
 ●​
@@ -2401,28 +2415,28 @@ Foreign keys: FoodOrderId → FoodOrders(FoodOrderId), MenuItemId
 → MenuItems(MenuItemId) 
 ●​
 Unique keys: None 
-14 KOT 
+15 KOT 
 ●​
 Primary keys: KotId 
 ●​
 Foreign keys: FoodOrderId → FoodOrders(FoodOrderId) 
 ●​
 Unique keys: FoodOrderId 
-15 Tours 
+16 Tours 
 ●​
 Primary keys: TourId 
 ●​
 Foreign keys: None 
 ●​
 Unique keys: None 
-16 TourSchedules 
+17 TourSchedules 
 ●​
 Primary keys: ScheduleId 
 ●​
 Foreign keys: TourId → Tours(TourId), GuideId → Users(UserId) 
 ●​
 Unique keys: None 
-17 TourBookings 
+18 TourBookings 
 ●​
 Primary keys: TourBookingId 
 ●​
@@ -2430,7 +2444,7 @@ Foreign keys: BookingId → Bookings(BookingId), ScheduleId →
 TourSchedules(ScheduleId) 
 ●​
 Unique keys: None 
-18 Reviews 
+19 Reviews 
 ●​
 Primary keys: ReviewId 
 ●​
@@ -2441,21 +2455,21 @@ Foreign keys: UserId → Users(UserId)
 
 ●​
 Unique keys: None 
-19 GuestFolios 
+20 GuestFolios 
 ●​
 Primary keys: FolioId 
 ●​
 Foreign keys: BookingId → Bookings(BookingId) 
 ●​
 Unique keys: BookingId 
-20 FolioTransactions 
+21 FolioTransactions 
 ●​
 Primary keys: TransactionId 
 ●​
 Foreign keys: FolioId → GuestFolios(FolioId) 
 ●​
 Unique keys: None 
-21 Invoices 
+22 Invoices 
 ●​
 Primary keys: InvoiceId 
 ●​
