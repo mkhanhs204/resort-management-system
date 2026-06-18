@@ -16,7 +16,7 @@ Quy chuan Tai lieu Ky thuat va Dac ta Hien thuc hoa
 | Last Review    | 2026-06-13                          |
 | Based on EDS   | v2.0                                |
 
-> **PHAM VI TAI LIEU**: File nay CHI xu ly **UC11, UC13, UC14** (Dat do an Room Service, Quan ly trang thai don hang, Charge to Room). UC12 (Dat ban nha hang / Table Reservation) se duoc xu ly trong file `TableReservation_EDS.md` rieng biet.
+> **PHAM VI TAI LIEU**: File nay CHI xu ly **UC25, UC66, UC69, UC73** (Dat do an Room Service, Quan ly trang thai don hang, Charge to Room, Quan ly KOT). UC24 (Dat ban nha hang / Table Reservation) se duoc xu ly trong file `TableReservation_EDS.md` rieng biet.
 
 ## CHANGELOG
 
@@ -24,7 +24,7 @@ Quy chuan Tai lieu Ky thuat va Dac ta Hien thuc hoa
 
 | Ngay       | Nguoi thuc hien                     | Noi dung thay doi                                                                                                                 |
 | ------------| -------------------------------------| -----------------------------------------------------------------------------------------------------------------------------------|
-| 2026-06-13 | `Ho Minh Khanh - Backend Developer` | Tao tai lieu lan dau cho Food Order & Room Service (UC11 + UC13 + UC14)                                                           |
+| 2026-06-13 | `Ho Minh Khanh - Backend Developer` | Tao tai lieu lan dau cho Food Order & Room Service (UC25 + UC66 + UC69 + UC73)                                                           |
 | 2026-06-13 | `Ho Minh Khanh - Backend Developer` | v2.0: Sua status flow, them anti-duplicate charge, sua bao mat, sua nullable model, dung seed data that                           |
 | 2026-06-13 | `Ho Minh Khanh - Backend Developer` | v2.1: Sua kieu tra ve Service (Result Object), chuan hoa Quantity validation, chuan hoa Role Constants, cap nhat policy Migration |
 | 2026-06-13 | `Ho Minh Khanh - Backend Developer` | v2.2: Yeu cau truyen currentUserId vao CreateFoodOrderAsync de check quyen so huu booking |
@@ -54,9 +54,9 @@ Quy chuan Tai lieu Ky thuat va Dac ta Hien thuc hoa
 
 Module **Food Order & Room Service** quan ly toan bo luong nghiep vu dat do an trong he thong PhucNguyen Resort — tu luc khach da Check-in dat mon (Room Service), den khi bep nhan va nau (KOT Workflow), cho den khi ghi no chi phi vao tien phong (Charge to Room).
 
-**Pham vi bao phu**: UC11, UC13, UC14 (theo SRS `SWP391-HOS-02`) tuong ung voi UC25, UC68/UC69, UC72 (theo SRS `SWP391_NHOM1`).
+**Pham vi bao phu**: UC25, UC66, UC69, UC73 (theo SRS ver2 `SWP391_NHOM1_ver2.pdf`).
 
-**KHONG bao gom**: UC12 (Dat ban nha hang) — se co tai lieu EDS rieng.
+**KHONG bao gom**: UC24 (Dat ban nha hang) — se co tai lieu EDS rieng.
 
 | Field                  | Value                                                                             |
 | ------------------------| -----------------------------------------------------------------------------------| 
@@ -75,11 +75,11 @@ Module **Food Order & Room Service** quan ly toan bo luong nghiep vu dat do an t
 
 | Requirement ID | Loai (BR/ADR/US) | Mo ta yeu cau                                                                                               | Thanh phan Code                                                        | Compliance Target | ADR lien quan |
 | ----------------| -------------------| ---------------------------------------------------------------------------------------------------------------| ------------------------------------------------------------------------| -------------------| --------------|
-| US-FOOD-001    | User Story        | UC11/UC25: Khach da check-in xem menu va dat do an len phong (Room Service)                                 | `FoodOrdersController.RoomService()`, `FoodOrderService.CreateFoodOrderAsync()` | —                 | ADR-001       |
-| US-FOOD-002    | User Story        | UC13/UC68: F&B Staff xem danh sach don hang do an dang den                                                  | `FoodOrdersController.OrderList()`, `FoodOrderService`                 | —                 | —             |
-| US-FOOD-003    | User Story        | UC13/UC69: F&B Staff cap nhat trang thai don hang (Pending -> Cooking -> Delivered)                          | `FoodOrdersController.UpdateStatus()`, `FoodOrderService`              | —                 | ADR-002       |
-| US-FOOD-004    | User Story        | UC14/UC72: F&B Staff ghi chi phi bua an vao tien phong (Charge to Room)                                     | `FoodOrderService.ChargeToRoomAsync()`, `GuestFolio`, `FolioTransaction` | —                 | ADR-003       |
-| US-FOOD-005    | User Story        | UC73/UC74/UC76: Kitchen Staff xem KOT va cap nhat trang thai bep (Pending -> Cooking -> Ready -> Completed)  | `KotController`, `KotService`                                          | —                 | ADR-002       |
+| US-FOOD-001    | User Story        | UC25: Khach da check-in xem menu va dat do an len phong (Room Service)                                 | `FoodOrdersController.RoomService()`, `FoodOrderService.CreateFoodOrderAsync()` | —                 | ADR-001       |
+| US-FOOD-002    | User Story        | UC68: F&B Staff xem danh sach don hang do an dang den                                                  | `FoodOrdersController.OrderList()`, `FoodOrderService`                 | —                 | —             |
+| US-FOOD-003    | User Story        | UC66: F&B Staff cap nhat trang thai don hang (Pending -> Cooking -> Delivered)                          | `FoodOrdersController.UpdateStatus()`, `FoodOrderService`              | —                 | ADR-002       |
+| US-FOOD-004    | User Story        | UC69: F&B Staff ghi chi phi bua an vao tien phong (Charge to Room)                                     | `FoodOrderService.ChargeToRoomAsync()`, `GuestFolio`, `FolioTransaction` | —                 | ADR-003       |
+| US-FOOD-005    | User Story        | UC73: Kitchen Staff xem KOT va cap nhat trang thai bep (Pending -> Cooking -> Ready -> Completed)  | `KotController`, `KotService`                                          | —                 | ADR-002       |
 | BR-FOOD-001   | Business Rule     | Chi Booking co trang thai `CheckedIn` moi duoc phep dat do an Room Service                                   | `FoodOrderService.CreateFoodOrderAsync()` — kiem tra `BookingStatus`   | —                 | —             |
 | BR-FOOD-002   | Business Rule     | Chi cho phep dat mon an co `IsAvailable = true` va `IsDeleted = false`                                       | `FoodOrderService.CreateFoodOrderAsync()` — filter MenuItems           | —                 | —             |
 | BR-FOOD-003   | Business Rule     | UnitPrice phai duoc snapshot tai thoi diem dat hang; thay doi gia menu sau do khong anh huong don da dat      | `FoodOrderService` — `UnitPrice = menuItem.Price`                      | —                 | ADR-004       |
@@ -160,7 +160,7 @@ Chon **Dual Status** vi dung voi mo hinh KOT (Kitchen Order Ticket) trong nganh 
 | Supersedes | `N/A`                           |
 
 **Boi canh (Context)**
-Khi F&B Staff thuc hien "Charge to Room" (UC14/UC72), chi phi bua an can duoc ghi nhan vao hoa don tong hop (Consolidated Invoice) de Receptionist thu tien khi khach Check-out.
+Khi F&B Staff thuc hien "Charge to Room" (UC69), chi phi bua an can duoc ghi nhan vao hoa don tong hop (Consolidated Invoice) de Receptionist thu tien khi khach Check-out.
 
 **Quyet dinh (Decision)**
 Chon **FolioTransaction** vi phu hop voi mo hinh tai chinh khach san chuan (USALI). Moi lan Charge to Room se tao 1 `FolioTransaction` voi `TransactionType = FoodCharge` va `ReferenceId = FoodOrderId`, dong thoi cap nhat `GuestFolio.TotalFoodCharges`.
@@ -191,7 +191,7 @@ Khi tao `FoodOrderItem`, copy gia hien tai cua `MenuItem.Price` vao `FoodOrderIt
 | Supersedes | `N/A`                           |
 
 **Boi canh (Context)**
-UC14 rat de loi neu F&B Staff bam "Charge to Room" nhieu lan cho cung mot don hang. Khong co co che chong trung se dan den sai so tien trong GuestFolio.
+UC69 rat de loi neu F&B Staff bam "Charge to Room" nhieu lan cho cung mot don hang. Khong co co che chong trung se dan den sai so tien trong GuestFolio.
 
 **Cac phuong an da xem xet (Options Considered)**
 
@@ -262,9 +262,9 @@ Tieu cuc / Trade-offs:
 | + RoomService(GET)         |       | + BuildRoomServiceOrderAsync()|
 | + RoomService(POST)        |       | + CreateFoodOrderAsync()      |
 | + Details(id)              |       | + GetFoodOrderDetailAsync()   |
-| + OrderList()         [NEW]|       | + GetAllOrdersAsync()    [NEW]|
-| + UpdateStatus(POST)  [NEW]|       | + UpdateOrderStatusAsync()[NEW]|
-| + ChargeToRoom(POST)  [NEW]|       | + ChargeToRoomAsync()    [NEW]|
+| + OrderList()              |       | + GetAllOrdersAsync()         |
+| + UpdateStatus(POST)       |       | + UpdateOrderStatusAsync()    |
+| + ChargeToRoom(POST)       |       | + ChargeToRoomAsync()         |
 +----------------------------+       +-------------------------------+
                                                 ^
                                                 | implements
@@ -275,7 +275,7 @@ Tieu cuc / Trade-offs:
                                      +-------------------------------+
 
 +----------------------------+       +-------------------------------+
-|   KotController       [NEW]|------>|   IKotService            [NEW]|
+|   KotController            |------>|   IKotService                 |
 |   (Controller)             |       |   (Interface)                 |
 +----------------------------+       +-------------------------------+
 | + Dashboard(GET)           |       | + GetPendingKotsAsync()       |
@@ -420,7 +420,7 @@ Users (1) -- (N) Bookings (1) ---- (N) FoodOrders (1) -+
 
 ## 6. Dynamic Modeling (Mo hinh Dong)
 
-### 6.1. Sequence Diagram — UC11: Dat do an Room Service (Happy Path)
+### 6.1. Sequence Diagram — UC25: Dat do an Room Service (Happy Path)
 
 ```
 Customer Browser      FoodOrdersController       FoodOrderService          ResortDbContext
@@ -463,7 +463,7 @@ Customer Browser      FoodOrdersController       FoodOrderService          Resor
      |    {orderId} ----------|                          |                        |
 ```
 
-### 6.2. Sequence Diagram — UC14: Charge to Room (voi Anti-Duplicate Check)
+### 6.2. Sequence Diagram — UC69: Charge to Room (voi Anti-Duplicate Check)
 
 ```
 F&B Staff Browser     FoodOrdersController       FoodOrderService          ResortDbContext
@@ -605,18 +605,18 @@ public interface IFoodOrderService
     Task<RoomServiceOrderViewModel?> BuildRoomServiceOrderAsync(int bookingId);
     
     /// <summary>
-    /// [UC11/UC25] Tao don hang do an.
+    /// [UC25] Tao don hang do an.
     /// Bat buoc phai truyen currentUserId vao de service kiem tra quyen so huu booking hoac controller phai tu check (BR-FOOD-009).
     /// </summary>
     Task<FoodOrderCreateResult> CreateFoodOrderAsync(FoodOrderCreateRequest request, int currentUserId);
     
     Task<FoodOrderDetailViewModel?> GetFoodOrderDetailAsync(int foodOrderId);
 
-    // === NEW (v2.0 — UC13 + UC14) ===
+    // === NEW (v2.0) ===
     Task<IEnumerable<FoodOrderDetailViewModel>> GetAllOrdersAsync(FoodOrderStatus? filterStatus = null);
 
     /// <summary>
-    /// [UC13/UC69] F&B Staff cap nhat trang thai don hang.
+    /// [UC66] F&B Staff cap nhat trang thai don hang.
     /// Tra ve FoodOrderActionResult thay vi bool de xu ly loi ro rang.
     /// @returns NotFound neu don hang khong ton tai.
     /// @returns InvalidState neu chuyen trang thai vi pham quy tac.
@@ -624,7 +624,7 @@ public interface IFoodOrderService
     Task<FoodOrderActionResult> UpdateOrderStatusAsync(int foodOrderId, FoodOrderStatus newStatus);
 
     /// <summary>
-    /// [UC14/UC72] Ghi chi phi don hang vao tien phong.
+    /// [UC69] Ghi chi phi don hang vao tien phong.
     /// CHONG CHARGE TRUNG: Kiem tra IsChargedToRoom truoc khi tao FolioTransaction.
     /// @returns NotFound (FOOD-003) neu FoodOrderId khong ton tai.
     /// @returns InvalidState (FOOD-007) neu don hang chua Delivered.
@@ -664,9 +664,9 @@ public interface IKotService
 | GET    | `/FoodOrders/RoomService?bookingId={id}` | Authenticated | `Customer` (chi booking cua minh) | Yes     | Form dat do an Room Service        |
 | POST   | `/FoodOrders/RoomService`              | Authenticated | `Customer` (chi booking cua minh) | No      | Submit dat do an                   |
 | GET    | `/FoodOrders/Details/{id}`             | Authenticated | `Customer (own), FnBStaff`  | Yes         | Chi tiet don hang                  |
-| GET    | `/FoodOrders/OrderList`           [NEW]| Authenticated | `FnBStaff`                  | Yes         | Danh sach don hang (F&B Dashboard)|
-| POST   | `/FoodOrders/UpdateStatus`        [NEW]| Authenticated | `FnBStaff`                  | No          | Cap nhat trang thai don hang       |
-| POST   | `/FoodOrders/ChargeToRoom`        [NEW]| Authenticated | `FnBStaff`                  | No          | Ghi no vao tien phong (1 lan duy nhat)|
+| GET    | `/FoodOrders/OrderList`                | Authenticated | `FnBStaff`                  | Yes         | Danh sach don hang (F&B Dashboard)|
+| POST   | `/FoodOrders/UpdateStatus`             | Authenticated | `FnBStaff`                  | No          | Cap nhat trang thai don hang       |
+| POST   | `/FoodOrders/ChargeToRoom`             | Authenticated | `FnBStaff`                  | No          | Ghi no vao tien phong (1 lan duy nhat)|
 
 **KotController (MOI):**
 

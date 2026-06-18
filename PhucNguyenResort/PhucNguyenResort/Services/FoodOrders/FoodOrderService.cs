@@ -242,6 +242,8 @@ public class FoodOrderService : IFoodOrderService
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
             OrderedAt = foodOrder.OrderedAt,
+            IsChargedToRoom = foodOrder.IsChargedToRoom,
+            ChargedAt = foodOrder.ChargedAt,
             Items = foodOrder.FoodOrderItems
                 .OrderBy(item => item.MenuItem?.Category?.CategoryName)
                 .ThenBy(item => item.MenuItem?.ItemName)
@@ -254,5 +256,157 @@ public class FoodOrderService : IFoodOrderService
                 })
                 .ToList()
         };
+    }
+
+    public async Task<List<FoodOrderDetailViewModel>> GetAllFoodOrdersAsync()
+    {
+        var foodOrders = await _context.FoodOrders
+            .AsNoTracking()
+            .Include(order => order.Booking)
+                .ThenInclude(booking => booking!.User)
+            .Include(order => order.Booking)
+                .ThenInclude(booking => booking!.Room)
+            .Include(order => order.Kot)
+            .Include(order => order.FoodOrderItems)
+                .ThenInclude(orderItem => orderItem.MenuItem)
+                    .ThenInclude(menuItem => menuItem!.Category)
+            .OrderByDescending(order => order.OrderedAt)
+            .ToListAsync();
+
+        return foodOrders.Select(foodOrder => new FoodOrderDetailViewModel
+        {
+            FoodOrderId = foodOrder.FoodOrderId,
+            BookingId = foodOrder.BookingId,
+            CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
+            RoomNumber = foodOrder.Booking?.Room?.RoomNumber ?? string.Empty,
+            OrderStatus = foodOrder.OrderStatus,
+            KitchenStatus = foodOrder.Kot?.Status,
+            TotalAmount = foodOrder.TotalAmount ?? 0,
+            OrderedAt = foodOrder.OrderedAt,
+            IsChargedToRoom = foodOrder.IsChargedToRoom,
+            ChargedAt = foodOrder.ChargedAt,
+            Items = foodOrder.FoodOrderItems
+                .OrderBy(item => item.MenuItem?.Category?.CategoryName)
+                .ThenBy(item => item.MenuItem?.ItemName)
+                .Select(item => new FoodOrderDetailItemViewModel
+                {
+                    ItemName = item.MenuItem?.ItemName ?? string.Empty,
+                    CategoryName = item.MenuItem?.Category?.CategoryName ?? "Uncategorized",
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice
+                })
+                .ToList()
+        }).ToList();
+    }
+
+    // [UC66] F&B Staff cap nhat trang thai don hang
+    public async Task<FoodOrderActionResult> UpdateOrderStatusAsync(int foodOrderId, FoodOrderStatus newStatus)
+    {
+        var foodOrder = await _context.FoodOrders
+            .Include(o => o.Kot)
+            .FirstOrDefaultAsync(o => o.FoodOrderId == foodOrderId);
+
+        if (foodOrder == null)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.NotFound, "Food order not found.");
+        }
+
+        var currentStatus = foodOrder.OrderStatus;
+        bool isValidTransition = false;
+
+        switch (currentStatus)
+        {
+            case FoodOrderStatus.Pending:
+                // From Pending, can only move to Cooking or Cancelled
+                if (newStatus == FoodOrderStatus.Cooking || newStatus == FoodOrderStatus.Cancelled)
+                {
+                    isValidTransition = true;
+                }
+                break;
+
+            case FoodOrderStatus.Cooking:
+                // From Cooking, can only move to Delivered
+                if (newStatus == FoodOrderStatus.Delivered)
+                {
+                    // Dual Status Model check (ADR-002): Kitchen must be done
+                    if (foodOrder.Kot != null && (foodOrder.Kot.Status == KotStatus.Ready || foodOrder.Kot.Status == KotStatus.Completed))
+                    {
+                        isValidTransition = true;
+                    }
+                }
+                break;
+
+            case FoodOrderStatus.Delivered:
+            case FoodOrderStatus.Cancelled:
+                // Terminal states, no transitions allowed
+                break;
+        }
+
+        if (!isValidTransition)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.InvalidState, 
+                $"Cannot transition from {currentStatus} to {newStatus} or constraints not met.");
+        }
+
+        foodOrder.OrderStatus = newStatus;
+        await _context.SaveChangesAsync();
+
+        return FoodOrderActionResult.Succeeded();
+    }
+
+    // [UC69] Ghi no vao tien phong
+    public async Task<FoodOrderActionResult> ChargeToRoomAsync(int foodOrderId)
+    {
+        var foodOrder = await _context.FoodOrders
+            .FirstOrDefaultAsync(o => o.FoodOrderId == foodOrderId);
+
+        if (foodOrder == null)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.NotFound, "Food order not found.");
+        }
+
+        if (foodOrder.OrderStatus == FoodOrderStatus.Cancelled)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.InvalidState, "Cannot charge a cancelled order.");
+        }
+
+        if (foodOrder.OrderStatus != FoodOrderStatus.Delivered)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.InvalidState, "Order must be delivered before charging to room.");
+        }
+
+        if (foodOrder.IsChargedToRoom)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.AlreadyCharged, "Order has already been charged to room.");
+        }
+
+        var folio = await _context.GuestFolios
+            .FirstOrDefaultAsync(f => f.BookingId == foodOrder.BookingId);
+
+        if (folio == null)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.NoFolio, "No guest folio found for this booking.");
+        }
+
+        // Apply charge
+        foodOrder.IsChargedToRoom = true;
+        foodOrder.ChargedAt = DateTime.Now;
+
+        folio.TotalFoodCharges += foodOrder.TotalAmount ?? 0;
+
+        var transaction = new FolioTransaction
+        {
+            FolioId = folio.FolioId,
+            TransactionType = FolioTransactionType.FoodCharge,
+            ReferenceId = foodOrder.FoodOrderId,
+            Amount = foodOrder.TotalAmount ?? 0,
+            CreatedAt = DateTime.Now
+        };
+
+        _context.FolioTransactions.Add(transaction);
+
+        await _context.SaveChangesAsync();
+
+        return FoodOrderActionResult.Succeeded();
     }
 }

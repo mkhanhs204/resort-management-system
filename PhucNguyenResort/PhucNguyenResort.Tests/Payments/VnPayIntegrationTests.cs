@@ -61,7 +61,7 @@ namespace PhucNguyenResort.Tests.Payments
                 .Options;
             var context = new ResortDbContext(options);
 
-            var controller = new PaymentController(mockService.Object, context);
+            var controller = new PaymentController(mockService.Object, context, new Mock<PhucNguyenResort.Services.Email.IEmailSender>().Object, new Mock<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().Object);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext()
@@ -117,7 +117,7 @@ namespace PhucNguyenResort.Tests.Payments
 
             using (var context = new ResortDbContext(options))
             {
-                var controller = new PaymentController(mockService.Object, context);
+                var controller = new PaymentController(mockService.Object, context, new Mock<PhucNguyenResort.Services.Email.IEmailSender>().Object, new Mock<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().Object);
                 controller.ControllerContext = new ControllerContext
                 {
                     HttpContext = new DefaultHttpContext()
@@ -178,7 +178,7 @@ namespace PhucNguyenResort.Tests.Payments
 
             using (var context = new ResortDbContext(options))
             {
-                var controller = new PaymentController(mockService.Object, context);
+                var controller = new PaymentController(mockService.Object, context, new Mock<PhucNguyenResort.Services.Email.IEmailSender>().Object, new Mock<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().Object);
                 
                 var httpContext = new DefaultHttpContext();
                 var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());

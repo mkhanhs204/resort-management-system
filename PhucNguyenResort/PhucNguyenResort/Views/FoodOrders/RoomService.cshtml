@@ -7,16 +7,7 @@
 <div class="container my-5">
     <h1 class="h3 mb-4">Room Service Food Order</h1>
 
-    <form asp-action="RoomService" method="get" class="row g-2 align-items-end mb-4">
-        <div class="col-md-4">
-            <label asp-for="BookingId" class="form-label"></label>
-            <input asp-for="BookingId" class="form-control" placeholder="Checked-in booking id" />
-            <span asp-validation-for="BookingId" class="text-danger"></span>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Load menu</button>
-        </div>
-    </form>
+
 
     @if (!ViewData.ModelState.IsValid)
     {

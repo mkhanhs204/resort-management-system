@@ -1,10 +1,10 @@
-# TEST-DRIVEN DEVELOPMENT SPECIFICATION — UC11 (Room Service)
+# TEST-DRIVEN DEVELOPMENT SPECIFICATION — UC25 (Room Service)
 
-Mẫu Đặc tả Kiểm thử Hướng Phát triển cho Use Case 11 (Đặt đồ ăn tại phòng)
+Mẫu Đặc tả Kiểm thử Hướng Phát triển cho Use Case 25 (Đặt đồ ăn tại phòng)
 
 **Document ID**: PHUCNGUYEN-FOODORDER-TDD-001
-**Version**: 1.1
-**Date**: 2026-06-13
+**Version**: 1.2
+**Date**: 2026-06-18
 **Status**: Approved
 **Standard**: ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author**: `Ho Minh Khanh  - Backend Developer`
@@ -14,7 +14,7 @@ Mẫu Đặc tả Kiểm thử Hướng Phát triển cho Use Case 11 (Đặt đ
 **Classification**: Internal - Confidential
 
 **References**:
-- `01_SRS/SWP391-HOS-02.md` — Functional requirements (UC11)
+- `01_SRS/SWP391_NHOM1_ver2.pdf` — Functional requirements (UC25)
 - `03_implement/FoodOrder_EDS.md` (v2.2) — Technical Specification cho Food Order
 - `02_Design/ADR/ADR-001` — MVC SSR
 - `02_Design/ADR/ADR-002` — Dual Status Model
@@ -32,6 +32,7 @@ Test data sử dụng từ `SeedData.cs` (BookingId=2,7,12,17) cho integration, 
 | ------------| -----------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 2026-06-13 | `Ho Minh Khanh` | Khởi tạo tài liệu — TDD spec cho UC11 (Food Order & Room Service)                                                                                           |
 | 2026-06-13 | `Ho Minh Khanh` | v1.1: Chỉnh sửa Scope thành Service Only, cập nhật FoodOrderCreateStatus, thêm tests cho InvalidQuantity, BookingNotFound, và IsDeleted. Cập nhật fixtures. |
+| 2026-06-18 | `Ho Minh Khanh` | v1.2: Cập nhật ID từ UC11 thành UC25 cho khớp với SRS ver2.                                                                                                 |
 
 ---
 
@@ -50,7 +51,7 @@ Test data sử dụng từ `SeedData.cs` (BookingId=2,7,12,17) cho integration, 
 
 | Field | Value |
 | --- | --- |
-| Feature / Gap ID | UC11 / UC25 (Room Service Order) |
+| Feature / Gap ID | UC25 (Room Service Order) |
 | Module | `Food Order & Room Service` |
 | Spec gốc | `PHUCNGUYEN-FOODORDER-IMP-001` (v2.2) |
 | Priority | 🔴 P0 |
@@ -88,19 +89,19 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 ### TDS-03 — Test Conditions and Coverage Items
 | Condition ID | Test Condition                                   | Coverage Item                | Test Cases    |
 | --------------| --------------------------------------------------| ------------------------------| ---------------|
-| TC-COND-001  | Customer tạo order hợp lệ (mix quantity 0 và >0) | `CreateFoodOrderAsync`       | `UC11-TC-001` |
-| TC-COND-002  | Customer tạo order cho booking của người khác    | `CreateFoodOrderAsync`       | `UC11-TC-002` |
-| TC-COND-003  | Booking tồn tại nhưng chưa CheckedIn             | `CreateFoodOrderAsync`       | `UC11-TC-003` |
-| TC-COND-004  | Submit toàn bộ danh sách món quantity = 0        | `CreateFoodOrderAsync`       | `UC11-TC-004` |
-| TC-COND-005  | Đặt món bị ngưng kinh doanh (IsAvailable=false)  | `CreateFoodOrderAsync`       | `UC11-TC-005` |
-| TC-COND-006  | Submit quantity âm (<0)                          | `CreateFoodOrderAsync`       | `UC11-TC-006` |
-| TC-COND-007  | Submit quantity vượt giới hạn (>1000)            | `CreateFoodOrderAsync`       | `UC11-TC-007` |
-| TC-COND-008  | Đặt cho BookingId không tồn tại                  | `CreateFoodOrderAsync`       | `UC11-TC-008` |
-| TC-COND-009  | Đặt món đã bị xóa (IsDeleted=true)               | `CreateFoodOrderAsync`       | `UC11-TC-009` |
-| TC-COND-010  | Đặt món với MenuItemId không tồn tại             | `CreateFoodOrderAsync`       | `UC11-TC-010` |
-| TC-COND-011  | Gửi nhiều items có cùng MenuItemId               | `CreateFoodOrderAsync`       | `UC11-TC-011` |
-| TC-COND-012  | Load menu hợp lệ cho Room Service                | `BuildRoomServiceOrderAsync` | `UC11-TC-012` |
-| TC-COND-013  | Load menu cho booking không hợp lệ               | `BuildRoomServiceOrderAsync` | `UC11-TC-013` |
+| TC-COND-001  | Customer tạo order hợp lệ (mix quantity 0 và >0) | `CreateFoodOrderAsync`       | `UC25-TC-001` |
+| TC-COND-002  | Customer tạo order cho booking của người khác    | `CreateFoodOrderAsync`       | `UC25-TC-002` |
+| TC-COND-003  | Booking tồn tại nhưng chưa CheckedIn             | `CreateFoodOrderAsync`       | `UC25-TC-003` |
+| TC-COND-004  | Submit toàn bộ danh sách món quantity = 0        | `CreateFoodOrderAsync`       | `UC25-TC-004` |
+| TC-COND-005  | Đặt món bị ngưng kinh doanh (IsAvailable=false)  | `CreateFoodOrderAsync`       | `UC25-TC-005` |
+| TC-COND-006  | Submit quantity âm (<0)                          | `CreateFoodOrderAsync`       | `UC25-TC-006` |
+| TC-COND-007  | Submit quantity vượt giới hạn (>1000)            | `CreateFoodOrderAsync`       | `UC25-TC-007` |
+| TC-COND-008  | Đặt cho BookingId không tồn tại                  | `CreateFoodOrderAsync`       | `UC25-TC-008` |
+| TC-COND-009  | Đặt món đã bị xóa (IsDeleted=true)               | `CreateFoodOrderAsync`       | `UC25-TC-009` |
+| TC-COND-010  | Đặt món với MenuItemId không tồn tại             | `CreateFoodOrderAsync`       | `UC25-TC-010` |
+| TC-COND-011  | Gửi nhiều items có cùng MenuItemId               | `CreateFoodOrderAsync`       | `UC25-TC-011` |
+| TC-COND-012  | Load menu hợp lệ cho Room Service                | `BuildRoomServiceOrderAsync` | `UC25-TC-012` |
+| TC-COND-013  | Load menu cho booking không hợp lệ               | `BuildRoomServiceOrderAsync` | `UC25-TC-013` |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 | Technique (ISO 29119-4) | Applied To | Rationale |
@@ -124,10 +125,10 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ## 4. Test Case Specification
 
-**TC ID format**: `UC11-TC-[NNN]`
+**TC ID format**: `UC25-TC-[NNN]`
 **Severity**: CRITICAL / HIGH / MEDIUM / LOW
 
-### UC11-TC-001 — Create Order Happy Path (Filtering zero quantities)
+### UC25-TC-001 — Create Order Happy Path (Filtering zero quantities)
 **Severity**: CRITICAL
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -158,7 +159,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-002 — Create Order Access Denied (Not Owner)
+### UC25-TC-002 — Create Order Access Denied (Not Owner)
 **Severity**: HIGH
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -180,7 +181,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-003 — Create Order Invalid State (Not Checked In)
+### UC25-TC-003 — Create Order Invalid State (Not Checked In)
 **Severity**: HIGH
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -202,7 +203,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-004 — Create Order Validation Error (All Quantities are 0)
+### UC25-TC-004 — Create Order Validation Error (All Quantities are 0)
 **Severity**: MEDIUM
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -224,7 +225,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-005 — Create Order Unavailable Menu Item (IsAvailable = false)
+### UC25-TC-005 — Create Order Unavailable Menu Item (IsAvailable = false)
 **Severity**: MEDIUM
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -246,7 +247,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-006 — Create Order Invalid Quantity (< 0)
+### UC25-TC-006 — Create Order Invalid Quantity (< 0)
 **Severity**: MEDIUM
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -268,7 +269,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-007 — Create Order Invalid Quantity (> 1000)
+### UC25-TC-007 — Create Order Invalid Quantity (> 1000)
 **Severity**: MEDIUM
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -290,7 +291,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-008 — Create Order Booking Not Found
+### UC25-TC-008 — Create Order Booking Not Found
 **Severity**: HIGH
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -313,7 +314,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-009 — Create Order Deleted Menu Item (IsDeleted = true)
+### UC25-TC-009 — Create Order Deleted Menu Item (IsDeleted = true)
 **Severity**: MEDIUM
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -335,7 +336,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-010 — Create Order Menu Item Not Found
+### UC25-TC-010 — Create Order Menu Item Not Found
 **Severity**: MEDIUM
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -357,7 +358,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-011 — Create Order Duplicate Menu Item
+### UC25-TC-011 — Create Order Duplicate Menu Item
 **Severity**: MEDIUM
 **Feature Under Test**: `FoodOrderService.CreateFoodOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -379,7 +380,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-012 — Build Menu Happy Path
+### UC25-TC-012 — Build Menu Happy Path
 **Severity**: HIGH
 **Feature Under Test**: `FoodOrderService.BuildRoomServiceOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -401,7 +402,7 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 ---
 
-### UC11-TC-013 — Build Menu Invalid Booking
+### UC25-TC-013 — Build Menu Invalid Booking
 **Severity**: HIGH
 **Feature Under Test**: `FoodOrderService.BuildRoomServiceOrderAsync`
 **Test File**: `FoodOrderServiceTests.cs`
@@ -426,19 +427,19 @@ TDD spec này tập trung hoàn toàn vào luồng tạo FoodOrder từ phía Cu
 
 | TC ID | Test File | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
 | --- | --- | --- | --- | --- |
-| `UC11-TC-001` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-002` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-003` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-004` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-005` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-006` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-007` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-008` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-009` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-010` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-011` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-012` | `FoodOrderServiceTests.cs` | [x] | [x] | |
-| `UC11-TC-013` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-001` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-002` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-003` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-004` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-005` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-006` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-007` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-008` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-009` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-010` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-011` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-012` | `FoodOrderServiceTests.cs` | [x] | [x] | |
+| `UC25-TC-013` | `FoodOrderServiceTests.cs` | [x] | [x] | |
 
 ## 6. Entry / Exit Criteria
 

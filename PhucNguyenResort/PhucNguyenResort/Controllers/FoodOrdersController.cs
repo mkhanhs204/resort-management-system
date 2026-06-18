@@ -1,33 +1,53 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Constants;
+using PhucNguyenResort.Data;
+using PhucNguyenResort.Enums;
 using PhucNguyenResort.Services.FoodOrders;
 using PhucNguyenResort.ViewModels.FoodOrders;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace PhucNguyenResort.Controllers;
 
 public class FoodOrdersController : Controller
 {
     private readonly IFoodOrderService _foodOrderService;
+    private readonly ResortDbContext _context;
 
-    public FoodOrdersController(IFoodOrderService foodOrderService)
+    public FoodOrdersController(IFoodOrderService foodOrderService, ResortDbContext context)
     {
         _foodOrderService = foodOrderService;
+        _context = context;
     }
 
     [HttpGet]
     [Authorize(Roles = AppRoles.Customer)]
     public async Task<IActionResult> RoomService(int? bookingId)
     {
-        if (!bookingId.HasValue)
-        {
-            return View(new RoomServiceOrderViewModel());
-        }
-
         if (!TryGetCurrentUserId(out var currentUserId))
         {
             return Challenge();
+        }
+
+        if (!bookingId.HasValue)
+        {
+            // Auto-find a checked-in booking for the current user
+            var activeBooking = await _context.Bookings
+                .AsNoTracking()
+                .Where(b => b.UserId == currentUserId && b.BookingStatus == BookingStatus.CheckedIn)
+                .OrderByDescending(b => b.CheckInDate)
+                .FirstOrDefaultAsync();
+
+            if (activeBooking != null)
+            {
+                bookingId = activeBooking.BookingId;
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Bạn hiện không có phòng nào đang Check-in để sử dụng Dịch vụ phòng.");
+                return View(new RoomServiceOrderViewModel());
+            }
         }
 
         var viewModel = await _foodOrderService.BuildRoomServiceOrderAsync(bookingId.Value, currentUserId);

@@ -12,6 +12,8 @@ public class FoodOrderDetailViewModel
     public KotStatus? KitchenStatus { get; set; }
     public decimal TotalAmount { get; set; }
     public DateTime OrderedAt { get; set; }
+    public bool IsChargedToRoom { get; set; }
+    public DateTime? ChargedAt { get; set; }
     public List<FoodOrderDetailItemViewModel> Items { get; set; } = new();
 }
 
