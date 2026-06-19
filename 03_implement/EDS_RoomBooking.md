@@ -5,15 +5,15 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 | Field          | Value                   |
 | -------------- | ----------------------- |
 | Document ID    | `SWP391-MOD2-IMP-002` |
-| Version        | 1.1                     |
-| Date           | 2026-06-13              |
+| Version        | 1.3                     |
+| Date           | 2026-06-19              |
 | Status         | Approve                 |
 | Document Owner | Cuong                   |
 | Author         | Cuong                   |
 | Reviewed by    | Khanh                   |
 | DPO Sign-off   | Khanh                   |
 | Approved by    | Cuong                   |
-| Last Review    | 2026-06-13              |
+| Last Review    | 2026-06-19              |
 | Based on EDS   | v2.0                    |
 
 ## CHANGELOG
@@ -25,6 +25,7 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 | 2026-06-12 | Cuong               | Tạo tài liệu lần đầu - EDS cho Use Case Đặt Phòng (Room Booking)                                                                                                                                                 |
 | 2026-06-13 | Cuong               | Chỉnh sửa toàn bộ để khớp với codebase thực tế (v1.1): cập nhật BookingStatus enum, Booking model, IBookingService interface, CreateBookingViewModel, bổ sung đầy đủ các section theo EDS Template v2.0 |
 | 2026-06-14 | Cuong               | Cập nhật v1.2: Bổ sung logic kiểm tra và tự động cập nhật AvailableSlots của TourSchedule khi tạo và hủy Booking.                                                                                           |
+| 2026-06-19 | Cuong               | Cập nhật v1.3: Thay thế RoomId trực tiếp ở Booking bằng BookingDetails, cập nhật CreateBookingViewModel tương ứng với codebase thực tế và PDPD. |
 
 ## MỤC LỤC
 
@@ -182,7 +183,6 @@ classDiagram
     class Booking {
         +int BookingId
         +int UserId
-        +int RoomId
         +DateTime CheckInDate
         +DateTime CheckOutDate
         +int? NumberOfAdults
@@ -191,6 +191,15 @@ classDiagram
         +decimal? DepositAmount
         +decimal? TotalAmount
         +DateTime CreatedAt
+        +bool PdpdConsentChecked
+        +DateTime? ConsentTimestamp
+    }
+    class BookingDetail {
+        +int BookingDetailId
+        +int BookingId
+        +int RoomCategoryId
+        +int? RoomId
+        +decimal? Price
     }
     class Room {
         +int RoomId
@@ -223,7 +232,9 @@ classDiagram
     }
 
     Booking "1" --> "1" User : UserId
-    Booking "1" --> "1" Room : RoomId
+    Booking "1" --> "*" BookingDetail : BookingId
+    BookingDetail "*" --> "1" RoomCategory : RoomCategoryId
+    BookingDetail "*" --> "0..1" Room : RoomId
     Booking "1" --> "*" BookingGuest : BookingId
     Room "1" --> "1" RoomCategory : CategoryId
     Booking "1" --> "*" FoodOrder : BookingId
@@ -240,7 +251,6 @@ public class Booking
 {
     public int BookingId { get; set; }
     public int UserId { get; set; }
-    public int RoomId { get; set; }
 
     [Required, DataType(DataType.Date)]
     public DateTime CheckInDate { get; set; }
@@ -264,15 +274,33 @@ public class Booking
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    public bool PdpdConsentChecked { get; set; }
+    public DateTime? ConsentTimestamp { get; set; }
+
     // Navigation properties
     public User? User { get; set; }
-    public Room? Room { get; set; }
+    public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
     public ICollection<BookingGuest> BookingGuests { get; set; } = new List<BookingGuest>();
     public ICollection<FoodOrder> FoodOrders { get; set; } = new List<FoodOrder>();
     public ICollection<TourBooking> TourBookings { get; set; } = new List<TourBooking>();
     public GuestFolio? GuestFolio { get; set; }
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<Refund> Refunds { get; set; } = new List<Refund>();
+}
+
+public class BookingDetail
+{
+    public int BookingDetailId { get; set; }
+    public int BookingId { get; set; }
+    public int RoomCategoryId { get; set; }
+    public int? RoomId { get; set; }
+
+    [Range(0, 999999999)]
+    public decimal? Price { get; set; }
+
+    public Booking? Booking { get; set; }
+    public RoomCategory? RoomCategory { get; set; }
+    public Room? Room { get; set; }
 }
 ```
 
@@ -494,8 +522,7 @@ public interface IRoomService
 ```csharp
 public class CreateBookingViewModel
 {
-    [Required]
-    public int RoomId { get; set; }
+    public List<RoomSelectionViewModel> RoomSelections { get; set; } = new List<RoomSelectionViewModel>();
 
     [Required]
     [DataType(DataType.Date)]
@@ -507,14 +534,49 @@ public class CreateBookingViewModel
     [Display(Name = "Ngày trả phòng")]
     public DateTime CheckOutDate { get; set; }
 
-    [Range(1, 10)]
+    [Range(1, 20)]
     public int NumberOfAdults { get; set; }
 
     [Range(0, 10)]
     public int NumberOfChildren { get; set; }
 
-    // Mảng lưu ID của các Tour Schedule mà khách chọn thêm (Add-on)
-    public List<int>? SelectedTourScheduleIds { get; set; }
+    public List<TourSelectionViewModel>? SelectedTours { get; set; }
+
+    [Required(ErrorMessage = "Vui lòng nhập Họ tên người đặt phòng chính.")]
+    [Display(Name = "Họ tên người đặt chính")]
+    public string PrimaryGuestName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập Ngày sinh.")]
+    [DataType(DataType.Date)]
+    [Display(Name = "Ngày sinh")]
+    public DateTime? PrimaryGuestDateOfBirth { get; set; }
+
+    [Required(ErrorMessage = "Vui lòng chọn Giới tính.")]
+    [Display(Name = "Giới tính")]
+    public GenderType? PrimaryGuestGender { get; set; }
+
+    [Required(ErrorMessage = "Vui lòng nhập số CCCD/Hộ chiếu.")]
+    [Display(Name = "Số CCCD/Hộ chiếu")]
+    public string PrimaryGuestPassportNumber { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập Quốc tịch.")]
+    [Display(Name = "Quốc tịch")]
+    public string PrimaryGuestNationality { get; set; } = string.Empty;
+
+    [Display(Name = "Đồng ý điều khoản PDPD")]
+    public bool PdpdConsentChecked { get; set; }
+}
+
+public class RoomSelectionViewModel
+{
+    public int CategoryId { get; set; }
+    public int Quantity { get; set; }
+}
+
+public class TourSelectionViewModel
+{
+    public int ScheduleId { get; set; }
+    public int Participants { get; set; }
 }
 ```
 

@@ -47,13 +47,14 @@ namespace PhucNguyenResort.Tests.FoodOrder
             // Booking chuan (CheckedIn)
             _dbContext.Users.Add(new User { UserId = 2, FullName = "Customer 2" });
             _dbContext.Rooms.Add(new Room { RoomId = 1, RoomNumber = "101" });
-            _dbContext.Bookings.Add(new Booking // FX-BK-001
+            var booking = new Booking // FX-BK-001
             {
                 BookingId = 2,
                 UserId = 2,
-                RoomId = 1,
                 BookingStatus = BookingStatus.CheckedIn
-            });
+            };
+            booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 1, BookingId = 2 });
+            _dbContext.Bookings.Add(booking);
 
             // FX-ORD-001: Don hang Pending (cho chuyen sang Preparing/Cancelled)
             _dbContext.FoodOrders.Add(new Models.FoodOrder

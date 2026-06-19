@@ -93,20 +93,26 @@ namespace PhucNguyenResort.Services.Bookings
             _context.Bookings.Add(booking);
 
             // Xử lý tạo TourBookings nếu khách có chọn Add-on
-            if (request.SelectedTourScheduleIds != null && request.SelectedTourScheduleIds.Any())
+            if (request.SelectedTours != null && request.SelectedTours.Any(t => t.Participants > 0))
             {
+                var tourParticipants = request.SelectedTours
+                    .Where(t => t.Participants > 0)
+                    .ToDictionary(t => t.ScheduleId, t => t.Participants);
+
+                var scheduleIds = tourParticipants.Keys.ToList();
+
                 // Lấy thông tin các Schedule để tính tiền
                 var schedules = await _context.TourSchedules
                     .Include(s => s.Tour)
-                    .Where(s => request.SelectedTourScheduleIds.Contains(s.ScheduleId))
+                    .Where(s => scheduleIds.Contains(s.ScheduleId))
                     .ToListAsync();
-
-                int requestedSlots = request.NumberOfAdults + request.NumberOfChildren;
 
                 foreach (var schedule in schedules)
                 {
                     if (schedule.Tour != null)
                     {
+                        int requestedSlots = tourParticipants[schedule.ScheduleId];
+
                         if (schedule.AvailableSlots.HasValue && schedule.AvailableSlots.Value < requestedSlots)
                         {
                             return new BookingResult

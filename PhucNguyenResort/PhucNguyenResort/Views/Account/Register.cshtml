@@ -1,79 +1,197 @@
-﻿@model PhucNguyenResort.ViewModels.Auth.RegisterViewModel
+@model PhucNguyenResort.ViewModels.Auth.RegisterViewModel
 
 @{
     ViewData["Title"] = "Đăng ký";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h2 class="mb-4">Đăng ký tài khoản</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/css/register-premium.css" />
+}
 
-            <form asp-action="Register" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="register-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-10">
+                <div class="register-card">
+                    <h2 class="register-title">Đăng ký tài khoản</h2>
+                    <p class="register-subtitle">Trở thành thành viên để nhận những ưu đãi đặc biệt từ Phúc Nguyễn Resort</p>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="FullName" class="form-label"></label>
-                        <input asp-for="FullName" class="form-control" />
-                        <span asp-validation-for="FullName" class="text-danger"></span>
-                    </div>
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4 text-center"></div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
+                        <div class="row">
+                            <!-- FullName -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="FullName"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-user"></i></span>
+                                        <input asp-for="FullName" class="custom-input" placeholder="Nhập họ tên đầy đủ" required />
+                                    </div>
+                                    <span asp-validation-for="FullName" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="PhoneNumber" class="form-label"></label>
-                        <input asp-for="PhoneNumber" class="form-control" />
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                    </div>
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="Email"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-envelope"></i></span>
+                                        <input asp-for="Email" class="custom-input" placeholder="Nhập địa chỉ Email" required />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="DateOfBirth" class="form-label"></label>
-                        <input asp-for="DateOfBirth" class="form-control" />
-                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                    </div>
+                            <!-- PhoneNumber -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="PhoneNumber"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-phone"></i></span>
+                                        <input asp-for="PhoneNumber" class="custom-input" placeholder="Nhập số điện thoại" />
+                                    </div>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Nationality" class="form-label"></label>
-                        <input asp-for="Nationality" class="form-control" />
-                        <span asp-validation-for="Nationality" class="text-danger"></span>
-                    </div>
+                            <!-- DateOfBirth -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="DateOfBirth"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-calendar"></i></span>
+                                        <input asp-for="DateOfBirth" class="custom-input" type="date" />
+                                    </div>
+                                    <span asp-validation-for="DateOfBirth" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Address" class="form-label"></label>
-                        <input asp-for="Address" class="form-control" />
-                        <span asp-validation-for="Address" class="text-danger"></span>
-                    </div>
+                            <!-- Nationality -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="Nationality"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-globe"></i></span>
+                                        <input asp-for="Nationality" class="custom-input" placeholder="Ví dụ: Việt Nam" />
+                                    </div>
+                                    <span asp-validation-for="Nationality" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
+                            <!-- Address -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="Address"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-map-marker"></i></span>
+                                        <input asp-for="Address" class="custom-input" placeholder="Nhập địa chỉ của bạn" />
+                                    </div>
+                                    <span asp-validation-for="Address" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                        <input asp-for="ConfirmPassword" class="form-control" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            <!-- Password -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="Password"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-lock"></i></span>
+                                        <input asp-for="Password" class="custom-input" type="password" id="password-field" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required />
+                                        <button type="button" class="password-toggle-btn" id="toggle-password-visibility">
+                                            <i class="fa fa-eye" id="toggle-password-icon"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="Password" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
+
+                            <!-- ConfirmPassword -->
+                            <div class="col-md-6">
+                                <div class="custom-input-group">
+                                    <label asp-for="ConfirmPassword"></label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon"><i class="fa fa-lock"></i></span>
+                                        <input asp-for="ConfirmPassword" class="custom-input" type="password" id="confirm-password-field" placeholder="Nhập lại mật khẩu" required />
+                                        <button type="button" class="password-toggle-btn" id="toggle-confirm-password-visibility">
+                                            <i class="fa fa-eye" id="toggle-confirm-password-icon"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Consent Checkbox -->
+                        <div class="consent-container">
+                            <label class="custom-checkbox">
+                                <input asp-for="ConsentGiven" required />
+                                <span class="checkmark"></span>
+                                Tôi đồng ý với việc lưu trữ thông tin cá nhân để phục vụ khai báo tạm trú và tuân thủ điều khoản dịch vụ của Phúc Nguyễn Resort.
+                            </label>
+                            <span asp-validation-for="ConsentGiven" class="text-danger" style="font-size: 0.85rem;"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn-register">Đăng ký ngay <i class="fa fa-paper-plane ml-2"></i></button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="login-prompt">
+                        Đã có tài khoản? <a asp-action="Login">Đăng nhập tại đây</a>
                     </div>
                 </div>
-
-                <div class="form-check mb-3">
-                    <input asp-for="ConsentGiven" class="form-check-input" />
-                    <label asp-for="ConsentGiven" class="form-check-label"></label>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Đăng ký</button>
-                <a asp-action="Login" class="btn btn-link">Đã có tài khoản? Đăng nhập</a>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Password toggle
+            const passwordField = document.getElementById("password-field");
+            const togglePasswordBtn = document.getElementById("toggle-password-visibility");
+            const togglePasswordIcon = document.getElementById("toggle-password-icon");
+
+            if (togglePasswordBtn && passwordField && togglePasswordIcon) {
+                togglePasswordBtn.addEventListener("click", function () {
+                    if (passwordField.type === "password") {
+                        passwordField.type = "text";
+                        togglePasswordIcon.classList.remove("fa-eye");
+                        togglePasswordIcon.classList.add("fa-eye-slash");
+                    } else {
+                        passwordField.type = "password";
+                        togglePasswordIcon.classList.remove("fa-eye-slash");
+                        togglePasswordIcon.classList.add("fa-eye");
+                    }
+                });
+            }
+
+            // Confirm Password toggle
+            const confirmPasswordField = document.getElementById("confirm-password-field");
+            const toggleConfirmPasswordBtn = document.getElementById("toggle-confirm-password-visibility");
+            const toggleConfirmPasswordIcon = document.getElementById("toggle-confirm-password-icon");
+
+            if (toggleConfirmPasswordBtn && confirmPasswordField && toggleConfirmPasswordIcon) {
+                toggleConfirmPasswordBtn.addEventListener("click", function () {
+                    if (confirmPasswordField.type === "password") {
+                        confirmPasswordField.type = "text";
+                        toggleConfirmPasswordIcon.classList.remove("fa-eye");
+                        toggleConfirmPasswordIcon.classList.add("fa-eye-slash");
+                    } else {
+                        confirmPasswordField.type = "password";
+                        toggleConfirmPasswordIcon.classList.remove("fa-eye-slash");
+                        toggleConfirmPasswordIcon.classList.add("fa-eye");
+                    }
+                });
+            }
+        });
+    </script>
 }

@@ -64,7 +64,7 @@ namespace PhucNguyenResort.Tests.Tours
                     Attendees = s.TourBookings?.Where(tb => tb.BookingStatus != TourBookingStatus.Cancelled).Select(tb => new Attendee
                     {
                         GuestName = tb.Booking?.User?.FullName ?? "Unknown Guest",
-                        RoomNumber = tb.Booking?.Room?.RoomNumber,
+                        RoomNumber = tb.Booking?.BookingDetails?.FirstOrDefault(d => d.Room != null)?.Room?.RoomNumber,
                         NumberOfParticipants = tb.Participants ?? 0
                     }).ToList() ?? new List<Attendee>()
                 }).ToList()

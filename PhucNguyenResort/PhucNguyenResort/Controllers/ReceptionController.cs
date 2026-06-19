@@ -124,15 +124,57 @@ namespace PhucNguyenResort.Controllers
                 }
             }
 
+            // Validation for room assignments
+            if (model.RoomAssignments == null || model.RoomAssignments.Count == 0)
+            {
+                ModelState.AddModelError(string.Empty, "Danh sách gán phòng trống.");
+            }
+            else
+            {
+                var selectedRoomIds = new List<int>();
+                for (int i = 0; i < model.RoomAssignments.Count; i++)
+                {
+                    var assignment = model.RoomAssignments[i];
+                    if (!assignment.SelectedRoomId.HasValue)
+                    {
+                        ModelState.AddModelError($"RoomAssignments[{i}].SelectedRoomId", "Vui lòng chọn một phòng vật lý.");
+                    }
+                    else
+                    {
+                        if (selectedRoomIds.Contains(assignment.SelectedRoomId.Value))
+                        {
+                            ModelState.AddModelError($"RoomAssignments[{i}].SelectedRoomId", "Một phòng vật lý không thể được gán cho nhiều chi tiết đặt phòng cùng lúc.");
+                        }
+                        selectedRoomIds.Add(assignment.SelectedRoomId.Value);
+                    }
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 var fullModel = await _receptionService.PrepareCheckInViewModelAsync(model.BookingId);
                 if (fullModel != null)
                 {
-                    model.RoomNumber = fullModel.RoomNumber;
                     model.CategoryName = fullModel.CategoryName;
                     model.CheckInDate = fullModel.CheckInDate;
                     model.CheckOutDate = fullModel.CheckOutDate;
+
+                    if (model.RoomAssignments != null)
+                    {
+                        foreach (var assignment in model.RoomAssignments)
+                        {
+                            var fullAssignment = fullModel.RoomAssignments.FirstOrDefault(a => a.BookingDetailId == assignment.BookingDetailId);
+                            if (fullAssignment != null)
+                            {
+                                assignment.AvailableRooms = fullAssignment.AvailableRooms;
+                                assignment.CategoryName = fullAssignment.CategoryName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        model.RoomAssignments = fullModel.RoomAssignments;
+                    }
                 }
                 return View(model);
             }
@@ -155,10 +197,26 @@ namespace PhucNguyenResort.Controllers
                 var fullModel = await _receptionService.PrepareCheckInViewModelAsync(model.BookingId);
                 if (fullModel != null)
                 {
-                    model.RoomNumber = fullModel.RoomNumber;
                     model.CategoryName = fullModel.CategoryName;
                     model.CheckInDate = fullModel.CheckInDate;
                     model.CheckOutDate = fullModel.CheckOutDate;
+
+                    if (model.RoomAssignments != null)
+                    {
+                        foreach (var assignment in model.RoomAssignments)
+                        {
+                            var fullAssignment = fullModel.RoomAssignments.FirstOrDefault(a => a.BookingDetailId == assignment.BookingDetailId);
+                            if (fullAssignment != null)
+                            {
+                                assignment.AvailableRooms = fullAssignment.AvailableRooms;
+                                assignment.CategoryName = fullAssignment.CategoryName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        model.RoomAssignments = fullModel.RoomAssignments;
+                    }
                 }
                 return View(model);
             }
