@@ -55,16 +55,18 @@ namespace PhucNguyenResort.Tests.FoodOrder
             {
                 BookingId = 1,
                 UserId = 1,
-                RoomId = 101,
                 BookingStatus = BookingStatus.CheckedIn
             };
+            booking1.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 101, BookingId = 1 });
+
             var booking99 = new Booking
             {
                 BookingId = 99,
                 UserId = 99,
-                RoomId = 102,
                 BookingStatus = BookingStatus.CheckedIn
             };
+            booking99.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 102, BookingId = 99 });
+
             _dbContext.Bookings.AddRange(booking1, booking99);
 
             // Seed GuestFolio (Only for booking 1)

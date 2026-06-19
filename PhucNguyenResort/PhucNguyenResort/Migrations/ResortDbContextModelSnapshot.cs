@@ -82,9 +82,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 1,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 6, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3575),
-                            CheckOutDate = new DateTime(2026, 6, 10, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3582),
-                            CreatedAt = new DateTime(2026, 6, 3, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3586),
+                            CheckInDate = new DateTime(2026, 6, 9, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5789),
+                            CheckOutDate = new DateTime(2026, 6, 11, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5796),
+                            CreatedAt = new DateTime(2026, 6, 4, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5804),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -96,9 +96,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 2,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 23, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3589),
-                            CheckOutDate = new DateTime(2026, 6, 26, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3590),
-                            CreatedAt = new DateTime(2026, 6, 16, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3591),
+                            CheckInDate = new DateTime(2026, 6, 24, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5806),
+                            CheckOutDate = new DateTime(2026, 6, 27, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5806),
+                            CreatedAt = new DateTime(2026, 6, 17, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5808),
                             DepositAmount = 1500000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -110,9 +110,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 3,
                             BookingStatus = "PendingPayment",
-                            CheckInDate = new DateTime(2026, 6, 28, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3593),
-                            CheckOutDate = new DateTime(2026, 6, 30, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3594),
-                            CreatedAt = new DateTime(2026, 6, 17, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3596),
+                            CheckInDate = new DateTime(2026, 6, 29, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5810),
+                            CheckOutDate = new DateTime(2026, 7, 1, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5811),
+                            CreatedAt = new DateTime(2026, 6, 18, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5813),
                             DepositAmount = 2500000m,
                             NumberOfAdults = 4,
                             NumberOfChildren = 0,
@@ -124,9 +124,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 4,
                             BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 6, 13, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3597),
-                            CheckOutDate = new DateTime(2026, 6, 15, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3598),
-                            CreatedAt = new DateTime(2026, 6, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3600),
+                            CheckInDate = new DateTime(2026, 6, 14, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5814),
+                            CheckOutDate = new DateTime(2026, 6, 16, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5815),
+                            CreatedAt = new DateTime(2026, 6, 9, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5816),
                             DepositAmount = 1000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -138,9 +138,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 5,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 6, 19, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3602),
-                            CheckOutDate = new DateTime(2026, 6, 22, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3602),
-                            CreatedAt = new DateTime(2026, 6, 13, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3604),
+                            CheckInDate = new DateTime(2026, 6, 20, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5818),
+                            CheckOutDate = new DateTime(2026, 6, 23, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5818),
+                            CreatedAt = new DateTime(2026, 6, 14, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5820),
                             DepositAmount = 12000000m,
                             NumberOfAdults = 6,
                             NumberOfChildren = 0,
@@ -152,9 +152,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 6,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 5, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3606),
-                            CheckOutDate = new DateTime(2026, 5, 20, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3614),
-                            CreatedAt = new DateTime(2026, 5, 13, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3616),
+                            CheckInDate = new DateTime(2026, 5, 19, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5822),
+                            CheckOutDate = new DateTime(2026, 5, 21, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5826),
+                            CreatedAt = new DateTime(2026, 5, 14, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5828),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -166,9 +166,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 7,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 4, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3618),
-                            CheckOutDate = new DateTime(2026, 4, 21, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3619),
-                            CreatedAt = new DateTime(2026, 4, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3622),
+                            CheckInDate = new DateTime(2026, 4, 19, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5830),
+                            CheckOutDate = new DateTime(2026, 4, 22, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5830),
+                            CreatedAt = new DateTime(2026, 4, 9, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5833),
                             DepositAmount = 1500000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -180,9 +180,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 8,
                             BookingStatus = "Cancelled",
-                            CheckInDate = new DateTime(2026, 5, 29, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3624),
-                            CheckOutDate = new DateTime(2026, 5, 31, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3624),
-                            CreatedAt = new DateTime(2026, 5, 24, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3626),
+                            CheckInDate = new DateTime(2026, 5, 30, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5835),
+                            CheckOutDate = new DateTime(2026, 6, 1, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5835),
+                            CreatedAt = new DateTime(2026, 5, 25, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5836),
                             DepositAmount = 1200000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -194,9 +194,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 9,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 6, 3, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3628),
-                            CheckOutDate = new DateTime(2026, 6, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3628),
-                            CreatedAt = new DateTime(2026, 5, 29, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3630),
+                            CheckInDate = new DateTime(2026, 6, 4, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5838),
+                            CheckOutDate = new DateTime(2026, 6, 9, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5838),
+                            CreatedAt = new DateTime(2026, 5, 30, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5840),
                             DepositAmount = 3000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -208,9 +208,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 10,
                             BookingStatus = "Reserved",
-                            CheckInDate = new DateTime(2026, 7, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3654),
-                            CheckOutDate = new DateTime(2026, 7, 10, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3654),
-                            CreatedAt = new DateTime(2026, 6, 17, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3656),
+                            CheckInDate = new DateTime(2026, 7, 9, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5841),
+                            CheckOutDate = new DateTime(2026, 7, 11, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5842),
+                            CreatedAt = new DateTime(2026, 6, 18, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5843),
                             DepositAmount = 8000000m,
                             NumberOfAdults = 5,
                             NumberOfChildren = 0,
@@ -222,9 +222,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 11,
                             BookingStatus = "PendingPayment",
-                            CheckInDate = new DateTime(2026, 7, 3, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3658),
-                            CheckOutDate = new DateTime(2026, 7, 6, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3659),
-                            CreatedAt = new DateTime(2026, 6, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3660),
+                            CheckInDate = new DateTime(2026, 7, 4, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5845),
+                            CheckOutDate = new DateTime(2026, 7, 7, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5845),
+                            CreatedAt = new DateTime(2026, 6, 19, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5847),
                             DepositAmount = 12000000m,
                             NumberOfAdults = 6,
                             NumberOfChildren = 0,
@@ -236,9 +236,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 12,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 2, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3662),
-                            CheckOutDate = new DateTime(2026, 2, 23, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3662),
-                            CreatedAt = new DateTime(2026, 2, 8, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3665),
+                            CheckInDate = new DateTime(2026, 2, 19, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5848),
+                            CheckOutDate = new DateTime(2026, 2, 24, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5849),
+                            CreatedAt = new DateTime(2026, 2, 9, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5851),
                             DepositAmount = 3000000m,
                             NumberOfAdults = 2,
                             NumberOfChildren = 0,
@@ -250,9 +250,9 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             BookingId = 13,
                             BookingStatus = "CheckedOut",
-                            CheckInDate = new DateTime(2026, 1, 18, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3667),
-                            CheckOutDate = new DateTime(2026, 1, 19, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3668),
-                            CreatedAt = new DateTime(2026, 1, 15, 16, 13, 2, 463, DateTimeKind.Local).AddTicks(3670),
+                            CheckInDate = new DateTime(2026, 1, 19, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5853),
+                            CheckOutDate = new DateTime(2026, 1, 20, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5854),
+                            CreatedAt = new DateTime(2026, 1, 16, 9, 22, 51, 799, DateTimeKind.Local).AddTicks(5855),
                             DepositAmount = 600000m,
                             NumberOfAdults = 1,
                             NumberOfChildren = 0,
@@ -962,6 +962,50 @@ namespace PhucNguyenResort.Web.Migrations
                             Status = "Maintenance",
                             TableNumber = "T20"
                         });
+                });
+
+            modelBuilder.Entity("PhucNguyenResort.Models.EmailOtp", b =>
+                {
+                    b.Property<int>("OtpId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OtpId"));
+
+                    b.Property<int>("Attempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("ExpiryTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("OtpCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(6)");
+
+                    b.HasKey("OtpId");
+
+                    b.HasIndex("Email");
+
+                    b.ToTable("EmailOtps", (string)null);
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.FolioTransaction", b =>
@@ -4507,10 +4551,6 @@ namespace PhucNguyenResort.Web.Migrations
 
                     b.Property<int?>("Participants")
                         .HasColumnType("int");
-
-                    b.Property<string>("PaymentMethod")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");

@@ -23,6 +23,7 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 | Ngày      | Người thực hiện | Nội dung thay đổi                                                                                               |
 | ---------- | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | 2026-06-16 | Cuong               | Tạo tài liệu lần đầu - EDS cho Use Case Check-in (Reception), bổ sung chi tiết theo mẫu EDS Room Booking. |
+| 2026-06-19 | Cuong               | Cập nhật phiên bản v2.0: Chuyển đổi mô hình gán phòng từ RoomId trực tiếp sang BookingDetails; bổ sung logic check-in gán phòng vật lý động. |
 
 ## MỤC LỤC
 
@@ -143,10 +144,15 @@ Mọi thao tác truy xuất dữ liệu `BookingGuests` không hiển thị ID t
 classDiagram
     class Booking {
         +int BookingId
-        +int RoomId
         +DateTime CheckInDate
         +DateTime CheckOutDate
         +BookingStatus BookingStatus
+    }
+    class BookingDetail {
+        +int BookingDetailId
+        +int BookingId
+        +int RoomCategoryId
+        +int? RoomId
     }
     class Room {
         +int RoomId
@@ -161,10 +167,13 @@ classDiagram
         +DateTime? DateOfBirth
     }
     class ReceptionService {
-        +CheckInAsync(int bookingId, int roomId)
+        +PrepareCheckInViewModelAsync(int id)
+        +ProcessCheckInAsync(PreCheckinViewModel model)
+        +GetAvailableRoomsForCategoryAsync(int categoryId, DateTime checkIn, DateTime checkOut, int? currentBookingId)
     }
 
-    Booking "1" --> "1" Room : RoomId
+    Booking "1" --> "*" BookingDetail : BookingDetails
+    BookingDetail "1" --> "0..1" Room : RoomId
     Booking "1" --> "*" BookingGuest : BookingId
     ReceptionService ..> Booking : Updates
     ReceptionService ..> Room : Updates
@@ -178,9 +187,24 @@ classDiagram
 public class Booking
 {
     public int BookingId { get; set; }
-    public int RoomId { get; set; }
     public BookingStatus BookingStatus { get; set; } // Sẽ chuyển sang CheckedIn
+    public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
     //...
+}
+```
+
+**BookingDetail Model** — file: `Models/BookingDetail.cs`
+
+```csharp
+public class BookingDetail
+{
+    public int BookingDetailId { get; set; }
+    public int BookingId { get; set; }
+    public int RoomCategoryId { get; set; }
+    public int? RoomId { get; set; }
+    public Booking? Booking { get; set; }
+    public Room? Room { get; set; }
+    public RoomCategory? RoomCategory { get; set; }
 }
 ```
 
@@ -209,18 +233,25 @@ sequenceDiagram
     participant Service as ReceptionService
     participant DB as ResortDbContext
 
-    Receptionist->>View: Bấm nút "Check-in"
-    View->>Controller: POST /Reception/CheckIn (BookingId)
-    Controller->>Service: CheckInAsync(BookingId)
+    Receptionist->>View: Bấm nút "Check-in" (GET)
+    View->>Controller: GET /Reception/CheckIn/{id}
+    Controller->>Service: PrepareCheckInViewModelAsync(id)
+    Service->>DB: Booking details & available rooms
+    DB-->>Service: Data
+    Service-->>Controller: PreCheckinViewModel
+    Controller-->>View: Trả về View CheckIn với các dropdown gán phòng
+
+    Receptionist->>View: Chọn phòng vật lý & Điền tờ khai -> Bấm "Xác nhận Check-in"
+    View->>Controller: POST /Reception/CheckIn (PreCheckinViewModel)
+    Controller->>Service: ProcessCheckInAsync(PreCheckinViewModel)
     Service->>DB: Bookings.FindAsync(BookingId)
     DB-->>Service: Booking (Status: Reserved)
     Service->>Service: Đặt BookingStatus = CheckedIn
-    Service->>DB: Rooms.FindAsync(RoomId)
-    DB-->>Service: Room
-    Service->>Service: Đặt Room.Status = Occupied
+    Service->>Service: Lặp qua RoomAssignments, gán RoomId cho các BookingDetail
+    Service->>DB: Tìm các Room tương ứng, đặt Status = Occupied
     Service->>DB: SaveChangesAsync()
     DB-->>Service: Success
-    Service-->>Controller: CheckInResult { Success = true }
+    Service-->>Controller: (Success = true)
     Controller-->>View: Redirect → Index (Lễ tân)
 ```
 
@@ -251,23 +282,15 @@ stateDiagram-v2
 File: `Services/Reception/IReceptionService.cs`
 
 ```csharp
-// @version 1.0
+// @version 2.0
 public interface IReceptionService
 {
-    /// <summary>
-    /// Xử lý check-in: Cập nhật BookingStatus thành CheckedIn và RoomStatus thành Occupied.
-    /// Kiểm tra hợp lệ (Booking tồn tại, đang ở Reserved).
-    /// </summary>
-    /// <param name="bookingId">Mã đặt phòng</param>
-    /// <returns>CheckInResult báo lỗi hoặc thành công</returns>
-    Task<CheckInResult> CheckInAsync(int bookingId);
-}
-
-public class CheckInResult
-{
-    public bool Success { get; set; }
-    public string? ErrorMessage { get; set; }
-    public string? ErrorCode { get; set; }
+    Task<List<Booking>> GetBookingsAsync(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter = null);
+    Task<Booking?> GetBookingByIdAsync(int id);
+    Task<PreCheckinViewModel?> PrepareCheckInViewModelAsync(int id);
+    Task<(bool Success, string ErrorMessage)> ProcessCheckInAsync(PreCheckinViewModel model);
+    Task<(byte[]? FileContent, string FileName, string ErrorMessage)> GetManifestDataAsync(int id);
+    Task<List<Room>> GetAvailableRoomsForCategoryAsync(int categoryId, DateTime checkIn, DateTime checkOut, int? currentBookingId = null);
 }
 ```
 
@@ -279,7 +302,7 @@ public class CheckInResult
 | ----------- | --------------------------- | ---------------------------------------- | --------------------------- | ---------------------------------- | ------------ |
 | GET         | `/Reception/Index`        | `ReceptionController.Index`            | `Receptionist`, `Admin` | Xem danh sách Booking trong ngày | UC52         |
 | GET         | `/Reception/CheckIn/{id}` | `ReceptionController.CheckIn`          | `Receptionist`, `Admin` | Xem chi tiết để CheckIn         | UC51         |
-| POST        | `/Reception/CheckIn/{id}` | `ReceptionController.CheckInConfirmed` | `Receptionist`, `Admin` | Xác nhận Check-in                | UC53         |
+| POST        | `/Reception/CheckIn`      | `ReceptionController.CheckIn`          | `Receptionist`, `Admin` | Xác nhận Check-in                | UC53         |
 
 ## 10. Bảng thông báo lỗi (Validation & ModelState)
 

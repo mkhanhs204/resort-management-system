@@ -5,15 +5,15 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 | Field          | Value                |
 | -------------- | -------------------- |
 | Document ID    | `PNR-ROOM-IMP-001` |
-| Version        | 1.0                  |
-| Date           | 2026-06-11           |
+| Version        | 1.1                  |
+| Date           | 2026-06-19           |
 | Status         | Approved             |
 | Document Owner | Cuong                |
 | Author         | Cuong                |
 | Reviewed by    | Khanh                |
 | DPO Sign-off   | Khanh                |
 | Approved by    | Cuong                |
-| Last Review    | 2026-06-11           |
+| Last Review    | 2026-06-19           |
 | Based on EDS   | v2.0                 |
 
 ## CHANGELOG
@@ -23,6 +23,8 @@ Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 | Ngày      | Người thực hiện | Nội dung thay đổi                                                     |
 | ---------- | ------------------- | ------------------------------------------------------------------------ |
 | 2026-06-11 | Cuong               | Tạo tài liệu lần đầu - Logic kiểm tra phòng trống theo Category |
+| 2026-06-19 | Cuong               | Cập nhật kiến trúc: truy vấn qua `BookingDetails` thay vì `Bookings` trực tiếp, thêm model `BookingDetail`, cập nhật enum `BookingStatus` (thêm `PendingPayment`), loại trừ `Cancelled` + `CheckedOut` |
+| 2026-06-19 | Cuong               | Cập nhật v1.1: Sửa lỗi hiển thị comments và làm rõ đặc tả các phương thức CheckAvailabilityAsync và SearchAvailableCategoriesAsync trong IHomeService |
 
 ## MỤC LỤC
 
@@ -55,7 +57,7 @@ Mô tả ngắn gọn mục đích của module, phạm vi nghiệp vụ và lý
 | Bounded Context       | `Booking / Availability`                   |
 | Data Classification   | Internal / Public                            |
 | Compliance Scope      | N/A                                          |
-| Upstream Dependencies | `Room Service`, `Booking Service`        |
+| Upstream Dependencies | `Room Service`, `Booking Service`, `BookingDetail` |
 | Downstream Consumers  | `Home Controller`, `Booking Controller`  |
 
 ## 2. Ma trận Truy vết (Traceability Matrix)
@@ -121,16 +123,30 @@ public class Room
 {
     public int RoomId { get; set; }
     public int CategoryId { get; set; }
-    public string Status { get; set; } // Available, Maintenance, v.v.
+    public RoomStatus Status { get; set; } // Available, Maintenance, Occupied, NeedsCleaning
+    public ICollection<BookingDetail> BookingDetails { get; set; }
 }
 
 public class Booking
 {
     public int BookingId { get; set; }
-    public int RoomId { get; set; }
+    public int UserId { get; set; }
     public DateTime CheckInDate { get; set; }
     public DateTime CheckOutDate { get; set; }
-    public BookingStatus BookingStatus { get; set; } // Confirmed, CheckedIn, Cancelled, NoShow
+    public BookingStatus BookingStatus { get; set; } // Reserved, CheckedIn, CheckedOut, Cancelled, NoShow, PendingPayment
+    public ICollection<BookingDetail> BookingDetails { get; set; }
+}
+
+public class BookingDetail
+{
+    public int BookingDetailId { get; set; }
+    public int BookingId { get; set; }
+    public int RoomCategoryId { get; set; }
+    public int? RoomId { get; set; }
+    public decimal? Price { get; set; }
+    public Booking? Booking { get; set; }
+    public RoomCategory? RoomCategory { get; set; }
+    public Room? Room { get; set; }
 }
 ```
 
@@ -141,8 +157,11 @@ public class Booking
 Hai khoảng thời gian `[Start1, End1]` và `[Start2, End2]` bị trùng lắp khi và chỉ khi:
 `Start1 < End2 && End1 > Start2`
 
-Tương đương trong code:
-`b.CheckInDate < checkOutDate && b.CheckOutDate > checkInDate`
+Tương đương trong code (truy vấn qua `BookingDetails`):
+`bd.Booking.CheckInDate < checkOutDate && bd.Booking.CheckOutDate > checkInDate`
+
+Logic loại trừ booking không còn hiệu lực:
+`bd.Booking.BookingStatus != BookingStatus.Cancelled && bd.Booking.BookingStatus != BookingStatus.CheckedOut`
 
 ## 8. Interface Specification (Đặc tả Giao diện)
 
@@ -155,8 +174,13 @@ Tương đương trong code:
 public interface IHomeService 
 {
     /// <summary>
-    /// Kiểm tra số lượng phòng trống của một loại phòng trong khoảng thời gian nhất định
-    /// Loại bỏ các phòng đang bảo trì (Maintenance)    /// Tìm tất cả RoomCategory có phòng trống ≥ roomCount, phù hợp số lượng người lớn và trẻ em.
+    /// Kiểm tra số lượng phòng trống của một loại phòng trong khoảng thời gian nhất định.
+    /// Loại bỏ các phòng đang bảo trì (Maintenance).
+    /// </summary>
+    Task<int> CheckAvailabilityAsync(int categoryId, DateTime checkInDate, DateTime checkOutDate);
+
+    /// <summary>
+    /// Tìm tất cả RoomCategory có phòng trống ≥ roomCount, phù hợp số lượng người lớn và trẻ em.
     /// </summary>
     Task<IEnumerable<RoomCategory>> SearchAvailableCategoriesAsync(DateTime checkInDate, DateTime checkOutDate, int adultsCount, int childrenCount, int roomCount);
 }

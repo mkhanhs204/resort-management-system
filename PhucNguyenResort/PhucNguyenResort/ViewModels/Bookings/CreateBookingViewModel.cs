@@ -25,8 +25,8 @@ namespace PhucNguyenResort.ViewModels.Bookings
         [Range(0, 10)]
         public int NumberOfChildren { get; set; }
 
-        // Mảng lưu ID của các Tour Schedule mà khách chọn thêm
-        public List<int>? SelectedTourScheduleIds { get; set; }
+        // Danh sách Tour mà khách chọn thêm với số lượng slot tùy chỉnh
+        public List<TourSelectionViewModel>? SelectedTours { get; set; }
 
         // Primary Booker Details for Stay Registration (Law on Residence 2020 & PDPD Compliance)
         [Required(ErrorMessage = "Vui lòng nhập Họ tên người đặt phòng chính.")]
@@ -52,5 +52,11 @@ namespace PhucNguyenResort.ViewModels.Bookings
 
         [Display(Name = "Đồng ý điều khoản PDPD")]
         public bool PdpdConsentChecked { get; set; }
+    }
+
+    public class TourSelectionViewModel
+    {
+        public int ScheduleId { get; set; }
+        public int Participants { get; set; }
     }
 }

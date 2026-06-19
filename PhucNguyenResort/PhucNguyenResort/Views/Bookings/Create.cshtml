@@ -138,18 +138,42 @@
                         <div class="premium-card">
                             <h5><i class="fa fa-compass"></i> 2. Trải Nghiệm Thêm</h5>
                             <div class="tour-list-modern">
+                                @{
+                                    int tourIdx = 0;
+                                }
                                 @foreach (var tour in tours)
                                 {
-                                    <div class="tour-card-modern" data-schedule-id="@tour.ScheduleId">
-                                        <input type="checkbox" name="SelectedTourScheduleIds" value="@tour.ScheduleId" id="tour_@tour.ScheduleId" data-price="@(tour.Tour?.Price ?? 0)">
-                                        <div class="tour-details-modern">
-                                            <strong>@tour.Tour?.TourName</strong>
-                                            <span class="time"><i class="fa fa-calendar"></i> @tour.TourDate?.ToString("dd/MM/yyyy") @(tour.StartTime != null ? " - " + tour.StartTime?.ToString(@"hh\:mm") : "")</span>
+                                    <div class="tour-card-modern d-flex justify-content-between align-items-center p-3 mb-3" data-schedule-id="@tour.ScheduleId" style="border: 1px solid var(--border-color); border-radius: 12px; background: #fff; transition: all 0.3s ease;">
+                                        <div class="tour-details-modern flex-grow-1">
+                                            <strong style="font-size: 16px; color: var(--primary-color); display: block; margin-bottom: 4px;">@tour.Tour?.TourName</strong>
+                                            <span class="time d-block text-muted" style="font-size: 13px; margin-bottom: 4px;">
+                                                <i class="fa fa-calendar text-warning mr-1"></i> @tour.TourDate?.ToString("dd/MM/yyyy") @(tour.StartTime != null ? " - " + tour.StartTime?.ToString(@"hh\:mm") : "")
+                                            </span>
+                                            <span class="slots-left text-danger" style="font-size: 13px; font-weight: 600;">
+                                                <i class="fa fa-users mr-1"></i> Còn @(tour.AvailableSlots ?? 0) chỗ trống
+                                            </span>
                                         </div>
-                                        <div class="tour-card-price">
-                                            + @tour.Tour?.Price?.ToString("N0") VNĐ
+                                        <div class="tour-pricing-action-wrapper d-flex align-items-center">
+                                            <div class="tour-card-price mr-4" style="font-size: 16px; font-weight: 700; color: var(--accent-color);">
+                                                + @tour.Tour?.Price?.ToString("N0") VNĐ <span style="font-size: 12px; font-weight: 400; color: #64748b;">/ slot</span>
+                                            </div>
+                                            
+                                            <input type="hidden" name="SelectedTours[@tourIdx].ScheduleId" value="@tour.ScheduleId" />
+                                            
+                                            <div class="quantity-selector-tour">
+                                                <div class="input-group tour-qty-group" style="width: 120px; border-radius: 30px; border: 1px solid #e2e8f0; overflow: hidden; background: #f8fafc; height: 38px;">
+                                                    <div class="input-group-prepend">
+                                                        <button class="btn btn-qty-tour" type="button" onclick="decrementTourQty(this)" style="background: transparent; border: none; width: 35px; color: #64748b; font-weight: 700; cursor: pointer;">-</button>
+                                                    </div>
+                                                    <input type="number" name="SelectedTours[@tourIdx].Participants" class="form-control text-center tour-qty" value="0" min="0" max="@(tour.AvailableSlots ?? 0)" readonly data-price="@(tour.Tour?.Price ?? 0)" data-name="@tour.Tour?.TourName" style="border: none; background: transparent !important; font-weight: 700; font-size: 14px; color: var(--primary-color); padding: 0;" />
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-qty-tour" type="button" onclick="incrementTourQty(this)" style="background: transparent; border: none; width: 35px; color: #64748b; font-weight: 700; cursor: pointer;">+</button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                    tourIdx++;
                                 }
                             </div>
                         </div>
@@ -217,7 +241,7 @@
                 </div>
 
                 <!-- Right Column: Sticky Summary Widget -->
-                <div class="col-lg-5 col-md-12">
+                <div class="col-lg-5 col-md-12 sticky-sidebar-column">
                     <div class="payment-summary-widget">
                         <h4>Tóm Tắt Đặt Phòng</h4>
                         
@@ -252,6 +276,9 @@
                             <div class="price-breakdown-row" id="tour-subtotal-row" style="display: none;">
                                 <span>Trải nghiệm dịch vụ:</span>
                                 <span id="tour-subtotal-val">0 VNĐ</span>
+                            </div>
+                            <div id="tour-breakdown-details" style="display: none; flex-direction: column; padding-left: 15px; border-left: 2px solid var(--accent-color); margin-bottom: 10px;">
+                                <!-- Detailed tour items will be injected here -->
                             </div>
                             <div class="price-breakdown-row total">
                                 <span>Tổng cộng:</span>
@@ -288,12 +315,42 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Quantity adjustment functions
+        window.decrementTourQty = function(btn) {
+            var input = btn.closest('.tour-qty-group').querySelector('.tour-qty');
+            var val = parseInt(input.value) || 0;
+            var min = parseInt(input.min) || 0;
+            if (val > min) {
+                input.value = val - 1;
+                var card = btn.closest('.tour-card-modern');
+                if (val - 1 === 0) {
+                    card.classList.remove('selected');
+                } else {
+                    card.classList.add('selected');
+                }
+                // Trigger calculation
+                window.calculatePricesGlobal();
+            }
+        };
+
+        window.incrementTourQty = function(btn) {
+            var input = btn.closest('.tour-qty-group').querySelector('.tour-qty');
+            var val = parseInt(input.value) || 0;
+            var max = parseInt(input.max) || 0;
+            if (val < max) {
+                input.value = val + 1;
+                var card = btn.closest('.tour-card-modern');
+                card.classList.add('selected');
+                // Trigger calculation
+                window.calculatePricesGlobal();
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             var checkInInput = document.querySelector('input[name="CheckInDate"]');
             var checkOutInput = document.querySelector('input[name="CheckOutDate"]');
             var adultsInput = document.querySelector('input[name="NumberOfAdults"]');
             var childrenInput = document.querySelector('input[name="NumberOfChildren"]');
-            var tourCheckboxes = document.querySelectorAll('input[name="SelectedTourScheduleIds"]');
             
             // Dynamic display elements
             var summaryCheckIn = document.getElementById('summary-checkin');
@@ -305,10 +362,9 @@
             var roomSubtotalVal = document.getElementById('room-subtotal-val');
             var tourSubtotalVal = document.getElementById('tour-subtotal-val');
             var tourSubtotalRow = document.getElementById('tour-subtotal-row');
+            var tourBreakdownDetails = document.getElementById('tour-breakdown-details');
             var totalAmountVal = document.getElementById('total-amount-val');
             var depositAmountVal = document.getElementById('deposit-amount-val');
-            
-            var pricePerNight = 0; // Handled in JS based on selections
             
             // Format number helper (e.g. 1,000,000)
             function formatVnd(amount) {
@@ -342,7 +398,6 @@
                 
                 var adults = parseInt(adultsInput.value) || 0;
                 var children = parseInt(childrenInput.value) || 0;
-                var totalGuests = adults + children;
                 summaryGuests.textContent = adults + ' Người lớn, ' + children + ' Trẻ em';
                 
                 // Calculate room total
@@ -359,15 +414,24 @@
                 // Calculate tours total
                 var tourTotal = 0;
                 var selectedToursCount = 0;
+                var selectedToursHtml = '';
                 
-                tourCheckboxes.forEach(function(cb) {
-                    var card = cb.closest('.tour-card-modern');
-                    if (cb.checked) {
+                document.querySelectorAll('.tour-qty').forEach(function(input) {
+                    var qty = parseInt(input.value) || 0;
+                    var card = input.closest('.tour-card-modern');
+                    if (qty > 0) {
                         card.classList.add('selected');
-                        // Retrieve tour price from data attribute
-                        var price = parseFloat(cb.getAttribute('data-price')) || 0;
-                        tourTotal += price * totalGuests;
+                        var price = parseFloat(input.getAttribute('data-price')) || 0;
+                        var name = input.getAttribute('data-name') || '';
+                        tourTotal += price * qty;
                         selectedToursCount++;
+                        
+                        selectedToursHtml += `
+                            <div class="price-breakdown-row" style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
+                                <span>&bull; ${name} (x${qty})</span>
+                                <span>${formatVnd(price * qty)}</span>
+                            </div>
+                        `;
                     } else {
                         card.classList.remove('selected');
                     }
@@ -377,8 +441,12 @@
                 if (selectedToursCount > 0) {
                     tourSubtotalRow.style.display = 'flex';
                     tourSubtotalVal.textContent = formatVnd(tourTotal);
+                    tourBreakdownDetails.style.display = 'flex';
+                    tourBreakdownDetails.innerHTML = selectedToursHtml;
                 } else {
                     tourSubtotalRow.style.display = 'none';
+                    tourBreakdownDetails.style.display = 'none';
+                    tourBreakdownDetails.innerHTML = '';
                 }
                 
                 // Calculate grand total and deposit
@@ -388,6 +456,9 @@
                 totalAmountVal.textContent = formatVnd(grandTotal);
                 depositAmountVal.textContent = formatVnd(deposit);
             }
+            
+            // Expose globally so external click handlers can trigger it
+            window.calculatePricesGlobal = calculatePrices;
             
             // Set up date constraints
             checkInInput.addEventListener('change', function() {
@@ -411,18 +482,6 @@
             checkOutInput.addEventListener('change', calculatePrices);
             adultsInput.addEventListener('input', calculatePrices);
             childrenInput.addEventListener('input', calculatePrices);
-            
-            tourCheckboxes.forEach(function(cb) {
-                cb.addEventListener('change', calculatePrices);
-                // Also listen to clicking the card to toggle checkbox
-                var card = cb.closest('.tour-card-modern');
-                card.addEventListener('click', function(e) {
-                    if (e.target !== cb && !e.target.closest('input')) {
-                        cb.checked = !cb.checked;
-                        cb.dispatchEvent(new Event('change'));
-                    }
-                });
-            });
             
             // Initial run
             calculatePrices();

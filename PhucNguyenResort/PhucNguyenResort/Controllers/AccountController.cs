@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Helpers;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.ViewModels.Auth;
-using PhucNguyenResort.Helpers;
+using PhucNguyenResort.Services.Email;
 using System.Security.Claims;
 
 namespace PhucNguyenResort.Controllers
@@ -15,10 +15,12 @@ namespace PhucNguyenResort.Controllers
     public class AccountController : Controller
     {
         private readonly ResortDbContext _context;
+        private readonly IEmailSender _emailSender;
 
-        public AccountController(ResortDbContext context)
+        public AccountController(ResortDbContext context, IEmailSender emailSender)
         {
             _context = context;
+            _emailSender = emailSender;
         }
 
         [AllowAnonymous]
@@ -39,8 +41,11 @@ namespace PhucNguyenResort.Controllers
 
             var email = model.Email.Trim();
 
-            var emailExists = await _context.Users.AnyAsync(u => u.Email == email);
-            if (emailExists)
+            var existingUser = await _context.Users
+                .Include(u => u.UserProfile)
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (existingUser != null && existingUser.IsActive)
             {
                 ModelState.AddModelError(nameof(model.Email), "Email này đã được sử dụng.");
                 return View(model);
@@ -55,36 +60,252 @@ namespace PhucNguyenResort.Controllers
                 return View(model);
             }
 
-            var user = new User
+            User user;
+            if (existingUser != null)
             {
-                FullName = model.FullName.Trim(),
+                user = existingUser;
+                user.FullName = model.FullName.Trim();
+                user.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim();
+                user.PasswordHash = PasswordHelper.HashPassword(user, model.Password);
+                user.CreatedAt = DateTime.Now;
+
+                if (user.UserProfile != null)
+                {
+                    user.UserProfile.DateOfBirth = model.DateOfBirth;
+                    user.UserProfile.Nationality = string.IsNullOrWhiteSpace(model.Nationality) ? null : model.Nationality.Trim();
+                    user.UserProfile.Address = string.IsNullOrWhiteSpace(model.Address) ? null : model.Address.Trim();
+                    user.UserProfile.ConsentGiven = model.ConsentGiven;
+                }
+                else
+                {
+                    var profile = new UserProfile
+                    {
+                        UserId = user.UserId,
+                        DateOfBirth = model.DateOfBirth,
+                        Nationality = string.IsNullOrWhiteSpace(model.Nationality) ? null : model.Nationality.Trim(),
+                        Address = string.IsNullOrWhiteSpace(model.Address) ? null : model.Address.Trim(),
+                        ConsentGiven = model.ConsentGiven,
+                        DeletionRequested = false
+                    };
+                    _context.UserProfiles.Add(profile);
+                }
+            }
+            else
+            {
+                user = new User
+                {
+                    FullName = model.FullName.Trim(),
+                    Email = email,
+                    PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim(),
+                    RoleId = customerRole.RoleId,
+                    IsActive = false, // Set to inactive until email is verified
+                    CreatedAt = DateTime.Now
+                };
+
+                user.PasswordHash = PasswordHelper.HashPassword(user, model.Password);
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                var profile = new UserProfile
+                {
+                    UserId = user.UserId,
+                    DateOfBirth = model.DateOfBirth,
+                    Nationality = string.IsNullOrWhiteSpace(model.Nationality) ? null : model.Nationality.Trim(),
+                    Address = string.IsNullOrWhiteSpace(model.Address) ? null : model.Address.Trim(),
+                    ConsentGiven = model.ConsentGiven,
+                    DeletionRequested = false
+                };
+
+                _context.UserProfiles.Add(profile);
+            }
+
+            // Generate OTP Verification Code
+            var random = new Random();
+            var otpCode = random.Next(100000, 999999).ToString();
+            var emailOtp = new EmailOtp
+            {
                 Email = email,
-                PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim(),
-                RoleId = customerRole.RoleId,
-                IsActive = true,
+                OtpCode = otpCode,
+                ExpiryTime = DateTime.Now.AddMinutes(5),
+                IsUsed = false,
+                Attempts = 0,
+                CreatedAt = DateTime.Now
+            };
+            _context.EmailOtps.Add(emailOtp);
+
+            await _context.SaveChangesAsync();
+
+            // Send Email OTP
+            var subject = "Xác nhận tài khoản - PhucNguyen Resort";
+            var body = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+                    <h2 style='color: #d4a373; text-align: center;'>Phúc Nguyễn Resort</h2>
+                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
+                    <p>Cảm ơn bạn đã đăng ký tài khoản tại Phúc Nguyễn Resort. Mã xác thực đăng ký tài khoản của bạn là:</p>
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1d3557; background-color: #f1faee; padding: 10px 20px; border-radius: 5px; border: 1px dashed #d4a373;'>{otpCode}</span>
+                    </div>
+                    <p style='color: #e63946;'><strong>Lưu ý:</strong> Mã OTP này có hiệu lực trong vòng 5 phút. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>
+                    <hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;' />
+                    <p style='font-size: 12px; color: #888; text-align: center;'>Đây là email tự động, vui lòng không phản hồi email này.</p>
+                </div>";
+
+            try
+            {
+                await _emailSender.SendEmailAsync(email, subject, body);
+            }
+            catch (Exception ex)
+            {
+                // In a production system, we'd log the exception: ex.Message
+                TempData["ErrorMessage"] = "Tài khoản đã được tạo nhưng không thể gửi mã xác nhận qua email. Vui lòng thử lại.";
+            }
+
+            return RedirectToAction(nameof(VerifyOtp), new { email = email });
+        }
+
+        [AllowAnonymous]
+        public IActionResult VerifyOtp(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction(nameof(Register));
+            }
+            return View(new VerifyOtpViewModel { Email = email });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var email = model.Email.Trim();
+            var code = model.OtpCode.Trim();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "Tài khoản không tồn tại.");
+                return View(model);
+            }
+
+            if (user.IsActive)
+            {
+                TempData["SuccessMessage"] = "Tài khoản đã được xác thực trước đó. Vui lòng đăng nhập.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var latestOtp = await _context.EmailOtps
+                .Where(o => o.Email == email && !o.IsUsed)
+                .OrderByDescending(o => o.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (latestOtp == null || latestOtp.ExpiryTime < DateTime.Now)
+            {
+                ModelState.AddModelError(nameof(model.OtpCode), "Mã xác thực không đúng hoặc đã hết hạn.");
+                return View(model);
+            }
+
+            if (latestOtp.Attempts >= 5)
+            {
+                ModelState.AddModelError(nameof(model.OtpCode), "Mã xác thực này đã bị khóa do nhập sai quá nhiều lần. Vui lòng nhấn gửi lại mã.");
+                return View(model);
+            }
+
+            if (latestOtp.OtpCode != code)
+            {
+                latestOtp.Attempts++;
+                await _context.SaveChangesAsync();
+                ModelState.AddModelError(nameof(model.OtpCode), $"Mã xác thực không chính xác. Bạn còn {5 - latestOtp.Attempts} lần thử.");
+                return View(model);
+            }
+
+            // Correct OTP
+            latestOtp.IsUsed = true;
+            user.IsActive = true;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Xác thực tài khoản thành công! Vui lòng đăng nhập.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpRequest model)
+        {
+            if (model == null || string.IsNullOrWhiteSpace(model.Email))
+            {
+                return Json(new { success = false, message = "Email không hợp lệ." });
+            }
+
+            var email = model.Email.Trim();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Tài khoản không tồn tại." });
+            }
+
+            if (user.IsActive)
+            {
+                return Json(new { success = false, message = "Tài khoản đã được xác thực." });
+            }
+
+            // Check rate limit (last OTP generated < 60 seconds ago)
+            var lastOtp = await _context.EmailOtps
+                .Where(o => o.Email == email)
+                .OrderByDescending(o => o.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (lastOtp != null && (DateTime.Now - lastOtp.CreatedAt).TotalSeconds < 60)
+            {
+                var remaining = 60 - (int)(DateTime.Now - lastOtp.CreatedAt).TotalSeconds;
+                return Json(new { success = false, message = $"Vui lòng đợi {remaining} giây trước khi gửi lại mã." });
+            }
+
+            // Create new OTP
+            var random = new Random();
+            var otpCode = random.Next(100000, 999999).ToString();
+            var emailOtp = new EmailOtp
+            {
+                Email = email,
+                OtpCode = otpCode,
+                ExpiryTime = DateTime.Now.AddMinutes(5),
+                IsUsed = false,
+                Attempts = 0,
                 CreatedAt = DateTime.Now
             };
 
-            user.PasswordHash = PasswordHelper.HashPassword(user, model.Password);
-
-            _context.Users.Add(user);
+            _context.EmailOtps.Add(emailOtp);
             await _context.SaveChangesAsync();
 
-            var profile = new UserProfile
+            var subject = "Gửi lại mã xác thực - PhucNguyen Resort";
+            var body = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+                    <h2 style='color: #d4a373; text-align: center;'>Phúc Nguyễn Resort</h2>
+                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
+                    <p>Yêu cầu gửi lại mã xác thực đăng ký tài khoản của bạn đã được thực hiện. Mã xác thực mới là:</p>
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1d3557; background-color: #f1faee; padding: 10px 20px; border-radius: 5px; border: 1px dashed #d4a373;'>{otpCode}</span>
+                    </div>
+                    <p style='color: #e63946;'><strong>Lưu ý:</strong> Mã OTP này có hiệu lực trong vòng 5 phút. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>
+                    <hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;' />
+                    <p style='font-size: 12px; color: #888; text-align: center;'>Đây là email tự động, vui lòng không phản hồi email này.</p>
+                </div>";
+
+            try
             {
-                UserId = user.UserId,
-                DateOfBirth = model.DateOfBirth,
-                Nationality = string.IsNullOrWhiteSpace(model.Nationality) ? null : model.Nationality.Trim(),
-                Address = string.IsNullOrWhiteSpace(model.Address) ? null : model.Address.Trim(),
-                ConsentGiven = model.ConsentGiven,
-                DeletionRequested = false
-            };
-
-            _context.UserProfiles.Add(profile);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Đăng ký thành công. Vui lòng đăng nhập.";
-            return RedirectToAction(nameof(Login));
+                await _emailSender.SendEmailAsync(email, subject, body);
+                return Json(new { success = true, message = "Mã xác thực mới đã được gửi thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Không thể gửi email. Vui lòng thử lại sau." });
+            }
         }
 
         [AllowAnonymous]

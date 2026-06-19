@@ -97,15 +97,16 @@ namespace PhucNguyenResort.Tests.Payments
 
             using (var context = new ResortDbContext(options))
             {
-                context.Bookings.Add(new Booking
+                var booking = new Booking
                 {
                     BookingId = 99,
                     UserId = 1,
-                    RoomId = 1,
                     CheckInDate = DateTime.Today.AddDays(1),
                     CheckOutDate = DateTime.Today.AddDays(3),
                     BookingStatus = BookingStatus.PendingPayment
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 99 });
+                context.Bookings.Add(booking);
 
                 context.TourBookings.Add(new TourBooking
                 {
@@ -162,15 +163,16 @@ namespace PhucNguyenResort.Tests.Payments
 
             using (var context = new ResortDbContext(options))
             {
-                context.Bookings.Add(new Booking
+                var booking = new Booking
                 {
                     BookingId = 99,
                     UserId = 1,
-                    RoomId = 1,
                     CheckInDate = DateTime.Today.AddDays(1),
                     CheckOutDate = DateTime.Today.AddDays(3),
                     BookingStatus = BookingStatus.PendingPayment
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 99 });
+                context.Bookings.Add(booking);
 
                 context.TourBookings.Add(new TourBooking
                 {
