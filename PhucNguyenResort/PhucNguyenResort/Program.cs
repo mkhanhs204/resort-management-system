@@ -42,7 +42,9 @@ builder.Services.AddDbContext<ResortDbContext>(options =>
 builder.Services.AddScoped<PhucNguyenResort.Services.Rooms.IRoomService, PhucNguyenResort.Services.Rooms.RoomService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.RoomCategories.IRoomCategoryService, PhucNguyenResort.Services.RoomCategories.RoomCategoryService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Users.IUserService, PhucNguyenResort.Services.Users.UserService>();
-builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourService, PhucNguyenResort.Services.Tours.TourService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourCatalogService, PhucNguyenResort.Services.Tours.TourCatalogService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourScheduleService, PhucNguyenResort.Services.Tours.TourScheduleService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourBookingService, PhucNguyenResort.Services.Tours.TourBookingService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Home.IHomeService, PhucNguyenResort.Services.Home.HomeService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingService, PhucNguyenResort.Services.Bookings.BookingService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingGuestService, PhucNguyenResort.Services.Bookings.BookingGuestService>();

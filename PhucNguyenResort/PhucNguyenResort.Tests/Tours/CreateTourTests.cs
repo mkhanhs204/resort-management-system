@@ -10,12 +10,12 @@ namespace PhucNguyenResort.Tests.Tours
 {
     public class CreateTourTests
     {
-        private readonly Mock<ITourService> _mockTourService;
+        private readonly Mock<ITourCatalogService> _mockTourService;
         private readonly ToursController _controller;
 
         public CreateTourTests()
         {
-            _mockTourService = new Mock<ITourService>();
+            _mockTourService = new Mock<ITourCatalogService>();
             _controller = new ToursController(_mockTourService.Object, null!);
         }
 

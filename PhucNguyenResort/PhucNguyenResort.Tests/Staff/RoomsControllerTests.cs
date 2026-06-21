@@ -9,7 +9,7 @@ using PhucNguyenResort.ViewModels.Rooms;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace PhucNguyenResort.Tests
+namespace PhucNguyenResort.Tests.Staff
 {
     public class RoomsControllerTests
     {

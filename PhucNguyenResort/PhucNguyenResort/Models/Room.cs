@@ -19,5 +19,5 @@ public class Room
     public RoomStatus Status { get; set; } = RoomStatus.Available;
 
     public RoomCategory? Category { get; set; }
-    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
 }

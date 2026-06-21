@@ -34,21 +34,21 @@
         </div>
     }
 
-    <div class="row">
-        <!-- Left: Guest Manifest details -->
-        <div class="col-lg-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Danh Sách Khách Lưu Trú</h6>
-                    <a asp-action="ExportManifest" asp-route-id="@Model.BookingId" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-download fa-sm mr-1"></i> Xuất Tờ Khai Tạm Trú
-                    </a>
-                </div>
-                <div class="card-body">
-                    <form asp-action="CheckIn" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;"></div>
-                        <input type="hidden" asp-for="BookingId" />
+    <form asp-action="CheckIn" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;"></div>
+        <input type="hidden" asp-for="BookingId" />
 
+        <div class="row">
+            <!-- Left: Guest Manifest details -->
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">Danh Sách Khách Lưu Trú</h6>
+                        <a asp-action="ExportManifest" asp-route-id="@Model.BookingId" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download fa-sm mr-1"></i> Xuất Tờ Khai Tạm Trú
+                        </a>
+                    </div>
+                    <div class="card-body">
                         @for (int i = 0; i < Model.Guests.Count; i++)
                         {
                             var isPrimary = Model.Guests[i].IsPrimaryBooker;
@@ -104,53 +104,84 @@
                         <button type="submit" class="btn btn-success btn-lg btn-block mt-3 shadow-sm">
                             <i class="fas fa-check-circle mr-1"></i> Xác Nhận Check-In & Lưu Thông Tin
                         </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right: Room & Booking Info -->
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Thông Tin Đặt Phòng</h6>
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-hotel fa-3x text-gray-300 mb-3"></i>
-                        <h5 class="text-dark font-weight-bold">Phòng @Model.RoomNumber</h5>
-                        <span class="badge badge-info px-3 py-2">@Model.CategoryName</span>
-                    </div>
-
-                    <hr />
-
-                    <div class="mb-3">
-                        <span class="text-muted d-block small">Thời gian lưu trú</span>
-                        <span class="text-dark font-weight-bold">@Model.CheckInDate.ToString("dd/MM/yyyy") - @Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
-                    </div>
-
-                    <div class="mb-3">
-                        <span class="text-muted d-block small">Trạng thái đồng ý bảo mật (PDPD Consent)</span>
-                        @if (Model.PdpdConsentChecked)
-                        {
-                            <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Đã đồng ý trực tuyến</span>
-                        }
-                        else
-                        {
-                            <span class="badge badge-warning"><i class="fas fa-exclamation-triangle mr-1"></i> Chưa đồng ý trực tuyến</span>
-                        }
-                    </div>
-
-                    <hr />
-
-                    <div class="text-muted small">
-                        <p class="mb-1"><i class="fas fa-info-circle mr-1 text-info"></i> Hãy yêu cầu khách xuất trình giấy tờ tùy thân thực tế để đối chiếu.</p>
-                        <p class="mb-0"><i class="fas fa-file-excel mr-1 text-success"></i> Tải file báo cáo tạm trú sau khi check-in để gửi cho cơ quan Công an.</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Right: Room & Booking Info -->
+            <div class="col-lg-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Thông Tin Đặt Phòng & Xếp Phòng</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-hotel fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-dark font-weight-bold">Xếp Phòng Cho Đặt Phòng</h5>
+                            <span class="badge badge-info px-3 py-2">@Model.CategoryName</span>
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-4">
+                            <h6 class="font-weight-bold text-dark mb-3"><i class="fas fa-bed mr-2 text-primary"></i> Gán Phòng Vật Lý</h6>
+                            
+                            @for (int j = 0; j < Model.RoomAssignments.Count; j++)
+                            {
+                                <div class="p-3 mb-3 bg-light rounded border">
+                                    <input type="hidden" asp-for="RoomAssignments[j].BookingDetailId" />
+                                    <input type="hidden" asp-for="RoomAssignments[j].RoomCategoryId" />
+                                    <input type="hidden" asp-for="RoomAssignments[j].CategoryName" />
+                                    
+                                    <label class="small font-weight-bold text-gray-800 d-block mb-1">
+                                        Chi tiết phòng #@(j + 1): @Model.RoomAssignments[j].CategoryName
+                                    </label>
+                                    
+                                    <select asp-for="RoomAssignments[j].SelectedRoomId" class="form-control form-control-sm">
+                                        <option value="">-- Chọn phòng trống --</option>
+                                        @if (Model.RoomAssignments[j].AvailableRooms != null)
+                                        {
+                                            @foreach (var room in Model.RoomAssignments[j].AvailableRooms)
+                                            {
+                                                <option value="@room.Id">Phòng @room.RoomNumber</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="RoomAssignments[j].SelectedRoomId" class="text-danger small d-block mt-1"></span>
+                                </div>
+                            }
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-3">
+                            <span class="text-muted d-block small">Thời gian lưu trú</span>
+                            <span class="text-dark font-weight-bold">@Model.CheckInDate.ToString("dd/MM/yyyy") - @Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="text-muted d-block small">Trạng thái đồng ý bảo mật (PDPD Consent)</span>
+                            @if (Model.PdpdConsentChecked)
+                            {
+                                <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Đã đồng ý trực tuyến</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-warning"><i class="fas fa-exclamation-triangle mr-1"></i> Chưa đồng ý trực tuyến</span>
+                            }
+                        </div>
+
+                        <hr />
+
+                        <div class="text-muted small">
+                            <p class="mb-1"><i class="fas fa-info-circle mr-1 text-info"></i> Hãy yêu cầu khách xuất trình giấy tờ tùy thân thực tế để đối chiếu.</p>
+                            <p class="mb-0"><i class="fas fa-file-excel mr-1 text-success"></i> Tải file báo cáo tạm trú sau khi check-in để gửi cho cơ quan Công an.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 
 @section Scripts {

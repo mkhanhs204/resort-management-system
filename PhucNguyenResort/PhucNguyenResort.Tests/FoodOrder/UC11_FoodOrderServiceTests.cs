@@ -48,9 +48,17 @@ namespace PhucNguyenResort.Tests.FoodOrder
             _dbContext.Rooms.Add(new Room { RoomId = 1, RoomNumber = "101" });
 
             // Bookings
-            _dbContext.Bookings.Add(new Booking { BookingId = 2, UserId = 2, RoomId = 1, BookingStatus = BookingStatus.CheckedIn }); // FX-BK-001
-            _dbContext.Bookings.Add(new Booking { BookingId = 7, UserId = 7, RoomId = 1, BookingStatus = BookingStatus.CheckedIn }); // FX-BK-002
-            _dbContext.Bookings.Add(new Booking { BookingId = 1, UserId = 2, RoomId = 1, BookingStatus = BookingStatus.Reserved }); // FX-BK-003
+            var booking2 = new Booking { BookingId = 2, UserId = 2, BookingStatus = BookingStatus.CheckedIn };
+            booking2.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 1, BookingId = 2 });
+            _dbContext.Bookings.Add(booking2); // FX-BK-001
+
+            var booking7 = new Booking { BookingId = 7, UserId = 7, BookingStatus = BookingStatus.CheckedIn };
+            booking7.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 1, BookingId = 7 });
+            _dbContext.Bookings.Add(booking7); // FX-BK-002
+
+            var booking1 = new Booking { BookingId = 1, UserId = 2, BookingStatus = BookingStatus.Reserved };
+            booking1.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 1, BookingId = 1 });
+            _dbContext.Bookings.Add(booking1); // FX-BK-003
             
             // Menu Items
             _dbContext.MenuItems.Add(new MenuItem { MenuItemId = 1, Price = 85000, IsAvailable = true, IsDeleted = false, CategoryId = 1 }); // FX-MN-001

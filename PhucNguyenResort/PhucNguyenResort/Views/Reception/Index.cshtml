@@ -107,8 +107,8 @@
                                     <span class="small text-muted">@item.User?.Email</span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-light border p-2">@item.Room?.RoomNumber</span><br />
-                                    <span class="small text-muted">@item.Room?.Category?.CategoryName</span>
+                                    <span class="badge badge-light border p-2">@(item.BookingDetails != null && item.BookingDetails.Any(bd => bd.Room != null) ? string.Join(", ", item.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : "Chưa xếp phòng")</span><br />
+                                    <span class="small text-muted">@(item.BookingDetails != null ? string.Join(", ", item.BookingDetails.GroupBy(bd => bd.RoomCategory?.CategoryName).Select(g => $"{g.Count()}x {g.Key}")) : "")</span>
                                 </td>
                                 <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
                                 <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>

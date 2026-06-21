@@ -3,8 +3,8 @@
 Đặc tả Kiểm thử Hướng Phát triển — Room Booking
 
 **Document ID**: SWP391-MOD2-TDD-002
-**Version**: 1.1
-**Date**: 2026-06-13
+**Version**: 1.2
+**Date**: 2026-06-19
 **Status**: Approve
 **Standard**: ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author**: Cuong
@@ -32,6 +32,7 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 | ---------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-06-12 | Cuong               | Khởi tạo tài liệu — TDD spec cho Room Booking                                                                                                            |
 | 2026-06-13 | Cuong               | Cập nhật v1.1: Khớp trạng thái `BookingStatus.Reserved`, sửa `TotalAmount`, xóa yêu cầu `RowVersion` sai, bổ sung Test Case cho Tour Add-ons. |
+| 2026-06-19 | Cuong               | Cập nhật v1.2: Cập nhật cấu trúc sang BookingDetails, thay thế đầu vào RoomId bằng danh sách RoomSelections và SelectedTours trong các test cases. |
 
 ---
 
@@ -136,22 +137,26 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 **Condition Ref**: TC-COND-001
 
 **Preconditions**:
-
-- Phòng Id = 1 (Price: 500,000) trống từ ngày 01/01/2027 đến 05/01/2027 (4 đêm).
+- Loại phòng Id = 1 (Price: 500,000) có phòng trống khả dụng từ ngày 01/01/2027 đến 05/01/2027 (4 đêm).
 - Fixture: FX-001
 
 **Test Steps**:
-
-1. Gọi `CreateBookingAsync` với request `roomId: 1, checkIn: "01/01/2027", checkOut: "05/01/2027", NumberOfAdults: 2, NumberOfChildren: 0` và `userId: 1`.
+1. Gọi `CreateBookingAsync` với request:
+   - `RoomSelections`: `[{ CategoryId: 1, Quantity: 1 }]`
+   - `CheckInDate`: "01/01/2027"
+   - `CheckOutDate`: "05/01/2027"
+   - `NumberOfAdults`: 2
+   - `NumberOfChildren`: 0
+   - `userId`: 1.
 
 **Expected Result (PASS)**:
-
 - `Success` = true.
-- DB lưu `BookingStatus` là `Reserved`.
+- DB lưu `BookingStatus` là `PendingPayment` (chờ thanh toán cọc).
+- Tạo 1 record `BookingDetail` liên kết với `RoomCategoryId = 1`.
 - Tính đúng `TotalAmount` = 4 * 500,000 = 2,000,000.
 - `DepositAmount` được tính = 800,000 (40% TotalAmount).
 
-### BKG-TC-002 — Báo lỗi khi phòng đã được đặt (Concurrency Conflict)
+### BKG-TC-002 — Báo lỗi khi phòng đã được đặt hết (Concurrency Conflict)
 
 **Severity**: CRITICAL
 **Feature Under Test**: `BookingService.CreateBookingAsync()`
@@ -159,16 +164,16 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 **Condition Ref**: TC-COND-002
 
 **Preconditions**:
-
-- Phòng Id = 1 đã có 1 Booking từ 01/01/2027 đến 05/01/2027 có trạng thái `Reserved` (FX-002).
+- Loại phòng Id = 1 chỉ có 1 phòng vật lý, và phòng này đã bị đặt trùng lịch từ 01/01/2027 đến 05/01/2027 (status: Reserved) (FX-002).
 
 **Test Steps**:
-
-1. Khách hàng B gọi `CreateBookingAsync(roomId: 1, checkIn: "02/01/2027", checkOut: "04/01/2027")`.
+1. Khách hàng B gọi `CreateBookingAsync` với request:
+   - `RoomSelections`: `[{ CategoryId: 1, Quantity: 1 }]`
+   - `CheckInDate`: "02/01/2027"
+   - `CheckOutDate`: "04/01/2027"
 
 **Expected Result (PASS)**:
-
-- `Success` = false, `ErrorCode` = "BKG-002", `ErrorMessage` = "Room not available".
+- `Success` = false, `ErrorCode` = "BKG-002", `ErrorMessage` chứa thông báo hết phòng khả dụng.
 - KHÔNG có Booking mới nào được lưu.
 
 ### BKG-TC-003 — Báo lỗi khi ngày Check-in/Check-out không hợp lệ
@@ -194,16 +199,16 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 **Condition Ref**: TC-COND-004
 
 **Preconditions**:
-
-- Phòng Id = 1 trống.
+- Loại phòng Id = 1 có phòng trống.
 - `TourScheduleId = 5` có `Tour.Price = 200,000`. (FX-003)
 
 **Test Steps**:
-
-1. Gọi `CreateBookingAsync` với `SelectedTourScheduleIds = [5]` và `NumberOfAdults = 2, NumberOfChildren = 0`.
+1. Gọi `CreateBookingAsync` với request:
+   - `RoomSelections`: `[{ CategoryId: 1, Quantity: 1 }]`
+   - `SelectedTours`: `[{ ScheduleId: 5, Participants: 2 }]`
+   - `NumberOfAdults` = 2, `NumberOfChildren` = 0.
 
 **Expected Result (PASS)**:
-
 - Booking phòng được tạo thành công.
 - Kèm theo 1 record `TourBooking` gắn liền `BookingId` vừa sinh.
 - `TourBooking.TotalAmount` = 200,000 * 2 = 400,000.
@@ -258,16 +263,16 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 **Condition Ref**: TC-COND-007
 
 **Preconditions**:
-
-- Phòng Id = 1 trống.
+- Loại phòng Id = 1 có phòng trống.
 - Lịch trình tour `TourScheduleId = 5` có `AvailableSlots = 10`.
 
 **Test Steps**:
-
-1. Gọi `CreateBookingAsync` với `SelectedTourScheduleIds = [5]` và `NumberOfAdults = 2, NumberOfChildren = 0`.
+1. Gọi `CreateBookingAsync` với request:
+   - `RoomSelections`: `[{ CategoryId: 1, Quantity: 1 }]`
+   - `SelectedTours`: `[{ ScheduleId: 5, Participants: 2 }]`
+   - `NumberOfAdults` = 2, `NumberOfChildren` = 0.
 
 **Expected Result (PASS)**:
-
 - Đặt phòng thành công.
 - `AvailableSlots` của `TourScheduleId = 5` giảm xuống còn `8` (10 - 2).
 
@@ -279,16 +284,16 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 **Condition Ref**: TC-COND-008
 
 **Preconditions**:
-
-- Phòng Id = 1 trống.
+- Loại phòng Id = 1 có phòng trống.
 - Lịch trình tour `TourScheduleId = 5` có `AvailableSlots = 1`.
 
 **Test Steps**:
-
-1. Gọi `CreateBookingAsync` với `SelectedTourScheduleIds = [5]` và `NumberOfAdults = 2, NumberOfChildren = 0`.
+1. Gọi `CreateBookingAsync` với request:
+   - `RoomSelections`: `[{ CategoryId: 1, Quantity: 1 }]`
+   - `SelectedTours`: `[{ ScheduleId: 5, Participants: 2 }]`
+   - `NumberOfAdults` = 2, `NumberOfChildren` = 0.
 
 **Expected Result (PASS)**:
-
 - `Success` = false, `ErrorCode` = "BKG-003", `ErrorMessage` chứa thông tin không đủ chỗ.
 - Không có Booking hay TourBooking nào được tạo.
 

@@ -39,7 +39,7 @@ namespace PhucNguyenResort.Tests.Bookings
                 var service = new BookingService(context);
                 var request = new CreateBookingViewModel
                 {
-                    RoomId = 1,
+                    RoomSelections = new List<RoomSelectionViewModel> { new RoomSelectionViewModel { CategoryId = 1, Quantity = 1 } },
                     CheckInDate = DateTime.Today.AddDays(10),
                     CheckOutDate = DateTime.Today.AddDays(14),
                     NumberOfAdults = 2,
@@ -72,15 +72,16 @@ namespace PhucNguyenResort.Tests.Bookings
                 context.Users.Add(new User { UserId = 1, FullName = "Test User 1" });
                 context.Users.Add(new User { UserId = 2, FullName = "Test User 2" });
                 
-                context.Bookings.Add(new Booking 
+                var booking = new Booking 
                 { 
                     BookingId = 1, 
-                    RoomId = 1, 
                     UserId = 1, 
                     CheckInDate = DateTime.Today.AddDays(10), 
                     CheckOutDate = DateTime.Today.AddDays(14),
                     BookingStatus = BookingStatus.Reserved
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 1 });
+                context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
             }
 
@@ -89,7 +90,7 @@ namespace PhucNguyenResort.Tests.Bookings
                 var service = new BookingService(context);
                 var request = new CreateBookingViewModel
                 {
-                    RoomId = 1,
+                    RoomSelections = new List<RoomSelectionViewModel> { new RoomSelectionViewModel { CategoryId = 1, Quantity = 1 } },
                     CheckInDate = DateTime.Today.AddDays(11),
                     CheckOutDate = DateTime.Today.AddDays(13),
                     NumberOfAdults = 2,
@@ -115,7 +116,7 @@ namespace PhucNguyenResort.Tests.Bookings
                 var service = new BookingService(context);
                 var request = new CreateBookingViewModel
                 {
-                    RoomId = 1,
+                    RoomSelections = new List<RoomSelectionViewModel> { new RoomSelectionViewModel { CategoryId = 1, Quantity = 1 } },
                     CheckInDate = DateTime.Today.AddDays(14),
                     CheckOutDate = DateTime.Today.AddDays(10), // CheckOut < CheckIn
                     NumberOfAdults = 2,
@@ -153,12 +154,12 @@ namespace PhucNguyenResort.Tests.Bookings
                 var service = new BookingService(context);
                 var request = new CreateBookingViewModel
                 {
-                    RoomId = 1,
+                    RoomSelections = new List<RoomSelectionViewModel> { new RoomSelectionViewModel { CategoryId = 1, Quantity = 1 } },
                     CheckInDate = DateTime.Today.AddDays(10),
                     CheckOutDate = DateTime.Today.AddDays(14),
                     NumberOfAdults = 2,
-                NumberOfChildren = 0,
-                    SelectedTourScheduleIds = new List<int> { 5 }
+                    NumberOfChildren = 0,
+                    SelectedTours = new List<TourSelectionViewModel> { new TourSelectionViewModel { ScheduleId = 5, Participants = 2 } }
                 };
 
                 // Act
@@ -190,16 +191,17 @@ namespace PhucNguyenResort.Tests.Bookings
             var checkIn = DateTime.Now.AddDays(3); // > 48h
             using (var context = new ResortDbContext(options))
             {
-                context.Bookings.Add(new Booking 
+                var booking = new Booking 
                 { 
                     BookingId = 1, 
-                    RoomId = 1, 
                     UserId = 1, 
                     CheckInDate = checkIn, 
                     CheckOutDate = checkIn.AddDays(2),
                     BookingStatus = BookingStatus.Reserved,
                     DepositAmount = 1000000
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 1 });
+                context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
             }
 
@@ -232,16 +234,17 @@ namespace PhucNguyenResort.Tests.Bookings
             var checkIn = DateTime.Now.AddHours(24); // < 48h
             using (var context = new ResortDbContext(options))
             {
-                context.Bookings.Add(new Booking 
+                var booking = new Booking 
                 { 
                     BookingId = 1, 
-                    RoomId = 1, 
                     UserId = 1, 
                     CheckInDate = checkIn, 
                     CheckOutDate = checkIn.AddDays(2),
                     BookingStatus = BookingStatus.Reserved,
                     DepositAmount = 1000000
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 1 });
+                context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
             }
 
@@ -274,13 +277,13 @@ namespace PhucNguyenResort.Tests.Bookings
                 var booking = new Booking 
                 { 
                     BookingId = 1, 
-                    RoomId = 1, 
                     UserId = 1, 
                     CheckInDate = checkIn, 
                     CheckOutDate = checkIn.AddDays(2),
                     BookingStatus = BookingStatus.Reserved,
                     DepositAmount = 1000000
                 };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 1 });
                 context.Bookings.Add(booking);
 
                 context.Tours.Add(new Tour { TourId = 1, TourName = "Island Hopping", Price = 250000 });
@@ -339,12 +342,12 @@ namespace PhucNguyenResort.Tests.Bookings
                 var service = new BookingService(context);
                 var request = new CreateBookingViewModel
                 {
-                    RoomId = 1,
+                    RoomSelections = new List<RoomSelectionViewModel> { new RoomSelectionViewModel { CategoryId = 1, Quantity = 1 } },
                     CheckInDate = DateTime.Today.AddDays(10),
                     CheckOutDate = DateTime.Today.AddDays(14),
                     NumberOfAdults = 2,
                     NumberOfChildren = 0,
-                    SelectedTourScheduleIds = new List<int> { 5 }
+                    SelectedTours = new List<TourSelectionViewModel> { new TourSelectionViewModel { ScheduleId = 5, Participants = 2 } }
                 };
 
                 // Act
@@ -379,12 +382,12 @@ namespace PhucNguyenResort.Tests.Bookings
                 var service = new BookingService(context);
                 var request = new CreateBookingViewModel
                 {
-                    RoomId = 1,
+                    RoomSelections = new List<RoomSelectionViewModel> { new RoomSelectionViewModel { CategoryId = 1, Quantity = 1 } },
                     CheckInDate = DateTime.Today.AddDays(10),
                     CheckOutDate = DateTime.Today.AddDays(14),
                     NumberOfAdults = 2,
                     NumberOfChildren = 0,
-                    SelectedTourScheduleIds = new List<int> { 5 }
+                    SelectedTours = new List<TourSelectionViewModel> { new TourSelectionViewModel { ScheduleId = 5, Participants = 2 } }
                 };
 
                 // Act
@@ -410,13 +413,13 @@ namespace PhucNguyenResort.Tests.Bookings
                 var booking = new Booking 
                 { 
                     BookingId = 1, 
-                    RoomId = 1, 
                     UserId = 1, 
                     CheckInDate = checkIn, 
                     CheckOutDate = checkIn.AddDays(2),
                     BookingStatus = BookingStatus.Reserved,
                     DepositAmount = 1000000
                 };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 1 });
                 context.Bookings.Add(booking);
                 
                 context.Tours.Add(new Tour { TourId = 1, TourName = "Island Hopping", Price = 200000 });

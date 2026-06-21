@@ -2,8 +2,26 @@
 
 @{
     ViewData["Title"] = "Đặt Phòng - Phuc Nguyen Resort";
-    var room = ViewBag.Room as PhucNguyenResort.Models.Room;
+    var selectedCategories = ViewBag.SelectedCategories as List<PhucNguyenResort.Models.RoomCategory>;
     var tours = ViewBag.UpcomingTours as List<PhucNguyenResort.Models.TourSchedule>;
+
+    int maxTotalAdults = 0;
+    int maxTotalChildren = 0;
+    if (selectedCategories != null && Model.RoomSelections != null)
+    {
+        foreach (var selection in Model.RoomSelections)
+        {
+            var category = selectedCategories.FirstOrDefault(c => c.CategoryId == selection.CategoryId);
+            if (category != null)
+            {
+                maxTotalAdults += (category.MaxAdults ?? 2) * selection.Quantity;
+                maxTotalChildren += (category.MaxChildren ?? 1) * selection.Quantity;
+            }
+        }
+    }
+    // Fallback if something goes wrong
+    if (maxTotalAdults == 0) maxTotalAdults = 50;
+    if (maxTotalChildren == 0) maxTotalChildren = 50;
 }
 
 @section Styles {
@@ -33,36 +51,49 @@
 
         <form asp-action="Create" method="post" id="bookingForm">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 12px; font-size: 0.9rem;"></div>
-            <input type="hidden" asp-for="RoomId" />
+            @for (int i = 0; i < Model.RoomSelections.Count; i++)
+            {
+                <input type="hidden" name="RoomSelections[@i].CategoryId" value="@Model.RoomSelections[i].CategoryId" />
+                <input type="hidden" name="RoomSelections[@i].Quantity" value="@Model.RoomSelections[i].Quantity" />
+            }
 
             <div class="row">
                 <!-- Left Column: Input Forms -->
                 <div class="col-lg-7 col-md-12">
                     
                     <!-- Room Showcase -->
-                    <div class="room-showcase-horizontal">
-                        <div class="room-showcase-img">
-                            @if (!string.IsNullOrEmpty(room?.Category?.ImageUrl))
+                    @if (selectedCategories != null)
+                    {
+                        foreach (var selection in Model.RoomSelections)
+                        {
+                            var category = selectedCategories.FirstOrDefault(c => c.CategoryId == selection.CategoryId);
+                            if (category != null)
                             {
-                                <img src="@room.Category.ImageUrl" alt="@room.Category.CategoryName" />
+                                <div class="room-showcase-horizontal mb-3">
+                                    <div class="room-showcase-img">
+                                        @if (!string.IsNullOrEmpty(category.ImageUrl))
+                                        {
+                                            <img src="@category.ImageUrl" alt="@category.CategoryName" />
+                                        }
+                                        else
+                                        {
+                                            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Resort Room" />
+                                        }
+                                    </div>
+                                    <div class="room-showcase-details">
+                                        <h3>@category.CategoryName <span class="badge badge-warning text-white ml-2">x @selection.Quantity</span></h3>
+                                        <div class="price" data-price="@category.PricePerNight" data-qty="@selection.Quantity">
+                                            @category.PricePerNight?.ToString("N0") VNĐ <span>/ Đêm</span>
+                                        </div>
+                                        <div class="features-container mt-2">
+                                            <span class="feature-badge"><i class="fa fa-users"></i> Tối đa: @category.MaxAdults NL, @category.MaxChildren TE</span>
+                                            <span class="feature-badge"><i class="fa fa-wifi"></i> Free Wifi</span>
+                                        </div>
+                                    </div>
+                                </div>
                             }
-                            else
-                            {
-                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Resort Room" />
-                            }
-                        </div>
-                        <div class="room-showcase-details">
-                            <h3>@room?.Category?.CategoryName</h3>
-                            <div class="price">
-                                @room?.Category?.PricePerNight?.ToString("N0") VNĐ <span>/ Đêm</span>
-                            </div>
-                            <div class="features-container">
-                                <span class="feature-badge"><i class="fa fa-bed"></i> Phòng số: @room?.RoomNumber</span>
-                                <span class="feature-badge"><i class="fa fa-users"></i> Tối đa: @room?.Category?.MaxAdults NL, @room?.Category?.MaxChildren TE</span>
-                                <span class="feature-badge"><i class="fa fa-wifi"></i> Free Wifi</span>
-                            </div>
-                        </div>
-                    </div>
+                        }
+                    }
 
                     <!-- Section 1: Dates & Guests -->
                     <div class="premium-card">
@@ -86,15 +117,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group-modern">
-                                    <label asp-for="NumberOfAdults">Người Lớn</label>
-                                    <input type="number" asp-for="NumberOfAdults" class="form-control-modern" min="1" max="@(room?.Category?.MaxAdults ?? 10)" value="2" />
+                                    <label asp-for="NumberOfAdults">Người Lớn <small class="text-muted">(Tối đa: @maxTotalAdults)</small></label>
+                                    <input type="number" asp-for="NumberOfAdults" class="form-control-modern" min="1" max="@maxTotalAdults" value="@Model.NumberOfAdults" oninput="this.value = Math.min(Math.max(this.value, this.min), this.max);" />
                                     <span asp-validation-for="NumberOfAdults" class="text-danger small"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group-modern">
-                                    <label asp-for="NumberOfChildren">Trẻ Em</label>
-                                    <input type="number" asp-for="NumberOfChildren" class="form-control-modern" min="0" max="@(room?.Category?.MaxChildren ?? 10)" value="0" />
+                                    <label asp-for="NumberOfChildren">Trẻ Em <small class="text-muted">(Tối đa: @maxTotalChildren)</small></label>
+                                    <input type="number" asp-for="NumberOfChildren" class="form-control-modern" min="0" max="@maxTotalChildren" value="@Model.NumberOfChildren" oninput="this.value = Math.min(Math.max(this.value, this.min), this.max);" />
                                     <span asp-validation-for="NumberOfChildren" class="text-danger small"></span>
                                 </div>
                             </div>
@@ -107,18 +138,42 @@
                         <div class="premium-card">
                             <h5><i class="fa fa-compass"></i> 2. Trải Nghiệm Thêm</h5>
                             <div class="tour-list-modern">
+                                @{
+                                    int tourIdx = 0;
+                                }
                                 @foreach (var tour in tours)
                                 {
-                                    <div class="tour-card-modern" data-schedule-id="@tour.ScheduleId">
-                                        <input type="checkbox" name="SelectedTourScheduleIds" value="@tour.ScheduleId" id="tour_@tour.ScheduleId" data-price="@(tour.Tour?.Price ?? 0)">
-                                        <div class="tour-details-modern">
-                                            <strong>@tour.Tour?.TourName</strong>
-                                            <span class="time"><i class="fa fa-calendar"></i> @tour.TourDate?.ToString("dd/MM/yyyy") @(tour.StartTime != null ? " - " + tour.StartTime?.ToString(@"hh\:mm") : "")</span>
+                                    <div class="tour-card-modern d-flex justify-content-between align-items-center p-3 mb-3" data-schedule-id="@tour.ScheduleId" style="border: 1px solid var(--border-color); border-radius: 12px; background: #fff; transition: all 0.3s ease;">
+                                        <div class="tour-details-modern flex-grow-1">
+                                            <strong style="font-size: 16px; color: var(--primary-color); display: block; margin-bottom: 4px;">@tour.Tour?.TourName</strong>
+                                            <span class="time d-block text-muted" style="font-size: 13px; margin-bottom: 4px;">
+                                                <i class="fa fa-calendar text-warning mr-1"></i> @tour.TourDate?.ToString("dd/MM/yyyy") @(tour.StartTime != null ? " - " + tour.StartTime?.ToString(@"hh\:mm") : "")
+                                            </span>
+                                            <span class="slots-left text-danger" style="font-size: 13px; font-weight: 600;">
+                                                <i class="fa fa-users mr-1"></i> Còn @(tour.AvailableSlots ?? 0) chỗ trống
+                                            </span>
                                         </div>
-                                        <div class="tour-card-price">
-                                            + @tour.Tour?.Price?.ToString("N0") VNĐ
+                                        <div class="tour-pricing-action-wrapper d-flex align-items-center">
+                                            <div class="tour-card-price mr-4" style="font-size: 16px; font-weight: 700; color: var(--accent-color);">
+                                                + @tour.Tour?.Price?.ToString("N0") VNĐ <span style="font-size: 12px; font-weight: 400; color: #64748b;">/ slot</span>
+                                            </div>
+                                            
+                                            <input type="hidden" name="SelectedTours[@tourIdx].ScheduleId" value="@tour.ScheduleId" />
+                                            
+                                            <div class="quantity-selector-tour">
+                                                <div class="input-group tour-qty-group" style="width: 120px; border-radius: 30px; border: 1px solid #e2e8f0; overflow: hidden; background: #f8fafc; height: 38px;">
+                                                    <div class="input-group-prepend">
+                                                        <button class="btn btn-qty-tour" type="button" onclick="decrementTourQty(this)" style="background: transparent; border: none; width: 35px; color: #64748b; font-weight: 700; cursor: pointer;">-</button>
+                                                    </div>
+                                                    <input type="number" name="SelectedTours[@tourIdx].Participants" class="form-control text-center tour-qty" value="0" min="0" max="@(tour.AvailableSlots ?? 0)" readonly data-price="@(tour.Tour?.Price ?? 0)" data-name="@tour.Tour?.TourName" style="border: none; background: transparent !important; font-weight: 700; font-size: 14px; color: var(--primary-color); padding: 0;" />
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-qty-tour" type="button" onclick="incrementTourQty(this)" style="background: transparent; border: none; width: 35px; color: #64748b; font-weight: 700; cursor: pointer;">+</button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                    tourIdx++;
                                 }
                             </div>
                         </div>
@@ -186,14 +241,14 @@
                 </div>
 
                 <!-- Right Column: Sticky Summary Widget -->
-                <div class="col-lg-5 col-md-12">
+                <div class="col-lg-5 col-md-12 sticky-sidebar-column">
                     <div class="payment-summary-widget">
                         <h4>Tóm Tắt Đặt Phòng</h4>
                         
                         <ul class="summary-info-list">
                             <li>
                                 <span>Phòng đặt:</span>
-                                <span>@room?.Category?.CategoryName (P.@room?.RoomNumber)</span>
+                                <span>Đã chọn @Model.RoomSelections.Sum(r => r.Quantity) phòng</span>
                             </li>
                             <li>
                                 <span>Nhận phòng:</span>
@@ -221,6 +276,9 @@
                             <div class="price-breakdown-row" id="tour-subtotal-row" style="display: none;">
                                 <span>Trải nghiệm dịch vụ:</span>
                                 <span id="tour-subtotal-val">0 VNĐ</span>
+                            </div>
+                            <div id="tour-breakdown-details" style="display: none; flex-direction: column; padding-left: 15px; border-left: 2px solid var(--accent-color); margin-bottom: 10px;">
+                                <!-- Detailed tour items will be injected here -->
                             </div>
                             <div class="price-breakdown-row total">
                                 <span>Tổng cộng:</span>
@@ -257,12 +315,42 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Quantity adjustment functions
+        window.decrementTourQty = function(btn) {
+            var input = btn.closest('.tour-qty-group').querySelector('.tour-qty');
+            var val = parseInt(input.value) || 0;
+            var min = parseInt(input.min) || 0;
+            if (val > min) {
+                input.value = val - 1;
+                var card = btn.closest('.tour-card-modern');
+                if (val - 1 === 0) {
+                    card.classList.remove('selected');
+                } else {
+                    card.classList.add('selected');
+                }
+                // Trigger calculation
+                window.calculatePricesGlobal();
+            }
+        };
+
+        window.incrementTourQty = function(btn) {
+            var input = btn.closest('.tour-qty-group').querySelector('.tour-qty');
+            var val = parseInt(input.value) || 0;
+            var max = parseInt(input.max) || 0;
+            if (val < max) {
+                input.value = val + 1;
+                var card = btn.closest('.tour-card-modern');
+                card.classList.add('selected');
+                // Trigger calculation
+                window.calculatePricesGlobal();
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             var checkInInput = document.querySelector('input[name="CheckInDate"]');
             var checkOutInput = document.querySelector('input[name="CheckOutDate"]');
             var adultsInput = document.querySelector('input[name="NumberOfAdults"]');
             var childrenInput = document.querySelector('input[name="NumberOfChildren"]');
-            var tourCheckboxes = document.querySelectorAll('input[name="SelectedTourScheduleIds"]');
             
             // Dynamic display elements
             var summaryCheckIn = document.getElementById('summary-checkin');
@@ -274,10 +362,9 @@
             var roomSubtotalVal = document.getElementById('room-subtotal-val');
             var tourSubtotalVal = document.getElementById('tour-subtotal-val');
             var tourSubtotalRow = document.getElementById('tour-subtotal-row');
+            var tourBreakdownDetails = document.getElementById('tour-breakdown-details');
             var totalAmountVal = document.getElementById('total-amount-val');
             var depositAmountVal = document.getElementById('deposit-amount-val');
-            
-            var pricePerNight = parseFloat('@(room?.Category?.PricePerNight ?? 0)');
             
             // Format number helper (e.g. 1,000,000)
             function formatVnd(amount) {
@@ -311,26 +398,40 @@
                 
                 var adults = parseInt(adultsInput.value) || 0;
                 var children = parseInt(childrenInput.value) || 0;
-                var totalGuests = adults + children;
                 summaryGuests.textContent = adults + ' Người lớn, ' + children + ' Trẻ em';
                 
                 // Calculate room total
-                var roomTotal = nights * pricePerNight;
+                var roomTotal = 0;
+                document.querySelectorAll('.room-showcase-details .price').forEach(function(el) {
+                    var p = parseFloat(el.getAttribute('data-price')) || 0;
+                    var q = parseInt(el.getAttribute('data-qty')) || 0;
+                    roomTotal += (p * q * nights);
+                });
+                
                 roomSubtotalLabel.textContent = 'Tiền phòng (' + nights + ' đêm)';
                 roomSubtotalVal.textContent = formatVnd(roomTotal);
                 
                 // Calculate tours total
                 var tourTotal = 0;
                 var selectedToursCount = 0;
+                var selectedToursHtml = '';
                 
-                tourCheckboxes.forEach(function(cb) {
-                    var card = cb.closest('.tour-card-modern');
-                    if (cb.checked) {
+                document.querySelectorAll('.tour-qty').forEach(function(input) {
+                    var qty = parseInt(input.value) || 0;
+                    var card = input.closest('.tour-card-modern');
+                    if (qty > 0) {
                         card.classList.add('selected');
-                        // Retrieve tour price from data attribute
-                        var price = parseFloat(cb.getAttribute('data-price')) || 0;
-                        tourTotal += price * totalGuests;
+                        var price = parseFloat(input.getAttribute('data-price')) || 0;
+                        var name = input.getAttribute('data-name') || '';
+                        tourTotal += price * qty;
                         selectedToursCount++;
+                        
+                        selectedToursHtml += `
+                            <div class="price-breakdown-row" style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
+                                <span>&bull; ${name} (x${qty})</span>
+                                <span>${formatVnd(price * qty)}</span>
+                            </div>
+                        `;
                     } else {
                         card.classList.remove('selected');
                     }
@@ -340,8 +441,12 @@
                 if (selectedToursCount > 0) {
                     tourSubtotalRow.style.display = 'flex';
                     tourSubtotalVal.textContent = formatVnd(tourTotal);
+                    tourBreakdownDetails.style.display = 'flex';
+                    tourBreakdownDetails.innerHTML = selectedToursHtml;
                 } else {
                     tourSubtotalRow.style.display = 'none';
+                    tourBreakdownDetails.style.display = 'none';
+                    tourBreakdownDetails.innerHTML = '';
                 }
                 
                 // Calculate grand total and deposit
@@ -351,6 +456,9 @@
                 totalAmountVal.textContent = formatVnd(grandTotal);
                 depositAmountVal.textContent = formatVnd(deposit);
             }
+            
+            // Expose globally so external click handlers can trigger it
+            window.calculatePricesGlobal = calculatePrices;
             
             // Set up date constraints
             checkInInput.addEventListener('change', function() {
@@ -374,18 +482,6 @@
             checkOutInput.addEventListener('change', calculatePrices);
             adultsInput.addEventListener('input', calculatePrices);
             childrenInput.addEventListener('input', calculatePrices);
-            
-            tourCheckboxes.forEach(function(cb) {
-                cb.addEventListener('change', calculatePrices);
-                // Also listen to clicking the card to toggle checkbox
-                var card = cb.closest('.tour-card-modern');
-                card.addEventListener('click', function(e) {
-                    if (e.target !== cb && !e.target.closest('input')) {
-                        cb.checked = !cb.checked;
-                        cb.dispatchEvent(new Event('change'));
-                    }
-                });
-            });
             
             // Initial run
             calculatePrices();

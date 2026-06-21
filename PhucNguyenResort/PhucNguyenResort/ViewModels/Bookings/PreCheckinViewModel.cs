@@ -15,5 +15,25 @@ namespace PhucNguyenResort.ViewModels.Bookings
         public bool PdpdConsentChecked { get; set; }
 
         public List<BookingGuestDto> Guests { get; set; } = new List<BookingGuestDto>();
+
+        public List<BookingDetailAssignmentViewModel> RoomAssignments { get; set; } = new();
+    }
+
+    public class BookingDetailAssignmentViewModel
+    {
+        public int BookingDetailId { get; set; }
+        public int RoomCategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+
+        [Display(Name = "Phòng vật lý")]
+        public int? SelectedRoomId { get; set; }
+
+        public List<RoomDto> AvailableRooms { get; set; } = new();
+    }
+
+    public class RoomDto
+    {
+        public int Id { get; set; }
+        public string RoomNumber { get; set; } = string.Empty;
     }
 }

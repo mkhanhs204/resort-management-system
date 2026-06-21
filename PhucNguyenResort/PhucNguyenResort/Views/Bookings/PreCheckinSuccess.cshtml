@@ -17,15 +17,24 @@
             <h2>Khai Báo Thành Công!</h2>
             <p>Thông tin lưu trú của quý khách đã được ghi nhận và mã hóa bảo mật trên hệ thống. Lễ tân sẽ xác thực nhanh khi quý khách đến làm thủ tục check-in.</p>
 
+            @{
+                var groupedRooms = Model.BookingDetails
+                    .GroupBy(bd => bd.RoomCategory?.CategoryName)
+                    .Select(g => $"{g.Count()}x {g.Key}")
+                    .ToList();
+                string categoryNameDisplay = string.Join(", ", groupedRooms);
+                var assignedRooms = Model.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
+                string roomNumberDisplay = assignedRooms.Any() ? string.Join(", ", assignedRooms) : "Chưa xếp phòng";
+            }
             <div class="booking-details-box">
                 <h5>Chi Tiết Đặt Phòng #@Model.BookingId</h5>
                 <div class="details-row">
                     <span>Loại phòng</span>
-                    <span>@Model.Room?.Category?.CategoryName</span>
+                    <span>@categoryNameDisplay</span>
                 </div>
                 <div class="details-row">
                     <span>Số phòng</span>
-                    <span>@Model.Room?.RoomNumber</span>
+                    <span>@roomNumberDisplay</span>
                 </div>
                 <div class="details-row">
                     <span>Ngày Check-in</span>
