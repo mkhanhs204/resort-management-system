@@ -105,41 +105,141 @@
                     }
                 </div>
 
+                <form asp-controller="Bookings" asp-action="Create" method="get" class="w-100" id="multiRoomForm">
+                    <input type="hidden" name="checkIn" value="@ViewBag.CheckIn" />
+                    <input type="hidden" name="checkOut" value="@ViewBag.CheckOut" />
+                    <input type="hidden" name="adults" value="@ViewBag.AdultsCount" />
+                    <input type="hidden" name="children" value="@ViewBag.ChildrenCount" />
+                    <div class="row">
+                        <!-- Left Column: Room List -->
+                        <div class="col-lg-8">
+                            <div class="row">
+                @{
                 int imgIndex = 1;
-                foreach (var room in Model)
+                int roomIndex = 0;
+                }
+                @foreach (var room in Model)
                 {
                     string bgImage = string.IsNullOrEmpty(room.ImageUrl) || room.ImageUrl.Contains("category-") 
-                                     ? $"/img/room/room-b{imgIndex}.jpg" 
+                                     ? $"/img/room/room-{imgIndex}.jpg" 
                                      : room.ImageUrl.Replace(" ", "%20");
 
                     imgIndex++;
-                    if (imgIndex > 4) imgIndex = 1;
+                    if (imgIndex > 6) imgIndex = 1;
+                    
+                    int preQty = (ViewBag.PreselectId != null && ViewBag.PreselectId == room.CategoryId) ? (ViewBag.PreselectQty ?? 1) : 0;
 
-                    <div class="col-lg-4 col-md-6 mb-5">
-                        <div class="card h-100 border-0 luxury-card">
-                            <div class="card-img-wrapper">
-                                <img src="@bgImage" class="card-img-top" alt="@room.CategoryName">
-                                <div class="price-pill">
-                                    @(room.PricePerNight?.ToString("N0") ?? "0") VNĐ <span>/ Đêm</span>
+                    <div class="col-12 mb-4">
+                        <div class="card border-0 luxury-list-card">
+                            <div class="row no-gutters h-100">
+                                <div class="col-md-4">
+                                    <div class="card-img-wrapper h-100">
+                                        <img src="@bgImage" class="card-img-top h-100" style="object-fit: cover;" alt="@room.CategoryName">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="card-body d-flex flex-column" style="padding: 30px;">
-                                <h4 class="card-title" style="font-family: 'Playfair Display', serif; font-size: 24px; color: #1e293b; font-weight: 700; margin-bottom: 15px;">@room.CategoryName</h4>
-                                <p class="card-text text-muted" style="font-size: 15px; line-height: 1.7; margin-bottom: 25px; flex-grow: 1;">
-                                    Tận hưởng không gian lưu trú lý tưởng cho @ViewBag.AdultsCount người lớn, @ViewBag.ChildrenCount trẻ em. Tiện nghi đầy đủ, view tuyệt đẹp và dịch vụ phòng 24/7.
-                                </p>
-                                <div class="room-amenities mb-4">
-                                    <span class="amenity-pill"><i class="fa fa-arrows-alt"></i> 30 m²</span>
-                                    <span class="amenity-pill"><i class="fa fa-user"></i> Tối đa @(room.MaxAdults ?? 2) người lớn, @(room.MaxChildren ?? 1) trẻ em</span>
+                                <div class="col-md-5 d-flex flex-column justify-content-center" style="padding: 30px;">
+                                    <h4 class="card-title" style="font-family: 'Playfair Display', serif; font-size: 24px; color: #1e293b; font-weight: 700; margin-bottom: 10px;">@room.CategoryName</h4>
+                                    <p class="card-text text-muted" style="font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
+                                        Tận hưởng không gian lưu trú lý tưởng cho @ViewBag.AdultsCount người lớn, @ViewBag.ChildrenCount trẻ em. Tiện nghi đầy đủ và dịch vụ 24/7.
+                                    </p>
+                                    <div class="room-amenities">
+                                        <span class="amenity-pill"><i class="fa fa-arrows-alt"></i> 30 m²</span>
+                                        <span class="amenity-pill"><i class="fa fa-user"></i> Tối đa @(room.MaxAdults ?? 2) NL, @(room.MaxChildren ?? 1) TE</span>
+                                    </div>
                                 </div>
-                                <a asp-controller="Home" asp-action="RoomDetails" asp-route-id="@room.CategoryId" 
-                                   class="btn w-100 luxury-book-btn">
-                                    Chi Tiết & Đặt Phòng
-                                </a>
+                                <div class="col-md-3 d-flex flex-column justify-content-center align-items-center" style="padding: 30px; background: #f8fafc; border-left: 1px solid #e2e8f0;">
+                                    <div class="price-text mb-3 text-center">
+                                        <div style="font-size: 22px; font-weight: 700; color: #dfa974;">@(room.PricePerNight?.ToString("N0") ?? "0") VNĐ</div>
+                                        <div style="font-size: 13px; color: #64748b;">/ Đêm</div>
+                                    </div>
+                                    
+                                    @if (ViewBag.IsFiltered != null && (bool)ViewBag.IsFiltered && room.AvailableRoomsCount > 0)
+                                    {
+                                        <div style="color: #dc3545; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+                                            Còn @room.AvailableRoomsCount phòng
+                                        </div>
+                                    }
+
+                                    <div class="quantity-selector w-100 mb-3">
+                                        <div class="input-group luxury-qty-group">
+                                            <div class="input-group-prepend">
+                                                <button class="btn btn-qty" type="button" onclick="decrementQty(this)">-</button>
+                                            </div>
+                                            <input type="hidden" name="RoomSelections[@roomIndex].CategoryId" value="@room.CategoryId" />
+                                            <input type="number" name="RoomSelections[@roomIndex].Quantity" class="form-control text-center room-qty" value="@preQty" min="0" max="@((ViewBag.IsFiltered != null && (bool)ViewBag.IsFiltered) ? room.AvailableRoomsCount : 10)" readonly data-price="@(room.PricePerNight ?? 0)" />
+                                            <div class="input-group-append">
+                                                <button class="btn btn-qty" type="button" onclick="incrementQty(this)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a asp-controller="Home" asp-action="RoomDetails" asp-route-id="@room.CategoryId" class="btn luxury-btn-outline w-100" style="height: 40px; line-height: 38px; padding: 0;">Xem Chi Tiết</a>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    roomIndex++;
                 }
+                    </div>
+                </div>
+                        
+                        <!-- Right Column: Sidebar Cart -->
+                        <div class="col-lg-4 d-none d-lg-block">
+                            <div class="booking-sidebar-card sticky-top" style="top: 100px;">
+                                <h3>Chuyến đi</h3>
+                                
+                                <div class="trip-details mb-4">
+                                    <h5>Phúc Nguyên Resort</h5>
+                                    <div style="font-size: 14px; color: #64748b; margin-bottom: 5px;">
+                                        <i class="fa fa-calendar mr-2" style="color: #dfa974;"></i>
+                                        @ViewBag.CheckIn <i class="fa fa-arrow-right mx-1" style="font-size: 10px;"></i> @ViewBag.CheckOut
+                                    </div>
+                                    <div style="font-size: 14px; color: #64748b;">
+                                        <i class="fa fa-user mr-2" style="color: #dfa974;"></i>
+                                        @ViewBag.AdultsCount Người lớn, @ViewBag.ChildrenCount Trẻ em
+                                    </div>
+                                </div>
+ 
+                                <div id="sidebar-selected-rooms" class="mb-4" style="border-top: 1px dashed #eaeaea; padding-top: 15px;">
+                                    <!-- Selected rooms will be injected here by JS -->
+                                    <div class="text-center text-muted py-3" id="sidebar-empty-msg" style="font-size: 14px; font-style: italic;">
+                                        Chưa có phòng nào được chọn.
+                                    </div>
+                                </div>
+ 
+                                <div class="sidebar-total">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span style="font-size: 16px; color: #1e293b; font-weight: 600;">Tổng cộng:</span>
+                                        <span id="sidebar-total-price" style="font-size: 24px; color: #dfa974; font-weight: 700;">0 đ</span>
+                                    </div>
+                                    <div style="font-size: 12px; color: #888; text-align: right;">(Đã bao gồm thuế, phí)</div>
+                                </div>
+ 
+                                <button type="button" class="btn w-100" id="sidebar-btn-submit" onclick="submitMultiRoomForm()" disabled>Tiếp tục</button>
+                                
+                                <div class="mt-4 p-3" style="background: #fff8f0; border-radius: 6px; border: 1px solid #f9e5cc;">
+                                    <div style="display: flex; align-items: flex-start;">
+                                        <i class="fa fa-credit-card mt-1 mr-2" style="color: #d39e6a;"></i>
+                                        <div>
+                                            <strong style="color: #d39e6a; font-size: 13px; display: block; margin-bottom: 3px;">THANH TOÁN AN TOÀN</strong>
+                                            <span style="font-size: 12px; color: #666;">Bảo mật mọi thông tin giao dịch của bạn bằng mã hóa SSL 256-bit.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                <!-- Sticky Checkout Bar (Mobile Only) -->
+                <div class="sticky-checkout-bar d-block d-lg-none">
+                    <div class="container d-flex justify-content-between align-items-center">
+                        <div class="checkout-info">
+                            <span class="total-rooms-label">Đã chọn: <strong id="totalRoomsCount">0</strong> phòng</span>
+                            <span class="total-price-label d-none d-md-inline-block ml-4">Tổng tạm tính: <strong id="totalPriceAmount" style="color: #dfa974; font-size: 24px;">0 VNĐ</strong></span>
+                        </div>
+                        <button type="button" class="btn luxury-btn px-4 px-md-5" id="btnSubmitBooking" onclick="submitMultiRoomForm()" disabled>Tiến Hành Đặt</button>
+                    </div>
+                </div>
+                </form>
             }
             else
             {
@@ -156,3 +256,102 @@
     </div>
 </section>
 <!-- Search Details Section End -->
+
+@section Scripts {
+    <script>
+        function submitMultiRoomForm() {
+            var totalRooms = parseInt(document.getElementById('totalRoomsCount').innerText) || 0;
+            if (totalRooms <= 0) {
+                alert('Vui lòng chọn số lượng ít nhất một phòng để tiếp tục!');
+                return;
+            }
+            document.getElementById('multiRoomForm').submit();
+        }
+
+        function calculateTotal() {
+            var totalRooms = 0;
+            var totalPrice = 0;
+            var selectedRoomsHtml = '';
+            var hasSelection = false;
+
+            document.querySelectorAll('.room-qty').forEach(function(input) {
+                var qty = parseInt(input.value) || 0;
+                if (qty > 0) {
+                    var price = parseFloat(input.getAttribute('data-price')) || 0;
+                    totalRooms += qty;
+                    totalPrice += (qty * price);
+                    hasSelection = true;
+
+                    // Get room name from the DOM tree
+                    var cardBody = input.closest('.luxury-list-card');
+                    var roomName = cardBody.querySelector('.card-title').innerText;
+                    var roomPriceStr = (price * qty).toLocaleString('vi-VN');
+
+                    selectedRoomsHtml += `
+                        <div class="sidebar-room-item" style="margin-bottom: 12px;">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <strong style="font-size: 14px; color: #1e293b; max-width: 70%; line-height: 1.4;">${roomName}</strong>
+                                <span style="font-size: 14px; font-weight: 600; color: #dfa974;">${roomPriceStr} đ</span>
+                            </div>
+                            <div style="font-size: 13px; color: #64748b;">x${qty} phòng</div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Update Desktop Sidebar
+            var sidebarMsg = document.getElementById('sidebar-empty-msg');
+            var sidebarList = document.getElementById('sidebar-selected-rooms');
+            var sidebarBtn = document.getElementById('sidebar-btn-submit');
+            var sidebarTotal = document.getElementById('sidebar-total-price');
+
+            if (hasSelection) {
+                sidebarMsg.style.display = 'none';
+                // Remove existing items, keep the empty msg element
+                Array.from(sidebarList.children).forEach(child => {
+                    if (child.id !== 'sidebar-empty-msg') sidebarList.removeChild(child);
+                });
+                // Append new HTML
+                sidebarList.insertAdjacentHTML('beforeend', selectedRoomsHtml);
+                sidebarBtn.disabled = false;
+                sidebarTotal.innerText = totalPrice.toLocaleString('vi-VN') + ' đ';
+            } else {
+                sidebarMsg.style.display = 'block';
+                Array.from(sidebarList.children).forEach(child => {
+                    if (child.id !== 'sidebar-empty-msg') sidebarList.removeChild(child);
+                });
+                sidebarBtn.disabled = true;
+                sidebarTotal.innerText = '0 đ';
+            }
+
+            // Update Mobile Bottom Bar
+            document.getElementById('totalRoomsCount').innerText = totalRooms;
+            document.getElementById('totalPriceAmount').innerText = totalPrice.toLocaleString('vi-VN') + ' VNĐ';
+            document.getElementById('btnSubmitBooking').disabled = (totalRooms === 0);
+        }
+
+        function decrementQty(btn) {
+            var input = btn.closest('.input-group').querySelector('.room-qty');
+            var val = parseInt(input.value) || 0;
+            var min = parseInt(input.min) || 0;
+            if (val > min) {
+                input.value = val - 1;
+                calculateTotal();
+            }
+        }
+
+        function incrementQty(btn) {
+            var input = btn.closest('.input-group').querySelector('.room-qty');
+            var val = parseInt(input.value) || 0;
+            var max = parseInt(input.max) || 10;
+            if (val < max) {
+                input.value = val + 1;
+                calculateTotal();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            calculateTotal();
+        });
+    </script>
+}

@@ -93,7 +93,16 @@
 
                 <li class="@IsActive("Home", "Blog")"><a href="./blog.html">Tin Tức</a></li>
                 <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
-                <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Customer"))
+                {
+                    <li class="@IsActive("FoodOrders", "RoomService")"><a asp-controller="FoodOrders" asp-action="RoomService">Dịch vụ phòng</a></li>
+                }
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
+                {
+                    <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+                }
 
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
@@ -208,6 +217,11 @@
 
                                     <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Customer"))
+                                    {
+                                        <li class="@IsActive("FoodOrders", "RoomService")"><a asp-controller="FoodOrders" asp-action="RoomService">Dịch vụ phòng</a></li>
+                                    }
+
                                     @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                                     {
                                         <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
@@ -215,7 +229,7 @@
 
                                      @if (User.Identity != null && User.Identity.IsAuthenticated)
                                      {
-                                         <li style="margin-left: 30px;">
+                                         <li style="margin-left: 10px;">
                                              <a href="#">Xin chào, @User.Identity.Name <i class="fa fa-angle-down"></i></a>
                                              <ul class="dropdown">
                                                  <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>

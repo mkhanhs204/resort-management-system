@@ -22,8 +22,10 @@ namespace PhucNguyenResort.Services.Reception
         {
             var query = _context.Bookings
                 .Include(b => b.User)
-                .Include(b => b.Room)
-                .ThenInclude(r => r.Category)
+                .Include(b => b.BookingDetails)
+                .ThenInclude(d => d.RoomCategory)
+                .Include(b => b.BookingDetails)
+                .ThenInclude(d => d.Room)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
@@ -32,7 +34,7 @@ namespace PhucNguyenResort.Services.Reception
                     b.BookingId.ToString() == searchString ||
                     (b.User != null && b.User.FullName != null && b.User.FullName.Contains(searchString)) ||
                     (b.User != null && b.User.Email != null && b.User.Email.Contains(searchString)) ||
-                    (b.Room != null && b.Room.RoomNumber != null && b.Room.RoomNumber.Contains(searchString))
+                    b.BookingDetails.Any(d => d.Room != null && d.Room.RoomNumber != null && d.Room.RoomNumber.Contains(searchString))
                 );
             }
 
@@ -57,8 +59,10 @@ namespace PhucNguyenResort.Services.Reception
         public async Task<Booking?> GetBookingByIdAsync(int id)
         {
             return await _context.Bookings
-                .Include(b => b.Room)
-                    .ThenInclude(r => r.Category)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.RoomCategory)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.Room)
                 .Include(b => b.User)
                 .FirstOrDefaultAsync(b => b.BookingId == id);
         }
@@ -80,21 +84,58 @@ namespace PhucNguyenResort.Services.Reception
                 });
             }
 
+            var groupedRooms = booking.BookingDetails
+                .GroupBy(bd => bd.RoomCategory?.CategoryName)
+                .Select(g => $"{g.Count()}x {g.Key}")
+                .ToList();
+            string categoryNameDisplay = string.Join(", ", groupedRooms);
+            var assignedRooms = booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
+            string roomNumberDisplay = assignedRooms.Any() ? string.Join(", ", assignedRooms) : "Chưa xếp phòng";
+
+            var roomAssignments = new List<BookingDetailAssignmentViewModel>();
+            foreach (var detail in booking.BookingDetails)
+            {
+                var categoryName = detail.RoomCategory?.CategoryName ?? "Không rõ";
+                var availableRooms = await GetAvailableRoomsForCategoryAsync(
+                    detail.RoomCategoryId,
+                    booking.CheckInDate,
+                    booking.CheckOutDate,
+                    booking.BookingId
+                );
+
+                roomAssignments.Add(new BookingDetailAssignmentViewModel
+                {
+                    BookingDetailId = detail.BookingDetailId,
+                    RoomCategoryId = detail.RoomCategoryId,
+                    CategoryName = categoryName,
+                    SelectedRoomId = detail.RoomId,
+                    AvailableRooms = availableRooms.Select(r => new RoomDto
+                    {
+                        Id = r.RoomId,
+                        RoomNumber = r.RoomNumber ?? string.Empty
+                    }).ToList()
+                });
+            }
+
             return new PreCheckinViewModel
             {
                 BookingId = booking.BookingId,
-                RoomNumber = booking.Room?.RoomNumber ?? string.Empty,
-                CategoryName = booking.Room?.Category?.CategoryName ?? string.Empty,
+                RoomNumber = roomNumberDisplay,
+                CategoryName = categoryNameDisplay,
                 CheckInDate = booking.CheckInDate,
                 CheckOutDate = booking.CheckOutDate,
                 PdpdConsentChecked = booking.PdpdConsentChecked,
-                Guests = guestList
+                Guests = guestList,
+                RoomAssignments = roomAssignments
             };
         }
 
         public async Task<(bool Success, string ErrorMessage)> ProcessCheckInAsync(PreCheckinViewModel model)
         {
-            var booking = await _context.Bookings.FindAsync(model.BookingId);
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                .ThenInclude(d => d.Room)
+                .FirstOrDefaultAsync(b => b.BookingId == model.BookingId);
             if (booking == null)
             {
                 return (false, "Không tìm thấy thông tin đặt phòng.");
@@ -105,6 +146,63 @@ namespace PhucNguyenResort.Services.Reception
                 return (false, "Đơn đặt phòng này không ở trạng thái có thể Check-in.");
             }
 
+            if (model.RoomAssignments == null || model.RoomAssignments.Count == 0)
+            {
+                return (false, "Danh sách gán phòng trống.");
+            }
+
+            if (model.RoomAssignments.Count != booking.BookingDetails.Count)
+            {
+                return (false, "Số lượng phòng gán không khớp với thông tin đặt phòng.");
+            }
+
+            var selectedRoomIds = new List<int>();
+            foreach (var assignment in model.RoomAssignments)
+            {
+                if (!assignment.SelectedRoomId.HasValue)
+                {
+                    return (false, "Vui lòng gán phòng vật lý cho tất cả các chi tiết đặt phòng.");
+                }
+
+                int roomId = assignment.SelectedRoomId.Value;
+
+                if (selectedRoomIds.Contains(roomId))
+                {
+                    return (false, "Một phòng vật lý không thể được gán cho nhiều chi tiết đặt phòng cùng lúc.");
+                }
+                selectedRoomIds.Add(roomId);
+
+                var room = await _context.Rooms.FindAsync(roomId);
+                if (room == null)
+                {
+                    return (false, $"Không tìm thấy phòng với ID {roomId}.");
+                }
+
+                if (room.CategoryId != assignment.RoomCategoryId)
+                {
+                    return (false, $"Phòng {room.RoomNumber} không thuộc loại phòng yêu cầu.");
+                }
+
+                if (room.Status == RoomStatus.Maintenance)
+                {
+                    return (false, $"Phòng {room.RoomNumber} đang trong tình trạng bảo trì.");
+                }
+
+                var isOverlapping = await _context.BookingDetails
+                    .AnyAsync(bd => bd.RoomId == roomId
+                                 && bd.Booking != null
+                                 && bd.Booking.BookingStatus != BookingStatus.Cancelled
+                                 && bd.Booking.BookingStatus != BookingStatus.CheckedOut
+                                 && bd.Booking.BookingStatus != BookingStatus.NoShow
+                                 && bd.Booking.CheckInDate < booking.CheckOutDate
+                                 && bd.Booking.CheckOutDate > booking.CheckInDate
+                                 && bd.BookingId != booking.BookingId);
+                if (isOverlapping)
+                {
+                    return (false, $"Phòng {room.RoomNumber} đã được gán hoặc đang được sử dụng bởi một đơn đặt phòng khác trong thời gian này.");
+                }
+            }
+
             var validGuests = model.Guests
                 .Where(g => !string.IsNullOrWhiteSpace(g.FullName))
                 .ToList();
@@ -113,14 +211,21 @@ namespace PhucNguyenResort.Services.Reception
             {
                 await _bookingGuestService.SaveBookingGuestsAsync(model.BookingId, validGuests, true);
 
-                booking.BookingStatus = BookingStatus.CheckedIn;
-                
-                // Update RoomStatus to Occupied
-                var room = await _context.Rooms.FindAsync(booking.RoomId);
-                if (room != null)
+                foreach (var assignment in model.RoomAssignments)
                 {
-                    room.Status = RoomStatus.Occupied;
+                    var detail = booking.BookingDetails.FirstOrDefault(d => d.BookingDetailId == assignment.BookingDetailId);
+                    if (detail != null)
+                    {
+                        detail.RoomId = assignment.SelectedRoomId;
+                        var room = await _context.Rooms.FindAsync(assignment.SelectedRoomId.Value);
+                        if (room != null)
+                        {
+                            room.Status = RoomStatus.Occupied;
+                        }
+                    }
                 }
+
+                booking.BookingStatus = BookingStatus.CheckedIn;
 
                 await _context.SaveChangesAsync();
 
@@ -132,10 +237,32 @@ namespace PhucNguyenResort.Services.Reception
             }
         }
 
+        public async Task<List<Room>> GetAvailableRoomsForCategoryAsync(int categoryId, DateTime checkIn, DateTime checkOut, int? currentBookingId = null)
+        {
+            var bookedRoomIds = await _context.BookingDetails
+                .Where(bd => bd.RoomCategoryId == categoryId
+                          && bd.RoomId.HasValue
+                          && bd.Booking != null
+                          && bd.Booking.BookingStatus != BookingStatus.Cancelled
+                          && bd.Booking.BookingStatus != BookingStatus.CheckedOut
+                          && bd.Booking.BookingStatus != BookingStatus.NoShow
+                          && bd.Booking.CheckInDate < checkOut
+                          && bd.Booking.CheckOutDate > checkIn
+                          && (!currentBookingId.HasValue || bd.BookingId != currentBookingId.Value))
+                .Select(bd => bd.RoomId!.Value)
+                .Distinct()
+                .ToListAsync();
+
+            return await _context.Rooms
+                .Where(r => r.CategoryId == categoryId
+                         && r.Status != RoomStatus.Maintenance
+                         && !bookedRoomIds.Contains(r.RoomId))
+                .ToListAsync();
+        }
+
         public async Task<(byte[]? FileContent, string FileName, string ErrorMessage)> GetManifestDataAsync(int id)
         {
             var booking = await _context.Bookings
-                .Include(b => b.Room)
                 .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null)

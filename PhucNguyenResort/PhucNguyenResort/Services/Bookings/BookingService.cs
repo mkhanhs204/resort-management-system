@@ -25,62 +25,94 @@ namespace PhucNguyenResort.Services.Bookings
                 return new BookingResult { Success = false, ErrorCode = "BKG-001", ErrorMessage = "Invalid dates" };
             }
 
-            var overlap = await _context.Bookings
-                .AnyAsync(b => b.RoomId == request.RoomId 
-                            && b.BookingStatus != BookingStatus.Cancelled
-                            && b.BookingStatus != BookingStatus.CheckedOut
-                            && b.CheckInDate < request.CheckOutDate 
-                            && b.CheckOutDate > request.CheckInDate);
-
-            if (overlap)
+            if (request.RoomSelections == null || !request.RoomSelections.Any())
             {
-                return new BookingResult { Success = false, ErrorCode = "BKG-002", ErrorMessage = "Room not available" };
+                return new BookingResult { Success = false, ErrorMessage = "No rooms selected" };
             }
 
-            var room = await _context.Rooms
-                .Include(r => r.Category)
-                .FirstOrDefaultAsync(r => r.RoomId == request.RoomId);
-
-            if (room == null || room.Category == null)
-            {
-                return new BookingResult { Success = false, ErrorMessage = "Room not found" };
-            }
-
+            decimal totalRoomPrice = 0;
             int nights = (request.CheckOutDate - request.CheckInDate).Days;
-            decimal pricePerNight = room.Category.PricePerNight ?? 0;
-            decimal totalPrice = nights * pricePerNight;
-            decimal depositAmount = totalPrice * 0.4m;
 
             var booking = new Booking
             {
-                RoomId = request.RoomId,
                 UserId = userId,
                 CheckInDate = request.CheckInDate,
                 CheckOutDate = request.CheckOutDate,
                 NumberOfAdults = request.NumberOfAdults,
                 NumberOfChildren = request.NumberOfChildren,
-                TotalAmount = totalPrice,
-                DepositAmount = depositAmount,
-                BookingStatus = BookingStatus.PendingPayment
+                BookingStatus = BookingStatus.PendingPayment,
+                BookingDetails = new List<BookingDetail>()
             };
+
+            foreach (var selection in request.RoomSelections)
+            {
+                if (selection.Quantity <= 0) continue;
+
+                var category = await _context.RoomCategories.FindAsync(selection.CategoryId);
+                if (category == null)
+                {
+                    return new BookingResult { Success = false, ErrorMessage = $"Category {selection.CategoryId} not found" };
+                }
+
+                int totalRooms = await _context.Rooms.CountAsync(r => r.CategoryId == selection.CategoryId && r.Status != RoomStatus.Maintenance);
+                int bookedRooms = await _context.BookingDetails
+                    .Where(bd => bd.RoomCategoryId == selection.CategoryId
+                              && bd.Booking != null
+                              && bd.Booking.BookingStatus != BookingStatus.Cancelled
+                              && bd.Booking.BookingStatus != BookingStatus.CheckedOut
+                              && bd.Booking.CheckInDate < request.CheckOutDate
+                              && bd.Booking.CheckOutDate > request.CheckInDate)
+                    .CountAsync();
+
+                if (totalRooms - bookedRooms < selection.Quantity)
+                {
+                    return new BookingResult { Success = false, ErrorCode = "BKG-002", ErrorMessage = $"Not enough rooms available for category {category.CategoryName}" };
+                }
+
+                decimal pricePerNight = category.PricePerNight ?? 0;
+                totalRoomPrice += pricePerNight * nights * selection.Quantity;
+
+                for (int i = 0; i < selection.Quantity; i++)
+                {
+                    booking.BookingDetails.Add(new BookingDetail
+                    {
+                        RoomCategoryId = selection.CategoryId,
+                        Price = pricePerNight
+                    });
+                }
+            }
+
+            if (!booking.BookingDetails.Any())
+            {
+                return new BookingResult { Success = false, ErrorMessage = "No valid rooms selected" };
+            }
+
+            booking.TotalAmount = totalRoomPrice;
+            booking.DepositAmount = totalRoomPrice * 0.4m;
 
             _context.Bookings.Add(booking);
 
             // Xử lý tạo TourBookings nếu khách có chọn Add-on
-            if (request.SelectedTourScheduleIds != null && request.SelectedTourScheduleIds.Any())
+            if (request.SelectedTours != null && request.SelectedTours.Any(t => t.Participants > 0))
             {
+                var tourParticipants = request.SelectedTours
+                    .Where(t => t.Participants > 0)
+                    .ToDictionary(t => t.ScheduleId, t => t.Participants);
+
+                var scheduleIds = tourParticipants.Keys.ToList();
+
                 // Lấy thông tin các Schedule để tính tiền
                 var schedules = await _context.TourSchedules
                     .Include(s => s.Tour)
-                    .Where(s => request.SelectedTourScheduleIds.Contains(s.ScheduleId))
+                    .Where(s => scheduleIds.Contains(s.ScheduleId))
                     .ToListAsync();
-
-                int requestedSlots = request.NumberOfAdults + request.NumberOfChildren;
 
                 foreach (var schedule in schedules)
                 {
                     if (schedule.Tour != null)
                     {
+                        int requestedSlots = tourParticipants[schedule.ScheduleId];
+
                         if (schedule.AvailableSlots.HasValue && schedule.AvailableSlots.Value < requestedSlots)
                         {
                             return new BookingResult
