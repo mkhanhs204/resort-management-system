@@ -85,6 +85,12 @@
                     </a>
                 </li>
 
+                <li class="@IsActive("CustomerTourBooking")">
+                    <a asp-controller="CustomerTourBooking" asp-action="Index">
+                        Tour
+                    </a>
+                </li>
+
                 <li class="@IsActive("Home", "AboutUs")">
                     <a asp-area="" asp-controller="Home" asp-action="AboutUs">
                         Về Chúng Tôi
@@ -111,6 +117,7 @@
                         <ul class="dropdown">
                             <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
                             <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
+                            <li><a asp-controller="CustomerTourBooking" asp-action="MyTourBookings">Lịch sử đặt tour</a></li>
                             <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
                         </ul>
                     </li>
@@ -208,6 +215,12 @@
                                         </a>
                                     </li>
 
+                                    <li class="@IsActive("CustomerTourBooking")">
+                                        <a asp-controller="CustomerTourBooking" asp-action="Index">
+                                            Tour
+                                        </a>
+                                    </li>
+
                                     <li class="@IsActive("Home", "AboutUs")">
                                         <a asp-area="" asp-controller="Home" asp-action="AboutUs">
                                             Về Chúng Tôi
@@ -234,6 +247,7 @@
                                              <ul class="dropdown">
                                                  <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
                                                  <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
+                                                 <li><a asp-controller="CustomerTourBooking" asp-action="MyTourBookings">Lịch sử đặt tour</a></li>
                                                  <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
                                              </ul>
                                          </li>
