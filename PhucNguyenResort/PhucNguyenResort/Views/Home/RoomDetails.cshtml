@@ -10,188 +10,230 @@
     var galleryImages = Model.Images?.Take(4).ToList() ?? new List<PhucNguyenResort.Models.RoomCategoryImage>();
 }
 
-<!-- Breadcrumb Section Begin -->
-<div class="breadcrumb-section" style="padding: 40px 0 30px; background: #fff;">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="breadcrumb-text" style="text-align: left;">
-                    <div class="bt-option">
-                        <a asp-controller="Home" asp-action="Index" style="color: #333; text-transform: capitalize; font-weight: 400; font-size: 15px; margin-right: 8px;">Trang Chủ</a>
-                        <span style="color: #888; font-size: 14px;">/</span>
-                        <a href="#" style="color: #333; text-transform: capitalize; font-weight: 400; font-size: 15px; margin: 0 8px;">Phúc Nguyên Resort</a>
-                        <span style="color: #888; font-size: 14px;">/</span>
-                        <span style="color: #888; font-weight: 400; font-size: 15px; margin-left: 8px;">Chi Tiết Phòng</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Breadcrumb Section End -->
+<link rel="stylesheet" href="~/css/room-details-premium.css" asp-append-version="true" />
 
-<!-- Gallery Section Begin -->
-<section class="room-gallery-section spad" style="padding-top: 0; padding-bottom: 50px;">
-    <div class="container">
-        <div class="row">
-            <!-- Main Image -->
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <a href="@mainImage" class="gallery-popup">
-                    <img src="@mainImage" alt="@Model.CategoryName" style="width: 100%; height: 516px; object-fit: cover; cursor: pointer; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                </a>
-            </div>
-            <!-- Sub Images -->
-            <div class="col-lg-6">
-                <div class="row">
-                    @for (int i = 0; i < 4; i++)
-                    {
-                        string imgUrl = $"/img/room/room-b{i+1}.jpg"; // Default fallback images
-                        if (i < galleryImages.Count)
-                        {
-                            imgUrl = galleryImages[i].ImageUrl.Replace(" ", "%20");
-                        }
-                        
-                        <div class="col-6 mb-4">
-                            <a href="@imgUrl" class="gallery-popup" style="display: block; position: relative;">
-                                <img src="@imgUrl" alt="Gallery Image @i" style="width: 100%; height: 246px; object-fit: cover; cursor: pointer; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                                @if (i == 3)
-                                {
-                                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='rgba(0,0,0,0.3)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">
-                                        + Xem Tất Cả
-                                    </div>
-                                }
-                            </a>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Gallery Section End -->
-
-<!-- Room Info Section Begin -->
-<section class="room-info-section spad" style="padding-top: 0; padding-bottom: 80px;">
-    <div class="container">
-        <div class="row">
-            <!-- Left Column: Description & Details -->
-            <div class="col-lg-8 pr-lg-5 mb-5 mb-lg-0">
-                <h2 style="color: #8f3636; font-family: 'Lora', serif; font-size: 38px; font-weight: 700; margin-bottom: 15px;">@Model.CategoryName</h2>
-                
-                <div style="color: #b58d56; font-size: 22px; font-weight: 600; margin-bottom: 25px;">
-                    Chỉ từ @(Model.PricePerNight?.ToString("N0") ?? "0") VNĐ <span style="font-size: 16px; color: #666; font-weight: 400;">/ Đêm</span>
-                </div>
-
-                <p style="color: #444; font-size: 16px; line-height: 1.8; margin-bottom: 35px;">
-                    @(string.IsNullOrEmpty(Model.Description) ? "Khởi đầu hành trình nghỉ dưỡng hoàn hảo với dịch vụ cá nhân hóa và tiện nghi đẳng cấp tại Phúc Nguyên Resort. Với tầm nhìn tuyệt đẹp và không gian yên tĩnh, phòng nghỉ của chúng tôi được thiết kế để mang đến sự thư giãn tuyệt đối cho bạn và người thân." : Model.Description)
-                </p>
-
-                <h4 style="color: #222; font-size: 20px; font-weight: 700; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                    Tiện Nghi Nổi Bật
-                </h4>
-                
-                <!-- Amenities Grid -->
-                <div class="row" style="margin-bottom: 40px;">
-                    <div class="col-md-6 mb-4">
-                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
-                            <i class="fa fa-arrows-alt" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
-                            <span><strong>Diện tích:</strong> Khoảng 30 - 45 m²</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
-                            <i class="fa fa-users" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
-                            <span><strong>Sức chứa:</strong> Tối đa @(Model.MaxAdults ?? 2) Người lớn, @(Model.MaxChildren ?? 1) Trẻ em</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
-                            <i class="fa fa-bed" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
-                            <span><strong>Giường:</strong> 1 Giường Đôi (King)</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
-                            <i class="fa fa-wifi" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
-                            <span><strong>Kết nối:</strong> Wifi tốc độ cao miễn phí</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
-                            <i class="fa fa-television" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
-                            <span><strong>Giải trí:</strong> Smart TV màn hình phẳng</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div style="display: flex; align-items: center; color: #555; font-size: 15px;">
-                            <i class="fa fa-bath" style="color: #8f3636; width: 35px; font-size: 20px; text-align: center;"></i>
-                            <span><strong>Phòng tắm:</strong> Bồn tắm & Vòi sen đứng</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Package Includes -->
-                <div style="background-color: #fdfbf9; border-left: 4px solid #8f3636; padding: 25px;">
-                    <h5 style="color: #222; font-size: 18px; font-weight: 600; margin-bottom: 15px;">Gói Ưu Đãi Bao Gồm:</h5>
-                    <ul style="list-style: none; padding: 0; color: #444; font-size: 15px; line-height: 1.8; margin: 0;">
-                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Miễn phí bữa sáng tự chọn tiêu chuẩn quốc tế hàng ngày.</li>
-                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Tặng phiếu Spa trị giá 300,000 VNĐ cho mỗi lần lưu trú.</li>
-                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Nước suối, trà và cà phê miễn phí trong phòng mỗi ngày.</li>
-                        <li><i class="fa fa-check" style="color: #8f3636; margin-right: 8px;"></i> Miễn phí sử dụng hồ bơi vô cực và phòng Gym hiện đại.</li>
+<div class="container-fluid room-details-container">
+    <!-- Breadcrumb Section Begin -->
+    <div class="breadcrumb-section-custom">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="breadcrumb-custom">
+                        <li><a asp-controller="Home" asp-action="Index"><i class="fa fa-home mr-1"></i> Trang Chủ</a></li>
+                        <li class="separator">/</li>
+                        <li><a href="#">Phúc Nguyễn Resort</a></li>
+                        <li class="separator">/</li>
+                        <li class="active">Chi Tiết Phòng</li>
                     </ul>
                 </div>
             </div>
+        </div>
+    </div>
+    <!-- Breadcrumb Section End -->
 
-            <!-- Right Column: Booking Widget (Sticky) -->
-            <div class="col-lg-4">
-                <div class="booking-widget" style="background: #fff; padding: 30px; border: 1px solid #eaeaea; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: sticky; top: 120px; z-index: 99;">
-                    <h3 style="font-size: 22px; color: #19191a; margin-bottom: 25px; font-weight: 700; text-align: center;">Đặt Phòng Ngay</h3>
-                    
-                    <div style="text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
-                        <span style="font-size: 14px; color: #666;">Giá ưu đãi trực tiếp từ</span><br>
-                        <strong style="font-size: 28px; color: #8f3636;">@(Model.PricePerNight?.ToString("N0") ?? "0") VNĐ</strong>
+    <!-- Gallery Section Begin -->
+    <section class="room-gallery-section" style="padding-bottom: 50px;">
+        <div class="container">
+            <div class="row">
+                <!-- Main Image -->
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="gallery-image-wrapper">
+                        <a href="@mainImage" class="gallery-popup">
+                            <img src="@mainImage" alt="@Model.CategoryName" style="height: 516px;">
+                        </a>
                     </div>
-
-                    <form id="booking-form" method="get" action="/Bookings/Create">
-                        <input type="hidden" name="RoomSelections[0].CategoryId" id="category-id" value="@Model.CategoryId" />
-                        <input type="hidden" name="adults" value="@(Model.MaxAdults ?? 2)" />
-                        <input type="hidden" name="children" value="@(Model.MaxChildren ?? 0)" />
-                        <div class="mb-3">
-                            <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Ngày Nhận Phòng</label>
-                            <div style="position: relative;">
-                                <input type="text" name="checkIn" id="checkin-date" class="room-date-picker" placeholder="Chọn ngày" autocomplete="off" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; cursor: pointer;" required>
-                                <i class="fa fa-calendar" style="position: absolute; left: 15px; top: 14px; color: #8f3636; pointer-events: none;"></i>
+                </div>
+                <!-- Sub Images -->
+                <div class="col-lg-6">
+                    <div class="row">
+                        @for (int i = 0; i < 4; i++)
+                        {
+                            string imgUrl = $"/img/room/room-b{i+1}.jpg"; // Default fallback images
+                            if (i < galleryImages.Count)
+                            {
+                                imgUrl = galleryImages[i].ImageUrl.Replace(" ", "%20");
+                            }
+                            
+                            <div class="col-6 mb-4">
+                                <div class="gallery-image-wrapper">
+                                    <a href="@imgUrl" class="gallery-popup" style="display: block; position: relative;">
+                                        <img src="@imgUrl" alt="Gallery Image @i" style="height: 246px;">
+                                        @if (i == 3)
+                                        {
+                                            <div class="gallery-overlay-all">
+                                                + Xem Tất Cả
+                                            </div>
+                                        }
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Ngày Trả Phòng</label>
-                            <div style="position: relative;">
-                                <input type="text" name="checkOut" id="checkout-date" class="room-date-picker" placeholder="Chọn ngày" autocomplete="off" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; cursor: pointer;" required>
-                                <i class="fa fa-calendar" style="position: absolute; left: 15px; top: 14px; color: #8f3636; pointer-events: none;"></i>
-                            </div>
-
-                        <div id="availability-msg" style="margin-bottom: 15px; font-weight: 600; text-align: center; display: none; font-size: 15px;"></div>
-
-                        <div id="qty-selector" style="display: none; margin-bottom: 15px;">
-                            <label style="font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: block;">Số lượng phòng muốn đặt</label>
-                            <input type="number" name="RoomSelections[0].Quantity" id="room-qty" class="form-control" value="1" min="1" max="1" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; text-align: center; font-weight: bold;" />
-                        </div>
-
-                        <button type="button" id="check-availability-btn" class="btn" style="background-color: #8f3636; color: white; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#7a2e2e'" onmouseout="this.style.backgroundColor='#8f3636'">KIỂM TRA PHÒNG TRỐNG</button>
-                        
-                        <button type="submit" id="book-now-btn" class="btn" style="background-color: #dfa974; color: white; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s; display: none;" onmouseover="this.style.backgroundColor='#c99560'" onmouseout="this.style.backgroundColor='#dfa974'">TIẾN HÀNH ĐẶT PHÒNG</button>
-                        
-                        <button type="button" id="book-more-btn" class="btn mt-3" style="background-color: #f8f9fa; color: #8f3636; border: 1px solid #8f3636; width: 100%; padding: 15px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; transition: 0.3s; display: none;" onmouseover="this.style.backgroundColor='#8f3636'; this.style.color='white'" onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.color='#8f3636'" onclick="goToSearchRooms()">CHỌN THÊM PHÒNG KHÁC</button>
-                    </form>
-                    
-                    <p style="text-align: center; font-size: 13px; color: #888; margin-top: 15px; margin-bottom: 0;">
-                        Thanh toán an toàn, bảo mật thông tin.
-                    </p>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+    <!-- Gallery Section End -->
+
+    <!-- Room Info Section Begin -->
+    <section class="room-info-section" style="padding-bottom: 80px;">
+        <div class="container">
+            <div class="row">
+                <!-- Left Column: Description & Details -->
+                <div class="col-lg-8 pr-lg-5 mb-5 mb-lg-0">
+                    <h2 class="room-title-premium">@Model.CategoryName</h2>
+                    
+                    <div class="room-price-premium">
+                        <span>Chỉ từ</span>
+                        <strong class="room-price-val">@(Model.PricePerNight?.ToString("N0") ?? "0")</strong>
+                        <span class="room-price-sub">VNĐ / Đêm</span>
+                    </div>
+
+                    <p class="room-description-premium">
+                        @(string.IsNullOrEmpty(Model.Description) ? "Khởi đầu hành trình nghỉ dưỡng hoàn hảo với dịch vụ cá nhân hóa và tiện nghi đẳng cấp tại Phúc Nguyên Resort. Với tầm nhìn tuyệt đẹp và không gian yên tĩnh, phòng nghỉ của chúng tôi được thiết kế để mang đến sự thư giãn tuyệt đối cho bạn và người thân." : Model.Description)
+                    </p>
+
+                    <h4 class="section-subtitle-premium">
+                        <i class="fa fa-th-large text-gold"></i> Tiện Nghi Nổi Bật
+                    </h4>
+                    
+                    <!-- Amenities Grid -->
+                    <div class="row amenities-grid">
+                        <div class="col-md-6 mb-4">
+                            <div class="amenity-card">
+                                <div class="amenity-icon-wrapper">
+                                    <i class="fa fa-arrows-alt"></i>
+                                </div>
+                                <div class="amenity-text-wrapper">
+                                    <span class="amenity-label">Diện tích</span>
+                                    <span class="amenity-value">Khoảng 30 - 45 m²</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="amenity-card">
+                                <div class="amenity-icon-wrapper">
+                                    <i class="fa fa-users"></i>
+                                </div>
+                                <div class="amenity-text-wrapper">
+                                    <span class="amenity-label">Sức chứa</span>
+                                    <span class="amenity-value">Tối đa @(Model.MaxAdults ?? 2) Người lớn, @(Model.MaxChildren ?? 1) Trẻ em</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="amenity-card">
+                                <div class="amenity-icon-wrapper">
+                                    <i class="fa fa-bed"></i>
+                                </div>
+                                <div class="amenity-text-wrapper">
+                                    <span class="amenity-label">Giường</span>
+                                    <span class="amenity-value">1 Giường Đôi (King)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="amenity-card">
+                                <div class="amenity-icon-wrapper">
+                                    <i class="fa fa-wifi"></i>
+                                </div>
+                                <div class="amenity-text-wrapper">
+                                    <span class="amenity-label">Kết nối</span>
+                                    <span class="amenity-value">Wifi tốc độ cao miễn phí</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="amenity-card">
+                                <div class="amenity-icon-wrapper">
+                                    <i class="fa fa-television"></i>
+                                </div>
+                                <div class="amenity-text-wrapper">
+                                    <span class="amenity-label">Giải trí</span>
+                                    <span class="amenity-value">Smart TV màn hình phẳng</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="amenity-card">
+                                <div class="amenity-icon-wrapper">
+                                    <i class="fa fa-bath"></i>
+                                </div>
+                                <div class="amenity-text-wrapper">
+                                    <span class="amenity-label">Phòng tắm</span>
+                                    <span class="amenity-value">Bồn tắm & Vòi sen đứng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Package Includes -->
+                    <div class="promo-package-card">
+                        <h5 class="promo-title">
+                            <i class="fa fa-gift"></i> Gói Ưu Đãi Bao Gồm:
+                        </h5>
+                        <ul class="promo-list">
+                            <li class="promo-item"><i class="fa fa-check-circle"></i> Miễn phí bữa sáng tự chọn tiêu chuẩn quốc tế hàng ngày.</li>
+                            <li class="promo-item"><i class="fa fa-check-circle"></i> Tặng phiếu Spa trị giá 300,000 VNĐ cho mỗi lần lưu trú.</li>
+                            <li class="promo-item"><i class="fa fa-check-circle"></i> Nước suối, trà và cà phê miễn phí trong phòng mỗi ngày.</li>
+                            <li class="promo-item"><i class="fa fa-check-circle"></i> Miễn phí sử dụng hồ bơi vô cực và phòng Gym hiện đại.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Column: Booking Widget (Sticky) -->
+                <div class="col-lg-4">
+                    <div class="booking-widget-premium">
+                        <h3 class="widget-title">Đặt Phòng Ngay</h3>
+                        
+                        <div class="widget-price-box">
+                            <span class="widget-price-label">Giá ưu đãi trực tiếp từ</span>
+                            <strong class="widget-price-amount">@(Model.PricePerNight?.ToString("N0") ?? "0") VNĐ</strong>
+                        </div>
+
+                        <form id="booking-form" method="get" action="/Bookings/Create">
+                            <input type="hidden" name="RoomSelections[0].CategoryId" id="category-id" value="@Model.CategoryId" />
+                            <input type="hidden" name="adults" value="@(Model.MaxAdults ?? 2)" />
+                            <input type="hidden" name="children" value="@(Model.MaxChildren ?? 0)" />
+                            
+                            <div class="booking-input-group">
+                                <label class="booking-input-label">Ngày Nhận Phòng</label>
+                                <input type="text" name="checkIn" id="checkin-date" class="form-control-premium-input room-date-picker" placeholder="Chọn ngày" autocomplete="off" required>
+                                <i class="fa fa-calendar input-icon-left"></i>
+                            </div>
+                            
+                            <div class="booking-input-group">
+                                <label class="booking-input-label">Ngày Trả Phòng</label>
+                                <input type="text" name="checkOut" id="checkout-date" class="form-control-premium-input room-date-picker" placeholder="Chọn ngày" autocomplete="off" required>
+                                <i class="fa fa-calendar input-icon-left"></i>
+                            </div>
+
+                            <div id="availability-msg" style="margin-bottom: 15px; font-weight: 600; text-align: center; display: none; font-size: 15px;"></div>
+
+                            <div id="qty-selector" style="display: none; margin-bottom: 15px;">
+                                <label class="booking-input-label">Số lượng phòng muốn đặt</label>
+                                <div class="quantity-selector-box">
+                                    <span style="font-size: 0.9rem; color: var(--text-muted);">Số phòng:</span>
+                                    <input type="number" name="RoomSelections[0].Quantity" id="room-qty" class="qty-input-custom" value="1" min="1" max="1" />
+                                </div>
+                            </div>
+
+                            <button type="button" id="check-availability-btn" class="btn-premium-check-availability">KIỂM TRA PHÒNG TRỐNG</button>
+                            
+                            <button type="submit" id="book-now-btn" class="btn-premium-book-now" style="display: none;">TIẾN HÀNH ĐẶT PHÒNG</button>
+                            
+                            <button type="button" id="book-more-btn" class="btn-premium-book-more mt-3" style="display: none;" onclick="goToSearchRooms()">CHỌN THÊM PHÒNG KHÁC</button>
+                        </form>
+                        
+                        <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 15px; margin-bottom: 0;">
+                            <i class="fa fa-shield mr-1" style="color: var(--accent-color);"></i> Thanh toán an toàn, bảo mật thông tin.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 <!-- Room Info Section End -->
 
 @section Scripts {
