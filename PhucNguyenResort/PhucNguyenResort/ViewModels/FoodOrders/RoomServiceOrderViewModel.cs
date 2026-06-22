@@ -9,12 +9,23 @@ public class RoomServiceOrderViewModel
     [Display(Name = "Booking")]
     public int BookingId { get; set; }
 
+    public int? BookingDetailId { get; set; }
+
     public string CustomerName { get; set; } = string.Empty;
     public string RoomNumber { get; set; } = string.Empty;
     public BookingStatus? BookingStatus { get; set; }
     public bool CanPlaceOrder { get; set; }
     public string? Message { get; set; }
+    public List<RoomServiceRoomOptionViewModel> RoomOptions { get; set; } = new();
     public List<RoomServiceMenuItemViewModel> MenuItems { get; set; } = new();
+}
+
+public class RoomServiceRoomOptionViewModel
+{
+    public int BookingDetailId { get; set; }
+    public int RoomId { get; set; }
+    public string RoomNumber { get; set; } = string.Empty;
+    public string CategoryName { get; set; } = string.Empty;
 }
 
 public class RoomServiceMenuItemViewModel

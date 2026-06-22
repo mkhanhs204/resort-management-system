@@ -17,5 +17,6 @@ public class FoodOrderConfiguration : IEntityTypeConfiguration<FoodOrder>
         builder.Property(x => x.IsChargedToRoom).HasDefaultValue(false);
         builder.Property(x => x.ChargedAt);
         builder.HasOne(x => x.Booking).WithMany(x => x.FoodOrders).HasForeignKey(x => x.BookingId).OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.BookingDetail).WithMany().HasForeignKey(x => x.BookingDetailId).OnDelete(DeleteBehavior.Restrict);
     }
 }

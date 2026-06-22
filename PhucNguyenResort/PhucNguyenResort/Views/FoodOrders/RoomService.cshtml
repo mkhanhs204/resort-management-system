@@ -5,9 +5,17 @@
 }
 
 <div class="container my-5">
-    <h1 class="h3 mb-4">Room Service Food Order</h1>
-
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Room Service Food Order</h1>
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <a asp-action="MyOrders" class="btn btn-outline-primary">My room service orders</a>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">Sign in to view orders</a>
+        }
+    </div>
 
     @if (!ViewData.ModelState.IsValid)
     {
@@ -32,14 +40,51 @@
             }
         </div>
     }
+    else if (!string.IsNullOrWhiteSpace(Model.Message))
+    {
+        <div class="alert alert-info">@Model.Message</div>
+    }
 
     @if (Model.CanPlaceOrder)
     {
-        @if (Model.MenuItems.Any())
+        @if (!Model.RoomOptions.Any())
+        {
+            <div class="alert alert-warning">This booking does not have an assigned room yet, so room service is not available.</div>
+        }
+        else if (Model.MenuItems.Any())
         {
             <form asp-action="RoomService" method="post">
                 @Html.AntiForgeryToken()
                 <input asp-for="BookingId" type="hidden" />
+
+                @if (Model.RoomOptions.Count == 1)
+                {
+                    var selectedRoom = Model.RoomOptions[0];
+                    <input asp-for="BookingDetailId" type="hidden" value="@selectedRoom.BookingDetailId" />
+                    <div class="alert alert-info">
+                        Delivery room: Room @selectedRoom.RoomNumber
+                        @if (!string.IsNullOrWhiteSpace(selectedRoom.CategoryName))
+                        {
+                            <span>- @selectedRoom.CategoryName</span>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-4">
+                        <label asp-for="BookingDetailId" class="form-label fw-semibold">Delivery room</label>
+                        <select asp-for="BookingDetailId" class="form-select" required>
+                            <option value="">Select delivery room</option>
+                            @foreach (var room in Model.RoomOptions)
+                            {
+                                <option value="@room.BookingDetailId">
+                                    Room @room.RoomNumber@(string.IsNullOrWhiteSpace(room.CategoryName) ? string.Empty : $" - {room.CategoryName}")
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="BookingDetailId" class="text-danger"></span>
+                    </div>
+                }
 
                 @{
                     var groupedItems = Model.MenuItems
@@ -108,6 +153,60 @@
         {
             <div class="alert alert-info">No menu items are currently available.</div>
         }
+    }
+    else if (Model.MenuItems.Any())
+    {
+        var groupedBrowseItems = Model.MenuItems
+            .GroupBy(item => item.CategoryName);
+
+        @foreach (var category in groupedBrowseItems)
+        {
+            <h2 class="h5 mt-4">@category.Key</h2>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-end">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in category)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-light border rounded d-flex align-items-center justify-content-center overflow-hidden"
+                                             style="width: 88px; height: 66px; flex: 0 0 88px;">
+                                            @if (string.IsNullOrWhiteSpace(item.ImageUrl))
+                                            {
+                                                <span class="small text-muted">No image</span>
+                                            }
+                                            else
+                                            {
+                                                <img src="@item.ImageUrl"
+                                                     alt="@item.ItemName"
+                                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                                     onerror="this.replaceWith(document.createTextNode('No image'));" />
+                                            }
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">@item.ItemName</div>
+                                            <div class="small text-muted">@item.CategoryName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-end">@item.Price.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">No menu items are currently available.</div>
     }
 </div>
 
