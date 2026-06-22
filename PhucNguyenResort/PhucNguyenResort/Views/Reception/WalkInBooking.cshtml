@@ -1,0 +1,578 @@
+@model PhucNguyenResort.ViewModels.Bookings.WalkInBookingViewModel
+@using PhucNguyenResort.Enums
+
+@{
+    ViewData["Title"] = "Đặt Phòng Tại Quầy - Phuc Nguyen Resort";
+    Layout = "_DashboardLayout";
+}
+
+<link rel="stylesheet" href="~/css/checkin-premium.css" asp-append-version="true" />
+<style>
+    .room-checkbox-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fff;
+    }
+    .room-checkbox-card:hover {
+        border-color: #d97706;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .room-checkbox-card.selected {
+        background: #fffbeb;
+        border-color: #d97706;
+    }
+    #roomsContainer::-webkit-scrollbar {
+        width: 6px;
+    }
+    #roomsContainer::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 4px;
+    }
+    #roomsContainer::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+    #roomsContainer::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
+
+<div class="container-fluid checkin-container py-4">
+    <div class="checkin-header-section d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div>
+            <span class="checkin-badge">Lễ Tân / Front Desk Operations</span>
+            <h1 class="checkin-title">Tạo Đơn Đặt Phòng Tại Quầy</h1>
+        </div>
+        <a asp-action="Index" class="btn-premium-back shadow-sm">
+            <i class="fas fa-arrow-left fa-sm mr-2"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <form asp-action="WalkInBooking" method="post" id="walkInForm">
+        <div asp-validation-summary="All" class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: #fef2f2; color: #991b1b;"></div>
+
+        <div class="row">
+            <!-- Left: Client Info & Room Selection -->
+            <div class="col-lg-8">
+                <!-- Card 1: Customer Details -->
+                <div class="premium-card mb-4">
+                    <div class="premium-card-header">
+                        <h5 class="premium-card-title">
+                            <i class="fas fa-user-check mr-2"></i> 1. Thông Tin Khách Hàng
+                        </h5>
+                    </div>
+                    <div class="premium-card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="PhoneNumber" class="label-premium">Số Điện Thoại <span class="text-danger">*</span></label>
+                                <input type="text" asp-for="PhoneNumber" class="form-control-premium" placeholder="Nhập SĐT khách hàng..." id="txtPhone" required />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="CustomerName" class="label-premium">Họ và Tên <span class="text-danger">*</span></label>
+                                <input type="text" asp-for="CustomerName" class="form-control-premium" placeholder="NGUYEN VAN A" id="txtName" required />
+                                <span asp-validation-for="CustomerName" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12 mb-0">
+                                <label asp-for="Email" class="label-premium">Địa Chỉ Email (Optional)</label>
+                                <input type="email" asp-for="Email" class="form-control-premium" placeholder="customer@gmail.com" id="txtEmail" />
+                                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                                <small class="text-muted mt-1 d-block">Nếu để trống, hệ thống sẽ tự động tạo Email tạm dựa trên SĐT.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Staying Details & Room Selection -->
+                <div class="premium-card mb-4">
+                    <div class="premium-card-header">
+                        <h5 class="premium-card-title">
+                            <i class="fas fa-bed mr-2"></i> 2. Thời Gian & Chọn Phòng Vật Lý
+                        </h5>
+                    </div>
+                    <div class="premium-card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="CheckInDate" class="label-premium">Ngày Nhận Phòng (Check-in)</label>
+                                <input type="date" asp-for="CheckInDate" class="form-control-premium" id="dtCheckIn" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="CheckInDate" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="CheckOutDate" class="label-premium">Ngày Trả Phòng (Check-out)</label>
+                                <input type="date" asp-for="CheckOutDate" class="form-control-premium" id="dtCheckOut" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="CheckOutDate" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="NumberOfAdults" class="label-premium">Số Người Lớn</label>
+                                <input type="number" asp-for="NumberOfAdults" class="form-control-premium" min="1" max="20" id="numAdults" />
+                                <span asp-validation-for="NumberOfAdults" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="NumberOfChildren" class="label-premium">Số Trẻ Em</label>
+                                <input type="number" asp-for="NumberOfChildren" class="form-control-premium" min="0" max="10" id="numChildren" />
+                                <span asp-validation-for="NumberOfChildren" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label-premium mb-2">Chọn Phòng Trống Khả Dụng <span class="text-danger">*</span></label>
+                            
+                            <!-- Search & Filter Controls -->
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center mb-3 p-2 bg-light" style="border-radius: 10px; border: 1px solid #e2e8f0; gap: 10px;">
+                                <div class="input-group input-group-sm" style="flex: 1; max-width: 300px;">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0 text-muted"><i class="fas fa-search"></i></span>
+                                    </div>
+                                    <input type="text" id="searchRoomNum" class="form-control border-left-0" placeholder="Tìm số phòng (ví dụ: 101)..." style="font-size: 0.85rem;" />
+                                </div>
+                                <div class="d-flex align-items-center" style="gap: 5px;">
+                                    <i class="fas fa-filter text-muted mr-1" style="font-size: 0.85rem;"></i>
+                                    <select id="filterCategory" class="custom-select custom-select-sm" style="font-size: 0.85rem; width: auto; font-weight: 500;">
+                                        <option value="">Tất cả loại phòng</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="roomsContainer" class="row" style="max-height: 380px; overflow-y: auto; margin-right: -15px; margin-left: -15px; padding-right: 5px; padding-left: 5px;">
+                                @if (ViewBag.AvailableRooms != null && ((IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms).Any())
+                                {
+                                    @foreach (var room in (IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms)
+                                    {
+                                        <div class="col-md-6">
+                                            <div class="room-checkbox-card" data-room-id="@room.RoomId" data-price="@room.Category?.PricePerNight" data-room-number="@room.RoomNumber" data-category-name="@room.Category?.CategoryName">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">Phòng @room.RoomNumber</div>
+                                                        <span class="badge badge-light border text-muted">@room.Category?.CategoryName</span>
+                                                        <div class="text-muted small mt-1" style="font-size: 0.8rem;">
+                                                            <i class="fas fa-users mr-1"></i> Tối đa: @room.Category?.MaxAdults người lớn, @room.Category?.MaxChildren trẻ em
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <span class="text-gold font-weight-bold">@room.Category?.PricePerNight?.ToString("N0") VNĐ</span><br />
+                                                        <span class="text-muted small">/ đêm</span>
+                                                    </div>
+                                                </div>
+                                                <input type="checkbox" name="SelectedRoomIds" value="@room.RoomId" class="d-none" id="chkRoom-@room.RoomId" />
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-warning border-0 p-3">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i> Không có phòng trống nào khả dụng cho khoảng thời gian này.
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <span asp-validation-for="SelectedRoomIds" class="text-danger small d-block mt-2"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Identification Info (Visible only when Check-in immediately is enabled) -->
+                <div class="premium-card mb-4" id="sectionGuests">
+                    <div class="premium-card-header">
+                        <h5 class="premium-card-title">
+                            <i class="fas fa-id-card mr-2"></i> 3. Khai Báo Tạm Trú (Nhận Phòng Ngay)
+                        </h5>
+                    </div>
+                    <div class="premium-card-body">
+                        <div class="premium-guest-card primary-guest p-4" style="border-radius: 12px; border-left: 4px solid var(--accent-color); background: #fafafa;">
+                            <h6 class="font-weight-bold text-dark mb-3"><span class="badge badge-warning text-dark mr-2">1</span> Thông tin người đặt chính (Khách chính)</h6>
+                            <input type="hidden" name="Guests[0].IsPrimaryBooker" value="true" />
+                            
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    <label class="label-premium">Họ và Tên Khách Chính</label>
+                                    <input type="text" name="Guests[0].FullName" class="form-control-premium" placeholder="NGUYEN VAN A" id="txtPrimaryGuestName" />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Giới Tính</label>
+                                    <select name="Guests[0].Gender" class="form-control-premium">
+                                        <option value="">-- Chọn --</option>
+                                        <option value="Male">Nam</option>
+                                        <option value="Female">Nữ</option>
+                                        <option value="Other">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Ngày Sinh</label>
+                                    <input type="date" name="Guests[0].DateOfBirth" class="form-control-premium" />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Số CCCD / Hộ Chiếu <span class="text-danger">*</span></label>
+                                    <input type="text" name="Guests[0].PassportNumber" class="form-control-premium" placeholder="Mã định danh" />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Quốc Tịch <span class="text-danger">*</span></label>
+                                    <input type="text" name="Guests[0].Nationality" class="form-control-premium" placeholder="Vietnam" value="Vietnam" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Guests Fields Container -->
+                        <div id="secondaryGuestsContainer" class="mt-3"></div>
+
+                        <div class="pdpd-alert-premium mt-4" role="alert">
+                            <div class="d-flex">
+                                <i class="fas fa-shield-alt mr-3 mt-1" style="font-size: 1.25rem;"></i>
+                                <div class="form-check m-0">
+                                    <input type="checkbox" asp-for="PdpdConsentChecked" class="form-check-input mt-1" id="chkPdpd" />
+                                    <label class="form-check-label font-weight-bold text-dark" for="chkPdpd">
+                                        Cam kết tuân thủ PDPD: Tôi xác nhận đã đối chiếu giấy tờ tùy thân của khách lưu trú và khách hàng đồng ý cung cấp thông tin cho mục đích khai báo tạm trú.
+                                    </label>
+                                </div>
+                            </div>
+                            <span asp-validation-for="PdpdConsentChecked" class="text-danger small d-block mt-2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Payments & Operations -->
+            <div class="col-lg-4">
+                <div class="premium-card position-sticky" style="top: 20px;">
+                    <div class="premium-card-header">
+                        <h5 class="premium-card-title">
+                            <i class="fas fa-dollar-sign mr-2"></i> Thanh Toán & Xử Lý
+                        </h5>
+                    </div>
+                    <div class="premium-card-body">
+                        <div class="form-group">
+                            <div class="custom-control custom-switch custom-switch-premium">
+                                <input type="checkbox" asp-for="InstantCheckIn" class="custom-control-input" id="chkInstantCheckIn" />
+                                <label class="custom-control-label font-weight-bold text-dark" for="chkInstantCheckIn">
+                                    Làm thủ tục Check-in ngay
+                                </label>
+                            </div>
+                            <small class="text-muted d-block mt-1">Khi bật tùy chọn này, Booking sẽ chuyển sang trạng thái Checked-in và các phòng vật lý sẽ đổi thành màu đỏ (Occupied).</small>
+                        </div>
+
+                        <hr style="border-top: 1px solid #f1f5f9;" />
+
+                        <div class="form-group">
+                            <label asp-for="PaymentMethod" class="label-premium">Phương Thức Thanh Toán</label>
+                            <select asp-for="PaymentMethod" class="form-control-premium" id="selPaymentMethod">
+                                <option value="Cash">Tiền Mặt (Cash)</option>
+                                <option value="POS">Quẹt Thẻ (POS)</option>
+                                <option value="BankTransfer">Chuyển Khoản Ngân Hàng</option>
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="PaidAmount" class="label-premium">Số Tiền Thực Nhận (VNĐ)</label>
+                            <input type="number" asp-for="PaidAmount" class="form-control-premium font-weight-bold text-success" style="font-size: 1.15rem;" id="txtPaidAmount" />
+                            <span asp-validation-for="PaidAmount" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="payment-summary-box p-3 mb-4" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Thời gian thuê:</span>
+                                <span class="font-weight-bold text-dark small" id="lblNights">1 đêm</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Tổng tiền phòng:</span>
+                                <span class="font-weight-bold text-dark small" id="lblRoomTotal">0 VNĐ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Tiền cọc tối thiểu (40%):</span>
+                                <span class="font-weight-bold text-danger small" id="lblMinDeposit">0 VNĐ</span>
+                            </div>
+                            <hr class="my-2" style="border-top: 1px dashed #cbd5e1;" />
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="font-weight-bold text-dark" style="font-size: 0.95rem;">Tổng tiền phải thanh toán:</span>
+                                <span class="text-gold font-weight-bold" style="font-size: 1.15rem;" id="lblGrandTotal">0 VNĐ</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit-premium-main shadow w-100">
+                            <i class="fas fa-check-circle mr-2"></i> Hoàn Tất Đặt Phòng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            // Live update values on room card selection
+            $(document).on('click', '.room-checkbox-card', function () {
+                var chk = $(this).find('input[type="checkbox"]');
+                chk.prop('checked', !chk.prop('checked'));
+                $(this).toggleClass('selected', chk.prop('checked'));
+                calculateTotals();
+            });
+
+            // Handle SĐT change to auto-fill guest main info
+            $('#txtPhone').on('input change', function() {
+                var phone = $(this).val().trim();
+                if(phone.length === 10) {
+                    $('#txtPrimaryGuestName').val($('#txtName').val());
+                }
+            });
+
+            $('#txtName').on('input', function() {
+                $('#txtPrimaryGuestName').val($(this).val());
+            });
+
+            // Toggle instant check-in guests section
+            function toggleGuestsSection() {
+                var isChecked = $('#chkInstantCheckIn').is(':checked');
+                if (isChecked) {
+                    $('#sectionGuests').slideDown(200);
+                    $('#txtPrimaryGuestName').prop('required', true);
+                    $('input[name="Guests[0].PassportNumber"]').prop('required', true);
+                    $('input[name="Guests[0].Nationality"]').prop('required', true);
+                    $('#chkPdpd').prop('required', true);
+                } else {
+                    $('#sectionGuests').slideUp(200);
+                    $('#txtPrimaryGuestName').prop('required', false);
+                    $('input[name="Guests[0].PassportNumber"]').prop('required', false);
+                    $('input[name="Guests[0].Nationality"]').prop('required', false);
+                    $('#chkPdpd').prop('required', false);
+                }
+            }
+            $('#chkInstantCheckIn').change(toggleGuestsSection);
+            toggleGuestsSection();
+
+            // Regenerate secondary guest fields based on total capacity (Adults + Children)
+            function updateSecondaryGuests() {
+                var adults = parseInt($('#numAdults').val()) || 1;
+                var children = parseInt($('#numChildren').val()) || 0;
+                var totalCapacity = adults + children;
+                var container = $('#secondaryGuestsContainer');
+                container.empty();
+
+                for (var i = 1; i < totalCapacity; i++) {
+                    var guestHtml = `
+                        <div class="premium-guest-card p-4 mt-3" style="border-radius: 12px; border-left: 4px solid #94a3b8; background: #fafafa;">
+                            <h6 class="font-weight-bold text-dark mb-3"><span class="badge badge-secondary mr-2">${i + 1}</span> Khách đi cùng #${i}</h6>
+                            <input type="hidden" name="Guests[${i}].IsPrimaryBooker" value="false" />
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    <label class="label-premium">Họ và Tên Khách</label>
+                                    <input type="text" name="Guests[${i}].FullName" class="form-control-premium" placeholder="NGUYEN VAN B" />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Giới Tính</label>
+                                    <select name="Guests[${i}].Gender" class="form-control-premium">
+                                        <option value="">-- Chọn --</option>
+                                        <option value="Male">Nam</option>
+                                        <option value="Female">Nữ</option>
+                                        <option value="Other">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Ngày Sinh</label>
+                                    <input type="date" name="Guests[${i}].DateOfBirth" class="form-control-premium" />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Số CCCD / Hộ Chiếu</label>
+                                    <input type="text" name="Guests[${i}].PassportNumber" class="form-control-premium" placeholder="Mã định danh" />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="label-premium">Quốc Tịch</label>
+                                    <input type="text" name="Guests[${i}].Nationality" class="form-control-premium" placeholder="Vietnam" value="Vietnam" />
+                                </div>
+                            </div>
+                        </div>`;
+                    container.append(guestHtml);
+                }
+            }
+
+            $('#numAdults, #numChildren').on('input change', updateSecondaryGuests);
+            updateSecondaryGuests();
+
+            // AJAX call to refresh available rooms list when CheckIn/Out dates change
+            $('#dtCheckIn, #dtCheckOut').change(function () {
+                validateAndSetMinDates();
+                var checkIn = $('#dtCheckIn').val();
+                var checkOut = $('#dtCheckOut').val();
+
+                if (checkIn && checkOut) {
+                    $.ajax({
+                        url: '@Url.Action("GetAvailableRoomsJson", "Reception")',
+                        type: 'GET',
+                        data: { checkIn: checkIn, checkOut: checkOut },
+                        success: function (data) {
+                            var container = $('#roomsContainer');
+                            container.empty();
+
+                            if (data && data.length > 0) {
+                                $.each(data, function (idx, room) {
+                                    var priceFormatted = new Intl.NumberFormat('vi-VN').format(room.price);
+                                    var roomCard = `
+                                        <div class="col-md-6">
+                                            <div class="room-checkbox-card" data-room-id="${room.roomId}" data-price="${room.price}" data-room-number="${room.roomNumber}" data-category-name="${room.categoryName}">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                     <div>
+                                                         <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">Phòng ${room.roomNumber}</div>
+                                                         <span class="badge badge-light border text-muted">${room.categoryName}</span>
+                                                         <div class="text-muted small mt-1" style="font-size: 0.8rem;">
+                                                             <i class="fas fa-users mr-1"></i> Tối đa: ${room.maxAdults} người lớn, ${room.maxChildren} trẻ em
+                                                         </div>
+                                                     </div>
+                                                    <div class="text-right">
+                                                        <span class="text-gold font-weight-bold">${priceFormatted} VNĐ</span><br />
+                                                        <span class="text-muted small">/ đêm</span>
+                                                    </div>
+                                                </div>
+                                                <input type="checkbox" name="SelectedRoomIds" value="${room.roomId}" class="d-none" id="chkRoom-${room.roomId}" />
+                                            </div>
+                                        </div>`;
+                                    container.append(roomCard);
+                                });
+                            } else {
+                                container.append(`
+                                    <div class="col-12">
+                                        <div class="alert alert-warning border-0 p-3">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i> Không có phòng trống nào khả dụng cho khoảng thời gian này.
+                                        </div>
+                                    </div>`);
+                            }
+                            rebuildCategoryFilter();
+                            filterRooms();
+                            calculateTotals();
+                        }
+                    });
+                }
+            });
+
+            // Calculate stay duration and total payment amounts
+            function calculateTotals() {
+                var checkIn = new Date($('#dtCheckIn').val());
+                var checkOut = new Date($('#dtCheckOut').val());
+                var nights = 1;
+
+                if (checkIn && checkOut && checkOut > checkIn) {
+                    var diffTime = Math.abs(checkOut - checkIn);
+                    nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                }
+                $('#lblNights').text(nights + " đêm");
+
+                var total = 0;
+                $('.room-checkbox-card.selected').each(function () {
+                    var price = parseFloat($(this).data('price')) || 0;
+                    total += price * nights;
+                });
+
+                var totalFormatted = new Intl.NumberFormat('vi-VN').format(total) + " VNĐ";
+                $('#lblRoomTotal').text(totalFormatted);
+                $('#lblGrandTotal').text(totalFormatted);
+
+                var minDeposit = total * 0.4;
+                var minDepositFormatted = new Intl.NumberFormat('vi-VN').format(minDeposit) + " VNĐ";
+                $('#lblMinDeposit').text(minDepositFormatted);
+
+                $('#txtPaidAmount').val(minDeposit);
+            }
+
+            // Rebuild and filter rooms based on user input
+            function filterRooms() {
+                var searchVal = $('#searchRoomNum').val().trim().toLowerCase();
+                var categoryVal = $('#filterCategory').val();
+
+                $('.room-checkbox-card').each(function () {
+                    var roomNum = ($(this).data('room-number') || '').toString().toLowerCase();
+                    var categoryName = $(this).data('category-name') || '';
+
+                    var matchSearch = roomNum.indexOf(searchVal) !== -1;
+                    var matchCategory = !categoryVal || categoryName === categoryVal;
+
+                    var colWrapper = $(this).parent();
+                    if (matchSearch && matchCategory) {
+                        colWrapper.show();
+                    } else {
+                        colWrapper.hide();
+                    }
+                });
+            }
+
+            // Dynamically populate Category Filter options based on available rooms
+            function rebuildCategoryFilter() {
+                var currentSelection = $('#filterCategory').val();
+                var categories = new Set();
+                $('.room-checkbox-card').each(function() {
+                    var cat = $(this).data('category-name');
+                    if (cat) {
+                        categories.add(cat);
+                    }
+                });
+
+                var select = $('#filterCategory');
+                select.find('option:not(:first)').remove();
+                categories.forEach(function(cat) {
+                    var selectedAttr = (cat === currentSelection) ? 'selected' : '';
+                    select.append(`<option value="${cat}" ${selectedAttr}>${cat}</option>`);
+                });
+            }
+
+            // Register Filter events
+            $(document).on('input', '#searchRoomNum', filterRooms);
+            $(document).on('change', '#filterCategory', filterRooms);
+
+            function getLocalDateString(date) {
+                var year = date.getFullYear();
+                var month = String(date.getMonth() + 1).padStart(2, '0');
+                var day = String(date.getDate()).padStart(2, '0');
+                return year + '-' + month + '-' + day;
+            }
+
+            function validateAndSetMinDates() {
+                var today = new Date();
+                var todayStr = getLocalDateString(today);
+                $('#dtCheckIn').attr('min', todayStr);
+
+                var checkInVal = $('#dtCheckIn').val();
+                if (checkInVal && checkInVal < todayStr) {
+                    $('#dtCheckIn').val(todayStr);
+                    checkInVal = todayStr;
+                }
+
+                var tomorrow = new Date();
+                tomorrow.setDate(today.getDate() + 1);
+                var tomorrowStr = getLocalDateString(tomorrow);
+
+                if (checkInVal) {
+                    var checkInDate = new Date(checkInVal);
+                    checkInDate.setDate(checkInDate.getDate() + 1);
+                    var minCheckOutStr = getLocalDateString(checkInDate);
+                    $('#dtCheckOut').attr('min', minCheckOutStr);
+
+                    var checkOutVal = $('#dtCheckOut').val();
+                    if (checkOutVal && checkOutVal < minCheckOutStr) {
+                        $('#dtCheckOut').val(minCheckOutStr);
+                    }
+                } else {
+                    $('#dtCheckOut').attr('min', tomorrowStr);
+                }
+            }
+
+            // Initializations
+            validateAndSetMinDates();
+            rebuildCategoryFilter();
+            calculateTotals();
+        });
+    </script>
+}

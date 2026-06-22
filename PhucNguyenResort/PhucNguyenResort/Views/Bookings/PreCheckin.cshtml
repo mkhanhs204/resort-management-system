@@ -52,64 +52,88 @@
                 <form asp-action="PreCheckin" method="post">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 12px; font-size: 0.9rem;"></div>
                     <input type="hidden" asp-for="BookingId" />
-                    <input type="hidden" name="token" value="@ViewBag.Token" />
+                                     <div class="accordion" id="guestAccordion">
+                        @for (int i = 0; i < Model.Guests.Count; i++)
+                        {
+                            var isPrimary = Model.Guests[i].IsPrimaryBooker;
+                            <div class="guest-card @(isPrimary ? "primary-guest" : "")">
+                                <div class="guest-card-header @(i == 0 ? "" : "collapsed")" data-toggle="collapse" data-target="#collapseGuest-@i" aria-expanded="@(i == 0 ? "true" : "false")" aria-controls="collapseGuest-@i" style="cursor: pointer;">
+                                    <div class="guest-title">
+                                        <span class="guest-number-circle mr-2">@(i + 1)</span>
+                                        <span id="guest-name-summary-@i" class="guest-name-text">
+                                            @(string.IsNullOrWhiteSpace(Model.Guests[i].FullName) ? $"Khách #{i + 1}" : Model.Guests[i].FullName)
+                                        </span>
+                                        @if (isPrimary)
+                                        {
+                                            <span class="guest-badge primary ml-2">Trưởng đoàn</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="guest-badge ml-2">Thành viên</span>
+                                        }
+                                    </div>
+                                    <input type="hidden" asp-for="Guests[i].IsPrimaryBooker" />
+                                    <div class="d-flex align-items-center">
+                                        <span class="guest-summary-info mr-3 d-none d-sm-inline-block text-muted small" id="guest-info-summary-@i" style="font-size: 0.85rem; font-weight: 500;">
+                                            @(Model.Guests[i].Gender.HasValue ? (Model.Guests[i].Gender.Value == GenderType.Male ? "Nam" : (Model.Guests[i].Gender.Value == GenderType.Female ? "Nữ" : "Khác")) : "")
+                                            @(!string.IsNullOrWhiteSpace(Model.Guests[i].PassportNumber) ? $" - CCCD/HC: {Model.Guests[i].PassportNumber}" : "")
+                                        </span>
+                                        <i class="fa fa-chevron-down accordion-arrow"></i>
+                                    </div>
+                                </div>
 
-                    @for (int i = 0; i < Model.Guests.Count; i++)
-                    {
-                        var isPrimary = Model.Guests[i].IsPrimaryBooker;
-                        <div class="guest-card">
-                            <div class="guest-title">
-                                <span>Khách #@(i + 1) @(isPrimary ? "(Người đặt phòng chính)" : string.Empty)</span>
-                                <input type="hidden" asp-for="Guests[i].IsPrimaryBooker" />
-                            </div>
+                                <div id="collapseGuest-@i" class="collapse @(i == 0 ? "show" : "")" aria-labelledby="guestHeading-@i" data-parent="#guestAccordion">
+                                    <div class="guest-card-body pt-3">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="form-group-modern">
+                                                    <label asp-for="Guests[i].FullName">Họ và tên @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
+                                                    <input type="text" asp-for="Guests[i].FullName" class="form-control-modern" placeholder="Ví dụ: NGUYEN VAN A" />
+                                                    <span asp-validation-for="Guests[i].FullName" class="text-danger small"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group-modern">
+                                                    <label asp-for="Guests[i].Gender">Giới tính @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
+                                                    <select asp-for="Guests[i].Gender" class="form-control-modern">
+                                                        <option value="">-- Chọn --</option>
+                                                        <option value="Male">Nam</option>
+                                                        <option value="Female">Nữ</option>
+                                                        <option value="Other">Khác</option>
+                                                    </select>
+                                                    <span asp-validation-for="Guests[i].Gender" class="text-danger small"></span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="form-group-modern">
-                                        <label asp-for="Guests[i].FullName">Họ và tên @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
-                                        <input type="text" asp-for="Guests[i].FullName" class="form-control-modern" placeholder="Ví dụ: NGUYEN VAN A" />
-                                        <span asp-validation-for="Guests[i].FullName" class="text-danger small"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group-modern">
-                                        <label asp-for="Guests[i].Gender">Giới tính @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
-                                        <select asp-for="Guests[i].Gender" class="form-control-modern">
-                                            <option value="">-- Chọn --</option>
-                                            <option value="Male">Nam</option>
-                                            <option value="Female">Nữ</option>
-                                            <option value="Other">Khác</option>
-                                        </select>
-                                        <span asp-validation-for="Guests[i].Gender" class="text-danger small"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-modern">
-                                        <label asp-for="Guests[i].DateOfBirth">Ngày sinh @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
-                                        <input type="date" asp-for="Guests[i].DateOfBirth" class="form-control-modern" />
-                                        <span asp-validation-for="Guests[i].DateOfBirth" class="text-danger small"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group-modern">
-                                        <label asp-for="Guests[i].PassportNumber">Số CCCD / Hộ chiếu @(isPrimary ? "(Bắt buộc)" : "(Không bắt buộc với TE)")</label>
-                                        <input type="text" asp-for="Guests[i].PassportNumber" class="form-control-modern" placeholder="Số định danh" />
-                                        <span asp-validation-for="Guests[i].PassportNumber" class="text-danger small"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group-modern">
-                                        <label asp-for="Guests[i].Nationality">Quốc tịch @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
-                                        <input type="text" asp-for="Guests[i].Nationality" class="form-control-modern" placeholder="Ví dụ: Vietnam" />
-                                        <span asp-validation-for="Guests[i].Nationality" class="text-danger small"></span>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group-modern">
+                                                    <label asp-for="Guests[i].DateOfBirth">Ngày sinh @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
+                                                    <input type="date" asp-for="Guests[i].DateOfBirth" class="form-control-modern" />
+                                                    <span asp-validation-for="Guests[i].DateOfBirth" class="text-danger small"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group-modern">
+                                                    <label asp-for="Guests[i].PassportNumber">Số CCCD / Hộ chiếu @(isPrimary ? "(Bắt buộc)" : "(Không bắt buộc với TE)")</label>
+                                                    <input type="text" asp-for="Guests[i].PassportNumber" class="form-control-modern" placeholder="Số định danh" />
+                                                    <span asp-validation-for="Guests[i].PassportNumber" class="text-danger small"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group-modern">
+                                                    <label asp-for="Guests[i].Nationality">Quốc tịch @(isPrimary ? "(Bắt buộc)" : string.Empty)</label>
+                                                    <input type="text" asp-for="Guests[i].Nationality" class="form-control-modern" placeholder="Ví dụ: Vietnam" />
+                                                    <span asp-validation-for="Guests[i].Nationality" class="text-danger small"></span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
 
                     <div class="premium-card">
                         <h5 class="mb-3" style="font-weight: 700; color: var(--primary);"><i class="fa fa-shield text-success mr-2"></i> Cam Kết Bảo Vệ Dữ Liệu Cá Nhân</h5>
@@ -146,4 +170,32 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            // Live update guest name in accordion header
+            $('input[id^="Guests_"][id$="__FullName"]').on('input', function () {
+                var id = $(this).attr('id');
+                var index = id.split('_')[1];
+                var val = $(this).val().trim();
+                $('#guest-name-summary-' + index).text(val ? val : 'Khách #' + (parseInt(index) + 1));
+            });
+
+            // Live update guest gender and passport number in accordion header
+            $('select[id^="Guests_"][id$="__Gender"], input[id^="Guests_"][id$="__PassportNumber"]').on('change input', function () {
+                var id = $(this).attr('id');
+                var index = id.split('_')[1];
+                
+                var genderVal = $('#Guests_' + index + '__Gender').val();
+                var genderText = "";
+                if (genderVal === "Male") genderText = "Nam";
+                else if (genderVal === "Female") genderText = "Nữ";
+                else if (genderVal === "Other") genderText = "Khác";
+
+                var passportVal = $('#Guests_' + index + '__PassportNumber').val().trim();
+                var passportText = passportVal ? " - CCCD/HC: " + passportVal : "";
+
+                $('#guest-info-summary-' + index).text(genderText + passportText);
+            });
+        });
+    </script>
 }
