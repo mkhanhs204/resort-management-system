@@ -322,6 +322,28 @@ namespace PhucNguyenResort.Services.Reception
 
         public async Task<WalkInResult> ProcessWalkInBookingAsync(WalkInBookingViewModel model)
         {
+            // 0.1. Kiểm tra ngày nhận phòng không được ở quá khứ
+            if (model.CheckInDate.Date < DateTime.Today)
+            {
+                return new WalkInResult
+                {
+                    Success = false,
+                    ErrorCode = "WKB-007",
+                    ErrorMessage = "Ngày nhận phòng không được ở quá khứ."
+                };
+            }
+
+            // 0.2. Kiểm tra ngày trả phòng phải sau ngày nhận phòng
+            if (model.CheckOutDate.Date <= model.CheckInDate.Date)
+            {
+                return new WalkInResult
+                {
+                    Success = false,
+                    ErrorCode = "WKB-008",
+                    ErrorMessage = "Ngày trả phòng phải sau ngày nhận phòng."
+                };
+            }
+
             // 0. Kiểm tra chọn ít nhất một phòng vật lý
             if (model.SelectedRoomIds == null || !model.SelectedRoomIds.Any())
             {

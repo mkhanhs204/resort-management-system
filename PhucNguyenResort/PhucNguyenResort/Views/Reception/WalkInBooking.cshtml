@@ -25,6 +25,20 @@
         background: #fffbeb;
         border-color: #d97706;
     }
+    #roomsContainer::-webkit-scrollbar {
+        width: 6px;
+    }
+    #roomsContainer::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 4px;
+    }
+    #roomsContainer::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+    #roomsContainer::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
 </style>
 
 <div class="container-fluid checkin-container py-4">
@@ -86,12 +100,12 @@
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label asp-for="CheckInDate" class="label-premium">Ngày Nhận Phòng (Check-in)</label>
-                                <input type="date" asp-for="CheckInDate" class="form-control-premium" id="dtCheckIn" />
+                                <input type="date" asp-for="CheckInDate" class="form-control-premium" id="dtCheckIn" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                                 <span asp-validation-for="CheckInDate" class="text-danger small mt-1 d-block"></span>
                             </div>
                             <div class="form-group col-md-6">
                                 <label asp-for="CheckOutDate" class="label-premium">Ngày Trả Phòng (Check-out)</label>
-                                <input type="date" asp-for="CheckOutDate" class="form-control-premium" id="dtCheckOut" />
+                                <input type="date" asp-for="CheckOutDate" class="form-control-premium" id="dtCheckOut" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
                                 <span asp-validation-for="CheckOutDate" class="text-danger small mt-1 d-block"></span>
                             </div>
                         </div>
@@ -111,17 +125,37 @@
 
                         <div class="form-group">
                             <label class="label-premium mb-2">Chọn Phòng Trống Khả Dụng <span class="text-danger">*</span></label>
-                            <div id="roomsContainer" class="row">
+                            
+                            <!-- Search & Filter Controls -->
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center mb-3 p-2 bg-light" style="border-radius: 10px; border: 1px solid #e2e8f0; gap: 10px;">
+                                <div class="input-group input-group-sm" style="flex: 1; max-width: 300px;">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0 text-muted"><i class="fas fa-search"></i></span>
+                                    </div>
+                                    <input type="text" id="searchRoomNum" class="form-control border-left-0" placeholder="Tìm số phòng (ví dụ: 101)..." style="font-size: 0.85rem;" />
+                                </div>
+                                <div class="d-flex align-items-center" style="gap: 5px;">
+                                    <i class="fas fa-filter text-muted mr-1" style="font-size: 0.85rem;"></i>
+                                    <select id="filterCategory" class="custom-select custom-select-sm" style="font-size: 0.85rem; width: auto; font-weight: 500;">
+                                        <option value="">Tất cả loại phòng</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="roomsContainer" class="row" style="max-height: 380px; overflow-y: auto; margin-right: -15px; margin-left: -15px; padding-right: 5px; padding-left: 5px;">
                                 @if (ViewBag.AvailableRooms != null && ((IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms).Any())
                                 {
                                     @foreach (var room in (IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms)
                                     {
                                         <div class="col-md-6">
-                                            <div class="room-checkbox-card" data-room-id="@room.RoomId" data-price="@room.Category?.PricePerNight">
+                                            <div class="room-checkbox-card" data-room-id="@room.RoomId" data-price="@room.Category?.PricePerNight" data-room-number="@room.RoomNumber" data-category-name="@room.Category?.CategoryName">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">Phòng @room.RoomNumber</div>
                                                         <span class="badge badge-light border text-muted">@room.Category?.CategoryName</span>
+                                                        <div class="text-muted small mt-1" style="font-size: 0.8rem;">
+                                                            <i class="fas fa-users mr-1"></i> Tối đa: @room.Category?.MaxAdults người lớn, @room.Category?.MaxChildren trẻ em
+                                                        </div>
                                                     </div>
                                                     <div class="text-right">
                                                         <span class="text-gold font-weight-bold">@room.Category?.PricePerNight?.ToString("N0") VNĐ</span><br />
@@ -292,8 +326,6 @@
             $('#txtPhone').on('input change', function() {
                 var phone = $(this).val().trim();
                 if(phone.length === 10) {
-                    // Try to search for existing user details (optional feature: client-side prefill)
-                    // If the receptionist type customer name matching, sync it
                     $('#txtPrimaryGuestName').val($('#txtName').val());
                 }
             });
@@ -320,7 +352,7 @@
                 }
             }
             $('#chkInstantCheckIn').change(toggleGuestsSection);
-            toggleGuestsSection(); // Init state
+            toggleGuestsSection();
 
             // Regenerate secondary guest fields based on total capacity (Adults + Children)
             function updateSecondaryGuests() {
@@ -370,10 +402,11 @@
             }
 
             $('#numAdults, #numChildren').on('input change', updateSecondaryGuests);
-            updateSecondaryGuests(); // Init state
+            updateSecondaryGuests();
 
             // AJAX call to refresh available rooms list when CheckIn/Out dates change
             $('#dtCheckIn, #dtCheckOut').change(function () {
+                validateAndSetMinDates();
                 var checkIn = $('#dtCheckIn').val();
                 var checkOut = $('#dtCheckOut').val();
 
@@ -391,12 +424,15 @@
                                     var priceFormatted = new Intl.NumberFormat('vi-VN').format(room.price);
                                     var roomCard = `
                                         <div class="col-md-6">
-                                            <div class="room-checkbox-card" data-room-id="${room.roomId}" data-price="${room.price}">
+                                            <div class="room-checkbox-card" data-room-id="${room.roomId}" data-price="${room.price}" data-room-number="${room.roomNumber}" data-category-name="${room.categoryName}">
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">Phòng ${room.roomNumber}</div>
-                                                        <span class="badge badge-light border text-muted">${room.categoryName}</span>
-                                                    </div>
+                                                     <div>
+                                                         <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">Phòng ${room.roomNumber}</div>
+                                                         <span class="badge badge-light border text-muted">${room.categoryName}</span>
+                                                         <div class="text-muted small mt-1" style="font-size: 0.8rem;">
+                                                             <i class="fas fa-users mr-1"></i> Tối đa: ${room.maxAdults} người lớn, ${room.maxChildren} trẻ em
+                                                         </div>
+                                                     </div>
                                                     <div class="text-right">
                                                         <span class="text-gold font-weight-bold">${priceFormatted} VNĐ</span><br />
                                                         <span class="text-muted small">/ đêm</span>
@@ -415,6 +451,8 @@
                                         </div>
                                     </div>`);
                             }
+                            rebuildCategoryFilter();
+                            filterRooms();
                             calculateTotals();
                         }
                     });
@@ -447,10 +485,94 @@
                 var minDepositFormatted = new Intl.NumberFormat('vi-VN').format(minDeposit) + " VNĐ";
                 $('#lblMinDeposit').text(minDepositFormatted);
 
-                $('#txtPaidAmount').val(minDeposit); // Prefill 40% deposit by default
+                $('#txtPaidAmount').val(minDeposit);
             }
 
-            calculateTotals(); // Init total sums calculation
+            // Rebuild and filter rooms based on user input
+            function filterRooms() {
+                var searchVal = $('#searchRoomNum').val().trim().toLowerCase();
+                var categoryVal = $('#filterCategory').val();
+
+                $('.room-checkbox-card').each(function () {
+                    var roomNum = ($(this).data('room-number') || '').toString().toLowerCase();
+                    var categoryName = $(this).data('category-name') || '';
+
+                    var matchSearch = roomNum.indexOf(searchVal) !== -1;
+                    var matchCategory = !categoryVal || categoryName === categoryVal;
+
+                    var colWrapper = $(this).parent();
+                    if (matchSearch && matchCategory) {
+                        colWrapper.show();
+                    } else {
+                        colWrapper.hide();
+                    }
+                });
+            }
+
+            // Dynamically populate Category Filter options based on available rooms
+            function rebuildCategoryFilter() {
+                var currentSelection = $('#filterCategory').val();
+                var categories = new Set();
+                $('.room-checkbox-card').each(function() {
+                    var cat = $(this).data('category-name');
+                    if (cat) {
+                        categories.add(cat);
+                    }
+                });
+
+                var select = $('#filterCategory');
+                select.find('option:not(:first)').remove();
+                categories.forEach(function(cat) {
+                    var selectedAttr = (cat === currentSelection) ? 'selected' : '';
+                    select.append(`<option value="${cat}" ${selectedAttr}>${cat}</option>`);
+                });
+            }
+
+            // Register Filter events
+            $(document).on('input', '#searchRoomNum', filterRooms);
+            $(document).on('change', '#filterCategory', filterRooms);
+
+            function getLocalDateString(date) {
+                var year = date.getFullYear();
+                var month = String(date.getMonth() + 1).padStart(2, '0');
+                var day = String(date.getDate()).padStart(2, '0');
+                return year + '-' + month + '-' + day;
+            }
+
+            function validateAndSetMinDates() {
+                var today = new Date();
+                var todayStr = getLocalDateString(today);
+                $('#dtCheckIn').attr('min', todayStr);
+
+                var checkInVal = $('#dtCheckIn').val();
+                if (checkInVal && checkInVal < todayStr) {
+                    $('#dtCheckIn').val(todayStr);
+                    checkInVal = todayStr;
+                }
+
+                var tomorrow = new Date();
+                tomorrow.setDate(today.getDate() + 1);
+                var tomorrowStr = getLocalDateString(tomorrow);
+
+                if (checkInVal) {
+                    var checkInDate = new Date(checkInVal);
+                    checkInDate.setDate(checkInDate.getDate() + 1);
+                    var minCheckOutStr = getLocalDateString(checkInDate);
+                    $('#dtCheckOut').attr('min', minCheckOutStr);
+
+                    var checkOutVal = $('#dtCheckOut').val();
+                    if (checkOutVal && checkOutVal < minCheckOutStr) {
+                        $('#dtCheckOut').val(minCheckOutStr);
+                    }
+                } else {
+                    $('#dtCheckOut').attr('min', tomorrowStr);
+                }
+            }
+
+            // Initializations
+            validateAndSetMinDates();
+            rebuildCategoryFilter();
+            calculateTotals();
         });
     </script>
 }

@@ -320,6 +320,15 @@ namespace PhucNguyenResort.Controllers
                 }
             }
 
+            if (model.CheckInDate.Date < DateTime.Today)
+            {
+                ModelState.AddModelError(nameof(model.CheckInDate), "Ngày nhận phòng không được ở quá khứ.");
+            }
+            if (model.CheckOutDate.Date <= model.CheckInDate.Date)
+            {
+                ModelState.AddModelError(nameof(model.CheckOutDate), "Ngày trả phòng phải sau ngày nhận phòng.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.AvailableRooms = await _receptionService.GetAvailableRoomsForDatesAsync(model.CheckInDate, model.CheckOutDate);
@@ -349,7 +358,9 @@ namespace PhucNguyenResort.Controllers
                 roomNumber = r.RoomNumber,
                 categoryId = r.CategoryId,
                 categoryName = r.Category?.CategoryName ?? "Loại phòng",
-                price = r.Category?.PricePerNight ?? 0
+                price = r.Category?.PricePerNight ?? 0,
+                maxAdults = r.Category?.MaxAdults ?? 0,
+                maxChildren = r.Category?.MaxChildren ?? 0
             });
             return Json(result);
         }
