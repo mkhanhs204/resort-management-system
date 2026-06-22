@@ -4,6 +4,7 @@ namespace PhucNguyenResort.Services.FoodOrders;
 
 public interface IFoodOrderService
 {
+    Task<MenuCategoryBrowseViewModel> BuildMenuCategoriesAsync(int? bookingId, int? userId);
     Task<RoomServiceOrderViewModel> BuildRoomServiceMenuAsync(string? message = null);
     Task<RoomServiceOrderViewModel?> BuildRoomServiceOrderAsync(int bookingId);
     Task<RoomServiceOrderViewModel?> BuildRoomServiceOrderAsync(int bookingId, int currentUserId);

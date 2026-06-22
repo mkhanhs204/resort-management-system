@@ -13,5 +13,7 @@ public enum FoodOrderCreateStatus
     DuplicateMenuItem,
     RoomNotSelected,
     BookingRoomNotFound,
-    BookingRoomNotAssigned
+    BookingRoomNotAssigned,
+    InvalidDeliveryTime,
+    InvalidNote
 }

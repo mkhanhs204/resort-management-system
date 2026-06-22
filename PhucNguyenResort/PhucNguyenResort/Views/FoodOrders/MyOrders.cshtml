@@ -3,101 +3,179 @@
 
 @{
     ViewData["Title"] = "My Room Service Orders";
+
+    var activeCount = Model?.Count(o => o.OrderStatus != FoodOrderStatus.Delivered && o.OrderStatus != FoodOrderStatus.Cancelled) ?? 0;
 }
 
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">My Room Service Orders</h1>
-        <a asp-action="RoomService" class="btn btn-outline-secondary">Back to room service</a>
-    </div>
+<div class="rs-page">
+    <div class="rs-container">
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-    }
-
-    @if (Model == null || !Model.Any())
-    {
-        <div class="alert alert-info">You do not have any room service orders yet.</div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead>
-                    <tr>
-                        <th>Order</th>
-                        <th>Booking</th>
-                        <th>Room</th>
-                        <th>Status</th>
-                        <th>Kitchen</th>
-                        <th class="text-end">Total</th>
-                        <th class="text-end">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var order in Model)
-                    {
-                        var canCancel = order.OrderStatus == FoodOrderStatus.Pending
-                            && (!order.KitchenStatus.HasValue || order.KitchenStatus == KotStatus.Pending)
-                            && !order.IsChargedToRoom;
-
-                        <tr>
-                            <td>
-                                <strong>#@order.FoodOrderId</strong><br />
-                                <small class="text-muted">@order.OrderedAt.ToString("yyyy-MM-dd HH:mm")</small>
-                            </td>
-                            <td>#@order.BookingId</td>
-                            <td>@(string.IsNullOrWhiteSpace(order.RoomNumber) ? "N/A" : order.RoomNumber)</td>
-                            <td>
-                                @if (order.OrderStatus == FoodOrderStatus.Cancelled)
-                                {
-                                    <span class="badge badge-danger">Cancelled</span>
-                                }
-                                else
-                                {
-                                    <span>@order.OrderStatus</span>
-                                }
-                            </td>
-                            <td>
-                                @if (order.KitchenStatus == KotStatus.Cancelled)
-                                {
-                                    <span class="badge badge-danger">Cancelled</span>
-                                }
-                                else
-                                {
-                                    <span>@(order.KitchenStatus?.ToString() ?? "Pending")</span>
-                                }
-                            </td>
-                            <td class="text-end">@order.TotalAmount.ToString("N0") VND</td>
-                            <td class="text-end">
-                                <a asp-action="Details" asp-route-id="@order.FoodOrderId" class="btn btn-sm btn-primary">Details</a>
-
-                                @if (canCancel)
-                                {
-                                    <form asp-action="Cancel" asp-route-id="@order.FoodOrderId" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this order?');">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
-                                    </form>
-                                }
-                                else if (order.OrderStatus == FoodOrderStatus.Cancelled)
-                                {
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Cancelled</button>
-                                }
-                                else
-                                {
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Cancel unavailable</button>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        @* -- Page Header -- *@
+        <div class="rs-page-header">
+            <h1>My <span style="color: var(--rs-primary);">Orders</span></h1>
+            <a asp-action="RoomService" class="rs-btn rs-btn-primary rs-btn-sm">
+                <i class="fa fa-plus"></i> New Order
+            </a>
         </div>
-    }
+
+        @* -- Messages -- *@
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="rs-alert rs-alert-success">
+                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="rs-alert rs-alert-danger">
+                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="rs-empty-state">
+                <div class="empty-icon"><i class="fa fa-inbox"></i></div>
+                <h3>No Orders Yet</h3>
+                <p>You haven't placed any room service orders yet. Browse our menu to get started.</p>
+                <a asp-action="RoomService" class="rs-btn rs-btn-primary">
+                    <i class="fa fa-cutlery"></i> Browse Menu
+                </a>
+            </div>
+        }
+        else
+        {
+            @* -- Filter Tabs -- *@
+            <div class="rs-filter-tabs">
+                <button class="rs-filter-tab active" data-filter="all">
+                    All (@Model.Count())
+                </button>
+                <button class="rs-filter-tab" data-filter="active">
+                    Active (@activeCount)
+                </button>
+                <button class="rs-filter-tab" data-filter="delivered">
+                    Delivered (@Model.Count(o => o.OrderStatus == FoodOrderStatus.Delivered))
+                </button>
+                <button class="rs-filter-tab" data-filter="cancelled">
+                    Cancelled (@Model.Count(o => o.OrderStatus == FoodOrderStatus.Cancelled))
+                </button>
+            </div>
+
+            @* -- Order Cards -- *@
+            @foreach (var order in Model)
+            {
+                var canCancel = order.OrderStatus == FoodOrderStatus.Pending
+                    && (!order.KitchenStatus.HasValue || order.KitchenStatus == KotStatus.Pending)
+                    && !order.IsChargedToRoom;
+
+                var statusClass = order.OrderStatus switch
+                {
+                    FoodOrderStatus.Pending => "pending",
+                    FoodOrderStatus.Cooking => "cooking",
+                    FoodOrderStatus.Delivered => "delivered",
+                    FoodOrderStatus.Cancelled => "cancelled",
+                    _ => "pending"
+                };
+
+                var filterStatus = order.OrderStatus == FoodOrderStatus.Delivered ? "delivered" :
+                    order.OrderStatus == FoodOrderStatus.Cancelled ? "cancelled" : "active";
+
+                // Progress percentage
+                var progressPercent = order.OrderStatus switch
+                {
+                    FoodOrderStatus.Pending => 15,
+                    FoodOrderStatus.Cooking => 50,
+                    FoodOrderStatus.Delivered => 100,
+                    _ => 0
+                };
+
+                <div class="rs-history-card" data-status="@filterStatus">
+                    <div class="card-top">
+                        <div>
+                            <div class="order-id">Order #@order.FoodOrderId</div>
+                        </div>
+                        <span class="rs-status-badge @statusClass">@order.OrderStatus</span>
+                    </div>
+
+                    <div class="card-meta">
+                        <span><i class="fa fa-clock-o"></i> @order.OrderedAt.ToString("MMM dd, yyyy · hh:mm tt")</span>
+                        <span><i class="fa fa-bed"></i> Room @(string.IsNullOrWhiteSpace(order.RoomNumber) ? "N/A" : order.RoomNumber)</span>
+                        <span><i class="fa fa-bookmark-o"></i> Booking #@order.BookingId</span>
+                    </div>
+
+                    @* Mini Progress Bar (only for active orders) *@
+                    @if (order.OrderStatus != FoodOrderStatus.Cancelled && order.OrderStatus != FoodOrderStatus.Delivered)
+                    {
+                        <div class="rs-mini-progress">
+                            <div class="progress-fill" style="width: @(progressPercent)%;"></div>
+                        </div>
+                    }
+
+                    <div class="card-items">
+                        @{
+                            var itemsSummary = string.Join(", ", order.Items.Select(i => $"{i.ItemName} x{i.Quantity}"));
+                            if (itemsSummary.Length > 80)
+                            {
+                                itemsSummary = itemsSummary.Substring(0, 77) + "...";
+                            }
+                        }
+                        @itemsSummary
+                    </div>
+
+                    <div class="card-bottom">
+                        <div class="order-total">@order.TotalAmount.ToString("N0") VND</div>
+                        <div style="display: flex; gap: 8px;">
+                            <a asp-action="Details" asp-route-id="@order.FoodOrderId"
+                               class="rs-btn rs-btn-outline rs-btn-sm">
+                                View Details <i class="fa fa-arrow-right"></i>
+                            </a>
+                            @if (canCancel)
+                            {
+                                <button type="button" class="rs-btn rs-btn-danger rs-btn-sm"
+                                        data-cancel-order
+                                        data-cancel-action="@Url.Action("Cancel", new { id = order.FoodOrderId })">
+                                    <i class="fa fa-times"></i> Cancel
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* -- Empty State for Filtered Results -- *@
+            <div class="rs-empty-state" id="rs-empty-filtered" style="display: none;">
+                <div class="empty-icon"><i class="fa fa-filter"></i></div>
+                <h3>No Orders Found</h3>
+                <p>No orders match the selected filter.</p>
+            </div>
+        }
+
+    </div>
 </div>
+
+@* -- Cancel Confirmation Modal -- *@
+<div class="rs-modal-backdrop" id="rs-cancel-modal">
+    <div class="rs-modal">
+        <h3><i class="fa fa-exclamation-triangle" style="color: var(--rs-danger);"></i> Cancel Order</h3>
+        <p>Are you sure you want to cancel this order? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="rs-btn rs-btn-outline rs-btn-sm" data-dismiss-modal>
+                Keep Order
+            </button>
+            <form method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="rs-btn rs-btn-danger rs-btn-sm">
+                    <i class="fa fa-times"></i> Yes, Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/room-service.css" />
+}
+
+@section Scripts {
+    <script src="~/js/room-service.js"></script>
+}
