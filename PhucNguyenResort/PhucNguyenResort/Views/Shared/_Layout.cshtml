@@ -100,7 +100,7 @@
                 <li class="@IsActive("Home", "Blog")"><a href="./blog.html">Tin Tức</a></li>
                 <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
-                <li class="@IsActive("FoodOrders", "RoomService")"><a asp-controller="FoodOrders" asp-action="RoomService">Dịch vụ phòng</a></li>
+                <li class="@IsActive("FoodOrders")"><a asp-controller="FoodOrders" asp-action="RoomService">Room Service</a></li>
 
                 @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                 {
@@ -227,7 +227,7 @@
 
                                     <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
-                                    <li class="@IsActive("FoodOrders", "RoomService")"><a asp-controller="FoodOrders" asp-action="RoomService">Dịch vụ phòng</a></li>
+                                    <li class="@IsActive("FoodOrders")"><a asp-controller="FoodOrders" asp-action="RoomService">Dịch Vụ</a></li>
 
                                     @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                                     {

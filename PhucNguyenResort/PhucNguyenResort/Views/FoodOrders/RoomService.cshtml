@@ -1,215 +1,254 @@
 @model PhucNguyenResort.ViewModels.FoodOrders.RoomServiceOrderViewModel
 
 @{
-    ViewData["Title"] = "Room Service Food Order";
+    ViewData["Title"] = "Room Service Menu";
+
+    var groupedItems = Model.MenuItems
+        .Select((item, index) => new { Item = item, Index = index })
+        .GroupBy(x => x.Item.CategoryName);
+
+    var categoryNames = Model.MenuItems
+        .Select(x => x.CategoryName)
+        .Distinct()
+        .OrderBy(x => x)
+        .ToList();
 }
 
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Room Service Food Order</h1>
-        @if (User.Identity != null && User.Identity.IsAuthenticated)
-        {
-            <a asp-action="MyOrders" class="btn btn-outline-primary">My room service orders</a>
-        }
-        else
-        {
-            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">Sign in to view orders</a>
-        }
-    </div>
+<div class="rs-page">
+    <div class="rs-container">
 
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div asp-validation-summary="All" class="alert alert-danger mb-3"></div>
-    }
-
-    @if (Model.BookingId > 0)
-    {
-        <div class="alert @(Model.CanPlaceOrder ? "alert-success" : "alert-warning")">
-            <div>Booking #@Model.BookingId</div>
-            @if (!string.IsNullOrWhiteSpace(Model.CustomerName) || !string.IsNullOrWhiteSpace(Model.RoomNumber))
+        @* -- Top Navigation -- *@
+        <div class="rs-back-nav">
+            <a asp-action="RoomService">
+                <i class="fa fa-arrow-left"></i> Back to Categories
+            </a>
+            @if (Model.BookingId > 0)
             {
-                <div>@Model.CustomerName - Room @Model.RoomNumber</div>
-            }
-            @if (Model.BookingStatus.HasValue)
-            {
-                <div>Status: @Model.BookingStatus</div>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.Message))
-            {
-                <div>@Model.Message</div>
+                <span style="font-size: 14px; color: var(--rs-text-muted);">
+                    <i class="fa fa-bed"></i> Room @Model.RoomNumber · Booking #@Model.BookingId
+                </span>
             }
         </div>
-    }
-    else if (!string.IsNullOrWhiteSpace(Model.Message))
-    {
-        <div class="alert alert-info">@Model.Message</div>
-    }
 
-    @if (Model.CanPlaceOrder)
-    {
-        @if (!Model.RoomOptions.Any())
+        @* -- Validation Errors -- *@
+        @if (!ViewData.ModelState.IsValid)
         {
-            <div class="alert alert-warning">This booking does not have an assigned room yet, so room service is not available.</div>
+            <div class="rs-alert rs-alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div><i class="fa fa-exclamation-triangle"></i> @error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        @* -- Messages -- *@
+        @if (!string.IsNullOrWhiteSpace(Model.Message))
+        {
+            <div class="rs-alert rs-alert-info">
+                <i class="fa fa-info-circle"></i> @Model.Message
+            </div>
+        }
+
+        @* -- Search Bar -- *@
+        <div class="rs-search-bar">
+            <span class="search-icon"><i class="fa fa-search"></i></span>
+            <input type="text" id="rs-search-input" placeholder="Search menu items..." autocomplete="off" />
+        </div>
+
+        @* -- Category Tabs -- *@
+        <div class="rs-category-tabs">
+            <button class="rs-category-tab @(Model.ActiveCategoryId == null ? "active" : "")" data-category="all">
+                All Menu
+            </button>
+            @foreach (var cat in categoryNames)
+            {
+                var isActive = Model.ActiveCategoryName != null &&
+                    string.Equals(cat, Model.ActiveCategoryName, StringComparison.OrdinalIgnoreCase);
+                <button class="rs-category-tab @(isActive ? "active" : "")" data-category="@cat">
+                    @cat
+                </button>
+            }
+        </div>
+
+        @if (Model.CanPlaceOrder)
+        {
+            @* -- Room Selector -- *@
+            @if (!Model.RoomOptions.Any())
+            {
+                <div class="rs-alert rs-alert-warning">
+                    <i class="fa fa-exclamation-circle"></i>
+                    This booking does not have an assigned room yet, so room service is not available.
+                </div>
+            }
+            else if (Model.MenuItems.Any())
+            {
+                <form asp-action="OrderMenu" method="post" id="rs-order-form">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="BookingId" type="hidden" />
+
+                    @* Room Selection *@
+                    @if (Model.RoomOptions.Count == 1)
+                    {
+                        var selectedRoom = Model.RoomOptions[0];
+                        <input asp-for="BookingDetailId" type="hidden" value="@selectedRoom.BookingDetailId" />
+                        <div class="rs-room-selector">
+                            <label><i class="fa fa-truck"></i> Delivery Room:</label>
+                            <span class="rs-room-info">
+                                Room @selectedRoom.RoomNumber
+                                @if (!string.IsNullOrWhiteSpace(selectedRoom.CategoryName))
+                                {
+                                    <text> — @selectedRoom.CategoryName</text>
+                                }
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rs-room-selector">
+                            <label for="BookingDetailId"><i class="fa fa-truck"></i> Delivery Room:</label>
+                            <select asp-for="BookingDetailId" id="BookingDetailId" required>
+                                <option value="">Select delivery room</option>
+                                @foreach (var room in Model.RoomOptions)
+                                {
+                                    <option value="@room.BookingDetailId">
+                                        Room @room.RoomNumber@(string.IsNullOrWhiteSpace(room.CategoryName) ? "" : $" — {room.CategoryName}")
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    @* Menu Items Grid *@
+                    @foreach (var category in groupedItems)
+                    {
+                        <h2 class="rs-section-title" data-section-category="@category.Key">@category.Key</h2>
+                        <div class="rs-menu-grid">
+                            @foreach (var entry in category)
+                            {
+                                <div class="rs-menu-card @(entry.Item.Quantity > 0 ? "has-quantity" : "")"
+                                     data-item-name="@entry.Item.ItemName"
+                                     data-category="@entry.Item.CategoryName">
+
+                                    @if (!string.IsNullOrWhiteSpace(entry.Item.ImageUrl))
+                                    {
+                                        <img src="@entry.Item.ImageUrl" alt="@entry.Item.ItemName" class="card-image"
+                                             onerror="this.outerHTML='<div class=\'no-image\'><i class=\'fa fa-cutlery\'></i> No image</div>';" />
+                                    }
+                                    else
+                                    {
+                                        <div class="no-image"><i class="fa fa-cutlery"></i> No image</div>
+                                    }
+
+                                    <div class="card-body">
+                                        <div class="item-name">@entry.Item.ItemName</div>
+                                        <div class="item-category">@entry.Item.CategoryName</div>
+                                        <div class="item-price">@entry.Item.Price.ToString("N0") VND</div>
+
+                                        <input name="MenuItems[@entry.Index].MenuItemId" value="@entry.Item.MenuItemId" type="hidden" />
+                                        <input name="MenuItems[@entry.Index].ItemName" value="@entry.Item.ItemName" type="hidden" />
+                                        <input name="MenuItems[@entry.Index].CategoryName" value="@entry.Item.CategoryName" type="hidden" />
+                                        <input name="MenuItems[@entry.Index].ImageUrl" value="@entry.Item.ImageUrl" type="hidden" />
+                                        <input name="MenuItems[@entry.Index].Price" value="@entry.Item.Price" type="hidden" />
+
+                                        <div class="rs-qty-selector">
+                                            <button type="button" class="rs-qty-btn qty-minus">−</button>
+                                            <input name="MenuItems[@entry.Index].Quantity"
+                                                   value="@entry.Item.Quantity"
+                                                   class="rs-qty-value"
+                                                   type="number" min="0" max="1000"
+                                                   data-price="@entry.Item.Price" />
+                                            <button type="button" class="rs-qty-btn qty-plus">+</button>
+                                        </div>
+                                        
+                                        <div style="margin-top: 15px;">
+                                            <textarea name="MenuItems[@entry.Index].ItemNote" maxlength="500" class="form-control" placeholder="Item note for kitchen (e.g., less spicy)" style="font-size: 13px; border-radius: var(--rs-radius-sm); border-color: var(--rs-border); background: #f1f5f9; padding: 10px; min-height: 50px; resize: vertical; width: 100%; box-shadow: none;">@entry.Item.ItemNote</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div style="height: 100px;"></div> @* Spacer for sticky bar *@
+
+                    @* Sticky Cart Bar *@
+                    <div class="rs-cart-bar" id="rs-cart-bar">
+                        <div class="rs-container">
+                            <div class="cart-content" style="flex-wrap: wrap; gap: 10px;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <input asp-for="CustomerNote" class="form-control" placeholder="Order note (e.g., call me, deliver now...)" style="height: 40px; border-radius: 20px; font-size: 13px; border: 1px solid var(--rs-border); padding: 0 16px;" maxlength="500" />
+                                </div>
+                                <div class="cart-info" style="margin-left: auto;">
+                                    <span class="cart-count"><strong>0</strong> items</span>
+                                    <span class="cart-subtotal">0 VND</span>
+                                </div>
+                                <button type="submit" class="rs-btn rs-btn-primary" style="white-space: nowrap;">
+                                    <i class="fa fa-shopping-cart"></i> Place Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="rs-empty-state">
+                    <div class="empty-icon"><i class="fa fa-cutlery"></i></div>
+                    <h3>No Items Available</h3>
+                    <p>No menu items are currently available. Please check back later.</p>
+                </div>
+            }
         }
         else if (Model.MenuItems.Any())
         {
-            <form asp-action="RoomService" method="post">
-                @Html.AntiForgeryToken()
-                <input asp-for="BookingId" type="hidden" />
+            @* Browse-only mode (not logged in or not checked in) *@
+            @foreach (var category in groupedItems)
+            {
+                <h2 class="rs-section-title" data-section-category="@category.Key">@category.Key</h2>
+                <div class="rs-menu-grid">
+                    @foreach (var entry in category)
+                    {
+                        <div class="rs-menu-card"
+                             data-item-name="@entry.Item.ItemName"
+                             data-category="@entry.Item.CategoryName">
 
-                @if (Model.RoomOptions.Count == 1)
-                {
-                    var selectedRoom = Model.RoomOptions[0];
-                    <input asp-for="BookingDetailId" type="hidden" value="@selectedRoom.BookingDetailId" />
-                    <div class="alert alert-info">
-                        Delivery room: Room @selectedRoom.RoomNumber
-                        @if (!string.IsNullOrWhiteSpace(selectedRoom.CategoryName))
-                        {
-                            <span>- @selectedRoom.CategoryName</span>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="mb-4">
-                        <label asp-for="BookingDetailId" class="form-label fw-semibold">Delivery room</label>
-                        <select asp-for="BookingDetailId" class="form-select" required>
-                            <option value="">Select delivery room</option>
-                            @foreach (var room in Model.RoomOptions)
+                            @if (!string.IsNullOrWhiteSpace(entry.Item.ImageUrl))
                             {
-                                <option value="@room.BookingDetailId">
-                                    Room @room.RoomNumber@(string.IsNullOrWhiteSpace(room.CategoryName) ? string.Empty : $" - {room.CategoryName}")
-                                </option>
+                                <img src="@entry.Item.ImageUrl" alt="@entry.Item.ItemName" class="card-image"
+                                     onerror="this.outerHTML='<div class=\'no-image\'><i class=\'fa fa-cutlery\'></i> No image</div>';" />
                             }
-                        </select>
-                        <span asp-validation-for="BookingDetailId" class="text-danger"></span>
-                    </div>
-                }
+                            else
+                            {
+                                <div class="no-image"><i class="fa fa-cutlery"></i> No image</div>
+                            }
 
-                @{
-                    var groupedItems = Model.MenuItems
-                        .Select((item, index) => new { Item = item, Index = index })
-                        .GroupBy(item => item.Item.CategoryName);
-                }
-
-                @foreach (var category in groupedItems)
-                {
-                    <h2 class="h5 mt-4">@category.Key</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th class="text-end">Price</th>
-                                    <th style="width: 160px;">Quantity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var entry in category)
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="bg-light border rounded d-flex align-items-center justify-content-center overflow-hidden"
-                                                     style="width: 88px; height: 66px; flex: 0 0 88px;">
-                                                    @if (string.IsNullOrWhiteSpace(entry.Item.ImageUrl))
-                                                    {
-                                                        <span class="small text-muted">No image</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <img src="@entry.Item.ImageUrl"
-                                                             alt="@entry.Item.ItemName"
-                                                             style="width: 100%; height: 100%; object-fit: cover;"
-                                                             onerror="this.replaceWith(document.createTextNode('No image'));" />
-                                                    }
-                                                </div>
-                                                <div>
-                                                    <div class="fw-semibold">@entry.Item.ItemName</div>
-                                                    <div class="small text-muted">@entry.Item.CategoryName</div>
-                                                </div>
-                                            </div>
-                                            <input name="MenuItems[@entry.Index].MenuItemId" value="@entry.Item.MenuItemId" type="hidden" />
-                                            <input name="MenuItems[@entry.Index].ItemName" value="@entry.Item.ItemName" type="hidden" />
-                                            <input name="MenuItems[@entry.Index].CategoryName" value="@entry.Item.CategoryName" type="hidden" />
-                                            <input name="MenuItems[@entry.Index].ImageUrl" value="@entry.Item.ImageUrl" type="hidden" />
-                                            <input name="MenuItems[@entry.Index].Price" value="@entry.Item.Price" type="hidden" />
-                                        </td>
-                                        <td class="text-end">@entry.Item.Price.ToString("N0")</td>
-                                        <td>
-                                            <input name="MenuItems[@entry.Index].Quantity" value="@entry.Item.Quantity" class="form-control" type="number" min="0" max="1000" />
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-
-                <button type="submit" class="btn btn-primary">Place room service order</button>
-            </form>
+                            <div class="card-body">
+                                <div class="item-name">@entry.Item.ItemName</div>
+                                <div class="item-category">@entry.Item.CategoryName</div>
+                                <div class="item-price">@entry.Item.Price.ToString("N0") VND</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         }
         else
         {
-            <div class="alert alert-info">No menu items are currently available.</div>
-        }
-    }
-    else if (Model.MenuItems.Any())
-    {
-        var groupedBrowseItems = Model.MenuItems
-            .GroupBy(item => item.CategoryName);
-
-        @foreach (var category in groupedBrowseItems)
-        {
-            <h2 class="h5 mt-4">@category.Key</h2>
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th class="text-end">Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in category)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-light border rounded d-flex align-items-center justify-content-center overflow-hidden"
-                                             style="width: 88px; height: 66px; flex: 0 0 88px;">
-                                            @if (string.IsNullOrWhiteSpace(item.ImageUrl))
-                                            {
-                                                <span class="small text-muted">No image</span>
-                                            }
-                                            else
-                                            {
-                                                <img src="@item.ImageUrl"
-                                                     alt="@item.ItemName"
-                                                     style="width: 100%; height: 100%; object-fit: cover;"
-                                                     onerror="this.replaceWith(document.createTextNode('No image'));" />
-                                            }
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">@item.ItemName</div>
-                                            <div class="small text-muted">@item.CategoryName</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-end">@item.Price.ToString("N0")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="rs-empty-state">
+                <div class="empty-icon"><i class="fa fa-cutlery"></i></div>
+                <h3>No Items Available</h3>
+                <p>No menu items are currently available. Please check back later.</p>
             </div>
         }
-    }
-    else
-    {
-        <div class="alert alert-info">No menu items are currently available.</div>
-    }
+
+    </div>
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/room-service.css" />
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/room-service.js"></script>
 }

@@ -80,12 +80,23 @@
                             {
                                 <tr>
                                     <td><strong>#@order.FoodOrderId</strong><br /><small class="text-muted">@order.OrderedAt.ToString("HH:mm dd/MM")</small></td>
-                                    <td>Room <strong>@order.RoomNumber</strong><br /><small class="text-muted">@order.CustomerName</small></td>
+                                    <td>
+                                        Room <strong>@order.RoomNumber</strong><br />
+                                        <small class="text-muted">@order.CustomerName</small>
+                                        @if(!string.IsNullOrWhiteSpace(order.CustomerNote)) {
+                                            <div style="font-size: 11px; margin-top: 4px; background: #fffbeb; border-left: 2px solid #d97706; padding: 2px 4px;"><strong>Note:</strong> @order.CustomerNote</div>
+                                        }
+                                    </td>
                                     <td>
                                         <ul class="list-unstyled mb-0" style="font-size: 13px;">
                                             @foreach(var item in order.Items.Take(2))
                                             {
-                                                <li>@item.Quantity x @item.ItemName</li>
+                                                <li>
+                                                    @item.Quantity x @item.ItemName
+                                                    @if(!string.IsNullOrWhiteSpace(item.ItemNote)) {
+                                                        <div style="font-size: 11px; color: #6c757d; font-style: italic; padding-left: 10px;">- @item.ItemNote</div>
+                                                    }
+                                                </li>
                                             }
                                             @if(order.Items.Count > 2)
                                             {

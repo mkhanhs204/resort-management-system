@@ -1,62 +1,246 @@
-        @model PhucNguyenResort.ViewModels.FoodOrders.FoodOrderDetailViewModel
+@using PhucNguyenResort.Enums
+@model PhucNguyenResort.ViewModels.FoodOrders.FoodOrderDetailViewModel
 
 @{
-    ViewData["Title"] = "Food Order Details";
+    ViewData["Title"] = "Order #" + Model.FoodOrderId;
+
+    // Calculate timeline state
+    var isCancelled = Model.OrderStatus == FoodOrderStatus.Cancelled;
+    var stepPlaced = !isCancelled;
+    var stepPreparing = Model.OrderStatus >= FoodOrderStatus.Cooking && !isCancelled;
+    var stepReady = (Model.KitchenStatus == KotStatus.Ready || Model.KitchenStatus == KotStatus.Completed) && !isCancelled;
+    var stepDelivered = Model.OrderStatus == FoodOrderStatus.Delivered && !isCancelled;
+
+    var activeStep = isCancelled ? "cancelled" :
+                     stepDelivered ? "delivered" :
+                     stepReady ? "ready" :
+                     stepPreparing ? "preparing" : "placed";
+
+    // Timeline fill width
+    var fillPercent = activeStep switch
+    {
+        "placed" => "0%",
+        "preparing" => "33%",
+        "ready" => "66%",
+        "delivered" => "100%",
+        "cancelled" => "0%",
+        _ => "0%"
+    };
+
+    // Status message
+    var statusIcon = activeStep switch
+    {
+        "placed" => "fa-clock-o",
+        "preparing" => "fa-fire",
+        "ready" => "fa-check-circle",
+        "delivered" => "fa-truck",
+        "cancelled" => "fa-times-circle",
+        _ => "fa-info-circle"
+    };
+
+    var statusMessage = activeStep switch
+    {
+        "placed" => "Your order has been placed and is waiting for the kitchen.",
+        "preparing" => "The kitchen is currently preparing your order.",
+        "ready" => "Your order is ready and waiting for delivery.",
+        "delivered" => "Your order has been delivered. Enjoy your meal!",
+        "cancelled" => "This order has been cancelled.",
+        _ => ""
+    };
+
+    var canCancel = Model.OrderStatus == FoodOrderStatus.Pending
+        && (!Model.KitchenStatus.HasValue || Model.KitchenStatus == KotStatus.Pending)
+        && !Model.IsChargedToRoom;
+
+    var orderStatusClass = Model.OrderStatus switch
+    {
+        FoodOrderStatus.Pending => "pending",
+        FoodOrderStatus.Cooking => "cooking",
+        FoodOrderStatus.Delivered => "delivered",
+        FoodOrderStatus.Cancelled => "cancelled",
+        _ => "pending"
+    };
+
+    var kitchenStatusClass = Model.KitchenStatus switch
+    {
+        KotStatus.Pending => "pending",
+        KotStatus.Cooking => "cooking",
+        KotStatus.Ready => "cooking",
+        KotStatus.Completed => "delivered",
+        _ => "pending"
+    };
 }
 
-<div class="container my-5">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-    }
+<div class="rs-page">
+    <div class="rs-container">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Food Order #@Model.FoodOrderId</h1>
-        <a asp-action="RoomService" asp-route-bookingId="@Model.BookingId" class="btn btn-outline-secondary">Back to room service order</a>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <dl class="row mb-0">
-                <dt class="col-sm-3">Booking</dt>
-                <dd class="col-sm-9">#@Model.BookingId - @Model.CustomerName - Room @Model.RoomNumber</dd>
-
-                <dt class="col-sm-3">Order status</dt>
-                <dd class="col-sm-9">@Model.OrderStatus</dd>
-
-                <dt class="col-sm-3">Kitchen status</dt>
-                <dd class="col-sm-9">@(Model.KitchenStatus?.ToString() ?? "Pending")</dd>
-
-                <dt class="col-sm-3">Ordered at</dt>
-                <dd class="col-sm-9">@Model.OrderedAt.ToString("yyyy-MM-dd HH:mm")</dd>
-
-                <dt class="col-sm-3">Total amount</dt>
-                <dd class="col-sm-9">@Model.TotalAmount.ToString("N0") VND</dd>
-            </dl>
+        @* -- Top Navigation -- *@
+        <div class="rs-back-nav" style="margin-bottom: 32px;">
+            <a asp-action="MyOrders">
+                <i class="fa fa-arrow-left"></i> My Orders
+            </a>
+            <span style="font-size: 14px; color: var(--rs-text-muted);">
+                <i class="fa fa-bed"></i> Room @Model.RoomNumber
+            </span>
         </div>
-    </div>
 
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Item</th>
-                <th>Category</th>
-                <th class="text-end">Quantity</th>
-                <th class="text-end">Unit price</th>
-                <th class="text-end">Line total</th>
-            </tr>
-        </thead>
-        <tbody>
+        @* -- Success Message -- *@
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="rs-alert rs-alert-success">
+                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @* -- Order Header -- *@
+        <div class="rs-order-header">
+            <h1>Order #@Model.FoodOrderId</h1>
+            <div class="order-time">
+                <i class="fa fa-clock-o"></i> @Model.OrderedAt.ToString("MMMM dd, yyyy · hh:mm tt")
+            </div>
+        </div>
+
+        @* -- Status Timeline -- *@
+        @if (!isCancelled)
+        {
+            <div class="rs-timeline">
+                <div class="timeline-fill" style="width: @fillPercent;"></div>
+
+                <div class="rs-timeline-step @(stepPlaced ? "completed" : "")">
+                    <div class="step-circle"><i class="fa fa-check"></i></div>
+                    <div class="step-label">Order Placed</div>
+                    <div class="step-time">@Model.OrderedAt.ToString("HH:mm")</div>
+                </div>
+
+                <div class="rs-timeline-step @(stepPreparing ? (stepReady ? "completed" : "active") : "")">
+                    <div class="step-circle"><i class="fa fa-fire"></i></div>
+                    <div class="step-label">Preparing</div>
+                </div>
+
+                <div class="rs-timeline-step @(stepReady ? (stepDelivered ? "completed" : "active") : "")">
+                    <div class="step-circle"><i class="fa fa-check-circle"></i></div>
+                    <div class="step-label">Ready</div>
+                </div>
+
+                <div class="rs-timeline-step @(stepDelivered ? "completed" : "")">
+                    <div class="step-circle"><i class="fa fa-truck"></i></div>
+                    <div class="step-label">Delivered</div>
+                </div>
+            </div>
+        }
+
+        @* -- Status Message -- *@
+        <div class="rs-status-message" style="@(isCancelled ? "border-color: var(--rs-danger);" : "")">
+            <div class="status-icon" style="color: @(isCancelled ? "var(--rs-danger)" : "var(--rs-primary)");">
+                <i class="fa @statusIcon"></i>
+            </div>
+            <div class="status-text">@statusMessage</div>
+        </div>
+
+        @* -- Order Items -- *@
+        <div class="rs-order-card">
+            <div class="card-header">
+                <i class="fa fa-list-ul"></i> Order Items
+            </div>
             @foreach (var item in Model.Items)
             {
-                <tr>
-                    <td>@item.ItemName</td>
-                    <td>@item.CategoryName</td>
-                    <td class="text-end">@item.Quantity</td>
-                    <td class="text-end">@item.UnitPrice.ToString("N0") VND</td>
-                    <td class="text-end">@item.LineTotal.ToString("N0") VND</td>
-                </tr>
+                <div class="rs-order-item">
+                    <div class="item-details">
+                        <div class="item-name">@item.ItemName</div>
+                        <div class="item-qty">x@item.Quantity · @item.CategoryName</div>
+                        @if (!string.IsNullOrWhiteSpace(item.ItemNote))
+                        {
+                            <div style="font-size: 13px; color: var(--rs-text-muted); font-style: italic; margin-top: 4px;">
+                                <i class="fa fa-info-circle"></i> Note: @item.ItemNote
+                            </div>
+                        }
+                    </div>
+                    <div class="item-price">@item.LineTotal.ToString("N0") VND</div>
+                </div>
             }
-        </tbody>
-    </table>
+            <div class="rs-order-total">
+                <div class="total-label">Total</div>
+                <div class="total-value">@Model.TotalAmount.ToString("N0") VND</div>
+            </div>
+        </div>
+
+        @* -- Booking Info -- *@
+        <div class="rs-order-card" style="margin-top: 16px;">
+            <div class="card-header">
+                <i class="fa fa-info-circle"></i> Booking Details
+            </div>
+            <div style="padding: 14px 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--rs-text-muted);">Booking</span>
+                    <span style="color: var(--rs-text); font-weight: 600;">#@Model.BookingId</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--rs-text-muted);">Guest</span>
+                    <span style="color: var(--rs-text); font-weight: 600;">@Model.CustomerName</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--rs-text-muted);">Room</span>
+                    <span style="color: var(--rs-text); font-weight: 600;">@Model.RoomNumber</span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.CustomerNote))
+                {
+                    <div style="display: flex; flex-direction: column; margin-bottom: 12px; background: #f8fafc; padding: 10px 15px; border-radius: var(--rs-radius-sm); border: 1px solid var(--rs-border);">
+                        <span style="color: var(--rs-text-muted); font-size: 12px; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Order Note</span>
+                        <span style="color: var(--rs-text); font-style: italic;">@Model.CustomerNote</span>
+                    </div>
+                }
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 16px; flex-wrap: wrap;">
+                    <span style="color: var(--rs-text-muted);">Order Status</span>
+                    <span class="rs-status-badge @orderStatusClass">@Model.OrderStatus</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <span style="color: var(--rs-text-muted);">Kitchen Status</span>
+                    <span class="rs-status-badge @kitchenStatusClass">@(Model.KitchenStatus?.ToString() ?? "Pending")</span>
+                </div>
+            </div>
+        </div>
+
+        @* -- Action Buttons -- *@
+        <div class="rs-actions">
+            <a asp-action="RoomService" class="rs-btn rs-btn-outline">
+                <i class="fa fa-arrow-left"></i> Back to Menu
+            </a>
+            @if (canCancel)
+            {
+                <button type="button" class="rs-btn rs-btn-danger"
+                        data-cancel-order
+                        data-cancel-action="@Url.Action("Cancel", new { id = Model.FoodOrderId })">
+                    <i class="fa fa-times"></i> Cancel Order
+                </button>
+            }
+        </div>
+
+    </div>
 </div>
+
+@* -- Cancel Confirmation Modal -- *@
+<div class="rs-modal-backdrop" id="rs-cancel-modal">
+    <div class="rs-modal">
+        <h3><i class="fa fa-exclamation-triangle" style="color: var(--rs-danger);"></i> Cancel Order</h3>
+        <p>Are you sure you want to cancel this order? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="rs-btn rs-btn-outline rs-btn-sm" data-dismiss-modal>
+                Keep Order
+            </button>
+            <form method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="rs-btn rs-btn-danger rs-btn-sm">
+                    <i class="fa fa-times"></i> Yes, Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/room-service.css" />
+}
+
+@section Scripts {
+    <script src="~/js/room-service.js"></script>
+}

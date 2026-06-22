@@ -15,6 +15,8 @@ public class FoodOrder
     public decimal? TotalAmount { get; set; }
 
     public DateTime OrderedAt { get; set; } = DateTime.Now;
+    public DateTime? RequestedDeliveryAt { get; set; }
+    public string? CustomerNote { get; set; }
     public bool IsChargedToRoom { get; set; } = false;
     public DateTime? ChargedAt { get; set; }
 

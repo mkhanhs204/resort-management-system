@@ -8,11 +8,84 @@ namespace PhucNguyenResort.Services.FoodOrders;
 
 public class FoodOrderService : IFoodOrderService
 {
+    private const int NoteMaxLength = 500;
+
     private readonly ResortDbContext _context;
 
     public FoodOrderService(ResortDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<MenuCategoryBrowseViewModel> BuildMenuCategoriesAsync(int? bookingId, int? userId)
+    {
+        var viewModel = new MenuCategoryBrowseViewModel();
+
+        // If user is logged in and has a checked-in booking, populate booking info
+        if (userId.HasValue)
+        {
+            var resolvedBookingId = bookingId;
+            if (!resolvedBookingId.HasValue)
+            {
+                var activeBooking = await _context.Bookings
+                    .AsNoTracking()
+                    .Where(b => b.UserId == userId.Value && b.BookingStatus == BookingStatus.CheckedIn)
+                    .OrderByDescending(b => b.CheckInDate)
+                    .FirstOrDefaultAsync();
+
+                resolvedBookingId = activeBooking?.BookingId;
+            }
+
+            if (resolvedBookingId.HasValue)
+            {
+                var booking = await _context.Bookings
+                    .AsNoTracking()
+                    .Include(b => b.User)
+                    .Include(b => b.BookingDetails).ThenInclude(bd => bd.Room)
+                    .FirstOrDefaultAsync(b => b.BookingId == resolvedBookingId.Value && b.UserId == userId.Value);
+
+                if (booking != null)
+                {
+                    viewModel.BookingId = booking.BookingId;
+                    viewModel.CustomerName = booking.User?.FullName ?? string.Empty;
+                    viewModel.BookingStatus = booking.BookingStatus;
+                    viewModel.CanPlaceOrder = booking.BookingStatus == BookingStatus.CheckedIn;
+                    viewModel.RoomNumber = string.Join(", ",
+                        booking.BookingDetails
+                            .Where(bd => bd.RoomId.HasValue && bd.Room != null)
+                            .Select(bd => bd.Room!.RoomNumber));
+                }
+            }
+        }
+
+        if (!viewModel.CanPlaceOrder && !userId.HasValue)
+        {
+            viewModel.Message = "Sign in with a checked-in booking to place a room service order.";
+        }
+        else if (!viewModel.CanPlaceOrder && viewModel.BookingId == 0)
+        {
+            viewModel.Message = "You do not currently have a checked-in booking for room service ordering.";
+        }
+
+        // Get categories with available item count and first item's image as cover
+        viewModel.Categories = await _context.MenuCategories
+            .AsNoTracking()
+            .Select(c => new MenuCategoryCardViewModel
+            {
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryName,
+                ItemCount = c.MenuItems.Count(mi => mi.IsAvailable && !mi.IsDeleted),
+                ImageUrl = c.MenuItems
+                    .Where(mi => mi.IsAvailable && !mi.IsDeleted && mi.ImageUrl != null)
+                    .OrderBy(mi => mi.ItemName)
+                    .Select(mi => mi.ImageUrl)
+                    .FirstOrDefault()
+            })
+            .Where(c => c.ItemCount > 0)
+            .OrderBy(c => c.CategoryName)
+            .ToListAsync();
+
+        return viewModel;
     }
 
     public async Task<RoomServiceOrderViewModel> BuildRoomServiceMenuAsync(string? message = null)
@@ -123,6 +196,14 @@ public class FoodOrderService : IFoodOrderService
 
     public async Task<FoodOrderCreateResult> CreateFoodOrderAsync(FoodOrderCreateRequest request, int currentUserId)
     {
+        var normalizedCustomerNote = NormalizeNote(request.CustomerNote);
+        if (normalizedCustomerNote?.Length > NoteMaxLength)
+        {
+            return FoodOrderCreateResult.Failed(
+                FoodOrderCreateStatus.InvalidNote,
+                "Customer note must not exceed 500 characters.");
+        }
+
         if (request.Items.Any(item => item.Quantity < 0))
         {
             return FoodOrderCreateResult.Failed(
@@ -140,6 +221,13 @@ public class FoodOrderService : IFoodOrderService
         var requestedItems = request.Items
             .Where(item => item.Quantity > 0)
             .ToList();
+
+        if (requestedItems.Any(item => NormalizeNote(item.ItemNote)?.Length > NoteMaxLength))
+        {
+            return FoodOrderCreateResult.Failed(
+                FoodOrderCreateStatus.InvalidNote,
+                "Food order item notes must not exceed 500 characters.");
+        }
 
         if (requestedItems.Count == 0)
         {
@@ -178,6 +266,24 @@ public class FoodOrderService : IFoodOrderService
             return FoodOrderCreateResult.Failed(
                 FoodOrderCreateStatus.BookingNotCheckedIn,
                 "Room service orders are only available for checked-in bookings.");
+        }
+
+        if (request.RequestedDeliveryAt.HasValue)
+        {
+            var requestedDeliveryAt = request.RequestedDeliveryAt.Value;
+            if (requestedDeliveryAt <= DateTime.Now)
+            {
+                return FoodOrderCreateResult.Failed(
+                    FoodOrderCreateStatus.InvalidDeliveryTime,
+                    "Requested delivery time must be later than the current time.");
+            }
+
+            if (requestedDeliveryAt.Date > booking.CheckOutDate.Date)
+            {
+                return FoodOrderCreateResult.Failed(
+                    FoodOrderCreateStatus.InvalidDeliveryTime,
+                    "Requested delivery time must not be after the booking checkout date.");
+            }
         }
 
         if (!request.BookingDetailId.HasValue)
@@ -234,6 +340,8 @@ public class FoodOrderService : IFoodOrderService
             BookingDetailId = request.BookingDetailId,
             OrderStatus = FoodOrderStatus.Pending,
             OrderedAt = DateTime.Now,
+            RequestedDeliveryAt = request.RequestedDeliveryAt,
+            CustomerNote = normalizedCustomerNote,
             IsChargedToRoom = false,
             Kot = new Kot
             {
@@ -250,7 +358,8 @@ public class FoodOrderService : IFoodOrderService
                 MenuItemId = menuItem.MenuItemId,
                 Quantity = requestedItem.Quantity,
                 // Snapshot the selling price at order time; later menu price changes must not affect this order.
-                UnitPrice = menuItem.Price
+                UnitPrice = menuItem.Price,
+                ItemNote = NormalizeNote(requestedItem.ItemNote)
             };
 
             foodOrder.FoodOrderItems.Add(orderItem);
@@ -311,6 +420,8 @@ public class FoodOrderService : IFoodOrderService
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
             OrderedAt = foodOrder.OrderedAt,
+            RequestedDeliveryAt = foodOrder.RequestedDeliveryAt,
+            CustomerNote = foodOrder.CustomerNote,
             IsChargedToRoom = foodOrder.IsChargedToRoom,
             ChargedAt = foodOrder.ChargedAt,
             Items = foodOrder.FoodOrderItems
@@ -321,7 +432,8 @@ public class FoodOrderService : IFoodOrderService
                     ItemName = item.MenuItem?.ItemName ?? string.Empty,
                     CategoryName = item.MenuItem?.Category?.CategoryName ?? "Uncategorized",
                     Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice
+                    UnitPrice = item.UnitPrice,
+                    ItemNote = item.ItemNote
                 })
                 .ToList()
         };
@@ -352,6 +464,8 @@ public class FoodOrderService : IFoodOrderService
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
             OrderedAt = foodOrder.OrderedAt,
+            RequestedDeliveryAt = foodOrder.RequestedDeliveryAt,
+            CustomerNote = foodOrder.CustomerNote,
             IsChargedToRoom = foodOrder.IsChargedToRoom,
             ChargedAt = foodOrder.ChargedAt,
             Items = foodOrder.FoodOrderItems
@@ -362,7 +476,8 @@ public class FoodOrderService : IFoodOrderService
                     ItemName = item.MenuItem?.ItemName ?? string.Empty,
                     CategoryName = item.MenuItem?.Category?.CategoryName ?? "Uncategorized",
                     Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice
+                    UnitPrice = item.UnitPrice,
+                    ItemNote = item.ItemNote
                 })
                 .ToList()
         }).ToList();
@@ -394,6 +509,8 @@ public class FoodOrderService : IFoodOrderService
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
             OrderedAt = foodOrder.OrderedAt,
+            RequestedDeliveryAt = foodOrder.RequestedDeliveryAt,
+            CustomerNote = foodOrder.CustomerNote,
             IsChargedToRoom = foodOrder.IsChargedToRoom,
             ChargedAt = foodOrder.ChargedAt,
             Items = foodOrder.FoodOrderItems
@@ -404,7 +521,8 @@ public class FoodOrderService : IFoodOrderService
                     ItemName = item.MenuItem?.ItemName ?? string.Empty,
                     CategoryName = item.MenuItem?.Category?.CategoryName ?? "Uncategorized",
                     Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice
+                    UnitPrice = item.UnitPrice,
+                    ItemNote = item.ItemNote
                 })
                 .ToList()
         }).ToList();
@@ -569,5 +687,11 @@ public class FoodOrderService : IFoodOrderService
         await _context.SaveChangesAsync();
 
         return FoodOrderActionResult.Succeeded();
+    }
+
+    private static string? NormalizeNote(string? note)
+    {
+        var trimmedNote = note?.Trim();
+        return string.IsNullOrWhiteSpace(trimmedNote) ? null : trimmedNote;
     }
 }

@@ -45,19 +45,20 @@ namespace PhucNguyenResort.Tests.FoodOrder
             _dbContext.Users.Add(new User { UserId = 7, FullName = "Customer 7" });
 
             // Room
-            _dbContext.Rooms.Add(new Room { RoomId = 1, RoomNumber = "101" });
+            _dbContext.RoomCategories.Add(new RoomCategory { CategoryId = 1, CategoryName = "Standard", PricePerNight = 1200000m });
+            _dbContext.Rooms.Add(new Room { RoomId = 1, RoomNumber = "101", CategoryId = 1 });
 
             // Bookings
-            var booking2 = new Booking { BookingId = 2, UserId = 2, BookingStatus = BookingStatus.CheckedIn };
-            booking2.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 1, BookingId = 2 });
+            var booking2 = new Booking { BookingId = 2, UserId = 2, BookingStatus = BookingStatus.CheckedIn, CheckInDate = DateTime.Today, CheckOutDate = DateTime.Today.AddDays(2) };
+            booking2.BookingDetails.Add(new BookingDetail { BookingDetailId = 2, RoomCategoryId = 1, RoomId = 1, BookingId = 2 });
             _dbContext.Bookings.Add(booking2); // FX-BK-001
 
-            var booking7 = new Booking { BookingId = 7, UserId = 7, BookingStatus = BookingStatus.CheckedIn };
-            booking7.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 1, BookingId = 7 });
+            var booking7 = new Booking { BookingId = 7, UserId = 7, BookingStatus = BookingStatus.CheckedIn, CheckInDate = DateTime.Today, CheckOutDate = DateTime.Today.AddDays(2) };
+            booking7.BookingDetails.Add(new BookingDetail { BookingDetailId = 7, RoomCategoryId = 1, RoomId = 1, BookingId = 7 });
             _dbContext.Bookings.Add(booking7); // FX-BK-002
 
-            var booking1 = new Booking { BookingId = 1, UserId = 2, BookingStatus = BookingStatus.Reserved };
-            booking1.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, RoomId = 1, BookingId = 1 });
+            var booking1 = new Booking { BookingId = 1, UserId = 2, BookingStatus = BookingStatus.Reserved, CheckInDate = DateTime.Today, CheckOutDate = DateTime.Today.AddDays(2) };
+            booking1.BookingDetails.Add(new BookingDetail { BookingDetailId = 1, RoomCategoryId = 1, RoomId = 1, BookingId = 1 });
             _dbContext.Bookings.Add(booking1); // FX-BK-003
             
             // Menu Items
@@ -77,9 +78,12 @@ namespace PhucNguyenResort.Tests.FoodOrder
             var request = new FoodOrderCreateRequest
             {
                 BookingId = 2,
+                BookingDetailId = 2,
+                RequestedDeliveryAt = DateTime.Now.AddHours(1),
+                CustomerNote = "  Please call before delivery.  ",
                 Items = new List<FoodOrderItemRequest>
                 {
-                    new FoodOrderItemRequest { MenuItemId = 1, Quantity = 2 },
+                    new FoodOrderItemRequest { MenuItemId = 1, Quantity = 2, ItemNote = "  Less spicy  " },
                     new FoodOrderItemRequest { MenuItemId = 7, Quantity = 1 },
                     new FoodOrderItemRequest { MenuItemId = 10, Quantity = 0 } // Should be filtered out
                 }
@@ -101,7 +105,10 @@ namespace PhucNguyenResort.Tests.FoodOrder
 
             Assert.NotNull(dbOrder);
             Assert.Equal(2, dbOrder.BookingId);
+            Assert.Equal(2, dbOrder.BookingDetailId);
             Assert.Equal(FoodOrderStatus.Pending, dbOrder.OrderStatus);
+            Assert.Equal("Please call before delivery.", dbOrder.CustomerNote);
+            Assert.NotNull(dbOrder.RequestedDeliveryAt);
             
             
             // Expected Amount: 85000*2 + 235000*1 = 405000
@@ -109,7 +116,7 @@ namespace PhucNguyenResort.Tests.FoodOrder
             
             // Check items: only 2 items (10 should be filtered out)
             Assert.Equal(2, dbOrder.FoodOrderItems.Count);
-            Assert.Contains(dbOrder.FoodOrderItems, i => i.MenuItemId == 1 && i.Quantity == 2 && i.UnitPrice == 85000);
+            Assert.Contains(dbOrder.FoodOrderItems, i => i.MenuItemId == 1 && i.Quantity == 2 && i.UnitPrice == 85000 && i.ItemNote == "Less spicy");
             Assert.Contains(dbOrder.FoodOrderItems, i => i.MenuItemId == 7 && i.Quantity == 1 && i.UnitPrice == 235000);
 
             // Check KOT
@@ -200,6 +207,7 @@ namespace PhucNguyenResort.Tests.FoodOrder
             var request = new FoodOrderCreateRequest
             {
                 BookingId = 2,
+                BookingDetailId = 2,
                 Items = new List<FoodOrderItemRequest>
                 {
                     new FoodOrderItemRequest { MenuItemId = 8, Quantity = 1 } // IsAvailable = false
@@ -300,6 +308,7 @@ namespace PhucNguyenResort.Tests.FoodOrder
             var request = new FoodOrderCreateRequest
             {
                 BookingId = 2,
+                BookingDetailId = 2,
                 Items = new List<FoodOrderItemRequest>
                 {
                     new FoodOrderItemRequest { MenuItemId = 9, Quantity = 1 } // IsDeleted = true
@@ -325,6 +334,7 @@ namespace PhucNguyenResort.Tests.FoodOrder
             var request = new FoodOrderCreateRequest
             {
                 BookingId = 2,
+                BookingDetailId = 2,
                 Items = new List<FoodOrderItemRequest>
                 {
                     new FoodOrderItemRequest { MenuItemId = 999, Quantity = 1 } // Does not exist
