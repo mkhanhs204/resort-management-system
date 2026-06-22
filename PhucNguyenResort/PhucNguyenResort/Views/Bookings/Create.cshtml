@@ -352,6 +352,17 @@
             var adultsInput = document.querySelector('input[name="NumberOfAdults"]');
             var childrenInput = document.querySelector('input[name="NumberOfChildren"]');
             
+            // Set max birthdate to 18 years ago from today (minimum age: 18)
+            var dobInput = document.querySelector('input[name="PrimaryGuestDateOfBirth"]');
+            if (dobInput) {
+                var today = new Date();
+                var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                var dd = String(maxDate.getDate()).padStart(2, '0');
+                var mm = String(maxDate.getMonth() + 1).padStart(2, '0');
+                var yyyy = maxDate.getFullYear();
+                dobInput.max = yyyy + '-' + mm + '-' + dd;
+            }
+            
             // Dynamic display elements
             var summaryCheckIn = document.getElementById('summary-checkin');
             var summaryCheckOut = document.getElementById('summary-checkout');

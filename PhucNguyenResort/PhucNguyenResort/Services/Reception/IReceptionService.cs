@@ -12,5 +12,15 @@ namespace PhucNguyenResort.Services.Reception
         Task<(bool Success, string ErrorMessage)> ProcessCheckInAsync(PreCheckinViewModel model);
         Task<(byte[]? FileContent, string FileName, string ErrorMessage)> GetManifestDataAsync(int id);
         Task<List<Room>> GetAvailableRoomsForCategoryAsync(int categoryId, DateTime checkIn, DateTime checkOut, int? currentBookingId = null);
+        Task<List<Room>> GetAvailableRoomsForDatesAsync(DateTime checkIn, DateTime checkOut);
+        Task<WalkInResult> ProcessWalkInBookingAsync(WalkInBookingViewModel model);
+    }
+
+    public class WalkInResult
+    {
+        public bool Success { get; set; }
+        public string? ErrorMessage { get; set; }
+        public string? ErrorCode { get; set; }
+        public int? BookingId { get; set; }
     }
 }

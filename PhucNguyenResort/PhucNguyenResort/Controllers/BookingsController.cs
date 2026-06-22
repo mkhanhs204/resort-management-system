@@ -131,6 +131,16 @@ namespace PhucNguyenResort.Controllers
                 ModelState.AddModelError(nameof(model.PdpdConsentChecked), "Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD).");
             }
 
+            if (model.PrimaryGuestDateOfBirth.HasValue)
+            {
+                var age = DateTime.Today.Year - model.PrimaryGuestDateOfBirth.Value.Year;
+                if (model.PrimaryGuestDateOfBirth.Value.Date > DateTime.Today.AddYears(-age)) age--;
+                if (age < 18)
+                {
+                    ModelState.AddModelError(nameof(model.PrimaryGuestDateOfBirth), "Người đặt phòng chính phải từ 18 tuổi trở lên để thực hiện đặt phòng.");
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.SelectedCategories = selectedCategories;
