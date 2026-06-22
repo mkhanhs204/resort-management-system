@@ -1,0 +1,52 @@
+======================================================================
+DỮ LIỆU MẪU KIỂM TRA XÁC THỰC (VALIDATION TEST DATA) - PHUC NGUYEN RESORT
+======================================================================
+
+--- DỮ LIỆU MẪU HỢP LỆ (VALID CASE) ---
+Họ và tên: NGUYEN VAN AN
+Ngày sinh: 15/06/1998
+Giới tính: Nam
+Số CCCD / Hộ chiếu: 037300012345
+Quốc tịch: Vietnam
+Điều khoản PDPD: Đã tích chọn đồng ý (Checked)
+
+--- DỮ LIỆU MẪU HỢP LỆ KHÁC ---
+Họ và tên: Tran Thi Mai
+Ngày sinh: 25/12/2000
+Giới tính: Nữ
+Số CCCD / Hộ chiếu: B9876543
+Quốc tịch: Vietnam
+Điều khoản PDPD: Đã tích chọn đồng ý (Checked)
+
+
+--- DỮ LIỆU MẪU SAI ĐỊNH DẠNG HỌ TÊN (INVALID NAME) ---
+Họ và tên: NGUYEN VAN A 123
+Ngày sinh: 15/06/1998
+Giới tính: Nam
+Số CCCD / Hộ chiếu: 037300012345
+Quốc tịch: Vietnam
+--> Lỗi mong đợi: "Họ tên chỉ được chứa chữ cái và khoảng trắng."
+
+
+--- DỮ LIỆU MẪU SAI TUỔI ĐẶT PHÒNG (< 18 TUỔI) ---
+Họ và tên: NGUYEN VAN AN
+Ngày sinh: 12/12/2015
+Giới tính: Nam
+Số CCCD / Hộ chiếu: 037300012345
+Quốc tịch: Vietnam
+--> Lỗi mong đợi: "Người đặt phòng chính phải từ 18 tuổi trở lên để thực hiện đặt phòng." (Hoặc không thể chọn lịch trên trình duyệt).
+
+
+--- DỮ LIỆU MẪU SAI CCCD/HỘ CHIẾU (INVALID PASSPORT) ---
+Họ và tên: NGUYEN VAN AN
+Ngày sinh: 15/06/1998
+Giới tính: Nam
+Số CCCD / Hộ chiếu: 0123 456 789 (chứa khoảng trắng) hoặc @CCCD123 (chứa ký tự đặc biệt)
+Quốc tịch: Vietnam
+--> Lỗi mong đợi: "Số CCCD/Hộ chiếu phải là ký tự chữ hoặc số, độ dài từ 8 đến 20 ký tự."
+
+
+--- DỮ LIỆU MẪU CHƯA ĐỒNG Ý ĐIỀU KHOẢN (UNCHECKED PDPD CONSENT) ---
+Điều khoản PDPD: Không tích chọn đồng ý (Unchecked)
+--> Lỗi mong đợi: "Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD) để tiếp tục."
+======================================================================

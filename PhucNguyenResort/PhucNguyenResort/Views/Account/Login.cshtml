@@ -64,7 +64,18 @@
                         <button type="submit" class="btn-login">Đăng nhập <i class="fa fa-arrow-right ml-2"></i></button>
                     </form>
 
-                    <div class="register-prompt">
+                    <div class="d-flex align-items-center my-3">
+                        <hr class="flex-grow-1" style="border-color: #eee; border-top: 1px solid #ddd;" />
+                        <span class="mx-3 text-muted small" style="font-weight: 500;">Hoặc</span>
+                        <hr class="flex-grow-1" style="border-color: #eee; border-top: 1px solid #ddd;" />
+                    </div>
+
+                    <a asp-action="GoogleLogin" class="btn btn-block btn-light d-flex align-items-center justify-content-center border shadow-sm" style="border-radius: 12px; padding: 10px; font-weight: 600; font-size: 0.95rem; color: #444; background: #fff; transition: all 0.2s; text-decoration: none;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width: 20px; height: 20px; margin-right: 10px;" />
+                        Đăng nhập bằng Google
+                    </a>
+
+                    <div class="register-prompt mt-3">
                         Chưa có tài khoản? <a asp-action="Register">Đăng ký ngay</a>
                     </div>
                 </div>

@@ -1,22 +1,54 @@
 using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using PhucNguyenResort.Data;
-using PhucNguyenResort.Enums;
-using PhucNguyenResort.Services.Home;
+using System.IO;
+using System.IO.Compression;
+using System.Xml.Linq;
+using System.Text;
 
 class Program
 {
-    static async System.Threading.Tasks.Task Main(string[] args)
+    static void Main(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<ResortDbContext>();
-        optionsBuilder.UseSqlServer("Server=MSI\\CUONG;Database=PhucNguyenResortDB;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;");
-        using var context = new ResortDbContext(optionsBuilder.Options);
-        var svc = new HomeService(context);
-        var checkIn = new DateTime(2026, 6, 27);
-        var checkOut = new DateTime(2026, 6, 30);
-        int total = await context.Rooms.CountAsync(r => r.CategoryId == 6 && r.Status != RoomStatus.Maintenance);
-        int booked = await context.Bookings.CountAsync(b => b.Room!.CategoryId == 6 && b.BookingStatus != BookingStatus.Cancelled && b.BookingStatus != BookingStatus.NoShow && b.CheckInDate < checkOut && b.CheckOutDate > checkIn);
-        Console.WriteLine($"total: {total}, booked: {booked}");
+        string docxPath = @"e:\SWP391_PROJECT\su26-swp391-se2023-g1\Tailieu\giay-xac-nhan-luu-tru-2_2010172147.docx";
+        string outputPath = @"e:\SWP391_PROJECT\su26-swp391-se2023-g1\PhucNguyenResort\docx_content.txt";
+
+        try
+        {
+            using (ZipArchive archive = ZipFile.OpenRead(docxPath))
+            {
+                ZipArchiveEntry documentEntry = archive.GetEntry("word/document.xml");
+                if (documentEntry == null)
+                {
+                    Console.WriteLine("Could not find word/document.xml in docx.");
+                    return;
+                }
+
+                using (Stream stream = documentEntry.Open())
+                {
+                    XDocument xdoc = XDocument.Load(stream);
+                    XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+                    
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var paragraph in xdoc.Descendants(w + "p"))
+                    {
+                        StringBuilder paraText = new StringBuilder();
+                        foreach (var text in paragraph.Descendants(w + "t"))
+                        {
+                            paraText.Append(text.Value);
+                        }
+                        if (paraText.Length > 0)
+                        {
+                            sb.AppendLine(paraText.ToString());
+                        }
+                    }
+                    
+                    File.WriteAllText(outputPath, sb.ToString(), Encoding.UTF8);
+                    Console.WriteLine("Successfully written docx content to docx_content.txt");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,0 +1,227 @@
+@model PhucNguyenResort.ViewModels.Tours.TourBookingSuccessVM
+@{
+    ViewData["Title"] = "Đặt Tour Thành Công";
+}
+
+@section Styles {
+<style>
+    .success-page {
+        background: #f8f6f3;
+        padding: 60px 0 80px;
+        min-height: 80vh;
+    }
+    .success-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+        max-width: 650px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    .success-header {
+        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+        color: #fff;
+        padding: 40px;
+        text-align: center;
+    }
+    .success-header .check-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        animation: scaleIn 0.5s ease;
+    }
+    .success-header .check-icon i {
+        font-size: 40px;
+    }
+    @@keyframes scaleIn {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .success-header h2 {
+        font-family: 'Lora', serif;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .success-header p {
+        opacity: 0.9;
+        font-size: 15px;
+    }
+    .success-body {
+        padding: 35px 40px;
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 15px;
+    }
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    .detail-row .label {
+        color: #999;
+    }
+    .detail-row .value {
+        font-weight: 600;
+        color: #19191a;
+    }
+    .detail-row.total {
+        font-size: 18px;
+        border-bottom: none;
+        margin-top: 8px;
+        padding-top: 18px;
+        border-top: 2px solid #f0f0f0;
+    }
+    .detail-row.total .value {
+        color: #dfa974;
+        font-family: 'Lora', serif;
+        font-size: 24px;
+    }
+    .qr-section {
+        text-align: center;
+        padding: 30px;
+        background: #faf8f5;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+    .qr-section h5 {
+        font-family: 'Lora', serif;
+        color: #19191a;
+        margin-bottom: 15px;
+    }
+    .qr-section img {
+        border: 3px solid #dfa974;
+        border-radius: 10px;
+        padding: 8px;
+        background: #fff;
+    }
+    .qr-section small {
+        display: block;
+        color: #999;
+        margin-top: 10px;
+        font-size: 13px;
+    }
+    .success-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+    .btn-primary-tour {
+        flex: 1;
+        background: #dfa974;
+        color: #fff;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .btn-primary-tour:hover {
+        background: #c89660;
+        color: #fff;
+    }
+    .btn-secondary-tour {
+        flex: 1;
+        background: transparent;
+        border: 2px solid #e0e0e0;
+        color: #555;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .btn-secondary-tour:hover {
+        border-color: #dfa974;
+        color: #dfa974;
+    }
+    .booking-id-badge {
+        background: #fdf5ec;
+        color: #dfa974;
+        padding: 4px 14px;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 16px;
+    }
+</style>
+}
+
+<div class="success-page">
+    <div class="container">
+        <div class="success-card">
+            <!-- Header -->
+            <div class="success-header">
+                <div class="check-icon">
+                    <i class="fa fa-check"></i>
+                </div>
+                <h2>Đặt Tour Thành Công!</h2>
+                <p>Vé tour của bạn đã được xác nhận. Hãy chuẩn bị cho hành trình tuyệt vời!</p>
+            </div>
+
+            <!-- Body -->
+            <div class="success-body">
+                <div class="detail-row">
+                    <span class="label">Mã đặt tour</span>
+                    <span class="booking-id-badge">#@Model.TourBookingId</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Tour</span>
+                    <span class="value">@Model.TourName</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Ngày khởi hành</span>
+                    <span class="value">@Model.TourDate.ToString("dd/MM/yyyy")</span>
+                </div>
+                @if (Model.StartTime.HasValue)
+                {
+                    <div class="detail-row">
+                        <span class="label">Giờ bắt đầu</span>
+                        <span class="value">@Model.StartTime.Value.ToString(@"hh\:mm")</span>
+                    </div>
+                }
+                <div class="detail-row">
+                    <span class="label">Số người tham gia</span>
+                    <span class="value">@Model.Participants người</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Phương thức thanh toán</span>
+                    <span class="value">@Model.PaymentMethod</span>
+                </div>
+                <div class="detail-row total">
+                    <span class="label">Tổng tiền</span>
+                    <span class="value">@Model.TotalAmount.ToString("N0") VNĐ</span>
+                </div>
+
+                <!-- QR Code -->
+                <div class="qr-section">
+                    <h5><i class="fa fa-qrcode" style="color: #dfa974;"></i> Vé Điện Tử</h5>
+                    <img src="@Model.QrCodeUrl" alt="QR Code Vé Tour" width="200" height="200" />
+                    <small>Xuất trình mã QR này cho hướng dẫn viên khi tham gia tour.</small>
+                </div>
+
+                <!-- Actions -->
+                <div class="success-actions">
+                    <a asp-action="MyTourBookings" class="btn-primary-tour">
+                        <i class="fa fa-list"></i> Xem Đặt Tour Của Tôi
+                    </a>
+                    <a asp-action="Index" class="btn-secondary-tour">
+                        <i class="fa fa-compass"></i> Khám Phá Thêm Tour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Services.RestaurantMenus;
 using PhucNguyenResort.ViewModels.RestaurantMenus;
 
 namespace PhucNguyenResort.Controllers;
 
+[Authorize(Roles = "System Admin,Business Manager,F&B Staff")]
 public class RestaurantMenusController : Controller
 {
     private readonly IRestaurantMenuService _restaurantMenuService;

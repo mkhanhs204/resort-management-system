@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -382,6 +383,102 @@ namespace PhucNguyenResort.Controllers
             {
                 return RedirectToAction("Index", "Dashboard");
             }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [AllowAnonymous]
+        public IActionResult GoogleLogin()
+        {
+            var redirectUrl = Url.Action("GoogleResponse", "Account");
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync("ExternalCookie");
+            if (!result.Succeeded || result.Principal == null)
+            {
+                TempData["ErrorMessage"] = "Đăng nhập bằng Google thất bại.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["ErrorMessage"] = "Không thể lấy thông tin email từ tài khoản Google của bạn.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+            {
+                var customerRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == "Customer")
+                                   ?? await _context.Roles.FirstOrDefaultAsync(r => r.RoleId == 3);
+
+                if (customerRole == null)
+                {
+                    TempData["ErrorMessage"] = "Hệ thống gặp sự cố cấu hình phân quyền (Role).";
+                    return RedirectToAction(nameof(Login));
+                }
+
+                user = new User
+                {
+                    FullName = name ?? "Google User",
+                    Email = email,
+                    RoleId = customerRole.RoleId,
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                var profile = new UserProfile
+                {
+                    UserId = user.UserId,
+                    ConsentGiven = true,
+                    DeletionRequested = false
+                };
+                _context.UserProfiles.Add(profile);
+                await _context.SaveChangesAsync();
+
+                user.Role = customerRole;
+            }
+            else if (!user.IsActive)
+            {
+                user.IsActive = true;
+                await _context.SaveChangesAsync();
+            }
+
+            await HttpContext.SignOutAsync("ExternalCookie");
+
+            var roleName = user.Role?.RoleName ?? "Customer";
+            var identityClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, roleName)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(identityClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(14)
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
 
             return RedirectToAction("Index", "Home");
         }

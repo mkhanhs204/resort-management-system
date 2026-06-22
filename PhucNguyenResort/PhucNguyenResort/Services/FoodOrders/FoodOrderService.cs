@@ -15,6 +15,16 @@ public class FoodOrderService : IFoodOrderService
         _context = context;
     }
 
+    public async Task<RoomServiceOrderViewModel> BuildRoomServiceMenuAsync(string? message = null)
+    {
+        return new RoomServiceOrderViewModel
+        {
+            CanPlaceOrder = false,
+            Message = message,
+            MenuItems = await GetAvailableMenuItemsAsync()
+        };
+    }
+
     public async Task<RoomServiceOrderViewModel?> BuildRoomServiceOrderAsync(int bookingId)
     {
         return await BuildRoomServiceOrderAsync(bookingId, null);
@@ -32,6 +42,8 @@ public class FoodOrderService : IFoodOrderService
             .Include(b => b.User)
             .Include(b => b.BookingDetails)
             .ThenInclude(bd => bd.Room)
+            .Include(b => b.BookingDetails)
+            .ThenInclude(bd => bd.RoomCategory)
             .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
         if (booking == null)
@@ -44,13 +56,26 @@ public class FoodOrderService : IFoodOrderService
             return null;
         }
 
+        var roomOptions = booking.BookingDetails
+            .Where(bd => bd.RoomId.HasValue && bd.Room != null)
+            .OrderBy(bd => bd.Room!.RoomNumber)
+            .Select(bd => new RoomServiceRoomOptionViewModel
+            {
+                BookingDetailId = bd.BookingDetailId,
+                RoomId = bd.RoomId!.Value,
+                RoomNumber = bd.Room!.RoomNumber ?? string.Empty,
+                CategoryName = bd.RoomCategory?.CategoryName ?? string.Empty
+            })
+            .ToList();
+
         var viewModel = new RoomServiceOrderViewModel
         {
             BookingId = booking.BookingId,
             CustomerName = booking.User?.FullName ?? string.Empty,
-            RoomNumber = booking.BookingDetails != null ? string.Join(", ", booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : string.Empty,
+            RoomNumber = string.Join(", ", roomOptions.Select(room => room.RoomNumber)),
             BookingStatus = booking.BookingStatus,
-            CanPlaceOrder = booking.BookingStatus == BookingStatus.CheckedIn
+            CanPlaceOrder = booking.BookingStatus == BookingStatus.CheckedIn,
+            RoomOptions = roomOptions
         };
 
         if (!viewModel.CanPlaceOrder)
@@ -58,7 +83,26 @@ public class FoodOrderService : IFoodOrderService
             return null;
         }
 
-        viewModel.MenuItems = await _context.MenuItems
+        if (viewModel.RoomOptions.Count == 0)
+        {
+            viewModel.CanPlaceOrder = false;
+            viewModel.Message = "This booking does not have an assigned room yet, so room service is not available.";
+            return viewModel;
+        }
+
+        if (viewModel.RoomOptions.Count == 1)
+        {
+            viewModel.BookingDetailId = viewModel.RoomOptions[0].BookingDetailId;
+        }
+
+        viewModel.MenuItems = await GetAvailableMenuItemsAsync();
+
+        return viewModel;
+    }
+
+    private async Task<List<RoomServiceMenuItemViewModel>> GetAvailableMenuItemsAsync()
+    {
+        return await _context.MenuItems
             .AsNoTracking()
             .Include(item => item.Category)
             .Where(item => item.IsAvailable && !item.IsDeleted)
@@ -75,8 +119,6 @@ public class FoodOrderService : IFoodOrderService
                 Price = item.Price
             })
             .ToListAsync();
-
-        return viewModel;
     }
 
     public async Task<FoodOrderCreateResult> CreateFoodOrderAsync(FoodOrderCreateRequest request, int currentUserId)
@@ -138,6 +180,31 @@ public class FoodOrderService : IFoodOrderService
                 "Room service orders are only available for checked-in bookings.");
         }
 
+        if (!request.BookingDetailId.HasValue)
+        {
+            return FoodOrderCreateResult.Failed(
+                FoodOrderCreateStatus.RoomNotSelected,
+                "A delivery room must be selected for room service orders.");
+        }
+
+        var bookingDetail = await _context.BookingDetails
+            .AsNoTracking()
+            .FirstOrDefaultAsync(detail => detail.BookingDetailId == request.BookingDetailId.Value);
+
+        if (bookingDetail == null || bookingDetail.BookingId != request.BookingId)
+        {
+            return FoodOrderCreateResult.Failed(
+                FoodOrderCreateStatus.BookingRoomNotFound,
+                "The selected delivery room does not belong to this booking.");
+        }
+
+        if (!bookingDetail.RoomId.HasValue)
+        {
+            return FoodOrderCreateResult.Failed(
+                FoodOrderCreateStatus.BookingRoomNotAssigned,
+                "The selected booking room has not been assigned to a physical room.");
+        }
+
         var menuItemIds = requestedItems
             .Select(item => item.MenuItemId)
             .ToList();
@@ -164,6 +231,7 @@ public class FoodOrderService : IFoodOrderService
         var foodOrder = new FoodOrder
         {
             BookingId = request.BookingId,
+            BookingDetailId = request.BookingDetailId,
             OrderStatus = FoodOrderStatus.Pending,
             OrderedAt = DateTime.Now,
             IsChargedToRoom = false,
@@ -213,9 +281,8 @@ public class FoodOrderService : IFoodOrderService
             .AsNoTracking()
             .Include(order => order.Booking)
                 .ThenInclude(booking => booking!.User)
-            .Include(order => order.Booking)
-                .ThenInclude(booking => booking!.BookingDetails)
-                    .ThenInclude(bd => bd.Room)
+            .Include(order => order.BookingDetail)
+                .ThenInclude(bookingDetail => bookingDetail!.Room)
             .Include(order => order.Kot)
             .Include(order => order.FoodOrderItems)
                 .ThenInclude(orderItem => orderItem.MenuItem)
@@ -239,7 +306,7 @@ public class FoodOrderService : IFoodOrderService
             FoodOrderId = foodOrder.FoodOrderId,
             BookingId = foodOrder.BookingId,
             CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
-            RoomNumber = foodOrder.Booking?.BookingDetails != null ? string.Join(", ", foodOrder.Booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : string.Empty,
+            RoomNumber = foodOrder.BookingDetail?.Room?.RoomNumber ?? string.Empty,
             OrderStatus = foodOrder.OrderStatus,
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
@@ -266,9 +333,8 @@ public class FoodOrderService : IFoodOrderService
             .AsNoTracking()
             .Include(order => order.Booking)
                 .ThenInclude(booking => booking!.User)
-            .Include(order => order.Booking)
-                .ThenInclude(booking => booking!.BookingDetails)
-                    .ThenInclude(bd => bd.Room)
+            .Include(order => order.BookingDetail)
+                .ThenInclude(bookingDetail => bookingDetail!.Room)
             .Include(order => order.Kot)
             .Include(order => order.FoodOrderItems)
                 .ThenInclude(orderItem => orderItem.MenuItem)
@@ -281,10 +347,49 @@ public class FoodOrderService : IFoodOrderService
             FoodOrderId = foodOrder.FoodOrderId,
             BookingId = foodOrder.BookingId,
             CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
-            RoomNumber = foodOrder.Booking?.BookingDetails
-                .Where(bd => bd.Room?.RoomNumber != null)
-                .Select(bd => bd.Room!.RoomNumber!)
-                .FirstOrDefault() ?? string.Empty,
+            RoomNumber = foodOrder.BookingDetail?.Room?.RoomNumber ?? string.Empty,
+            OrderStatus = foodOrder.OrderStatus,
+            KitchenStatus = foodOrder.Kot?.Status,
+            TotalAmount = foodOrder.TotalAmount ?? 0,
+            OrderedAt = foodOrder.OrderedAt,
+            IsChargedToRoom = foodOrder.IsChargedToRoom,
+            ChargedAt = foodOrder.ChargedAt,
+            Items = foodOrder.FoodOrderItems
+                .OrderBy(item => item.MenuItem?.Category?.CategoryName)
+                .ThenBy(item => item.MenuItem?.ItemName)
+                .Select(item => new FoodOrderDetailItemViewModel
+                {
+                    ItemName = item.MenuItem?.ItemName ?? string.Empty,
+                    CategoryName = item.MenuItem?.Category?.CategoryName ?? "Uncategorized",
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice
+                })
+                .ToList()
+        }).ToList();
+    }
+
+    public async Task<List<FoodOrderDetailViewModel>> GetFoodOrdersForCustomerAsync(int currentUserId)
+    {
+        var foodOrders = await _context.FoodOrders
+            .AsNoTracking()
+            .Include(order => order.Booking)
+                .ThenInclude(booking => booking!.User)
+            .Include(order => order.BookingDetail)
+                .ThenInclude(bookingDetail => bookingDetail!.Room)
+            .Include(order => order.Kot)
+            .Include(order => order.FoodOrderItems)
+                .ThenInclude(orderItem => orderItem.MenuItem)
+                    .ThenInclude(menuItem => menuItem!.Category)
+            .Where(order => order.Booking != null && order.Booking.UserId == currentUserId)
+            .OrderByDescending(order => order.OrderedAt)
+            .ToListAsync();
+
+        return foodOrders.Select(foodOrder => new FoodOrderDetailViewModel
+        {
+            FoodOrderId = foodOrder.FoodOrderId,
+            BookingId = foodOrder.BookingId,
+            CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
+            RoomNumber = foodOrder.BookingDetail?.Room?.RoomNumber ?? string.Empty,
             OrderStatus = foodOrder.OrderStatus,
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
@@ -306,6 +411,50 @@ public class FoodOrderService : IFoodOrderService
     }
 
     // [UC66] F&B Staff cap nhat trang thai don hang
+    public async Task<FoodOrderActionResult> CancelFoodOrderByCustomerAsync(int foodOrderId, int currentUserId)
+    {
+        var foodOrder = await _context.FoodOrders
+            .Include(order => order.Booking)
+            .Include(order => order.Kot)
+            .FirstOrDefaultAsync(order => order.FoodOrderId == foodOrderId);
+
+        if (foodOrder == null)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.NotFound, "Food order not found.");
+        }
+
+        if (foodOrder.Booking == null || foodOrder.Booking.UserId != currentUserId)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.Forbidden, "You are not authorized to cancel this order.");
+        }
+
+        if (foodOrder.IsChargedToRoom)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.InvalidState, "Charged orders cannot be cancelled.");
+        }
+
+        if (foodOrder.OrderStatus != FoodOrderStatus.Pending)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.InvalidState, "Only pending orders can be cancelled.");
+        }
+
+        if (foodOrder.Kot != null && foodOrder.Kot.Status != KotStatus.Pending)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.InvalidState, "The kitchen has already started preparing this order.");
+        }
+
+        foodOrder.OrderStatus = FoodOrderStatus.Cancelled;
+
+        if (foodOrder.Kot != null)
+        {
+            foodOrder.Kot.Status = KotStatus.Cancelled;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return FoodOrderActionResult.Succeeded();
+    }
+
     public async Task<FoodOrderActionResult> UpdateOrderStatusAsync(int foodOrderId, FoodOrderStatus newStatus)
     {
         var foodOrder = await _context.FoodOrders
@@ -355,6 +504,12 @@ public class FoodOrderService : IFoodOrderService
         }
 
         foodOrder.OrderStatus = newStatus;
+
+        if (newStatus == FoodOrderStatus.Cancelled && foodOrder.Kot != null)
+        {
+            foodOrder.Kot.Status = KotStatus.Cancelled;
+        }
+
         await _context.SaveChangesAsync();
 
         return FoodOrderActionResult.Succeeded();

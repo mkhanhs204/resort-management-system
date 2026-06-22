@@ -94,7 +94,6 @@
                             var firstDetail = booking.BookingDetails.FirstOrDefault();
                             
                             var assignedRooms = booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
-                            string assignedRoomsDisplay = assignedRooms.Any() ? $"(Phòng: {string.Join(", ", assignedRooms)})" : "(Chưa xếp phòng)";
                         }
 
                         <!-- Left: Image Section -->
@@ -113,7 +112,20 @@
                         <div class="booking-card-info">
                             <div>
                                 <div class="booking-id">Mã BKG: #@booking.BookingId</div>
-                                <h3>@roomsDisplay <span style="font-size: 1rem; color: var(--text-muted); font-weight: normal;">@assignedRoomsDisplay</span></h3>
+                                <h3>
+                                    @roomsDisplay
+                                    @if (assignedRooms.Any())
+                                    {
+                                        @foreach (var roomNum in assignedRooms)
+                                        {
+                                            <span class="room-number-tag">Phòng @roomNum</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="room-number-tag" style="background-color: #f3f4f6; color: #4b5563; border-color: #e2e8f0; font-weight: 500;">Chưa xếp phòng</span>
+                                    }
+                                </h3>
                                 
                                 <div class="stay-timeline">
                                     <div class="timeline-node">

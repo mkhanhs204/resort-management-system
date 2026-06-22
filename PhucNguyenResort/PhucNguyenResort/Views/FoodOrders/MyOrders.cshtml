@@ -1,0 +1,103 @@
+@using PhucNguyenResort.Enums
+@model IEnumerable<PhucNguyenResort.ViewModels.FoodOrders.FoodOrderDetailViewModel>
+
+@{
+    ViewData["Title"] = "My Room Service Orders";
+}
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">My Room Service Orders</h1>
+        <a asp-action="RoomService" class="btn btn-outline-secondary">Back to room service</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">You do not have any room service orders yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Booking</th>
+                        <th>Room</th>
+                        <th>Status</th>
+                        <th>Kitchen</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        var canCancel = order.OrderStatus == FoodOrderStatus.Pending
+                            && (!order.KitchenStatus.HasValue || order.KitchenStatus == KotStatus.Pending)
+                            && !order.IsChargedToRoom;
+
+                        <tr>
+                            <td>
+                                <strong>#@order.FoodOrderId</strong><br />
+                                <small class="text-muted">@order.OrderedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                            </td>
+                            <td>#@order.BookingId</td>
+                            <td>@(string.IsNullOrWhiteSpace(order.RoomNumber) ? "N/A" : order.RoomNumber)</td>
+                            <td>
+                                @if (order.OrderStatus == FoodOrderStatus.Cancelled)
+                                {
+                                    <span class="badge badge-danger">Cancelled</span>
+                                }
+                                else
+                                {
+                                    <span>@order.OrderStatus</span>
+                                }
+                            </td>
+                            <td>
+                                @if (order.KitchenStatus == KotStatus.Cancelled)
+                                {
+                                    <span class="badge badge-danger">Cancelled</span>
+                                }
+                                else
+                                {
+                                    <span>@(order.KitchenStatus?.ToString() ?? "Pending")</span>
+                                }
+                            </td>
+                            <td class="text-end">@order.TotalAmount.ToString("N0") VND</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@order.FoodOrderId" class="btn btn-sm btn-primary">Details</a>
+
+                                @if (canCancel)
+                                {
+                                    <form asp-action="Cancel" asp-route-id="@order.FoodOrderId" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </form>
+                                }
+                                else if (order.OrderStatus == FoodOrderStatus.Cancelled)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Cancelled</button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Cancel unavailable</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
