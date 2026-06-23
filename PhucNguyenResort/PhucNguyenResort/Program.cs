@@ -55,6 +55,7 @@ builder.Services.AddScoped<PhucNguyenResort.Services.Refunds.IRefundService, Phu
 builder.Services.AddScoped<PhucNguyenResort.Services.Email.IEmailSender, PhucNguyenResort.Services.Email.EmailSender>();
 builder.Services.AddDataProtection();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PdpdDataPurgeJob>();
+builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourBookingCleanupJob>();
 
 var app = builder.Build();
 

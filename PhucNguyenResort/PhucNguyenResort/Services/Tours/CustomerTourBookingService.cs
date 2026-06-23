@@ -275,7 +275,12 @@ namespace PhucNguyenResort.Services.Tours
                     TotalAmount = totalAmount,
                     BookingStatus = model.PaymentMethod == "ChargeToRoom"
                         ? TourBookingStatus.Confirmed
-                        : TourBookingStatus.Pending // Pending until VNPay confirms
+                        : TourBookingStatus.Pending, // Pending until VNPay confirms
+                    PrimaryGuestName = model.PrimaryGuestName,
+                    PrimaryGuestDateOfBirth = model.PrimaryGuestDateOfBirth,
+                    PrimaryGuestGender = model.PrimaryGuestGender,
+                    PrimaryGuestPassportNumber = model.PrimaryGuestPassportNumber,
+                    PrimaryGuestNationality = model.PrimaryGuestNationality
                 };
 
                 _context.TourBookings.Add(tourBooking);
@@ -320,11 +325,11 @@ namespace PhucNguyenResort.Services.Tours
                     paymentMethod = "VNPay";
                 }
 
-                // Can cancel if Confirmed/Pending and tour date is in the future (48h+ rule)
-                bool canCancel = (tb.BookingStatus == TourBookingStatus.Confirmed ||
-                                  tb.BookingStatus == TourBookingStatus.Pending) &&
-                                 tb.Schedule?.TourDate != null &&
-                                 (tb.Schedule.TourDate.Value - DateTime.Now).TotalHours > 48;
+                // Can cancel if Confirmed (and > 48h) or Pending (anytime)
+                bool canCancel = (tb.BookingStatus == TourBookingStatus.Confirmed &&
+                                  tb.Schedule?.TourDate != null &&
+                                  (tb.Schedule.TourDate.Value - DateTime.Now).TotalHours > 48) ||
+                                 (tb.BookingStatus == TourBookingStatus.Pending);
 
                 return new MyTourBookingItemVM
                 {
@@ -338,7 +343,8 @@ namespace PhucNguyenResort.Services.Tours
                     TotalAmount = tb.TotalAmount ?? 0,
                     BookingStatus = tb.BookingStatus.ToString(),
                     CanCancel = canCancel,
-                    PaymentMethod = paymentMethod
+                    PaymentMethod = paymentMethod,
+                    CreatedAt = tb.CreatedAt
                 };
             }).ToList();
         }
@@ -382,8 +388,9 @@ namespace PhucNguyenResort.Services.Tours
                     };
                 }
 
-                // BR-TOUR-04: Check 48h cancellation policy
-                if (tourBooking.Schedule?.TourDate != null &&
+                // BR-TOUR-04: Check 48h cancellation policy (only for Confirmed bookings)
+                if (tourBooking.BookingStatus == TourBookingStatus.Confirmed &&
+                    tourBooking.Schedule?.TourDate != null &&
                     (tourBooking.Schedule.TourDate.Value - DateTime.Now).TotalHours <= 48)
                 {
                     return new TourBookingResultVM

@@ -275,7 +275,7 @@
                             <div class="tour-card-img">
                                 @if (!string.IsNullOrEmpty(tour.ImageUrl))
                                 {
-                                    <img src="@tour.ImageUrl" alt="@tour.TourName" />
+                                    <img src="@tour.ImageUrl" alt="@tour.TourName" onerror="this.onerror=null;this.src='/img/room/room-b1.jpg';" />
                                 }
                                 else
                                 {

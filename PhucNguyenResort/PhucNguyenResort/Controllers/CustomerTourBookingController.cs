@@ -19,15 +19,18 @@ namespace PhucNguyenResort.Controllers
         private readonly ICustomerTourBookingService _tourBookingService;
         private readonly IVnPayService _vnPayService;
         private readonly ResortDbContext _context;
+        private readonly PhucNguyenResort.Services.Email.IEmailSender _emailSender;
 
         public CustomerTourBookingController(
             ICustomerTourBookingService tourBookingService,
             IVnPayService vnPayService,
-            ResortDbContext context)
+            ResortDbContext context,
+            PhucNguyenResort.Services.Email.IEmailSender emailSender)
         {
             _tourBookingService = tourBookingService;
             _vnPayService = vnPayService;
             _context = context;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -145,7 +148,8 @@ namespace PhucNguyenResort.Controllers
                     OrderId = result.TourBookingId!.Value,
                     Amount = (double)result.TotalAmount,
                     CreatedDate = DateTime.Now,
-                    Description = $"Thanh toan tour booking #{result.TourBookingId.Value}"
+                    Description = $"Thanh toan tour booking #{result.TourBookingId.Value}",
+                    ReturnUrl = $"{Request.Scheme}://{Request.Host}/CustomerTourBooking/VNPayTourReturn"
                 };
 
                 var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, vnPayModel);
@@ -154,9 +158,50 @@ namespace PhucNguyenResort.Controllers
             else
             {
                 // Charge to Room — already confirmed in service
+                _ = SendTourConfirmationEmail(result.TourBookingId!.Value); // Gửi mail xác nhận ngầm
                 TempData["Success"] = "Đặt tour thành công! Chi phí đã được ghi nợ vào phòng.";
                 return RedirectToAction("BookingSuccess", new { id = result.TourBookingId });
             }
+        }
+
+        [Authorize(Roles = "Customer")]
+        [HttpGet]
+        public async Task<IActionResult> PayPendingBooking(int id)
+        {
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdStr, out int userId))
+            {
+                return Challenge();
+            }
+
+            var booking = await _context.TourBookings
+                .Include(tb => tb.Schedule)
+                    .ThenInclude(s => s.Tour)
+                .FirstOrDefaultAsync(tb => tb.TourBookingId == id && tb.UserId == userId);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            if (booking.BookingStatus != Enums.TourBookingStatus.Pending)
+            {
+                TempData["Error"] = "Đơn đặt tour này không ở trạng thái chờ thanh toán.";
+                return RedirectToAction(nameof(MyTourBookings));
+            }
+
+            // Tạo link thanh toán VNPay mới
+            var vnPayModel = new VNPayRequestModel
+            {
+                OrderId = booking.TourBookingId,
+                Amount = (double)(booking.TotalAmount ?? 0),
+                CreatedDate = DateTime.Now,
+                Description = $"Thanh toan tour booking #{booking.TourBookingId}",
+                ReturnUrl = $"{Request.Scheme}://{Request.Host}/CustomerTourBooking/VNPayTourReturn"
+            };
+
+            var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, vnPayModel);
+            return Redirect(paymentUrl);
         }
 
         /// <summary>
@@ -195,6 +240,7 @@ namespace PhucNguyenResort.Controllers
             if (int.TryParse(response.OrderId, out int tourBookingId))
             {
                 await _tourBookingService.ConfirmPaymentAsync(tourBookingId);
+                _ = SendTourConfirmationEmail(tourBookingId); // Gửi mail xác nhận ngầm
                 TempData["Success"] = "Thanh toán tour thành công!";
                 return RedirectToAction("BookingSuccess", new { id = tourBookingId });
             }
@@ -273,6 +319,65 @@ namespace PhucNguyenResort.Controllers
                     return userId;
             }
             return null;
+        }
+        private async Task SendTourConfirmationEmail(int tourBookingId)
+        {
+            var booking = await _context.TourBookings
+                .Include(tb => tb.User)
+                .Include(tb => tb.Schedule)
+                    .ThenInclude(s => s.Tour)
+                .FirstOrDefaultAsync(tb => tb.TourBookingId == tourBookingId);
+
+            if (booking != null && booking.User != null && !string.IsNullOrEmpty(booking.User.Email))
+            {
+                var request = HttpContext.Request;
+                string baseUrl = $"{request.Scheme}://{request.Host}";
+                string qrData = $"{baseUrl}/Tours/CheckTicket?ticketId={tourBookingId}";
+                string qrCodeUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={System.Net.WebUtility.UrlEncode(qrData)}";
+
+                string subject = "Xác nhận đặt Tour thành công - PhucNguyen Resort";
+                string htmlBody = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
+                    <h2 style='color: #dfa974; text-align: center;'>Cảm ơn bạn đã đặt Tour!</h2>
+                    <p>Chào <strong>{booking.User.FullName}</strong>,</p>
+                    <p>PhucNguyen Resort xin xác nhận bạn đã đặt tour và thanh toán thành công.</p>
+                    
+                    <table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Tên Tour</td>
+                            <td style='padding: 10px; border: 1px solid #ddd;'>{booking.Schedule?.Tour?.TourName}</td>
+                        </tr>
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Ngày đi</td>
+                            <td style='padding: 10px; border: 1px solid #ddd;'>{booking.Schedule?.TourDate?.ToString("dd/MM/yyyy")}</td>
+                        </tr>
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Thời gian</td>
+                            <td style='padding: 10px; border: 1px solid #ddd;'>{booking.Schedule?.StartTime?.ToString(@"hh\:mm")}</td>
+                        </tr>
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Số người</td>
+                            <td style='padding: 10px; border: 1px solid #ddd;'>{booking.Participants} người</td>
+                        </tr>
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Tổng tiền</td>
+                            <td style='padding: 10px; border: 1px solid #ddd; color: #dfa974; font-weight: bold;'>{booking.TotalAmount?.ToString("N0")} VNĐ</td>
+                        </tr>
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Vé QR Code</td>
+                            <td style='padding: 10px; border: 1px solid #ddd; text-align: center;'>
+                                <img src='{qrCodeUrl}' alt='QR Ticket' style='max-width: 150px; border: 1px solid #eee; border-radius: 8px;' />
+                                <div style='font-size: 12px; color: #777; margin-top: 5px;'>Vui lòng xuất trình mã QR này khi tham gia Tour</div>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <p style='margin-top: 20px;'>Chúng tôi rất mong được đón tiếp bạn tham gia chuyến đi đầy thú vị này. Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ lễ tân.</p>
+                    <p style='margin-top: 30px; text-align: center; color: #777; font-size: 12px;'>PhucNguyen Resort &copy; {DateTime.Now.Year}</p>
+                </div>";
+
+                _ = _emailSender.SendEmailAsync(booking.User.Email, subject, htmlBody);
+            }
         }
     }
 }
