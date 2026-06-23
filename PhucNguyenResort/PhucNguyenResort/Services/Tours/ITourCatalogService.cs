@@ -12,5 +12,6 @@ namespace PhucNguyenResort.Services.Tours
         Task UpdateTourAsync(Tour tour);
         Task DeleteTourAsync(int tourId);
         bool TourExists(int tourId);
+        Task<List<User>> GetAvailableManagersAsync();
     }
 }

@@ -18,6 +18,9 @@ public class KotService : IKotService
     {
         var query = _context.KOT
             .Include(k => k.FoodOrder)
+                .ThenInclude(fo => fo!.BookingDetail)
+                    .ThenInclude(bd => bd!.Room)
+            .Include(k => k.FoodOrder)
                 .ThenInclude(fo => fo.FoodOrderItems)
                     .ThenInclude(i => i.MenuItem)
             .AsQueryable();
@@ -40,11 +43,14 @@ public class KotService : IKotService
             FoodOrderId = k.FoodOrderId,
             Status = k.Status,
             CreatedAt = k.CreatedAt,
+            RequestedDeliveryAt = k.FoodOrder?.RequestedDeliveryAt,
+            CustomerNote = k.FoodOrder?.CustomerNote,
+            RoomNumber = k.FoodOrder?.BookingDetail?.Room?.RoomNumber,
             Items = k.FoodOrder?.FoodOrderItems?.Select(i => new PhucNguyenResort.ViewModels.Kots.KotItemViewModel
             {
                 MenuItemName = i.MenuItem?.ItemName ?? "Unknown Item",
                 Quantity = i.Quantity,
-                Notes = null // No Notes column in FoodOrderItem
+                Notes = i.ItemNote
             }).ToList() ?? new List<PhucNguyenResort.ViewModels.Kots.KotItemViewModel>()
         });
     }

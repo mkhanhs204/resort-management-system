@@ -63,6 +63,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public List<ScheduleDisplayVM> UpcomingSchedules { get; set; } = new();
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
+        public string? TourGuideName { get; set; }
     }
 
     /// <summary>

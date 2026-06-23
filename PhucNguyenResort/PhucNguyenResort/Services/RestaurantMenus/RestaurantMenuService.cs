@@ -196,7 +196,7 @@ public class RestaurantMenuService : IRestaurantMenuService
             ImageUrl = viewModel.ImageUrl,
             IsAvailable = viewModel.IsAvailable,
             IsDeleted = false,
-            CategoryId = viewModel.CategoryId
+            CategoryId = viewModel.CategoryId!.Value
         };
 
         _context.MenuItems.Add(menuItem);
@@ -218,7 +218,7 @@ public class RestaurantMenuService : IRestaurantMenuService
         menuItem.Price = viewModel.Price;
         menuItem.ImageUrl = viewModel.ImageUrl;
         menuItem.IsAvailable = viewModel.IsAvailable;
-        menuItem.CategoryId = viewModel.CategoryId;
+        menuItem.CategoryId = viewModel.CategoryId!.Value;
 
         await _context.SaveChangesAsync();
         return true;

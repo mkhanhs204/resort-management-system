@@ -57,7 +57,9 @@ namespace PhucNguyenResort.Services.Tours
                     .Count(s => s.TourDate != null && s.TourDate >= DateTime.Today && (s.AvailableSlots ?? 0) > 0),
                 AverageRating = t.Reviews.Any() ? t.Reviews.Average(r => r.Rating ?? 0) : 0,
                 ReviewCount = t.Reviews.Count
-            }).ToList();
+            })
+            .Where(t => t.UpcomingScheduleCount > 0)
+            .ToList();
 
             // Sorting
             tourCards = sortBy switch
@@ -82,6 +84,7 @@ namespace PhucNguyenResort.Services.Tours
         public async Task<TourDetailVM?> GetTourDetailAsync(int tourId)
         {
             var tour = await _context.Tours
+                .Include(t => t.Manager)
                 .Include(t => t.TourSchedules)
                     .ThenInclude(s => s.Guide)
                 .Include(t => t.Reviews)
@@ -101,6 +104,7 @@ namespace PhucNguyenResort.Services.Tours
                 ImageUrl = tour.ImageUrl,
                 AverageRating = tour.Reviews.Any() ? tour.Reviews.Average(r => r.Rating ?? 0) : 0,
                 ReviewCount = tour.Reviews.Count,
+                TourGuideName = tour.Manager?.FullName,
                 UpcomingSchedules = tour.TourSchedules
                     .Where(s => s.TourDate != null && s.TourDate >= DateTime.Today)
                     .OrderBy(s => s.TourDate)
@@ -434,7 +438,7 @@ namespace PhucNguyenResort.Services.Tours
         }
 
         /// <inheritdoc/>
-        public async Task<bool> ConfirmPaymentAsync(int tourBookingId)
+        public async Task<bool> ConfirmPaymentAsync(int tourBookingId, string transactionCode)
         {
             var tourBooking = await _context.TourBookings
                 .FirstOrDefaultAsync(tb => tb.TourBookingId == tourBookingId);
@@ -443,6 +447,18 @@ namespace PhucNguyenResort.Services.Tours
                 return false;
 
             tourBooking.BookingStatus = TourBookingStatus.Confirmed;
+
+            var payment = new Payment
+            {
+                TourBookingId = tourBookingId,
+                PaymentMethod = PaymentMethod.VNPay,
+                Amount = tourBooking.TotalAmount,
+                PaymentStatus = PaymentStatus.Success,
+                TransactionCode = transactionCode,
+                PaidAt = DateTime.Now
+            };
+
+            _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
             return true;
         }

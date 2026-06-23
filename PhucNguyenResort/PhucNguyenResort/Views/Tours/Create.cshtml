@@ -106,6 +106,22 @@
                                oninput="previewImage(this.value)" />
                         <span asp-validation-for="ImageUrl" class="text-danger small"></span>
                     </div>
+
+                    <!-- Manager -->
+                    <div class="form-group mb-3">
+                        <label asp-for="ManagerId" class="control-label font-weight-bold">Tour guide</label>
+                        <select asp-for="ManagerId" class="form-control" id="select-manager">
+                            <option value="">-- Select a Tour guide --</option>
+                            @if (ViewBag.Managers != null)
+                            {
+                                foreach (var manager in ViewBag.Managers)
+                                {
+                                    <option value="@manager.UserId">@manager.FullName</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="ManagerId" class="text-danger small"></span>
+                    </div>
                 </div>
 
                 <!-- Live Image Preview -->

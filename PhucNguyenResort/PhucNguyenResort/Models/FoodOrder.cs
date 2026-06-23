@@ -8,16 +8,20 @@ public class FoodOrder
 {
     public int FoodOrderId { get; set; }
     public int BookingId { get; set; }
+    public int? BookingDetailId { get; set; }
     public FoodOrderStatus OrderStatus { get; set; } = FoodOrderStatus.Pending;
 
     [Range(0, 999999999)]
     public decimal? TotalAmount { get; set; }
 
     public DateTime OrderedAt { get; set; } = DateTime.Now;
+    public DateTime? RequestedDeliveryAt { get; set; }
+    public string? CustomerNote { get; set; }
     public bool IsChargedToRoom { get; set; } = false;
     public DateTime? ChargedAt { get; set; }
 
     public Booking? Booking { get; set; }
+    public BookingDetail? BookingDetail { get; set; }
     public ICollection<FoodOrderItem> FoodOrderItems { get; set; } = new List<FoodOrderItem>();
     public Kot? Kot { get; set; }
 }

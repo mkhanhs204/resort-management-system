@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Services.MenuCategories;
 using PhucNguyenResort.ViewModels.MenuCategories;
 
 namespace PhucNguyenResort.Controllers;
 
+[Authorize(Roles = "System Admin,Business Manager,F&B Staff")]
 public class MenuCategoriesController : Controller
 {
     private readonly IMenuCategoryService _menuCategoryService;

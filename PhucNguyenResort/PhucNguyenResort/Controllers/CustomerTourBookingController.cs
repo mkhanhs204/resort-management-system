@@ -158,7 +158,7 @@ namespace PhucNguyenResort.Controllers
             else
             {
                 // Charge to Room — already confirmed in service
-                _ = SendTourConfirmationEmail(result.TourBookingId!.Value); // Gửi mail xác nhận ngầm
+                await SendTourConfirmationEmail(result.TourBookingId!.Value); // Gửi mail xác nhận
                 TempData["Success"] = "Đặt tour thành công! Chi phí đã được ghi nợ vào phòng.";
                 return RedirectToAction("BookingSuccess", new { id = result.TourBookingId });
             }
@@ -239,8 +239,8 @@ namespace PhucNguyenResort.Controllers
             // Payment successful — confirm the booking
             if (int.TryParse(response.OrderId, out int tourBookingId))
             {
-                await _tourBookingService.ConfirmPaymentAsync(tourBookingId);
-                _ = SendTourConfirmationEmail(tourBookingId); // Gửi mail xác nhận ngầm
+                await _tourBookingService.ConfirmPaymentAsync(tourBookingId, response.TransactionId);
+                await SendTourConfirmationEmail(tourBookingId); // Gửi mail xác nhận
                 TempData["Success"] = "Thanh toán tour thành công!";
                 return RedirectToAction("BookingSuccess", new { id = tourBookingId });
             }
@@ -263,11 +263,7 @@ namespace PhucNguyenResort.Controllers
             var model = await _tourBookingService.GetBookingSuccessInfoAsync(id.Value, userId.Value);
             if (model == null) return NotFound();
 
-            // Generate full QR URL pointing to CheckTicket
-            var request = HttpContext.Request;
-            string baseUrl = $"{request.Scheme}://{request.Host}";
-            string qrData = $"{baseUrl}/Tours/CheckTicket?ticketId={model.TourBookingId}";
-            model.QrCodeUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={System.Net.WebUtility.UrlEncode(qrData)}";
+
 
             return View(model);
         }
@@ -330,10 +326,7 @@ namespace PhucNguyenResort.Controllers
 
             if (booking != null && booking.User != null && !string.IsNullOrEmpty(booking.User.Email))
             {
-                var request = HttpContext.Request;
-                string baseUrl = $"{request.Scheme}://{request.Host}";
-                string qrData = $"{baseUrl}/Tours/CheckTicket?ticketId={tourBookingId}";
-                string qrCodeUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={System.Net.WebUtility.UrlEncode(qrData)}";
+
 
                 string subject = "Xác nhận đặt Tour thành công - PhucNguyen Resort";
                 string htmlBody = $@"
@@ -363,13 +356,7 @@ namespace PhucNguyenResort.Controllers
                             <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Tổng tiền</td>
                             <td style='padding: 10px; border: 1px solid #ddd; color: #dfa974; font-weight: bold;'>{booking.TotalAmount?.ToString("N0")} VNĐ</td>
                         </tr>
-                        <tr>
-                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Vé QR Code</td>
-                            <td style='padding: 10px; border: 1px solid #ddd; text-align: center;'>
-                                <img src='{qrCodeUrl}' alt='QR Ticket' style='max-width: 150px; border: 1px solid #eee; border-radius: 8px;' />
-                                <div style='font-size: 12px; color: #777; margin-top: 5px;'>Vui lòng xuất trình mã QR này khi tham gia Tour</div>
-                            </td>
-                        </tr>
+
                     </table>
                     
                     <p style='margin-top: 20px;'>Chúng tôi rất mong được đón tiếp bạn tham gia chuyến đi đầy thú vị này. Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ lễ tân.</p>

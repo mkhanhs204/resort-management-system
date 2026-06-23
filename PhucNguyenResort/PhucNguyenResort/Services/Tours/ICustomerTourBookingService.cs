@@ -43,7 +43,7 @@ namespace PhucNguyenResort.Services.Tours
         /// <summary>
         /// Confirm a pending tour booking after VNPay payment success.
         /// </summary>
-        Task<bool> ConfirmPaymentAsync(int tourBookingId);
+        Task<bool> ConfirmPaymentAsync(int tourBookingId, string transactionCode);
 
         /// <summary>
         /// Get booking success info for display.

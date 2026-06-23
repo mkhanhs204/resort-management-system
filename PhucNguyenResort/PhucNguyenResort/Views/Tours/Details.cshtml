@@ -67,6 +67,20 @@
                             <em class="text-muted">Not specified</em>
                         }
                     </dd>
+
+                    <dt class="col-sm-4 text-muted">Tour guide</dt>
+                    <dd class="col-sm-8">
+                        @if (Model?.Manager != null)
+                        {
+                            <span class="text-primary font-weight-bold">
+                                <i class="fa fa-user-circle"></i> @Model.Manager.FullName
+                            </span>
+                        }
+                        else
+                        {
+                            <em class="text-muted">Not assigned</em>
+                        }
+                    </dd>
                 </dl>
             </div>
         </div>

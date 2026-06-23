@@ -205,14 +205,6 @@
                     <span class="value">@Model.TotalAmount.ToString("N0") VNĐ</span>
                 </div>
 
-                <!-- QR Code -->
-                <div class="qr-section">
-                    <h5><i class="fa fa-qrcode" style="color: #dfa974;"></i> Vé Điện Tử</h5>
-                    <img src="@Model.QrCodeUrl" alt="QR Code Vé Tour" width="200" height="200" />
-                    <small>Xuất trình mã QR này cho hướng dẫn viên khi tham gia tour.</small>
-                </div>
-
-                <!-- Actions -->
                 <div class="success-actions">
                     <a asp-action="MyTourBookings" class="btn-primary-tour">
                         <i class="fa fa-list"></i> Xem Đặt Tour Của Tôi

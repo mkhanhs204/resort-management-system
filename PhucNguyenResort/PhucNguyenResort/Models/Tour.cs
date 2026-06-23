@@ -30,4 +30,8 @@ public class Tour
 
     public ICollection<TourSchedule> TourSchedules { get; set; } = new List<TourSchedule>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+    public int? ManagerId { get; set; }
+    [ForeignKey("ManagerId")]
+    public User? Manager { get; set; }
 }

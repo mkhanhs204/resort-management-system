@@ -47,8 +47,9 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Tours/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Managers = await _tourService.GetAvailableManagersAsync();
             return View();
         }
 
@@ -67,13 +68,15 @@ namespace PhucNguyenResort.Controllers
                     MaxCapacity   = model.MaxCapacity,
                     DurationHours = model.DurationHours,
                     Location      = model.Location,
-                    ImageUrl      = model.ImageUrl
+                    ImageUrl      = model.ImageUrl,
+                    ManagerId     = model.ManagerId
                 };
 
                 await _tourService.AddTourAsync(tour);
                 if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been created successfully.";
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Managers = await _tourService.GetAvailableManagersAsync();
             return View(model);
         }
 
@@ -100,9 +103,11 @@ namespace PhucNguyenResort.Controllers
                 MaxCapacity   = tour.MaxCapacity ?? 0,
                 DurationHours = tour.DurationHours ?? 0,
                 Location      = tour.Location,
-                ImageUrl      = tour.ImageUrl
+                ImageUrl      = tour.ImageUrl,
+                ManagerId     = tour.ManagerId
             };
 
+            ViewBag.Managers = await _tourService.GetAvailableManagersAsync();
             return View(model);
         }
 
@@ -131,11 +136,13 @@ namespace PhucNguyenResort.Controllers
                 tour.DurationHours = model.DurationHours;
                 tour.Location      = model.Location;
                 tour.ImageUrl      = model.ImageUrl;
+                tour.ManagerId     = model.ManagerId;
 
                 await _tourService.UpdateTourAsync(tour);
                 if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Managers = await _tourService.GetAvailableManagersAsync();
             return View(model);
         }
 

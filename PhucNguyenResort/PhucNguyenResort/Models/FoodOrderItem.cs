@@ -16,6 +16,8 @@ public class FoodOrderItem
     [Range(0, 999999999)]
     public decimal UnitPrice { get; set; }
 
+    public string? ItemNote { get; set; }
+
     public FoodOrder? FoodOrder { get; set; }
     public MenuItem? MenuItem { get; set; }
 }

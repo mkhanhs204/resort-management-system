@@ -46,6 +46,7 @@
                         <th>Capacity</th>
                         <th>Duration</th>
                         <th>Location</th>
+                        <th>Tour guide</th>
                         <th>Image</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -68,6 +69,16 @@
                                     @if (!string.IsNullOrEmpty(item.Location))
                                     {
                                         <i class="fa fa-map-marker text-danger"></i> @item.Location
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Manager != null)
+                                    {
+                                        <span class="text-primary"><i class="fa fa-user-circle"></i> @item.Manager.FullName</span>
                                     }
                                     else
                                     {

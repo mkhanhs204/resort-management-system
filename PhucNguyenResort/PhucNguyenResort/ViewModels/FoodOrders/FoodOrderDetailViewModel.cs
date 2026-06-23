@@ -12,6 +12,8 @@ public class FoodOrderDetailViewModel
     public KotStatus? KitchenStatus { get; set; }
     public decimal TotalAmount { get; set; }
     public DateTime OrderedAt { get; set; }
+    public DateTime? RequestedDeliveryAt { get; set; }
+    public string? CustomerNote { get; set; }
     public bool IsChargedToRoom { get; set; }
     public DateTime? ChargedAt { get; set; }
     public List<FoodOrderDetailItemViewModel> Items { get; set; } = new();
@@ -23,5 +25,6 @@ public class FoodOrderDetailItemViewModel
     public string CategoryName { get; set; } = "Uncategorized";
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
+    public string? ItemNote { get; set; }
     public decimal LineTotal => Quantity * UnitPrice;
 }
