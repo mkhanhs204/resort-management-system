@@ -290,7 +290,7 @@ namespace PhucNguyenResort.Tests.Services
                 Assert.Equal("Vui lòng gán phòng vật lý cho tất cả các chi tiết đặt phòng.", result.ErrorMessage);
             }
         }
-        fix
+        // fix bug 
 
         [Fact]
         public async Task REC_TC_006_ProcessCheckInAsync_EmptyRoomAssignments_ReturnsFalse()
