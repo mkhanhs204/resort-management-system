@@ -33,6 +33,4 @@ public class User
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public ICollection<TourBooking> TourBookings { get; set; } = new List<TourBooking>();
 
-    [InverseProperty("Manager")]
-    public ICollection<Tour> ManagedTours { get; set; } = new List<Tour>();
 }

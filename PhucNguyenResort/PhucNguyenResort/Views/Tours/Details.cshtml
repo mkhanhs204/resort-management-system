@@ -4,26 +4,32 @@
     ViewData["Title"] = "Tour Details";
 }
 
-<div class="page-header d-flex justify-content-between align-items-center">
-    <div>
-        <h2><i class="fa fa-info-circle"></i> Tour Details</h2>
-        <p class="text-muted">Tour #@Model.TourId</p>
-    </div>
-    <div>
-        <a asp-action="Edit" asp-route-id="@Model?.TourId" class="btn btn-warning" id="btn-edit-tour">
-            <i class="fa fa-pencil"></i> Edit
-        </a>
-        <a asp-action="Index" class="btn btn-secondary" id="btn-back-to-list">
-            <i class="fa fa-arrow-left"></i> Back to List
-        </a>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-info-circle mr-2" style="color: #dfa974;"></i> Tour Details
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Tour #@Model.TourId</p>
+            </div>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model?.TourId" class="btn btn-warning" style="font-family: 'Cabin', sans-serif; background-color: #dfa974; border-color: #dfa974; color: white;" id="btn-edit-tour">
+                    <i class="fa fa-pencil"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary" style="font-family: 'Cabin', sans-serif;" id="btn-back-to-list">
+                    <i class="fa fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="row">
     <!-- Left: Info -->
     <div class="col-md-7">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header"><strong>Tour Information</strong></div>
+        <div class="card-box shadow-sm mb-4" style="border-top: 4px solid #dfa974;">
+            <div class="mb-3" style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;">Tour Information</div>
             <div class="card-body">
                 <dl class="row mb-0">
                     <dt class="col-sm-4 text-muted">Tour Name</dt>
@@ -68,19 +74,7 @@
                         }
                     </dd>
 
-                    <dt class="col-sm-4 text-muted">Tour guide</dt>
-                    <dd class="col-sm-8">
-                        @if (Model?.Manager != null)
-                        {
-                            <span class="text-primary font-weight-bold">
-                                <i class="fa fa-user-circle"></i> @Model.Manager.FullName
-                            </span>
-                        }
-                        else
-                        {
-                            <em class="text-muted">Not assigned</em>
-                        }
-                    </dd>
+
                 </dl>
             </div>
         </div>
@@ -88,10 +82,10 @@
         <!-- Schedules summary -->
         @if (Model?.TourSchedules != null && Model.TourSchedules.Any())
         {
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <strong><i class="fa fa-calendar"></i> Tour Schedules</strong>
-                    <span class="badge badge-warning ml-2">@Model.TourSchedules.Count</span>
+            <div class="card-box shadow-sm" style="border-top: 4px solid #17a2b8;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;"><i class="fa fa-calendar mr-2" style="color: #17a2b8;"></i> Tour Schedules</span>
+                    <span class="badge badge-warning">@Model.TourSchedules.Count</span>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-sm mb-0">
@@ -120,8 +114,8 @@
 
     <!-- Right: Image -->
     <div class="col-md-5">
-        <div class="card shadow-sm">
-            <div class="card-header"><strong>Tour Image</strong></div>
+        <div class="card-box shadow-sm" style="border-top: 4px solid #dfa974;">
+            <div class="mb-3" style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;">Tour Image</div>
             <div class="card-body text-center">
                 @if (!string.IsNullOrEmpty(Model?.ImageUrl))
                 {

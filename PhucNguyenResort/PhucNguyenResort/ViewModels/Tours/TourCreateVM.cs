@@ -27,7 +27,5 @@ namespace PhucNguyenResort.ViewModels.Tours
 
         [StringLength(255)]
         public string? ImageUrl { get; set; }
-
-        public int? ManagerId { get; set; }
     }
 }

@@ -1,39 +1,132 @@
 @model IEnumerable<PhucNguyenResort.Models.TourSchedule>
 
 @{
-    ViewData["Title"] = "Tour Schedules";
+    ViewData["Title"] = "Manage Tour Schedules";
 }
 
-<h1>Tour Schedules</h1>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-calendar mr-2" style="color: #dfa974;"></i> Manage Tour Schedules
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Assign dates, times, and Tour Guides to Tour Packages.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-clock-o mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New Schedule</a>
-</p>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Tour Name</th>
-            <th>Guide</th>
-            <th>Departure Date</th>
-            <th>Available Slots</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>@item.ScheduleId</td>
-            <td>@(item.Tour?.TourName ?? "N/A")</td>
-            <td>@(item.Guide?.FullName ?? "Not Assigned")</td>
-            <td>@(item.TourDate?.ToShortDateString()) @item.StartTime</td>
-            <td>@item.AvailableSlots</td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-warning">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-info">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card-box shadow-sm" style="border-top: 4px solid #dfa974; font-family: 'Cabin', sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;">
+            Assigned Schedules <span class="badge badge-primary ml-2">@(Model?.Count() ?? 0)</span>
+        </span>
+        <a asp-action="Create" class="btn btn-primary btn-sm" style="background-color: #dfa974; border-color: #dfa974;">
+            <i class="fa fa-plus"></i> Assign New Schedule
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tour Package</th>
+                        <th>Tour Guide</th>
+                        <th>Departure Time</th>
+                        <th>Status</th>
+                        <th>Available Slots</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">#@item.ScheduleId</td>
+                                <td><strong>@(item.Tour?.TourName ?? "N/A")</strong></td>
+                                <td>
+                                    @if (item.Guide != null)
+                                    {
+                                        <span class="text-primary font-weight-bold"><i class="fa fa-user-circle"></i> @item.Guide.FullName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger"><i class="fa fa-warning"></i> Not Assigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge badge-info" style="font-size: 13px;">
+                                        <i class="fa fa-calendar-o"></i> @(item.TourDate?.ToString("dd/MM/yyyy"))
+                                    </span>
+                                    <span class="badge badge-secondary" style="font-size: 13px;">
+                                        <i class="fa fa-clock-o"></i> @(item.StartTime?.ToString(@"hh\:mm"))
+                                    </span>
+                                </td>
+                                <td>
+                                    @{
+                                        var departureDateTime = item.TourDate?.Date.Add(item.StartTime ?? TimeSpan.Zero);
+                                        var endDateTime = departureDateTime?.AddHours(item.Tour?.DurationHours ?? 0);
+                                        
+                                        if (departureDateTime == null)
+                                        {
+                                            <span class="badge badge-secondary">Unknown</span>
+                                        }
+                                        else if (DateTime.Now > endDateTime)
+                                        {
+                                            <span class="badge badge-danger">Expired</span>
+                                        }
+                                        else if (DateTime.Now >= departureDateTime && DateTime.Now <= endDateTime)
+                                        {
+                                            <span class="badge badge-warning text-white" style="background-color: #dfa974;">In Progress</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-success">Upcoming</span>
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    @if(item.AvailableSlots > 0)
+                                    {
+                                        <span class="text-success font-weight-bold">@item.AvailableSlots seats left</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger font-weight-bold">Full</span>
+                                    }
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <a asp-action="Details" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-info" title="Details">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-warning" title="Edit">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fa fa-info-circle"></i> No schedules assigned yet. 
+                                <a asp-action="Create">Assign the first schedule</a>.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

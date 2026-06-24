@@ -20,7 +20,6 @@ namespace PhucNguyenResort.Services.Tours
         public async Task<IEnumerable<Tour>> GetAllToursAsync()
         {
             return await _context.Tours
-                .Include(t => t.Manager)
                 .OrderBy(t => t.TourId)
                 .ToListAsync();
         }
@@ -29,7 +28,6 @@ namespace PhucNguyenResort.Services.Tours
         {
             return await _context.Tours
                 .Include(t => t.TourSchedules)
-                .Include(t => t.Manager)
                 .FirstOrDefaultAsync(t => t.TourId == tourId);
         }
 

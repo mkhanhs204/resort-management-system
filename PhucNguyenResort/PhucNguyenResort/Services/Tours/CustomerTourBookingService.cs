@@ -84,7 +84,6 @@ namespace PhucNguyenResort.Services.Tours
         public async Task<TourDetailVM?> GetTourDetailAsync(int tourId)
         {
             var tour = await _context.Tours
-                .Include(t => t.Manager)
                 .Include(t => t.TourSchedules)
                     .ThenInclude(s => s.Guide)
                 .Include(t => t.Reviews)
@@ -104,7 +103,6 @@ namespace PhucNguyenResort.Services.Tours
                 ImageUrl = tour.ImageUrl,
                 AverageRating = tour.Reviews.Any() ? tour.Reviews.Average(r => r.Rating ?? 0) : 0,
                 ReviewCount = tour.Reviews.Count,
-                TourGuideName = tour.Manager?.FullName,
                 UpcomingSchedules = tour.TourSchedules
                     .Where(s => s.TourDate != null && s.TourDate >= DateTime.Today)
                     .OrderBy(s => s.TourDate)

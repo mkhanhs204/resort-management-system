@@ -4,9 +4,20 @@
     ViewData["Title"] = "Manage Tours";
 }
 
-<div class="page-header">
-    <h2><i class="fa fa-map-o"></i> Manage Tours</h2>
-    <p class="text-muted">Tour Catalog Management — Master Data (UC04)</p>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-map-o mr-2" style="color: #dfa974;"></i> Manage Tours
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Tour Catalog Management — Master Data (UC04)</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -28,10 +39,10 @@
     </div>
 }
 
-<div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span><strong>Tour List</strong> — <span class="badge badge-primary" id="tour-count">@(Model?.Count() ?? 0)</span> tour(s)</span>
-        <a asp-action="Create" class="btn btn-primary btn-sm" id="btn-create-tour">
+<div class="card-box shadow-sm" style="border-top: 4px solid #dfa974; font-family: 'Cabin', sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;">Tour List <span class="badge badge-primary ml-2" id="tour-count">@(Model?.Count() ?? 0)</span></span>
+        <a asp-action="Create" class="btn btn-primary btn-sm" style="background-color: #dfa974; border-color: #dfa974;" id="btn-create-tour">
             <i class="fa fa-plus"></i> Create New Tour
         </a>
     </div>
@@ -46,7 +57,6 @@
                         <th>Capacity</th>
                         <th>Duration</th>
                         <th>Location</th>
-                        <th>Tour guide</th>
                         <th>Image</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -75,16 +85,7 @@
                                         <span class="text-muted">—</span>
                                     }
                                 </td>
-                                <td>
-                                    @if (item.Manager != null)
-                                    {
-                                        <span class="text-primary"><i class="fa fa-user-circle"></i> @item.Manager.FullName</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">—</span>
-                                    }
-                                </td>
+
                                 <td>
                                     @if (!string.IsNullOrEmpty(item.ImageUrl))
                                     {
