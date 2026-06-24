@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.FoodOrders;
+using PhucNguyenResort.Services.Housekeeping;
 using PhucNguyenResort.Services.MenuCategories;
 using PhucNguyenResort.Services.RestaurantMenus;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // MVC
@@ -51,7 +51,7 @@ builder.Services.AddScoped<PhucNguyenResort.Services.Refunds.IRefundService, Phu
 builder.Services.AddScoped<PhucNguyenResort.Services.Email.IEmailSender, PhucNguyenResort.Services.Email.EmailSender>();
 builder.Services.AddDataProtection();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PdpdDataPurgeJob>();
-
+builder.Services.AddScoped<IHousekeepingService, HousekeepingService>();
 var app = builder.Build();
 
 // Auto Migration
