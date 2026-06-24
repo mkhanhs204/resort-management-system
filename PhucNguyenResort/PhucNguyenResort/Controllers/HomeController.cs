@@ -23,7 +23,7 @@ namespace PhucNguyenResort.Controllers
         public async Task<IActionResult> Index()
         {
             var roomCategories = await _homeService.GetRoomCategoriesForHomeAsync();
-            ViewBag.Tours = await _tourService.GetAllToursAsync();
+            ViewBag.Tours = await _tourService.GetActiveToursForHomeAsync();
             return View(roomCategories);
         }
 

@@ -57,7 +57,9 @@ namespace PhucNguyenResort.Services.Tours
                     .Count(s => s.TourDate != null && s.TourDate >= DateTime.Today && (s.AvailableSlots ?? 0) > 0),
                 AverageRating = t.Reviews.Any() ? t.Reviews.Average(r => r.Rating ?? 0) : 0,
                 ReviewCount = t.Reviews.Count
-            }).ToList();
+            })
+            .Where(t => t.UpcomingScheduleCount > 0)
+            .ToList();
 
             // Sorting
             tourCards = sortBy switch
@@ -275,7 +277,12 @@ namespace PhucNguyenResort.Services.Tours
                     TotalAmount = totalAmount,
                     BookingStatus = model.PaymentMethod == "ChargeToRoom"
                         ? TourBookingStatus.Confirmed
-                        : TourBookingStatus.Pending // Pending until VNPay confirms
+                        : TourBookingStatus.Pending, // Pending until VNPay confirms
+                    PrimaryGuestName = model.PrimaryGuestName,
+                    PrimaryGuestDateOfBirth = model.PrimaryGuestDateOfBirth,
+                    PrimaryGuestGender = model.PrimaryGuestGender,
+                    PrimaryGuestPassportNumber = model.PrimaryGuestPassportNumber,
+                    PrimaryGuestNationality = model.PrimaryGuestNationality
                 };
 
                 _context.TourBookings.Add(tourBooking);
@@ -320,11 +327,11 @@ namespace PhucNguyenResort.Services.Tours
                     paymentMethod = "VNPay";
                 }
 
-                // Can cancel if Confirmed/Pending and tour date is in the future (48h+ rule)
-                bool canCancel = (tb.BookingStatus == TourBookingStatus.Confirmed ||
-                                  tb.BookingStatus == TourBookingStatus.Pending) &&
-                                 tb.Schedule?.TourDate != null &&
-                                 (tb.Schedule.TourDate.Value - DateTime.Now).TotalHours > 48;
+                // Can cancel if Confirmed (and > 48h) or Pending (anytime)
+                bool canCancel = (tb.BookingStatus == TourBookingStatus.Confirmed &&
+                                  tb.Schedule?.TourDate != null &&
+                                  (tb.Schedule.TourDate.Value - DateTime.Now).TotalHours > 48) ||
+                                 (tb.BookingStatus == TourBookingStatus.Pending);
 
                 return new MyTourBookingItemVM
                 {
@@ -338,7 +345,8 @@ namespace PhucNguyenResort.Services.Tours
                     TotalAmount = tb.TotalAmount ?? 0,
                     BookingStatus = tb.BookingStatus.ToString(),
                     CanCancel = canCancel,
-                    PaymentMethod = paymentMethod
+                    PaymentMethod = paymentMethod,
+                    CreatedAt = tb.CreatedAt
                 };
             }).ToList();
         }
@@ -382,8 +390,9 @@ namespace PhucNguyenResort.Services.Tours
                     };
                 }
 
-                // BR-TOUR-04: Check 48h cancellation policy
-                if (tourBooking.Schedule?.TourDate != null &&
+                // BR-TOUR-04: Check 48h cancellation policy (only for Confirmed bookings)
+                if (tourBooking.BookingStatus == TourBookingStatus.Confirmed &&
+                    tourBooking.Schedule?.TourDate != null &&
                     (tourBooking.Schedule.TourDate.Value - DateTime.Now).TotalHours <= 48)
                 {
                     return new TourBookingResultVM
@@ -427,7 +436,7 @@ namespace PhucNguyenResort.Services.Tours
         }
 
         /// <inheritdoc/>
-        public async Task<bool> ConfirmPaymentAsync(int tourBookingId)
+        public async Task<bool> ConfirmPaymentAsync(int tourBookingId, string transactionCode)
         {
             var tourBooking = await _context.TourBookings
                 .FirstOrDefaultAsync(tb => tb.TourBookingId == tourBookingId);
@@ -436,6 +445,18 @@ namespace PhucNguyenResort.Services.Tours
                 return false;
 
             tourBooking.BookingStatus = TourBookingStatus.Confirmed;
+
+            var payment = new Payment
+            {
+                TourBookingId = tourBookingId,
+                PaymentMethod = PaymentMethod.VNPay,
+                Amount = tourBooking.TotalAmount,
+                PaymentStatus = PaymentStatus.Success,
+                TransactionCode = transactionCode,
+                PaidAt = DateTime.Now
+            };
+
+            _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
             return true;
         }

@@ -153,9 +153,21 @@
                     <li>
                         <p>SERVICES & TOURS</p>
                     </li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
-                        <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
-                    </li>
+                    @if (User.IsInRole("Business Manager"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
+                            <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "TourSchedules" ? "active" : "")">
+                            <a asp-controller="TourSchedules" asp-action="Index"><i class="fa fa-calendar"></i> Tour Schedules</a>
+                        </li>
+                    }
+                    else if (User.IsInRole("Tour Guide"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
+                            <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Tour Catalog</a>
+                        </li>
+                    }
                 }
             </ul>
         </nav>

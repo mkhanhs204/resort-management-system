@@ -14,6 +14,9 @@ namespace PhucNguyenResort.Services.Reception
         Task<List<Room>> GetAvailableRoomsForCategoryAsync(int categoryId, DateTime checkIn, DateTime checkOut, int? currentBookingId = null);
         Task<List<Room>> GetAvailableRoomsForDatesAsync(DateTime checkIn, DateTime checkOut);
         Task<WalkInResult> ProcessWalkInBookingAsync(WalkInBookingViewModel model);
+        Task<CheckOutViewModel?> PrepareCheckOutViewModelAsync(int bookingId);
+        Task<(bool Success, string ErrorMessage)> ProcessCheckOutAsync(CheckOutViewModel model);
+        Task<InvoiceViewModel?> PrepareInvoiceViewModelAsync(int bookingId);
     }
 
     public class WalkInResult

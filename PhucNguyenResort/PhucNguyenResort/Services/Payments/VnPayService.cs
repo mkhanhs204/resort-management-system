@@ -30,7 +30,9 @@ namespace PhucNguyenResort.Services.Payments
             vnpay.AddRequestData("vnp_OrderType", "other");
             
             // Lấy ReturnUrl động dựa trên domain/port hiện tại của người dùng
-            var returnUrl = $"{context.Request.Scheme}://{context.Request.Host}/Payment/VNPayReturn";
+            var returnUrl = !string.IsNullOrEmpty(model.ReturnUrl)
+                ? model.ReturnUrl
+                : $"{context.Request.Scheme}://{context.Request.Host}/Payment/VNPayReturn";
             vnpay.AddRequestData("vnp_ReturnUrl", returnUrl);
             
             // SỬA LỖI TRÙNG MÃ: Thêm Ticks vào OrderId để đảm bảo vnp_TxnRef luôn là duy nhất mỗi lần click thanh toán

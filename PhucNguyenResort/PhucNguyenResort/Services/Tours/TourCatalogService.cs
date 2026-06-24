@@ -24,6 +24,15 @@ namespace PhucNguyenResort.Services.Tours
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Tour>> GetActiveToursForHomeAsync()
+        {
+            return await _context.Tours
+                .Include(t => t.TourSchedules)
+                .Where(t => t.TourSchedules.Any(ts => ts.TourDate >= DateTime.Today && ts.AvailableSlots > 0))
+                .OrderBy(t => t.TourId)
+                .ToListAsync();
+        }
+
         public async Task<Tour?> GetTourByIdAsync(int tourId)
         {
             return await _context.Tours
@@ -65,6 +74,15 @@ namespace PhucNguyenResort.Services.Tours
         public bool TourExists(int tourId)
         {
             return _context.Tours.Any(e => e.TourId == tourId);
+        }
+
+        public async Task<List<User>> GetAvailableManagersAsync()
+        {
+            // Return all active users who are Tour Guides (RoleId 7)
+            return await _context.Users
+                .Where(u => u.IsActive && u.RoleId == 7)
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
         }
     }
 }

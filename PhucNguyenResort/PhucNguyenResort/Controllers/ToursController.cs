@@ -47,7 +47,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Tours/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
