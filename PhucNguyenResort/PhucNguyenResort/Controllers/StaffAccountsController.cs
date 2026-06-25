@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
-using PhucNguyenResort.Helpers;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Users;
 using PhucNguyenResort.ViewModels.Staff;

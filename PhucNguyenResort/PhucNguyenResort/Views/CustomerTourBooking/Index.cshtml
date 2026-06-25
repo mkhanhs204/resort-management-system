@@ -1,0 +1,343 @@
+@model PhucNguyenResort.ViewModels.Tours.TourListVM
+@{
+    ViewData["Title"] = "Tour Du Lịch";
+}
+
+@section Styles {
+<style>
+    .tour-hero {
+        background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('/img/hero/hero-1.jpg');
+        background-size: cover;
+        background-position: center;
+        padding: 120px 0 80px;
+        text-align: center;
+        color: #fff;
+    }
+    .tour-hero h1 {
+        font-family: 'Lora', serif;
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #ffffff;
+    }
+    .tour-hero p {
+        font-size: 18px;
+        color: #dfa974;
+        max-width: 600px;
+        margin: 0 auto;
+        font-weight: 500;
+    }
+    .tour-filter-bar {
+        background: #fff;
+        padding: 25px 30px;
+        border-radius: 8px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        margin-top: -45px;
+        position: relative;
+        z-index: 10;
+    }
+    .tour-filter-bar .form-control {
+        border: 1px solid #e0e0e0;
+        height: 48px;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+    .tour-filter-bar .btn-search {
+        background: #dfa974;
+        color: #fff;
+        border: none;
+        height: 48px;
+        padding: 0 30px;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .tour-filter-bar .btn-search:hover {
+        background: #c89660;
+    }
+    .tour-grid {
+        padding: 50px 0 80px;
+    }
+    .tour-card {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 20px rgba(0,0,0,0.07);
+        transition: all 0.35s ease;
+        margin-bottom: 30px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .tour-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+    }
+    .tour-card-img {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+    .tour-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+    .tour-card:hover .tour-card-img img {
+        transform: scale(1.06);
+    }
+    .tour-card-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #dfa974;
+        color: #fff;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .tour-card-badge.sold-out {
+        background: #e74c3c;
+    }
+    .tour-card-body {
+        padding: 20px 22px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .tour-card-body h4 {
+        font-family: 'Lora', serif;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #19191a;
+    }
+    .tour-card-body h4 a {
+        color: #19191a;
+        text-decoration: none;
+    }
+    .tour-card-body h4 a:hover {
+        color: #dfa974;
+    }
+    .tour-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-size: 13px;
+        color: #777;
+    }
+    .tour-card-meta span i {
+        color: #dfa974;
+        margin-right: 4px;
+        width: 16px;
+    }
+    .tour-card-desc {
+        color: #555;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .tour-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #f0f0f0;
+        padding: 15px 22px;
+    }
+    .tour-price {
+        font-family: 'Lora', serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #dfa974;
+    }
+    .tour-price small {
+        font-size: 13px;
+        color: #999;
+        font-weight: 400;
+    }
+    .tour-rating {
+        color: #f5a623;
+        font-size: 14px;
+    }
+    .tour-rating span {
+        color: #999;
+        font-size: 12px;
+        margin-left: 4px;
+    }
+    .btn-detail {
+        background: transparent;
+        border: 2px solid #dfa974;
+        color: #dfa974;
+        padding: 8px 22px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .btn-detail:hover {
+        background: #dfa974;
+        color: #fff;
+    }
+    .tour-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+    .tour-empty i {
+        font-size: 60px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    .sort-select {
+        border: 1px solid #e0e0e0;
+        height: 48px;
+        border-radius: 5px;
+        font-size: 14px;
+        background-color: #fff;
+    }
+    .result-count {
+        color: #999;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+</style>
+}
+
+<!-- Hero Section -->
+<div class="tour-hero">
+    <div class="container">
+        <h1>Khám Phá Tour Du Lịch</h1>
+        <p>Tận hưởng kỳ nghỉ trọn vẹn cùng Phúc Nguyễn Resort</p>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="container">
+    <div class="tour-filter-bar">
+        <form method="get" asp-action="Index" class="row align-items-center">
+            <div class="col-lg-6 col-md-5 mb-2 mb-md-0">
+                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm tour, địa điểm..." value="@Model.SearchKeyword" />
+            </div>
+            <div class="col-lg-3 col-md-4 mb-2 mb-md-0">
+                <select name="sortBy" class="form-control sort-select">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model.SortBy))">Sắp xếp theo</option>
+                    <option value="price_asc" selected="@(Model.SortBy == "price_asc")">Giá thấp → cao</option>
+                    <option value="price_desc" selected="@(Model.SortBy == "price_desc")">Giá cao → thấp</option>
+                    <option value="name" selected="@(Model.SortBy == "name")">Tên A → Z</option>
+                    <option value="duration" selected="@(Model.SortBy == "duration")">Thời lượng</option>
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-3">
+                <button type="submit" class="btn-search w-100">
+                    <i class="fa fa-search"></i> Tìm Kiếm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tour Grid -->
+<div class="tour-grid">
+    <div class="container">
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+            </div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+            </div>
+        }
+
+        <p class="result-count">Tìm thấy <strong>@Model.TotalCount</strong> tour</p>
+
+        @if (Model.Tours.Any())
+        {
+            <div class="row">
+                @foreach (var tour in Model.Tours)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="tour-card">
+                            <div class="tour-card-img">
+                                @if (!string.IsNullOrEmpty(tour.ImageUrl))
+                                {
+                                    <img src="@tour.ImageUrl" alt="@tour.TourName" onerror="this.onerror=null;this.src='/img/room/room-b1.jpg';" />
+                                }
+                                else
+                                {
+                                    <img src="/img/room/room-b1.jpg" alt="Tour" />
+                                }
+
+                            </div>
+                            <div class="tour-card-body">
+                                <h4>
+                                    <a asp-action="Details" asp-route-id="@tour.TourId">@tour.TourName</a>
+                                </h4>
+                                <div class="tour-card-meta">
+                                    @if (!string.IsNullOrEmpty(tour.Location))
+                                    {
+                                        <span><i class="fa fa-map-marker"></i> @tour.Location</span>
+                                    }
+                                    <span><i class="fa fa-clock-o"></i> @tour.DurationHours giờ</span>
+                                    <span><i class="fa fa-users"></i> Tối đa @tour.MaxCapacity người</span>
+                                </div>
+                                <div class="tour-card-desc">
+                                    @(tour.Description ?? "Khám phá tour tuyệt vời tại Phúc Nguyễn Resort.")
+                                </div>
+                            </div>
+                            <div class="tour-card-footer">
+                                <div>
+                                    <div class="tour-price">
+                                        @tour.Price.ToString("N0") <small>VNĐ/người</small>
+                                    </div>
+                                    @if (tour.ReviewCount > 0)
+                                    {
+                                        <div class="tour-rating">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= Math.Round(tour.AverageRating))
+                                                {
+                                                    <i class="fa fa-star"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fa fa-star-o"></i>
+                                                }
+                                            }
+                                            <span>(@tour.ReviewCount)</span>
+                                        </div>
+                                    }
+                                </div>
+                                <a asp-action="Details" asp-route-id="@tour.TourId" class="btn-detail">
+                                    Chi Tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="tour-empty">
+                <i class="fa fa-compass"></i>
+                <h4>Không tìm thấy tour nào</h4>
+                <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
+            </div>
+        }
+    </div>
+</div>

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PhucNguyenResort.ViewModels.RestaurantMenus;
 
-public class MenuItemFormViewModel : IValidatableObject
+public class MenuItemFormViewModel
 {
     public int MenuItemId { get; set; }
 
@@ -26,19 +26,11 @@ public class MenuItemFormViewModel : IValidatableObject
     [Display(Name = "Currently selling")]
     public bool IsAvailable { get; set; } = true;
 
+    [Required]
     [Display(Name = "Category")]
     public int? CategoryId { get; set; }
 
     [ValidateNever]
     public List<SelectListItem> CategoryOptions { get; set; } = new();
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (IsAvailable && !CategoryId.HasValue)
-        {
-            yield return new ValidationResult(
-                "Items that are currently selling must be assigned to a category.",
-                new[] { nameof(CategoryId) });
-        }
-    }
 }

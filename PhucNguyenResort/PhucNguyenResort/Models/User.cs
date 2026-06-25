@@ -32,4 +32,5 @@ public class User
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public ICollection<TourBooking> TourBookings { get; set; } = new List<TourBooking>();
+
 }

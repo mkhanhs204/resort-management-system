@@ -83,8 +83,26 @@ namespace PhucNguyenResort.Tests.Tours
             var validModel = new TourCreateVM { TourName = new string('a', 100), Price = 10, MaxCapacity = 10, DurationHours = 10 };
             var invalidModel = new TourCreateVM { TourName = new string('a', 101), Price = 10, MaxCapacity = 10, DurationHours = 10 };
 
-            Assert.Empty(ValidateModel(validModel).Where(v => v.MemberNames.Contains("TourName")));
-            Assert.NotEmpty(ValidateModel(invalidModel).Where(v => v.MemberNames.Contains("TourName")));
+            Assert.DoesNotContain(ValidateModel(validModel), v => v.MemberNames.Contains("TourName"));
+            Assert.Contains(ValidateModel(invalidModel), v => v.MemberNames.Contains("TourName"));
+        }
+
+        [Fact]
+        public void TourCreateVM_OptionalFields_CanBeNull()
+        {
+            var model = new TourCreateVM
+            {
+                TourName = "Test",
+                Price = 10,
+                MaxCapacity = 10,
+                DurationHours = 10,
+                Description = null,
+                Location = null,
+                ImageUrl = null
+            };
+
+            var results = ValidateModel(model);
+            Assert.Empty(results);
         }
     }
 }

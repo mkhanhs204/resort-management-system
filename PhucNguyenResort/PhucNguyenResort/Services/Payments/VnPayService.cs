@@ -30,12 +30,14 @@ namespace PhucNguyenResort.Services.Payments
             vnpay.AddRequestData("vnp_OrderType", "other");
             
             // Lấy ReturnUrl động dựa trên domain/port hiện tại của người dùng
-            var returnUrl = $"{context.Request.Scheme}://{context.Request.Host}/Payment/VNPayReturn";
+            var returnUrl = !string.IsNullOrEmpty(model.ReturnUrl)
+                ? model.ReturnUrl
+                : $"{context.Request.Scheme}://{context.Request.Host}/Payment/VNPayReturn";
             vnpay.AddRequestData("vnp_ReturnUrl", returnUrl);
             
-            // Ở đây TxnRef thường dùng OrderId, nhưng VNPay yêu cầu duy nhất trong ngày, nên có thể dùng Ticks 
-            // hoặc OrderId nếu không trùng lập. Để cho đúng test case thì truyền OrderId:
-            vnpay.AddRequestData("vnp_TxnRef", model.OrderId.ToString());
+            // SỬA LỖI TRÙNG MÃ: Thêm Ticks vào OrderId để đảm bảo vnp_TxnRef luôn là duy nhất mỗi lần click thanh toán
+            vnpay.AddRequestData("vnp_TxnRef", $"{model.OrderId}_{tick}");
+            vnpay.AddRequestData("vnp_ExpireDate", model.CreatedDate.AddMinutes(15).ToString("yyyyMMddHHmmss"));
 
             var paymentUrl = vnpay.CreateRequestUrl(_config["VNPay:BaseUrl"]!, _config["VNPay:HashSecret"]!);
             return paymentUrl;
@@ -52,8 +54,19 @@ namespace PhucNguyenResort.Services.Payments
                 }
             }
 
-            var vnp_orderId = Convert.ToInt64(vnpay.GetResponseData("vnp_TxnRef"));
-            var vnp_TransactionId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
+            var vnp_TxnRef_Raw = vnpay.GetResponseData("vnp_TxnRef");
+            var orderIdStr = vnp_TxnRef_Raw;
+            if (!string.IsNullOrEmpty(vnp_TxnRef_Raw) && vnp_TxnRef_Raw.Contains('_'))
+            {
+                orderIdStr = vnp_TxnRef_Raw.Split('_')[0];
+            }
+            
+            var vnp_TransactionNoStr = vnpay.GetResponseData("vnp_TransactionNo");
+            long vnp_TransactionId = 0;
+            if (!string.IsNullOrEmpty(vnp_TransactionNoStr))
+            {
+                long.TryParse(vnp_TransactionNoStr, out vnp_TransactionId);
+            }
             var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
             var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
@@ -73,7 +86,7 @@ namespace PhucNguyenResort.Services.Payments
                 Success = vnp_ResponseCode == "00",
                 PaymentMethod = "VnPay",
                 OrderDescription = vnp_OrderInfo,
-                OrderId = vnp_orderId.ToString(),
+                OrderId = orderIdStr,
                 TransactionId = vnp_TransactionId.ToString(),
                 Token = vnp_SecureHash.ToString(),
                 VnPayResponseCode = vnp_ResponseCode

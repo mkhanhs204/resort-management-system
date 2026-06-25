@@ -127,8 +127,8 @@
                     }
                     @if (User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
-                            <a href="#"><i class="fa fa-cutlery"></i> Orders</a>
+                        <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "FoodOrders" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="FoodOrders"><i class="fa fa-cutlery"></i> Orders</a>
                         </li>
                     }
                     @if (User.IsInRole("Kitchen Staff"))

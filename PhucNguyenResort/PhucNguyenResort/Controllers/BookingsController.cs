@@ -30,8 +30,16 @@ namespace PhucNguyenResort.Controllers
 
         // GET: /Bookings/Create
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> Create(int categoryId, string? checkIn, string? checkOut, int adults = 2, int children = 0)
+        public async Task<IActionResult> Create([FromQuery] List<RoomSelectionViewModel> RoomSelections, string? checkIn, string? checkOut, int adults = 2, int children = 0)
         {
+            if (RoomSelections == null || !RoomSelections.Any(x => x.Quantity > 0))
+            {
+                TempData["Error"] = "Vui lòng chọn ít nhất một phòng để tiếp tục.";
+                return RedirectToAction("SearchRooms", "Home");
+            }
+
+            RoomSelections = RoomSelections.Where(x => x.Quantity > 0).ToList();
+
             string[] formats = { "dd/MM/yyyy", "dd MM, yyyy", "d MMMM, yyyy", "dd MMMM, yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
             DateTime checkInDate = DateTime.Today.AddDays(1);
             DateTime checkOutDate = DateTime.Today.AddDays(2);
@@ -45,21 +53,17 @@ namespace PhucNguyenResort.Controllers
                 checkOutDate = parsedCheckOut;
             }
 
-            var bookedRoomIds = await _context.Bookings
-                .Where(b => b.BookingStatus != PhucNguyenResort.Enums.BookingStatus.Cancelled && b.BookingStatus != PhucNguyenResort.Enums.BookingStatus.CheckedOut)
-                .Where(b => b.CheckInDate < checkOutDate && b.CheckOutDate > checkInDate)
-                .Select(b => b.RoomId)
-                .ToListAsync();
-
-            var room = await _context.Rooms
-                .Include(r => r.Category)
-                .FirstOrDefaultAsync(r => r.CategoryId == categoryId 
-                                     && r.Status != PhucNguyenResort.Enums.RoomStatus.Maintenance 
-                                     && !bookedRoomIds.Contains(r.RoomId));
-
-            if (room == null || room.Category == null)
+            // We need to fetch details for all selected categories to show in the View
+            var selectedCategories = new List<RoomCategory>();
+            foreach(var selection in RoomSelections)
             {
-                TempData["Error"] = "Không tìm thấy thông tin phòng.";
+                var cat = await _context.RoomCategories.FirstOrDefaultAsync(c => c.CategoryId == selection.CategoryId);
+                if (cat != null) selectedCategories.Add(cat);
+            }
+
+            if (!selectedCategories.Any())
+            {
+                TempData["Error"] = "Không tìm thấy thông tin loại phòng.";
                 return RedirectToAction("SearchRooms", "Home");
             }
 
@@ -71,11 +75,11 @@ namespace PhucNguyenResort.Controllers
                 .ToListAsync();
 
             ViewBag.UpcomingTours = upcomingTours;
-            ViewBag.Room = room;
+            ViewBag.SelectedCategories = selectedCategories; // passing the full categories to view
 
             var model = new CreateBookingViewModel
             {
-                RoomId = room.RoomId,
+                RoomSelections = RoomSelections,
                 CheckInDate = checkInDate,
                 CheckOutDate = checkOutDate,
                 NumberOfAdults = adults,
@@ -91,13 +95,35 @@ namespace PhucNguyenResort.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateBookingViewModel model)
         {
-            var room = await _context.Rooms
-                .Include(r => r.Category)
-                .FirstOrDefaultAsync(r => r.RoomId == model.RoomId);
+            var categoryIds = model.RoomSelections.Select(x => x.CategoryId).ToList();
+            var selectedCategories = await _context.RoomCategories
+                .Where(c => categoryIds.Contains(c.CategoryId))
+                .ToListAsync();
 
-            if (room == null)
+            if (!selectedCategories.Any())
             {
                 return NotFound();
+            }
+
+            int maxTotalAdults = 0;
+            int maxTotalChildren = 0;
+            foreach (var selection in model.RoomSelections)
+            {
+                var category = selectedCategories.FirstOrDefault(c => c.CategoryId == selection.CategoryId);
+                if (category != null)
+                {
+                    maxTotalAdults += (category.MaxAdults ?? 2) * selection.Quantity;
+                    maxTotalChildren += (category.MaxChildren ?? 1) * selection.Quantity;
+                }
+            }
+
+            if (model.NumberOfAdults > maxTotalAdults)
+            {
+                ModelState.AddModelError(nameof(model.NumberOfAdults), $"Số người lớn không được vượt quá sức chứa ({maxTotalAdults} người).");
+            }
+            if (model.NumberOfChildren > maxTotalChildren)
+            {
+                ModelState.AddModelError(nameof(model.NumberOfChildren), $"Số trẻ em không được vượt quá sức chứa ({maxTotalChildren} trẻ em).");
             }
 
             if (!model.PdpdConsentChecked)
@@ -105,9 +131,19 @@ namespace PhucNguyenResort.Controllers
                 ModelState.AddModelError(nameof(model.PdpdConsentChecked), "Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD).");
             }
 
+            if (model.PrimaryGuestDateOfBirth.HasValue)
+            {
+                var age = DateTime.Today.Year - model.PrimaryGuestDateOfBirth.Value.Year;
+                if (model.PrimaryGuestDateOfBirth.Value.Date > DateTime.Today.AddYears(-age)) age--;
+                if (age < 18)
+                {
+                    ModelState.AddModelError(nameof(model.PrimaryGuestDateOfBirth), "Người đặt phòng chính phải từ 18 tuổi trở lên để thực hiện đặt phòng.");
+                }
+            }
+
             if (!ModelState.IsValid)
             {
-                ViewBag.Room = room;
+                ViewBag.SelectedCategories = selectedCategories;
                 ViewBag.UpcomingTours = await _context.TourSchedules
                     .Include(ts => ts.Tour)
                     .Where(ts => ts.TourDate != null && ts.TourDate >= DateTime.Today)
@@ -168,7 +204,7 @@ namespace PhucNguyenResort.Controllers
                 ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Lỗi không xác định khi đặt phòng.");
             }
 
-            ViewBag.Room = room;
+            ViewBag.SelectedCategories = selectedCategories;
             ViewBag.UpcomingTours = await _context.TourSchedules
                 .Include(ts => ts.Tour)
                 .Where(ts => ts.TourDate != null && ts.TourDate >= DateTime.Today)
@@ -189,8 +225,10 @@ namespace PhucNguyenResort.Controllers
             }
 
             var bookings = await _context.Bookings
-                .Include(b => b.Room)
-                    .ThenInclude(r => r.Category)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.RoomCategory)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.Room)
                 .Include(b => b.TourBookings)
                     .ThenInclude(tb => tb.Schedule)
                         .ThenInclude(ts => ts.Tour)
@@ -256,8 +294,10 @@ namespace PhucNguyenResort.Controllers
         public async Task<IActionResult> PreCheckin(int id, string? token)
         {
             var booking = await _context.Bookings
-                .Include(b => b.Room)
-                    .ThenInclude(r => r.Category)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.RoomCategory)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.Room)
                 .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null)
@@ -302,11 +342,19 @@ namespace PhucNguyenResort.Controllers
                 });
             }
 
+            var groupedRooms = booking.BookingDetails
+                .GroupBy(bd => bd.RoomCategory?.CategoryName)
+                .Select(g => $"{g.Count()}x {g.Key}")
+                .ToList();
+            string categoryNameDisplay = string.Join(", ", groupedRooms);
+            var assignedRooms = booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
+            string roomNumberDisplay = assignedRooms.Any() ? string.Join(", ", assignedRooms) : "Chưa xếp phòng";
+
             var model = new PreCheckinViewModel
             {
                 BookingId = booking.BookingId,
-                RoomNumber = booking.Room?.RoomNumber ?? string.Empty,
-                CategoryName = booking.Room?.Category?.CategoryName ?? string.Empty,
+                RoomNumber = roomNumberDisplay,
+                CategoryName = categoryNameDisplay,
                 CheckInDate = booking.CheckInDate,
                 CheckOutDate = booking.CheckOutDate,
                 PdpdConsentChecked = booking.PdpdConsentChecked,
@@ -413,13 +461,23 @@ namespace PhucNguyenResort.Controllers
             if (!ModelState.IsValid)
             {
                 var fullBooking = await _context.Bookings
-                    .Include(b => b.Room)
-                        .ThenInclude(r => r.Category)
+                    .Include(b => b.BookingDetails)
+                        .ThenInclude(d => d.RoomCategory)
+                    .Include(b => b.BookingDetails)
+                        .ThenInclude(d => d.Room)
                     .FirstOrDefaultAsync(b => b.BookingId == model.BookingId);
                 if (fullBooking != null)
                 {
-                    model.RoomNumber = fullBooking.Room?.RoomNumber ?? string.Empty;
-                    model.CategoryName = fullBooking.Room?.Category?.CategoryName ?? string.Empty;
+                    var groupedRooms = fullBooking.BookingDetails
+                        .GroupBy(bd => bd.RoomCategory?.CategoryName)
+                        .Select(g => $"{g.Count()}x {g.Key}")
+                        .ToList();
+                    string categoryNameDisplay = string.Join(", ", groupedRooms);
+                    var assignedRooms = fullBooking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
+                    string roomNumberDisplay = assignedRooms.Any() ? string.Join(", ", assignedRooms) : "Chưa xếp phòng";
+
+                    model.RoomNumber = roomNumberDisplay;
+                    model.CategoryName = categoryNameDisplay;
                     model.CheckInDate = fullBooking.CheckInDate;
                     model.CheckOutDate = fullBooking.CheckOutDate;
                 }
@@ -460,8 +518,10 @@ namespace PhucNguyenResort.Controllers
         public async Task<IActionResult> PreCheckinSuccess(int id, string? token)
         {
             var booking = await _context.Bookings
-                .Include(b => b.Room)
-                    .ThenInclude(r => r.Category)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.RoomCategory)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.Room)
                 .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null)

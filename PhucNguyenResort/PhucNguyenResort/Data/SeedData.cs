@@ -20,27 +20,28 @@ public static class SeedData
             new Role { RoleId = 9, RoleName = @"Maintenance Staff" }
         );
 
+        //Password@123
         modelBuilder.Entity<User>().HasData(
-            new User { UserId = 1, FullName = @"Nguyen Van An", Email = @"user01@phucnguyenresort.test", PasswordHash = @"hashed-password-01", PhoneNumber = @"0900000001", RoleId = 1, IsActive = true, CreatedAt = new DateTime(2026, 1, 1, 8, 30, 0) },
-            new User { UserId = 2, FullName = @"Tran Thi Binh", Email = @"user02@phucnguyenresort.test", PasswordHash = @"hashed-password-02", PhoneNumber = @"0900000002", RoleId = 2, IsActive = true, CreatedAt = new DateTime(2026, 1, 2, 8, 30, 0) },
-            new User { UserId = 3, FullName = @"Le Minh Chau", Email = @"user03@phucnguyenresort.test", PasswordHash = @"hashed-password-03", PhoneNumber = @"0900000003", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 1, 3, 8, 30, 0) },
-            new User { UserId = 4, FullName = @"Pham Quoc Dung", Email = @"user04@phucnguyenresort.test", PasswordHash = @"hashed-password-04", PhoneNumber = @"0900000004", RoleId = 4, IsActive = true, CreatedAt = new DateTime(2026, 1, 4, 8, 30, 0) },
-            new User { UserId = 5, FullName = @"Hoang Thu Ha", Email = @"user05@phucnguyenresort.test", PasswordHash = @"hashed-password-05", PhoneNumber = @"0900000005", RoleId = 5, IsActive = true, CreatedAt = new DateTime(2026, 2, 5, 8, 30, 0) },
-            new User { UserId = 6, FullName = @"Vo Tuan Kiet", Email = @"user06@phucnguyenresort.test", PasswordHash = @"hashed-password-06", PhoneNumber = @"0900000006", RoleId = 6, IsActive = true, CreatedAt = new DateTime(2026, 2, 6, 8, 30, 0) },
-            new User { UserId = 7, FullName = @"Dang Ngoc Linh", Email = @"user07@phucnguyenresort.test", PasswordHash = @"hashed-password-07", PhoneNumber = @"0900000007", RoleId = 7, IsActive = true, CreatedAt = new DateTime(2026, 2, 7, 8, 30, 0) },
-            new User { UserId = 8, FullName = @"Bui Gia Minh", Email = @"user08@phucnguyenresort.test", PasswordHash = @"hashed-password-08", PhoneNumber = @"0900000008", RoleId = 8, IsActive = true, CreatedAt = new DateTime(2026, 2, 8, 8, 30, 0) },
-            new User { UserId = 9, FullName = @"Do Phuong Nam", Email = @"user09@phucnguyenresort.test", PasswordHash = @"hashed-password-09", PhoneNumber = @"0900000009", RoleId = 9, IsActive = false, CreatedAt = new DateTime(2026, 3, 9, 8, 30, 0) },
-            new User { UserId = 10, FullName = @"Ngo Thanh Oanh", Email = @"user10@phucnguyenresort.test", PasswordHash = @"hashed-password-10", PhoneNumber = @"0900000010", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 10, 8, 30, 0) },
-            new User { UserId = 11, FullName = @"Huynh Duc Phat", Email = @"user11@phucnguyenresort.test", PasswordHash = @"hashed-password-11", PhoneNumber = @"0900000011", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 11, 8, 30, 0) },
-            new User { UserId = 12, FullName = @"Phan My Quyen", Email = @"user12@phucnguyenresort.test", PasswordHash = @"hashed-password-12", PhoneNumber = @"0900000012", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 12, 8, 30, 0) },
-            new User { UserId = 13, FullName = @"Vu Khanh Son", Email = @"user13@phucnguyenresort.test", PasswordHash = @"hashed-password-13", PhoneNumber = @"0900000013", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 13, 8, 30, 0) },
-            new User { UserId = 14, FullName = @"Truong Hai Tam", Email = @"user14@phucnguyenresort.test", PasswordHash = @"hashed-password-14", PhoneNumber = @"0900000014", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 14, 8, 30, 0) },
-            new User { UserId = 15, FullName = @"Ly Bao Uyen", Email = @"user15@phucnguyenresort.test", PasswordHash = @"hashed-password-15", PhoneNumber = @"0900000015", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 15, 8, 30, 0) },
-            new User { UserId = 16, FullName = @"Mai Hoai Viet", Email = @"user16@phucnguyenresort.test", PasswordHash = @"hashed-password-16", PhoneNumber = @"0900000016", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 16, 8, 30, 0) },
-            new User { UserId = 17, FullName = @"Dinh Nhat Vy", Email = @"user17@phucnguyenresort.test", PasswordHash = @"hashed-password-17", PhoneNumber = @"0900000017", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 5, 17, 8, 30, 0) },
-            new User { UserId = 18, FullName = @"Cao Tien Dat", Email = @"user18@phucnguyenresort.test", PasswordHash = @"hashed-password-18", PhoneNumber = @"0900000018", RoleId = 3, IsActive = false, CreatedAt = new DateTime(2026, 5, 18, 8, 30, 0) },
-            new User { UserId = 19, FullName = @"Ta Minh Anh", Email = @"user19@phucnguyenresort.test", PasswordHash = @"hashed-password-19", PhoneNumber = @"0900000019", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 5, 19, 8, 30, 0) },
-            new User { UserId = 20, FullName = @"Lam Gia Bao", Email = @"user20@phucnguyenresort.test", PasswordHash = @"hashed-password-20", PhoneNumber = @"0900000020", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 5, 20, 8, 30, 0) }
+            new User { UserId = 1, FullName = @"Nguyen Van An", Email = @"user01@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEAPfHpZqsicuzNWwEz2A+27fHA4T7jfsm+ZJVi/FMknonhnS15owgiKdE/xqvZZHvA==", PhoneNumber = @"0900000001", RoleId = 1, IsActive = true, CreatedAt = new DateTime(2026, 1, 1, 8, 30, 0) },
+            new User { UserId = 2, FullName = @"Tran Thi Binh", Email = @"user02@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEMqJfvDTu1nRZ1tWnVSdC2TxoksCbzZBG0Z5+hSqJBH6ubpqvEb9ytkmbnjrBlCJNQ==", PhoneNumber = @"0900000002", RoleId = 2, IsActive = true, CreatedAt = new DateTime(2026, 1, 2, 8, 30, 0) },
+            new User { UserId = 3, FullName = @"Le Minh Chau", Email = @"user03@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEL7OmuUdZtRjIWsMK4GpOru5NwFTcgkWIMT0XsKM12jVPo5pBAI3n0mPC42TwT4gQA==", PhoneNumber = @"0900000003", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 1, 3, 8, 30, 0) },
+            new User { UserId = 4, FullName = @"Pham Quoc Dung", Email = @"user04@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEPpO/sBlLtEog0z9muGuZ9dJU2By/al3/9rnCHHgIHGaUn3cCQxp8+rOHVNo771raA==", PhoneNumber = @"0900000004", RoleId = 4, IsActive = true, CreatedAt = new DateTime(2026, 1, 4, 8, 30, 0) },
+            new User { UserId = 5, FullName = @"Hoang Thu Ha", Email = @"user05@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAELLhWKBA7UEbgmc/qhu3mxKfNo1Y1UI6zVG4H6XqUfwyhBZIvWkZmDZrkXQK/KaAXQ==", PhoneNumber = @"0900000005", RoleId = 5, IsActive = true, CreatedAt = new DateTime(2026, 2, 5, 8, 30, 0) },
+            new User { UserId = 6, FullName = @"Vo Tuan Kiet", Email = @"user06@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEMos2lHKwL8xBwVjMAzlIWjtRXvVolAJDK4aTarDmRFhEgqc2mtMqB16Gvi4Y7hd7g==", PhoneNumber = @"0900000006", RoleId = 6, IsActive = true, CreatedAt = new DateTime(2026, 2, 6, 8, 30, 0) },
+            new User { UserId = 7, FullName = @"Dang Ngoc Linh", Email = @"user07@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEENQal0elXTjB9MuTiDqZw+Ju1XFx+c6PHLzlv+vB49TGulgOELiwxVLzBLR3zWcsA==", PhoneNumber = @"0900000007", RoleId = 7, IsActive = true, CreatedAt = new DateTime(2026, 2, 7, 8, 30, 0) },
+            new User { UserId = 8, FullName = @"Bui Gia Minh", Email = @"user08@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEJT25/CCK5rCrhV6iqZaRiccHs5/2PjxovAkY33vQQnePVOlNtFItn9Ej8hl8/GaVg==", PhoneNumber = @"0900000008", RoleId = 8, IsActive = true, CreatedAt = new DateTime(2026, 2, 8, 8, 30, 0) },
+            new User { UserId = 9, FullName = @"Do Phuong Nam", Email = @"user09@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEP/y/42LBSamtT9RhWTarQ8Arul0XOAu1F1fy0D9x/QhZvsyBZsXcw4BK2FianAmlQ==", PhoneNumber = @"0900000009", RoleId = 9, IsActive = false, CreatedAt = new DateTime(2026, 3, 9, 8, 30, 0) },
+            new User { UserId = 10, FullName = @"Ngo Thanh Oanh", Email = @"user10@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEHhfJbFM/03T1KAicxYcV1bTBoKZiD9CS841SnAOmTfifLMab/d2Ler9troq3w/uxQ==", PhoneNumber = @"0900000010", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 10, 8, 30, 0) },
+            new User { UserId = 11, FullName = @"Huynh Duc Phat", Email = @"user11@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEPaitqXlGlPfjdR10IkWztfw5bkaSETVCtiz1raV6zzlXBjpPzIMqeY4bfviE6e3Wg==", PhoneNumber = @"0900000011", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 11, 8, 30, 0) },
+            new User { UserId = 12, FullName = @"Phan My Quyen", Email = @"user12@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEDGl1/D1FrIqtwdXMp4MHKTcKLhrgp0BM7tRkmCJKU4CLs78GCzRBm6BNMw2g5wsMg==", PhoneNumber = @"0900000012", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 3, 12, 8, 30, 0) },
+            new User { UserId = 13, FullName = @"Vu Khanh Son", Email = @"user13@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEOUNXbZx/sSqOf8XhutyA8c0i1jpPfwprTXZMpZ+ddTO0eZ6DeGC6SappK1tnuLQtQ==", PhoneNumber = @"0900000013", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 13, 8, 30, 0) },
+            new User { UserId = 14, FullName = @"Truong Hai Tam", Email = @"user14@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEJJGfYgjY5DIU1LvrA7IqfQ9N0dG1VIKmKczDlrjsfeYlLZMV3uGZM3KB8t7jPVC0g==", PhoneNumber = @"0900000014", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 14, 8, 30, 0) },
+            new User { UserId = 15, FullName = @"Ly Bao Uyen", Email = @"user15@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAELC/3eh2uKrbHlslXEaKmDbBCqjLTpF7KJkmuTokz/4ZZtRftNGdc1r18mlfAWJ/zg==", PhoneNumber = @"0900000015", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 15, 8, 30, 0) },
+            new User { UserId = 16, FullName = @"Mai Hoai Viet", Email = @"user16@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEK8Tu2bzYxEFkVglibJ2FMF/v+tZLjtO8PlvonraPzVigrXUv+ezf6txnN9tzmUKRg==", PhoneNumber = @"0900000016", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 4, 16, 8, 30, 0) },
+            new User { UserId = 17, FullName = @"Dinh Nhat Vy", Email = @"user17@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEEu1vtHH1DPKJyipEF9CLiGKB5nlEfAALCHhcLHUl6Gj7930Z5fC8qFxmwbLTbFcnA==", PhoneNumber = @"0900000017", RoleId = 3, IsActive = true, CreatedAt = new DateTime(2026, 5, 17, 8, 30, 0) },
+            new User { UserId = 18, FullName = @"Cao Dat", Email = @"user18@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEBfvYhV6RZ4eaYPLilejiLRhlW1+Yc+NqGZ5EBekRqifvfY6ys/tZUV/GwRQrpr9sw==", PhoneNumber = @"0900000018", RoleId = 7, IsActive = true, CreatedAt = new DateTime(2026, 5, 18, 8, 30, 0) },
+            new User { UserId = 19, FullName = @"Ta Anh", Email = @"user19@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEGtWiO8pUkr97O2XfZppC3E24zWNciBmmNkqv/H5mHZXU64zaC04ozH9WwBorN8/WA==", PhoneNumber = @"0900000019", RoleId = 7, IsActive = true, CreatedAt = new DateTime(2026, 5, 19, 8, 30, 0) },
+            new User { UserId = 20, FullName = @"Lam Bao", Email = @"user20@phucnguyenresort.test", PasswordHash = @"AQAAAAIAAYagAAAAEOWoOu1dgyXSeUHjo7zAm5WWbYnrLWNWkMpjSUCTsJ3Vlznm0hcvxtyPQ/7cgwZNng==", PhoneNumber = @"0900000020", RoleId = 7, IsActive = true, CreatedAt = new DateTime(2026, 5, 20, 8, 30, 0) }
         );
 
         modelBuilder.Entity<UserProfile>().HasData(
@@ -71,68 +72,57 @@ public static class SeedData
             new RoomCategory { CategoryId = 2, CategoryName = @"Premium Garden View", Description = @"Phòng view vườn yên tĩnh", MaxAdults = 2, MaxChildren = 1, PricePerNight = 1000000m, ImageUrl = @"/img/room/room-2.jpg" },
             new RoomCategory { CategoryId = 3, CategoryName = @"Family Suite", Description = @"Suite rộng rãi cho gia đình", MaxAdults = 4, MaxChildren = 2, PricePerNight = 2500000m, ImageUrl = @"/img/room/room-3.jpg" },
             new RoomCategory { CategoryId = 4, CategoryName = @"Presidential Villa", Description = @"Biệt thự siêu cấp sang trọng", MaxAdults = 6, MaxChildren = 4, PricePerNight = 8000000m, ImageUrl = @"/img/room/room-4.jpg" },
-            new RoomCategory { CategoryId = 5, CategoryName = @"Family Suite", Description = @"Family Suite category with capacity 4 guest(s).", MaxAdults = 4, MaxChildren = 0, PricePerNight = 1800000.00m, ImageUrl = @"/images/rooms/category-05.jpg" },
-            new RoomCategory { CategoryId = 6, CategoryName = @"Executive Suite", Description = @"Executive Suite category with capacity 4 guest(s).", MaxAdults = 4, MaxChildren = 0, PricePerNight = 1980000.00m, ImageUrl = @"/images/rooms/category-06.jpg" },
-            new RoomCategory { CategoryId = 7, CategoryName = @"Presidential Villa", Description = @"Presidential Villa category with capacity 6 guest(s).", MaxAdults = 6, MaxChildren = 0, PricePerNight = 2160000.00m, ImageUrl = @"/images/rooms/category-07.jpg" },
-            new RoomCategory { CategoryId = 8, CategoryName = @"Honeymoon Villa", Description = @"Honeymoon Villa category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 2340000.00m, ImageUrl = @"/images/rooms/category-08.jpg" },
-            new RoomCategory { CategoryId = 9, CategoryName = @"Bungalow Garden", Description = @"Bungalow Garden category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 2520000.00m, ImageUrl = @"/images/rooms/category-09.jpg" },
-            new RoomCategory { CategoryId = 10, CategoryName = @"Bungalow Beach", Description = @"Bungalow Beach category with capacity 3 guest(s).", MaxAdults = 3, MaxChildren = 0, PricePerNight = 2700000.00m, ImageUrl = @"/images/rooms/category-10.jpg" },
-            new RoomCategory { CategoryId = 11, CategoryName = @"Twin Standard", Description = @"Twin Standard category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 2880000.00m, ImageUrl = @"/images/rooms/category-11.jpg" },
-            new RoomCategory { CategoryId = 12, CategoryName = @"Triple Deluxe", Description = @"Triple Deluxe category with capacity 3 guest(s).", MaxAdults = 3, MaxChildren = 0, PricePerNight = 3060000.00m, ImageUrl = @"/images/rooms/category-12.jpg" },
-            new RoomCategory { CategoryId = 13, CategoryName = @"Accessible Room", Description = @"Accessible Room category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 3240000.00m, ImageUrl = @"/images/rooms/category-13.jpg" },
-            new RoomCategory { CategoryId = 14, CategoryName = @"Connecting Room", Description = @"Connecting Room category with capacity 4 guest(s).", MaxAdults = 4, MaxChildren = 0, PricePerNight = 3420000.00m, ImageUrl = @"/images/rooms/category-14.jpg" },
-            new RoomCategory { CategoryId = 15, CategoryName = @"Long Stay Studio", Description = @"Long Stay Studio category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 3600000.00m, ImageUrl = @"/images/rooms/category-15.jpg" },
-            new RoomCategory { CategoryId = 16, CategoryName = @"Business Room", Description = @"Business Room category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 3780000.00m, ImageUrl = @"/images/rooms/category-16.jpg" },
-            new RoomCategory { CategoryId = 17, CategoryName = @"Penthouse Suite", Description = @"Penthouse Suite category with capacity 4 guest(s).", MaxAdults = 4, MaxChildren = 0, PricePerNight = 3960000.00m, ImageUrl = @"/images/rooms/category-17.jpg" },
-            new RoomCategory { CategoryId = 18, CategoryName = @"Lagoon Villa", Description = @"Lagoon Villa category with capacity 5 guest(s).", MaxAdults = 5, MaxChildren = 0, PricePerNight = 4140000.00m, ImageUrl = @"/images/rooms/category-18.jpg" },
-            new RoomCategory { CategoryId = 19, CategoryName = @"Mountain View", Description = @"Mountain View category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 4320000.00m, ImageUrl = @"/images/rooms/category-19.jpg" },
-            new RoomCategory { CategoryId = 20, CategoryName = @"Budget Room", Description = @"Budget Room category with capacity 2 guest(s).", MaxAdults = 2, MaxChildren = 0, PricePerNight = 4500000.00m, ImageUrl = @"/images/rooms/category-20.jpg" }
+            new RoomCategory { CategoryId = 5, CategoryName = @"Honeymoon Villa", Description = @"Biệt thự lãng mạn cho cặp đôi", MaxAdults = 2, MaxChildren = 0, PricePerNight = 3500000m, ImageUrl = @"/images/rooms/category-08.jpg" }
         );
 
         modelBuilder.Entity<Room>().HasData(
             new Room { RoomId = 1, RoomNumber = @"101", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Available },
-            new Room { RoomId = 2, RoomNumber = @"102", CategoryId = 2, FloorNumber = 1, Status = RoomStatus.Occupied },
-            new Room { RoomId = 3, RoomNumber = @"103", CategoryId = 3, FloorNumber = 1, Status = RoomStatus.Maintenance },
-            new Room { RoomId = 4, RoomNumber = @"104", CategoryId = 4, FloorNumber = 1, Status = RoomStatus.NeedsCleaning },
-            new Room { RoomId = 5, RoomNumber = @"105", CategoryId = 5, FloorNumber = 1, Status = RoomStatus.Available },
-            new Room { RoomId = 6, RoomNumber = @"106", CategoryId = 6, FloorNumber = 2, Status = RoomStatus.Occupied },
-            new Room { RoomId = 7, RoomNumber = @"107", CategoryId = 7, FloorNumber = 2, Status = RoomStatus.Maintenance },
-            new Room { RoomId = 8, RoomNumber = @"108", CategoryId = 8, FloorNumber = 2, Status = RoomStatus.NeedsCleaning },
-            new Room { RoomId = 9, RoomNumber = @"109", CategoryId = 9, FloorNumber = 2, Status = RoomStatus.Available },
-            new Room { RoomId = 10, RoomNumber = @"110", CategoryId = 10, FloorNumber = 2, Status = RoomStatus.Occupied },
-            new Room { RoomId = 11, RoomNumber = @"111", CategoryId = 11, FloorNumber = 3, Status = RoomStatus.Maintenance },
-            new Room { RoomId = 12, RoomNumber = @"112", CategoryId = 12, FloorNumber = 3, Status = RoomStatus.NeedsCleaning },
-            new Room { RoomId = 13, RoomNumber = @"113", CategoryId = 13, FloorNumber = 3, Status = RoomStatus.Available },
-            new Room { RoomId = 14, RoomNumber = @"114", CategoryId = 14, FloorNumber = 3, Status = RoomStatus.Occupied },
-            new Room { RoomId = 15, RoomNumber = @"115", CategoryId = 15, FloorNumber = 3, Status = RoomStatus.Maintenance },
-            new Room { RoomId = 16, RoomNumber = @"116", CategoryId = 16, FloorNumber = 4, Status = RoomStatus.NeedsCleaning },
-            new Room { RoomId = 17, RoomNumber = @"117", CategoryId = 17, FloorNumber = 4, Status = RoomStatus.Available },
-            new Room { RoomId = 18, RoomNumber = @"118", CategoryId = 18, FloorNumber = 4, Status = RoomStatus.Occupied },
-            new Room { RoomId = 19, RoomNumber = @"119", CategoryId = 19, FloorNumber = 4, Status = RoomStatus.Maintenance },
-            new Room { RoomId = 20, RoomNumber = @"120", CategoryId = 20, FloorNumber = 4, Status = RoomStatus.NeedsCleaning }
+            new Room { RoomId = 2, RoomNumber = @"102", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Occupied },
+            new Room { RoomId = 3, RoomNumber = @"103", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Available },
+            new Room { RoomId = 4, RoomNumber = @"104", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Available },
+
+            new Room { RoomId = 5, RoomNumber = @"201", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Available },
+            new Room { RoomId = 6, RoomNumber = @"202", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Maintenance },
+            new Room { RoomId = 7, RoomNumber = @"203", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Available },
+            new Room { RoomId = 8, RoomNumber = @"204", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Occupied },
+
+            new Room { RoomId = 9, RoomNumber = @"301", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
+            new Room { RoomId = 10, RoomNumber = @"302", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
+            new Room { RoomId = 11, RoomNumber = @"303", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.NeedsCleaning },
+            new Room { RoomId = 12, RoomNumber = @"304", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
+
+            new Room { RoomId = 13, RoomNumber = @"401", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
+            new Room { RoomId = 14, RoomNumber = @"402", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Occupied },
+            new Room { RoomId = 15, RoomNumber = @"403", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
+            new Room { RoomId = 16, RoomNumber = @"404", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
+
+            new Room { RoomId = 17, RoomNumber = @"501", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available },
+            new Room { RoomId = 18, RoomNumber = @"502", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available },
+            new Room { RoomId = 19, RoomNumber = @"503", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available },
+            new Room { RoomId = 20, RoomNumber = @"504", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.NeedsCleaning }
         );
 
         modelBuilder.Entity<Booking>().HasData(
-            new Booking { BookingId = 1, UserId = 2, RoomId = 1, CheckInDate = DateTime.Now.AddDays(-10), CheckOutDate = DateTime.Now.AddDays(-8), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1200000m, TotalAmount = 2400000m, CreatedAt = DateTime.Now.AddDays(-15) },
-            new Booking { BookingId = 2, UserId = 2, RoomId = 2, CheckInDate = DateTime.Now.AddDays(5), CheckOutDate = DateTime.Now.AddDays(8), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 1500000m, TotalAmount = 3000000m, CreatedAt = DateTime.Now.AddDays(-2) },
-            new Booking { BookingId = 3, UserId = 3, RoomId = 10, CheckInDate = DateTime.Now.AddDays(10), CheckOutDate = DateTime.Now.AddDays(12), NumberOfAdults = 4, NumberOfChildren = 0, BookingStatus = BookingStatus.PendingPayment, DepositAmount = 2500000m, TotalAmount = 5000000m, CreatedAt = DateTime.Now.AddDays(-1) },
-            new Booking { BookingId = 4, UserId = 3, RoomId = 11, CheckInDate = DateTime.Now.AddDays(-5), CheckOutDate = DateTime.Now.AddDays(-3), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1000000m, TotalAmount = 2000000m, CreatedAt = DateTime.Now.AddDays(-10) },
-            new Booking { BookingId = 5, UserId = 2, RoomId = 13, CheckInDate = DateTime.Now.AddDays(1), CheckOutDate = DateTime.Now.AddDays(4), NumberOfAdults = 6, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 12000000m, TotalAmount = 24000000m, CreatedAt = DateTime.Now.AddDays(-5) },
-            new Booking { BookingId = 6, UserId = 2, RoomId = 1, CheckInDate = DateTime.Now.AddMonths(-1), CheckOutDate = DateTime.Now.AddMonths(-1).AddDays(2), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1200000m, TotalAmount = 2400000m, CreatedAt = DateTime.Now.AddMonths(-1).AddDays(-5) },
-            new Booking { BookingId = 7, UserId = 3, RoomId = 2, CheckInDate = DateTime.Now.AddMonths(-2), CheckOutDate = DateTime.Now.AddMonths(-2).AddDays(3), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1500000m, TotalAmount = 3000000m, CreatedAt = DateTime.Now.AddMonths(-2).AddDays(-10) },
-            new Booking { BookingId = 8, UserId = 3, RoomId = 4, CheckInDate = DateTime.Now.AddDays(-20), CheckOutDate = DateTime.Now.AddDays(-18), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1200000m, TotalAmount = 2400000m, CreatedAt = DateTime.Now.AddDays(-25) },
-            new Booking { BookingId = 9, UserId = 2, RoomId = 5, CheckInDate = DateTime.Now.AddDays(-15), CheckOutDate = DateTime.Now.AddDays(-10), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 3000000m, TotalAmount = 6000000m, CreatedAt = DateTime.Now.AddDays(-20) },
-            new Booking { BookingId = 10, UserId = 3, RoomId = 13, CheckInDate = DateTime.Now.AddDays(20), CheckOutDate = DateTime.Now.AddDays(22), NumberOfAdults = 5, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 8000000m, TotalAmount = 16000000m, CreatedAt = DateTime.Now.AddDays(-1) },
-            new Booking { BookingId = 11, UserId = 2, RoomId = 14, CheckInDate = DateTime.Now.AddDays(15), CheckOutDate = DateTime.Now.AddDays(18), NumberOfAdults = 6, NumberOfChildren = 0, BookingStatus = BookingStatus.PendingPayment, DepositAmount = 12000000m, TotalAmount = 24000000m, CreatedAt = DateTime.Now.AddDays(0) },
-            new Booking { BookingId = 12, UserId = 3, RoomId = 6, CheckInDate = DateTime.Now.AddMonths(-4), CheckOutDate = DateTime.Now.AddMonths(-4).AddDays(5), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 3000000m, TotalAmount = 6000000m, CreatedAt = DateTime.Now.AddMonths(-4).AddDays(-10) },
-            new Booking { BookingId = 13, UserId = 3, RoomId = 1, CheckInDate = DateTime.Now.AddMonths(-5), CheckOutDate = DateTime.Now.AddMonths(-5).AddDays(1), NumberOfAdults = 1, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 600000m, TotalAmount = 1200000m, CreatedAt = DateTime.Now.AddMonths(-5).AddDays(-3) },
-            new Booking { BookingId = 14, UserId = 14, RoomId = 14, CheckInDate = new DateTime(2026, 6, 15, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 17, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1200000.00m, TotalAmount = 5300000.00m, CreatedAt = new DateTime(2026, 5, 15, 9, 0, 0) },
-            new Booking { BookingId = 15, UserId = 15, RoomId = 15, CheckInDate = new DateTime(2026, 6, 16, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 18, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.NoShow, DepositAmount = 1250000.00m, TotalAmount = 5550000.00m, CreatedAt = new DateTime(2026, 5, 16, 9, 0, 0) },
-            new Booking { BookingId = 16, UserId = 16, RoomId = 16, CheckInDate = new DateTime(2026, 6, 17, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 19, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 1300000.00m, TotalAmount = 5800000.00m, CreatedAt = new DateTime(2026, 5, 17, 9, 0, 0) },
-            new Booking { BookingId = 17, UserId = 17, RoomId = 17, CheckInDate = new DateTime(2026, 6, 18, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 20, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedIn, DepositAmount = 1350000.00m, TotalAmount = 6050000.00m, CreatedAt = new DateTime(2026, 5, 18, 9, 0, 0) },
-            new Booking { BookingId = 18, UserId = 18, RoomId = 18, CheckInDate = new DateTime(2026, 6, 19, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 21, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1400000.00m, TotalAmount = 6300000.00m, CreatedAt = new DateTime(2026, 5, 19, 9, 0, 0) },
-            new Booking { BookingId = 19, UserId = 19, RoomId = 19, CheckInDate = new DateTime(2026, 6, 20, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 22, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1450000.00m, TotalAmount = 6550000.00m, CreatedAt = new DateTime(2026, 5, 20, 9, 0, 0) },
-            new Booking { BookingId = 20, UserId = 20, RoomId = 20, CheckInDate = new DateTime(2026, 6, 21, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 23, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.NoShow, DepositAmount = 1500000.00m, TotalAmount = 6800000.00m, CreatedAt = new DateTime(2026, 5, 21, 9, 0, 0) }
+            new Booking { BookingId = 1, UserId = 2, CheckInDate = DateTime.Now.AddDays(-10), CheckOutDate = DateTime.Now.AddDays(-8), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1200000m, TotalAmount = 2400000m, CreatedAt = DateTime.Now.AddDays(-15) },
+            new Booking { BookingId = 2, UserId = 2, CheckInDate = DateTime.Now.AddDays(5), CheckOutDate = DateTime.Now.AddDays(8), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 1500000m, TotalAmount = 3000000m, CreatedAt = DateTime.Now.AddDays(-2) },
+            new Booking { BookingId = 3, UserId = 3, CheckInDate = DateTime.Now.AddDays(10), CheckOutDate = DateTime.Now.AddDays(12), NumberOfAdults = 4, NumberOfChildren = 0, BookingStatus = BookingStatus.PendingPayment, DepositAmount = 2500000m, TotalAmount = 5000000m, CreatedAt = DateTime.Now.AddDays(-1) },
+            new Booking { BookingId = 4, UserId = 3, CheckInDate = DateTime.Now.AddDays(-5), CheckOutDate = DateTime.Now.AddDays(-3), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1000000m, TotalAmount = 2000000m, CreatedAt = DateTime.Now.AddDays(-10) },
+            new Booking { BookingId = 5, UserId = 2, CheckInDate = DateTime.Now.AddDays(1), CheckOutDate = DateTime.Now.AddDays(4), NumberOfAdults = 6, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 12000000m, TotalAmount = 24000000m, CreatedAt = DateTime.Now.AddDays(-5) },
+            new Booking { BookingId = 6, UserId = 2, CheckInDate = DateTime.Now.AddMonths(-1), CheckOutDate = DateTime.Now.AddMonths(-1).AddDays(2), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1200000m, TotalAmount = 2400000m, CreatedAt = DateTime.Now.AddMonths(-1).AddDays(-5) },
+            new Booking { BookingId = 7, UserId = 3, CheckInDate = DateTime.Now.AddMonths(-2), CheckOutDate = DateTime.Now.AddMonths(-2).AddDays(3), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1500000m, TotalAmount = 3000000m, CreatedAt = DateTime.Now.AddMonths(-2).AddDays(-10) },
+            new Booking { BookingId = 8, UserId = 3, CheckInDate = DateTime.Now.AddDays(-20), CheckOutDate = DateTime.Now.AddDays(-18), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1200000m, TotalAmount = 2400000m, CreatedAt = DateTime.Now.AddDays(-25) },
+            new Booking { BookingId = 9, UserId = 2, CheckInDate = DateTime.Now.AddDays(-15), CheckOutDate = DateTime.Now.AddDays(-10), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 3000000m, TotalAmount = 6000000m, CreatedAt = DateTime.Now.AddDays(-20) },
+            new Booking { BookingId = 10, UserId = 3, CheckInDate = DateTime.Now.AddDays(20), CheckOutDate = DateTime.Now.AddDays(22), NumberOfAdults = 5, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 8000000m, TotalAmount = 16000000m, CreatedAt = DateTime.Now.AddDays(-1) },
+            new Booking { BookingId = 11, UserId = 2, CheckInDate = DateTime.Now.AddDays(15), CheckOutDate = DateTime.Now.AddDays(18), NumberOfAdults = 6, NumberOfChildren = 0, BookingStatus = BookingStatus.PendingPayment, DepositAmount = 12000000m, TotalAmount = 24000000m, CreatedAt = DateTime.Now.AddDays(0) },
+            new Booking { BookingId = 12, UserId = 3, CheckInDate = DateTime.Now.AddMonths(-4), CheckOutDate = DateTime.Now.AddMonths(-4).AddDays(5), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 3000000m, TotalAmount = 6000000m, CreatedAt = DateTime.Now.AddMonths(-4).AddDays(-10) },
+            new Booking { BookingId = 13, UserId = 3, CheckInDate = DateTime.Now.AddMonths(-5), CheckOutDate = DateTime.Now.AddMonths(-5).AddDays(1), NumberOfAdults = 1, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 600000m, TotalAmount = 1200000m, CreatedAt = DateTime.Now.AddMonths(-5).AddDays(-3) },
+            new Booking { BookingId = 14, UserId = 14, CheckInDate = new DateTime(2026, 6, 15, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 17, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1200000.00m, TotalAmount = 5300000.00m, CreatedAt = new DateTime(2026, 5, 15, 9, 0, 0) },
+            new Booking { BookingId = 15, UserId = 15, CheckInDate = new DateTime(2026, 6, 16, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 18, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.NoShow, DepositAmount = 1250000.00m, TotalAmount = 5550000.00m, CreatedAt = new DateTime(2026, 5, 16, 9, 0, 0) },
+            new Booking { BookingId = 16, UserId = 16, CheckInDate = new DateTime(2026, 6, 17, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 19, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Reserved, DepositAmount = 1300000.00m, TotalAmount = 5800000.00m, CreatedAt = new DateTime(2026, 5, 17, 9, 0, 0) },
+            new Booking { BookingId = 17, UserId = 17, CheckInDate = new DateTime(2026, 6, 18, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 20, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedIn, DepositAmount = 1350000.00m, TotalAmount = 6050000.00m, CreatedAt = new DateTime(2026, 5, 18, 9, 0, 0) },
+            new Booking { BookingId = 18, UserId = 18, CheckInDate = new DateTime(2026, 6, 19, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 21, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.CheckedOut, DepositAmount = 1400000.00m, TotalAmount = 6300000.00m, CreatedAt = new DateTime(2026, 5, 19, 9, 0, 0) },
+            new Booking { BookingId = 19, UserId = 19, CheckInDate = new DateTime(2026, 6, 20, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 22, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.Cancelled, DepositAmount = 1450000.00m, TotalAmount = 6550000.00m, CreatedAt = new DateTime(2026, 5, 20, 9, 0, 0) },
+            new Booking { BookingId = 20, UserId = 20, CheckInDate = new DateTime(2026, 6, 21, 0, 0, 0), CheckOutDate = new DateTime(2026, 6, 23, 0, 0, 0), NumberOfAdults = 2, NumberOfChildren = 0, BookingStatus = BookingStatus.NoShow, DepositAmount = 1500000.00m, TotalAmount = 6800000.00m, CreatedAt = new DateTime(2026, 5, 21, 9, 0, 0) }
         );
 
         modelBuilder.Entity<BookingGuest>().HasData(
@@ -156,6 +146,29 @@ public static class SeedData
             new BookingGuest { BookingGuestId = 18, BookingId = 18, FullName = @"Guest Companion 18", DateOfBirth = new DateTime(1993, 9, 24, 0, 0, 0), PassportNumber = @"P20260018", Nationality = @"Vietnamese" },
             new BookingGuest { BookingGuestId = 19, BookingId = 19, FullName = @"Guest Companion 19", DateOfBirth = new DateTime(1994, 10, 25, 0, 0, 0), PassportNumber = @"P20260019", Nationality = @"Vietnamese" },
             new BookingGuest { BookingGuestId = 20, BookingId = 20, FullName = @"Guest Companion 20", DateOfBirth = new DateTime(1995, 11, 26, 0, 0, 0), PassportNumber = @"P20260020", Nationality = @"Vietnamese" }
+        );
+
+        modelBuilder.Entity<BookingDetail>().HasData(
+            new BookingDetail { BookingDetailId = 1, BookingId = 1, RoomCategoryId = 1, RoomId = 1, Price = 1200000m },
+            new BookingDetail { BookingDetailId = 2, BookingId = 2, RoomCategoryId = 1, RoomId = 2, Price = 1200000m },
+            new BookingDetail { BookingDetailId = 3, BookingId = 3, RoomCategoryId = 1, RoomId = 3, Price = 1200000m },
+            new BookingDetail { BookingDetailId = 4, BookingId = 4, RoomCategoryId = 1, RoomId = 4, Price = 1200000m },
+            new BookingDetail { BookingDetailId = 5, BookingId = 5, RoomCategoryId = 2, RoomId = 5, Price = 1000000m },
+            new BookingDetail { BookingDetailId = 6, BookingId = 6, RoomCategoryId = 2, RoomId = 6, Price = 1000000m },
+            new BookingDetail { BookingDetailId = 7, BookingId = 7, RoomCategoryId = 2, RoomId = 7, Price = 1000000m },
+            new BookingDetail { BookingDetailId = 8, BookingId = 8, RoomCategoryId = 2, RoomId = 8, Price = 1000000m },
+            new BookingDetail { BookingDetailId = 9, BookingId = 9, RoomCategoryId = 3, RoomId = 9, Price = 2500000m },
+            new BookingDetail { BookingDetailId = 10, BookingId = 10, RoomCategoryId = 3, RoomId = 10, Price = 2500000m },
+            new BookingDetail { BookingDetailId = 11, BookingId = 11, RoomCategoryId = 3, RoomId = 11, Price = 2500000m },
+            new BookingDetail { BookingDetailId = 12, BookingId = 12, RoomCategoryId = 3, RoomId = 12, Price = 2500000m },
+            new BookingDetail { BookingDetailId = 13, BookingId = 13, RoomCategoryId = 4, RoomId = 13, Price = 8000000m },
+            new BookingDetail { BookingDetailId = 14, BookingId = 14, RoomCategoryId = 4, RoomId = 14, Price = 8000000m },
+            new BookingDetail { BookingDetailId = 15, BookingId = 15, RoomCategoryId = 4, RoomId = 15, Price = 8000000m },
+            new BookingDetail { BookingDetailId = 16, BookingId = 16, RoomCategoryId = 4, RoomId = 16, Price = 8000000m },
+            new BookingDetail { BookingDetailId = 17, BookingId = 17, RoomCategoryId = 5, RoomId = 17, Price = 3500000m },
+            new BookingDetail { BookingDetailId = 18, BookingId = 18, RoomCategoryId = 5, RoomId = 18, Price = 3500000m },
+            new BookingDetail { BookingDetailId = 19, BookingId = 19, RoomCategoryId = 5, RoomId = 19, Price = 3500000m },
+            new BookingDetail { BookingDetailId = 20, BookingId = 20, RoomCategoryId = 5, RoomId = 20, Price = 3500000m }
         );
 
         modelBuilder.Entity<MenuCategory>().HasData(
@@ -251,26 +264,26 @@ public static class SeedData
         );
 
         modelBuilder.Entity<FoodOrder>().HasData(
-            new FoodOrder { FoodOrderId = 1, BookingId = 1, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 170000.00m, OrderedAt = new DateTime(2026, 6, 3, 13, 15, 0) },
-            new FoodOrder { FoodOrderId = 2, BookingId = 2, OrderStatus = FoodOrderStatus.Preparing, TotalAmount = 330000.00m, OrderedAt = new DateTime(2026, 6, 4, 14, 15, 0) },
-            new FoodOrder { FoodOrderId = 3, BookingId = 3, OrderStatus = FoodOrderStatus.Ready, TotalAmount = 540000.00m, OrderedAt = new DateTime(2026, 6, 5, 15, 15, 0) },
-            new FoodOrder { FoodOrderId = 4, BookingId = 4, OrderStatus = FoodOrderStatus.Served, TotalAmount = 160000.00m, OrderedAt = new DateTime(2026, 6, 6, 16, 15, 0) },
-            new FoodOrder { FoodOrderId = 5, BookingId = 5, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 370000.00m, OrderedAt = new DateTime(2026, 6, 7, 17, 15, 0) },
-            new FoodOrder { FoodOrderId = 6, BookingId = 6, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 630000.00m, OrderedAt = new DateTime(2026, 6, 8, 18, 15, 0) },
-            new FoodOrder { FoodOrderId = 7, BookingId = 7, OrderStatus = FoodOrderStatus.Preparing, TotalAmount = 940000.00m, OrderedAt = new DateTime(2026, 6, 9, 19, 15, 0) },
-            new FoodOrder { FoodOrderId = 8, BookingId = 8, OrderStatus = FoodOrderStatus.Ready, TotalAmount = 260000.00m, OrderedAt = new DateTime(2026, 6, 10, 12, 15, 0) },
-            new FoodOrder { FoodOrderId = 9, BookingId = 9, OrderStatus = FoodOrderStatus.Served, TotalAmount = 570000.00m, OrderedAt = new DateTime(2026, 6, 11, 13, 15, 0) },
-            new FoodOrder { FoodOrderId = 10, BookingId = 10, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 930000.00m, OrderedAt = new DateTime(2026, 6, 12, 14, 15, 0) },
-            new FoodOrder { FoodOrderId = 11, BookingId = 11, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 1340000.00m, OrderedAt = new DateTime(2026, 6, 13, 15, 15, 0) },
-            new FoodOrder { FoodOrderId = 12, BookingId = 12, OrderStatus = FoodOrderStatus.Preparing, TotalAmount = 360000.00m, OrderedAt = new DateTime(2026, 6, 14, 16, 15, 0) },
-            new FoodOrder { FoodOrderId = 13, BookingId = 13, OrderStatus = FoodOrderStatus.Ready, TotalAmount = 770000.00m, OrderedAt = new DateTime(2026, 6, 15, 17, 15, 0) },
-            new FoodOrder { FoodOrderId = 14, BookingId = 14, OrderStatus = FoodOrderStatus.Served, TotalAmount = 1230000.00m, OrderedAt = new DateTime(2026, 6, 16, 18, 15, 0) },
-            new FoodOrder { FoodOrderId = 15, BookingId = 15, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 1740000.00m, OrderedAt = new DateTime(2026, 6, 17, 19, 15, 0) },
-            new FoodOrder { FoodOrderId = 16, BookingId = 16, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 460000.00m, OrderedAt = new DateTime(2026, 6, 18, 12, 15, 0) },
-            new FoodOrder { FoodOrderId = 17, BookingId = 17, OrderStatus = FoodOrderStatus.Preparing, TotalAmount = 970000.00m, OrderedAt = new DateTime(2026, 6, 19, 13, 15, 0) },
-            new FoodOrder { FoodOrderId = 18, BookingId = 18, OrderStatus = FoodOrderStatus.Ready, TotalAmount = 1530000.00m, OrderedAt = new DateTime(2026, 6, 20, 14, 15, 0) },
-            new FoodOrder { FoodOrderId = 19, BookingId = 19, OrderStatus = FoodOrderStatus.Served, TotalAmount = 2140000.00m, OrderedAt = new DateTime(2026, 6, 21, 15, 15, 0) },
-            new FoodOrder { FoodOrderId = 20, BookingId = 20, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 560000.00m, OrderedAt = new DateTime(2026, 6, 22, 16, 15, 0) }
+            new FoodOrder { FoodOrderId = 1, BookingId = 1, BookingDetailId = 1, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 170000.00m, OrderedAt = new DateTime(2026, 6, 3, 13, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 2, BookingId = 2, BookingDetailId = 2, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 330000.00m, OrderedAt = new DateTime(2026, 6, 4, 14, 15, 0), IsChargedToRoom = true, ChargedAt = new DateTime(2026, 6, 18, 10, 30, 0) },
+            new FoodOrder { FoodOrderId = 3, BookingId = 3, BookingDetailId = 3, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 540000.00m, OrderedAt = new DateTime(2026, 6, 5, 15, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 4, BookingId = 4, BookingDetailId = 4, OrderStatus = FoodOrderStatus.Delivered, TotalAmount = 160000.00m, OrderedAt = new DateTime(2026, 6, 6, 16, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 5, BookingId = 5, BookingDetailId = 5, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 370000.00m, OrderedAt = new DateTime(2026, 6, 7, 17, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 6, BookingId = 6, BookingDetailId = 6, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 630000.00m, OrderedAt = new DateTime(2026, 6, 8, 18, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 7, BookingId = 7, BookingDetailId = 7, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 940000.00m, OrderedAt = new DateTime(2026, 6, 9, 19, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 8, BookingId = 8, BookingDetailId = 8, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 260000.00m, OrderedAt = new DateTime(2026, 6, 10, 12, 15, 0), IsChargedToRoom = true, ChargedAt = new DateTime(2026, 6, 24, 10, 30, 0) },
+            new FoodOrder { FoodOrderId = 9, BookingId = 9, BookingDetailId = 9, OrderStatus = FoodOrderStatus.Delivered, TotalAmount = 570000.00m, OrderedAt = new DateTime(2026, 6, 11, 13, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 10, BookingId = 10, BookingDetailId = 10, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 930000.00m, OrderedAt = new DateTime(2026, 6, 12, 14, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 11, BookingId = 11, BookingDetailId = 11, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 1340000.00m, OrderedAt = new DateTime(2026, 6, 13, 15, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 12, BookingId = 12, BookingDetailId = 12, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 360000.00m, OrderedAt = new DateTime(2026, 6, 14, 16, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 13, BookingId = 13, BookingDetailId = 13, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 770000.00m, OrderedAt = new DateTime(2026, 6, 15, 17, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 14, BookingId = 14, BookingDetailId = 14, OrderStatus = FoodOrderStatus.Delivered, TotalAmount = 1230000.00m, OrderedAt = new DateTime(2026, 6, 16, 18, 15, 0), IsChargedToRoom = true, ChargedAt = new DateTime(2026, 6, 30, 10, 30, 0) },
+            new FoodOrder { FoodOrderId = 15, BookingId = 15, BookingDetailId = 15, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 1740000.00m, OrderedAt = new DateTime(2026, 6, 17, 19, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 16, BookingId = 16, BookingDetailId = 16, OrderStatus = FoodOrderStatus.Pending, TotalAmount = 460000.00m, OrderedAt = new DateTime(2026, 6, 18, 12, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 17, BookingId = 17, BookingDetailId = 17, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 970000.00m, OrderedAt = new DateTime(2026, 6, 19, 13, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 18, BookingId = 18, BookingDetailId = 18, OrderStatus = FoodOrderStatus.Cooking, TotalAmount = 1530000.00m, OrderedAt = new DateTime(2026, 6, 20, 14, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 19, BookingId = 19, BookingDetailId = 19, OrderStatus = FoodOrderStatus.Delivered, TotalAmount = 2140000.00m, OrderedAt = new DateTime(2026, 6, 21, 15, 15, 0), IsChargedToRoom = false, ChargedAt = null },
+            new FoodOrder { FoodOrderId = 20, BookingId = 20, BookingDetailId = 20, OrderStatus = FoodOrderStatus.Cancelled, TotalAmount = 560000.00m, OrderedAt = new DateTime(2026, 6, 22, 16, 15, 0), IsChargedToRoom = true, ChargedAt = new DateTime(2026, 7, 6, 10, 30, 0) }
         );
 
         modelBuilder.Entity<FoodOrderItem>().HasData(
@@ -344,25 +357,25 @@ public static class SeedData
 
         modelBuilder.Entity<TourSchedule>().HasData(
             new TourSchedule { ScheduleId = 1, TourId = 1, TourDate = new DateTime(2026, 6, 11, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 6, GuideId = 7 },
-            new TourSchedule { ScheduleId = 2, TourId = 2, TourDate = new DateTime(2026, 6, 12, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 7, GuideId = 8 },
-            new TourSchedule { ScheduleId = 3, TourId = 3, TourDate = new DateTime(2026, 6, 13, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 8, GuideId = 9 },
-            new TourSchedule { ScheduleId = 4, TourId = 4, TourDate = new DateTime(2026, 6, 14, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 9, GuideId = 10 },
-            new TourSchedule { ScheduleId = 5, TourId = 5, TourDate = new DateTime(2026, 6, 15, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 10, GuideId = 11 },
-            new TourSchedule { ScheduleId = 6, TourId = 6, TourDate = new DateTime(2026, 6, 16, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 11, GuideId = 12 },
-            new TourSchedule { ScheduleId = 7, TourId = 7, TourDate = new DateTime(2026, 6, 17, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 12, GuideId = 13 },
-            new TourSchedule { ScheduleId = 8, TourId = 8, TourDate = new DateTime(2026, 6, 18, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 13, GuideId = 14 },
-            new TourSchedule { ScheduleId = 9, TourId = 9, TourDate = new DateTime(2026, 6, 19, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 14, GuideId = 15 },
-            new TourSchedule { ScheduleId = 10, TourId = 10, TourDate = new DateTime(2026, 6, 20, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 5, GuideId = 16 },
-            new TourSchedule { ScheduleId = 11, TourId = 11, TourDate = new DateTime(2026, 6, 21, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 6, GuideId = 17 },
-            new TourSchedule { ScheduleId = 12, TourId = 12, TourDate = new DateTime(2026, 6, 22, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 7, GuideId = 18 },
-            new TourSchedule { ScheduleId = 13, TourId = 13, TourDate = new DateTime(2026, 6, 23, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 8, GuideId = 19 },
-            new TourSchedule { ScheduleId = 14, TourId = 14, TourDate = new DateTime(2026, 6, 24, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 9, GuideId = 20 },
-            new TourSchedule { ScheduleId = 15, TourId = 15, TourDate = new DateTime(2026, 6, 25, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 10, GuideId = 1 },
-            new TourSchedule { ScheduleId = 16, TourId = 16, TourDate = new DateTime(2026, 6, 26, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 11, GuideId = 2 },
-            new TourSchedule { ScheduleId = 17, TourId = 17, TourDate = new DateTime(2026, 6, 27, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 12, GuideId = 3 },
-            new TourSchedule { ScheduleId = 18, TourId = 18, TourDate = new DateTime(2026, 6, 28, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 13, GuideId = 4 },
-            new TourSchedule { ScheduleId = 19, TourId = 19, TourDate = new DateTime(2026, 6, 29, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 14, GuideId = 5 },
-            new TourSchedule { ScheduleId = 20, TourId = 20, TourDate = new DateTime(2026, 6, 30, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 5, GuideId = 6 }
+            new TourSchedule { ScheduleId = 2, TourId = 2, TourDate = new DateTime(2026, 6, 12, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 7, GuideId = 7 },
+            new TourSchedule { ScheduleId = 3, TourId = 3, TourDate = new DateTime(2026, 6, 13, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 8, GuideId = 7 },
+            new TourSchedule { ScheduleId = 4, TourId = 4, TourDate = new DateTime(2026, 6, 14, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 9, GuideId = 7 },
+            new TourSchedule { ScheduleId = 5, TourId = 5, TourDate = new DateTime(2026, 6, 15, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 6, TourId = 6, TourDate = new DateTime(2026, 6, 16, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 11, GuideId = 7 },
+            new TourSchedule { ScheduleId = 7, TourId = 7, TourDate = new DateTime(2026, 6, 17, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 12, GuideId = 7 },
+            new TourSchedule { ScheduleId = 8, TourId = 8, TourDate = new DateTime(2026, 6, 18, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 13, GuideId = 7 },
+            new TourSchedule { ScheduleId = 9, TourId = 9, TourDate = new DateTime(2026, 6, 19, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 14, GuideId = 7 },
+            new TourSchedule { ScheduleId = 10, TourId = 10, TourDate = new DateTime(2026, 6, 20, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 5, GuideId = 7 },
+            new TourSchedule { ScheduleId = 11, TourId = 11, TourDate = new DateTime(2026, 6, 21, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 6, GuideId = 7 },
+            new TourSchedule { ScheduleId = 12, TourId = 12, TourDate = new DateTime(2026, 6, 22, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 7, GuideId = 7 },
+            new TourSchedule { ScheduleId = 13, TourId = 13, TourDate = new DateTime(2026, 6, 23, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 8, GuideId = 7 },
+            new TourSchedule { ScheduleId = 14, TourId = 14, TourDate = new DateTime(2026, 6, 24, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 9, GuideId = 7 },
+            new TourSchedule { ScheduleId = 15, TourId = 15, TourDate = new DateTime(2026, 6, 25, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 16, TourId = 16, TourDate = new DateTime(2026, 6, 26, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 11, GuideId = 7 },
+            new TourSchedule { ScheduleId = 17, TourId = 17, TourDate = new DateTime(2026, 6, 27, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 12, GuideId = 7 },
+            new TourSchedule { ScheduleId = 18, TourId = 18, TourDate = new DateTime(2026, 6, 28, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 13, GuideId = 7 },
+            new TourSchedule { ScheduleId = 19, TourId = 19, TourDate = new DateTime(2026, 6, 29, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 14, GuideId = 7 },
+            new TourSchedule { ScheduleId = 20, TourId = 20, TourDate = new DateTime(2026, 6, 30, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 5, GuideId = 7 }
         );
 
         modelBuilder.Entity<TourBooking>().HasData(

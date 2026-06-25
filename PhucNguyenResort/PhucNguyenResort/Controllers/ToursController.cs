@@ -13,10 +13,10 @@ namespace PhucNguyenResort.Controllers
     /// </summary>
     public class ToursController : Controller
     {
-        private readonly ITourService _tourService;
+        private readonly ITourCatalogService _tourService;
         private readonly ResortDbContext _context;
 
-        public ToursController(ITourService tourService, ResortDbContext context)
+        public ToursController(ITourCatalogService tourService, ResortDbContext context)
         {
             _tourService = tourService;
             _context = context;
@@ -47,7 +47,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Tours/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }

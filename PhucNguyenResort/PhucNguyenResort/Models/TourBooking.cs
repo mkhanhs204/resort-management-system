@@ -19,17 +19,24 @@ namespace PhucNguyenResort.Models
 
         public TourBookingStatus BookingStatus { get; set; } = TourBookingStatus.Pending;
 
+        [StringLength(100)]
+        public string? PrimaryGuestName { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? PrimaryGuestDateOfBirth { get; set; }
+
+        public GenderType? PrimaryGuestGender { get; set; }
+
+        [StringLength(500)]
+        public string? PrimaryGuestPassportNumber { get; set; }
+
+        [StringLength(50)]
+        public string? PrimaryGuestNationality { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
         public Booking? Booking { get; set; }
         public TourSchedule? Schedule { get; set; }
-
-        // GIẢI PHÁP SỬA LỖI CS1061: Ánh xạ thực thể đồng bộ alias cho TourSchedule
-        [NotMapped]
-        public TourSchedule? TourSchedule
-        {
-            get => Schedule;
-            set => Schedule = value;
-        }
-
         public User? User { get; set; }
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }

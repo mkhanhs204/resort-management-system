@@ -1,0 +1,557 @@
+@model PhucNguyenResort.ViewModels.Tours.TourDetailVM
+@{
+    ViewData["Title"] = Model.TourName;
+}
+
+@section Styles {
+<style>
+    .tour-detail-hero {
+        position: relative;
+        height: 400px;
+        overflow: hidden;
+    }
+    .tour-detail-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .tour-detail-hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 200px;
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    }
+    .tour-detail-hero .hero-content {
+        position: absolute;
+        bottom: 30px;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        color: #fff;
+    }
+    .tour-detail-hero .hero-content h1 {
+        font-family: 'Lora', serif;
+        font-size: 40px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #ffffff !important;
+    }
+    .tour-info-section {
+        padding: 50px 0;
+    }
+    .tour-info-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 20px rgba(0,0,0,0.06);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    .tour-info-card h3 {
+        font-family: 'Lora', serif;
+        font-size: 24px;
+        color: #19191a;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        background: #faf8f5;
+        border-radius: 8px;
+    }
+    .info-item i {
+        font-size: 22px;
+        color: #dfa974;
+        width: 30px;
+        text-align: center;
+    }
+    .info-item .info-label {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .info-item .info-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #19191a;
+    }
+    .tour-description {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #555;
+    }
+    .price-highlight {
+        background: linear-gradient(135deg, #dfa974 0%, #c98a5a 100%);
+        color: #fff;
+        border-radius: 10px;
+        padding: 25px 30px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .price-highlight .price-amount {
+        font-family: 'Lora', serif;
+        font-size: 36px;
+        font-weight: 700;
+    }
+    .price-highlight .price-unit {
+        font-size: 14px;
+        opacity: 0.85;
+    }
+    .schedule-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    .schedule-table thead th {
+        background: #19191a;
+        color: #fff;
+        padding: 14px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .schedule-table thead th:first-child {
+        border-radius: 8px 0 0 8px;
+    }
+    .schedule-table thead th:last-child {
+        border-radius: 0 8px 8px 0;
+    }
+    .schedule-table tbody tr {
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: all 0.25s;
+    }
+    .schedule-table tbody tr:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .schedule-table td {
+        padding: 16px 18px;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+    .schedule-table td:first-child {
+        border-radius: 8px 0 0 8px;
+    }
+    .schedule-table td:last-child {
+        border-radius: 0 8px 8px 0;
+    }
+    .slot-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .slot-badge.available {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    .slot-badge.limited {
+        background: #fff3e0;
+        color: #e65100;
+    }
+    .slot-badge.full {
+        background: #ffebee;
+        color: #c62828;
+    }
+    .btn-book-tour {
+        background: #dfa974;
+        color: #fff;
+        border: none;
+        padding: 10px 28px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.3s;
+        white-space: nowrap;
+        display: inline-block;
+    }
+    .btn-book-tour:hover {
+        background: #c89660;
+        color: #fff;
+    }
+    .btn-book-tour.disabled {
+        background: #ccc;
+        color: #999;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    .breadcrumb-tour {
+        padding: 15px 0;
+        font-size: 14px;
+    }
+    .breadcrumb-tour a {
+        color: #dfa974;
+        text-decoration: none;
+    }
+    .breadcrumb-tour a:hover {
+        text-decoration: underline;
+    }
+    .no-schedule-msg {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+    .no-schedule-msg i {
+        font-size: 40px;
+        margin-bottom: 15px;
+        color: #ddd;
+    }
+    .review-summary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .review-summary .stars {
+        color: #f5a623;
+        font-size: 16px;
+    }
+    .review-summary .count {
+        color: #999;
+        font-size: 14px;
+    }
+    @@media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        .tour-detail-hero {
+            height: 280px;
+        }
+        .tour-detail-hero .hero-content h1 {
+            font-size: 28px;
+        }
+    }
+</style>
+}
+
+<!-- Hero Image -->
+<div class="tour-detail-hero">
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Model.ImageUrl" alt="@Model.TourName" onerror="this.onerror=null;this.src='/img/room/room-b1.jpg';" />
+    }
+    else
+    {
+        <img src="/img/room/room-b1.jpg" alt="Tour" />
+    }
+    <div class="hero-content">
+        <div class="container">
+            <h1>@Model.TourName</h1>
+            @if (Model.ReviewCount > 0)
+            {
+                <div class="review-summary">
+                    <div class="stars">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= Math.Round(Model.AverageRating))
+                            {
+                                <i class="fa fa-star"></i>
+                            }
+                            else
+                            {
+                                <i class="fa fa-star-o"></i>
+                            }
+                        }
+                    </div>
+                    <span class="count" style="color: #fff;">@Model.AverageRating.ToString("0.0") (@Model.ReviewCount đánh giá)</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="tour-info-section">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-tour" style="color: #666; font-size: 15px; margin-bottom: 10px;">
+            <a asp-action="Index" style="color: #dfa974; font-weight: 600;"><i class="fa fa-home"></i> Tour</a> 
+            <span style="margin: 0 8px; color: #ccc;">&raquo;</span> 
+            <strong style="color: #333;">Chi tiết</strong>
+        </div>
+
+        <div class="row">
+            <!-- Left Column: Tour Info -->
+            <div class="col-lg-8">
+                <!-- Info Grid -->
+                <div class="tour-info-card">
+                    <h3>Thông Tin Tour</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <i class="fa fa-map-marker"></i>
+                            <div>
+                                <div class="info-label">Địa điểm</div>
+                                <div class="info-value">@(Model.Location ?? "Resort")</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fa fa-clock-o"></i>
+                            <div>
+                                <div class="info-label">Thời lượng</div>
+                                <div class="info-value">@Model.DurationHours giờ</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fa fa-users"></i>
+                            <div>
+                                <div class="info-label">Sức chứa tối đa</div>
+                                <div class="info-value">@Model.MaxCapacity người</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fa fa-tag"></i>
+                            <div>
+                                <div class="info-label">Giá mỗi người</div>
+                                <div class="info-value" style="color: #dfa974;">@Model.Price.ToString("N0") VNĐ</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <h3>Mô Tả Chi Tiết</h3>
+                        <div class="tour-description">
+                            @Html.Raw(Model.Description.Replace("\n", "<br/>"))
+                        </div>
+                    }
+
+                    <h3 style="font-size: 20px; margin-top: 30px; margin-bottom: 15px;"><i class="fa fa-picture-o" style="color: #dfa974; margin-right: 8px;"></i> Hình Ảnh Khám Phá</h3>
+                    <div class="row" style="margin-bottom: 30px;">
+                        <div class="col-md-6 mb-4">
+                            <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                                <img src="@(!string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : "/img/gallery/gallery-1.jpg")" alt="@Model.TourName" style="width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onerror="this.onerror=null;this.src='/img/gallery/gallery-1.jpg';" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                                <img src="/img/hero/hero-1.jpg" alt="Tour landscape" style="width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                                <img src="/img/hero/hero-2.jpg" alt="Tour experience" style="width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                                <img src="/img/gallery/gallery-2.jpg" alt="Tour atmosphere" style="width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5 mb-4">
+                        <div class="col-lg-7 mb-4 mb-lg-0">
+                            <div style="padding: 25px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); background: #fff; height: 100%;">
+                                <h3 style="font-size: 18px; margin-bottom: 20px; font-weight: 700; color: #333;"><i class="fa fa-map-o" style="color: #dfa974; margin-right: 8px;"></i> Vị Trí Tuyến Đi</h3>
+                                <div style="border-radius: 8px; overflow: hidden; border: 1px solid #eaeaea;">
+                                    <iframe 
+                                        src="https://maps.google.com/maps?q=@System.Net.WebUtility.UrlEncode(Model.Location ?? Model.TourName)&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+                                        width="100%" 
+                                        height="300" 
+                                        frameborder="0" 
+                                        style="border:0;" 
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div style="padding: 25px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); background: #fdfbf9; height: 100%;">
+
+                                <h3 style="font-size: 18px; margin-bottom: 20px; font-weight: 700; color: #333;"><i class="fa fa-cloud" style="color: #dfa974; margin-right: 8px;"></i> Dự Báo Thời Tiết</h3>
+                                <div style="border-radius: 8px; overflow: hidden; background: #fff; border: 1px solid #eaeaea; padding: 15px;">
+                                    <div id="custom-weather-widget" class="text-center py-1">
+                                        <i class="fa fa-spinner fa-spin fa-2x" style="color: #dfa974;"></i>
+                                    </div>
+                                    <script>
+                                        document.addEventListener("DOMContentLoaded", function() {
+                                            var lat = 10.2289;
+                                            var lon = 103.9573;
+                                            
+                                            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FBangkok`)
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    var temp = Math.round(data.current_weather.temperature);
+                                                    var code = data.current_weather.weathercode;
+                                                    
+                                                    function getWeatherIcon(wcode) {
+                                                        if (wcode === 1 || wcode === 2 || wcode === 3) return { i: "fa-cloud", c: "#95a5a6", t: "Nhiều mây" };
+                                                        if (wcode >= 51 && wcode <= 67) return { i: "fa-tint", c: "#3498db", t: "Có mưa" };
+                                                        if (wcode >= 80 && wcode <= 82) return { i: "fa-umbrella", c: "#2980b9", t: "Mưa rào" };
+                                                        if (wcode >= 95) return { i: "fa-bolt", c: "#8e44ad", t: "Có dông" };
+                                                        return { i: "fa-sun-o", c: "#f39c12", t: "Trời nắng" };
+                                                    }
+                                                    
+                                                    var current = getWeatherIcon(code);
+
+                                                    var html = `
+                                                        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
+                                                            <i class="fa ${current.i}" style="font-size: 45px; color: ${current.c}; margin-right: 15px;"></i>
+                                                            <div style="text-align: left;">
+                                                                <h2 style="font-size: 32px; font-weight: 700; color: #333; margin: 0; line-height: 1;">${temp}<small style="font-size: 16px; color: #777;">°C</small></h2>
+                                                                <div style="font-size: 13px; color: #666; font-weight: 500; margin-top: 3px;">${current.t}</div>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                                    
+                                                    html += `<div style="border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px;">`;
+                                                    var maxDays = Math.min(4, data.daily.time.length);
+                                                    for(var i=1; i<maxDays; i++) {
+                                                        var dateObj = new Date(data.daily.time[i]);
+                                                        var dayName = dateObj.toLocaleDateString('vi-VN', { weekday: 'short' });
+                                                        var maxTemp = Math.round(data.daily.temperature_2m_max[i]);
+                                                        var minTemp = Math.round(data.daily.temperature_2m_min[i]);
+                                                        var dIcon = getWeatherIcon(data.daily.weathercode[i]);
+                                                        
+                                                        html += `
+                                                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0;">
+                                                                <div style="width: 50px; text-align: left; font-size: 13px; font-weight: 600; color: #555;">${dayName}</div>
+                                                                <div style="flex: 1; text-align: left; padding-left: 5px; white-space: nowrap;">
+                                                                    <i class="fa ${dIcon.i}" style="color: ${dIcon.c}; font-size: 14px; width: 18px; text-align: center;"></i>
+                                                                    <span style="font-size: 12px; color: #777; margin-left: 3px;">${dIcon.t}</span>
+                                                                </div>
+                                                                <div style="width: 65px; text-align: right; font-size: 13px; font-weight: 600; color: #333; white-space: nowrap;">${minTemp}° - ${maxTemp}°</div>
+                                                            </div>
+                                                        `;
+                                                    }
+                                                    html += `</div>`;
+                                                    
+                                                    document.getElementById('custom-weather-widget').innerHTML = html;
+                                                })
+                                                .catch(err => {
+                                                    document.getElementById('custom-weather-widget').innerHTML = '<div style="color: #e74c3c; font-size: 13px;">Lỗi kết nối thời tiết</div>';
+                                                });
+                                        });
+                                    </script>
+                                </div>
+                                <div class="mt-3 text-muted" style="font-size: 13px; line-height: 1.6;">
+                                    <i class="fa fa-info-circle" style="color: #dfa974;"></i> Thời tiết khu vực được tham chiếu tại trung tâm Phú Quốc.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Table -->
+                <div class="tour-info-card">
+                    <h3>Lịch Trình Sắp Tới</h3>
+
+                    @if (Model.UpcomingSchedules.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="schedule-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ngày khởi hành</th>
+                                        <th>Giờ bắt đầu</th>
+                                        <th>Hướng dẫn viên</th>
+                                        <th>Chỗ trống</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var schedule in Model.UpcomingSchedules)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@schedule.TourDate.ToString("dd/MM/yyyy")</strong>
+                                                <br />
+                                                <small style="color: #999;">@schedule.TourDate.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"))</small>
+                                            </td>
+                                            <td>
+                                                @if (schedule.StartTime.HasValue)
+                                                {
+                                                    @schedule.StartTime.Value.ToString(@"hh\:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span style="color:#999">--:--</span>
+                                                }
+                                            </td>
+                                            <td>@(schedule.GuideName ?? "Chưa phân công")</td>
+                                            <td>
+                                                @if (schedule.IsFull)
+                                                {
+                                                    <span class="slot-badge full">Hết chỗ</span>
+                                                }
+                                                else if (schedule.AvailableSlots <= 5)
+                                                {
+                                                    <span class="slot-badge limited">@schedule.AvailableSlots chỗ</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="slot-badge available">@schedule.AvailableSlots chỗ</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!schedule.IsFull)
+                                                {
+                                                    <a asp-action="Book" asp-route-id="@schedule.ScheduleId" class="btn-book-tour">
+                                                        <i class="fa fa-ticket"></i> Đặt Tour
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="btn-book-tour disabled">Hết chỗ</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-schedule-msg">
+                            <i class="fa fa-calendar-times-o"></i>
+                            <h5>Chưa có lịch trình nào sắp tới</h5>
+                            <p>Vui lòng quay lại sau hoặc liên hệ lễ tân để biết thêm chi tiết.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Right Column: Price + Quick Actions -->
+            <div class="col-lg-4">
+                <div class="price-highlight">
+                    <div class="price-unit">Giá từ</div>
+                    <div class="price-amount">@Model.Price.ToString("N0")</div>
+                    <div class="price-unit">VNĐ / người</div>
+                </div>
+
+                <div class="tour-info-card">
+                    <h3 style="font-size: 18px;">Lưu Ý Quan Trọng</h3>
+                    <ul style="font-size: 14px; color: #555; line-height: 2;">
+                        <li>Hủy miễn phí trước <strong>48 giờ</strong> khởi hành.</li>
+                        <li>Hủy trong vòng 48 giờ sẽ không được hoàn tiền.</li>
+                        <li>Giá đã bao gồm bảo hiểm du lịch cơ bản.</li>
+                        <li>Trẻ em dưới 5 tuổi được miễn phí.</li>
+                    </ul>
+                </div>
+
+                <div class="tour-info-card" style="text-align: center;">
+                    <a asp-action="Index" class="btn-detail" style="display: inline-block;">
+                        <i class="fa fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

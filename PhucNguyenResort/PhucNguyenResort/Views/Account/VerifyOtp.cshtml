@@ -1,0 +1,266 @@
+@model PhucNguyenResort.ViewModels.Auth.VerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Xác minh tài khoản";
+}
+
+<style>
+    .otp-container {
+        max-width: 500px;
+        margin: 50px auto;
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(212, 163, 115, 0.2);
+    }
+    .otp-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .otp-header h3 {
+        color: #1d3557;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .otp-header p {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+    .otp-box {
+        width: 50px;
+        height: 55px;
+        font-size: 24px;
+        font-weight: 700;
+        border: 2px solid #ced4da;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+        color: #1d3557;
+    }
+    .otp-box:focus {
+        border-color: #d4a373;
+        box-shadow: 0 0 0 0.25rem rgba(212, 163, 115, 0.25);
+        outline: none;
+    }
+    .btn-verify {
+        background-color: #d4a373;
+        border-color: #d4a373;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+    .btn-verify:hover {
+        background-color: #c29262;
+        border-color: #c29262;
+        color: #ffffff;
+    }
+    .resend-container {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 0.9rem;
+    }
+    .resend-link {
+        color: #d4a373;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .resend-link.disabled {
+        color: #6c757d;
+        cursor: not-allowed;
+        text-decoration: none;
+    }
+    .resend-link:hover:not(.disabled) {
+        text-decoration: underline;
+        color: #c29262;
+    }
+    .countdown {
+        font-weight: bold;
+        color: #1d3557;
+    }
+</style>
+
+<div class="container">
+    <div class="otp-container">
+        <div class="otp-header">
+            <h3>Xác minh tài khoản</h3>
+            <p>Chúng tôi đã gửi mã xác thực gồm 6 chữ số đến email của bạn:</p>
+            <p class="font-weight-bold text-dark"><strong>@Model.Email</strong></p>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger text-center">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div id="ajax-message" class="alert d-none text-center"></div>
+
+        <form asp-action="VerifyOtp" method="post" id="otp-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center"></div>
+            
+            <input type="hidden" asp-for="Email" />
+            <input type="hidden" asp-for="OtpCode" id="hiddenOtpCode" />
+
+            <div class="d-flex justify-content-between mb-4">
+                <input type="text" class="form-control text-center otp-box mx-1" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="form-control text-center otp-box mx-1" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="form-control text-center otp-box mx-1" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="form-control text-center otp-box mx-1" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="form-control text-center otp-box mx-1" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="form-control text-center otp-box mx-1" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+            </div>
+
+            <div class="text-center mb-4">
+                <span asp-validation-for="OtpCode" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-verify w-100">Xác minh</button>
+        </form>
+
+        <div class="resend-container">
+            Chưa nhận được mã? 
+            <span id="resend-timer-wrapper">Gửi lại mã sau <span class="countdown" id="countdown-timer">60</span>s</span>
+            <a id="resend-btn" class="resend-link d-none">Gửi lại mã ngay</a>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a asp-action="Register" class="text-secondary" style="font-size: 0.85rem;">Quay lại trang Đăng ký</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const boxes = document.querySelectorAll(".otp-box");
+            const hiddenInput = document.getElementById("hiddenOtpCode");
+            const form = document.getElementById("otp-form");
+            const resendBtn = document.getElementById("resend-btn");
+            const timerWrapper = document.getElementById("resend-timer-wrapper");
+            const timerSpan = document.getElementById("countdown-timer");
+            const ajaxMessage = document.getElementById("ajax-message");
+            
+            let timeLeft = 60;
+            let timerId = null;
+
+            function startTimer() {
+                timeLeft = 60;
+                resendBtn.classList.add("d-none");
+                timerWrapper.classList.remove("d-none");
+                timerSpan.textContent = timeLeft;
+                
+                if (timerId) clearInterval(timerId);
+                
+                timerId = setInterval(function () {
+                    timeLeft--;
+                    timerSpan.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerId);
+                        timerWrapper.classList.add("d-none");
+                        resendBtn.classList.remove("d-none");
+                    }
+                }, 1000);
+            }
+
+            // Start timer on load
+            startTimer();
+
+            // Set focus to the first box
+            if(boxes[0]) boxes[0].focus();
+
+            boxes.forEach((box, index) => {
+                box.addEventListener("input", function (e) {
+                    // Only allow numbers
+                    this.value = this.value.replace(/[^0-9]/g, "");
+
+                    if (this.value.length === 1 && index < boxes.length - 1) {
+                        boxes[index + 1].focus();
+                    }
+                    updateHiddenInput();
+                });
+
+                box.addEventListener("keydown", function (e) {
+                    if (e.key === "Backspace") {
+                        if (this.value.length === 0 && index > 0) {
+                            boxes[index - 1].focus();
+                            boxes[index - 1].value = "";
+                        } else {
+                            this.value = "";
+                        }
+                        updateHiddenInput();
+                        e.preventDefault();
+                    }
+                });
+
+                box.addEventListener("paste", function (e) {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData("text").trim();
+                    if (/^[0-9]{6}$/.test(text)) {
+                        for (let i = 0; i < boxes.length; i++) {
+                            boxes[i].value = text[i];
+                        }
+                        boxes[boxes.length - 1].focus();
+                        updateHiddenInput();
+                    }
+                });
+            });
+
+            function updateHiddenInput() {
+                let code = "";
+                boxes.forEach(box => {
+                    code += box.value;
+                });
+                hiddenInput.value = code;
+            }
+
+            form.addEventListener("submit", function (e) {
+                updateHiddenInput();
+                if (hiddenInput.value.length !== 6) {
+                    e.preventDefault();
+                    alert("Vui lòng nhập đủ 6 chữ số xác thực.");
+                }
+            });
+
+            resendBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                
+                ajaxMessage.classList.add("d-none");
+                ajaxMessage.classList.remove("alert-success", "alert-danger");
+
+                const email = document.querySelector('input[name="Email"]').value;
+
+                fetch('/Account/ResendOtp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        ajaxMessage.textContent = data.message;
+                        ajaxMessage.classList.remove("d-none");
+                        ajaxMessage.classList.add("alert-success");
+                        startTimer();
+                    } else {
+                        ajaxMessage.textContent = data.message;
+                        ajaxMessage.classList.remove("d-none");
+                        ajaxMessage.classList.add("alert-danger");
+                    }
+                })
+                .catch(error => {
+                    ajaxMessage.textContent = "Có lỗi xảy ra khi gửi lại mã. Vui lòng thử lại.";
+                    ajaxMessage.classList.remove("d-none");
+                    ajaxMessage.classList.add("alert-danger");
+                });
+            });
+        });
+    </script>
+}

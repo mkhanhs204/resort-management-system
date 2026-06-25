@@ -7,9 +7,8 @@ namespace PhucNguyenResort.ViewModels.Bookings
 {
     public class CreateBookingViewModel
     {
-        [Required]
-        public int RoomId { get; set; }
-        
+        public List<RoomSelectionViewModel> RoomSelections { get; set; } = new List<RoomSelectionViewModel>();
+
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Ngày nhận phòng")]
@@ -26,11 +25,12 @@ namespace PhucNguyenResort.ViewModels.Bookings
         [Range(0, 10)]
         public int NumberOfChildren { get; set; }
 
-        // Mảng lưu ID của các Tour Schedule mà khách chọn thêm
-        public List<int>? SelectedTourScheduleIds { get; set; }
+        // Danh sách Tour mà khách chọn thêm với số lượng slot tùy chỉnh
+        public List<TourSelectionViewModel>? SelectedTours { get; set; }
 
         // Primary Booker Details for Stay Registration (Law on Residence 2020 & PDPD Compliance)
         [Required(ErrorMessage = "Vui lòng nhập Họ tên người đặt phòng chính.")]
+        [RegularExpression(@"^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂÊÔƠỨỪỬỮỰẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăâêôơứừửữựấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲÝỴÝỳýỵỷỹ\s]+$", ErrorMessage = "Họ tên chỉ được chứa chữ cái và khoảng trắng.")]
         [Display(Name = "Họ tên người đặt chính")]
         public string PrimaryGuestName { get; set; } = string.Empty;
 
@@ -44,6 +44,7 @@ namespace PhucNguyenResort.ViewModels.Bookings
         public GenderType? PrimaryGuestGender { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập số CCCD/Hộ chiếu.")]
+        [RegularExpression(@"^[a-zA-Z0-9]{8,20}$", ErrorMessage = "Số CCCD/Hộ chiếu phải là ký tự chữ hoặc số, độ dài từ 8 đến 20 ký tự.")]
         [Display(Name = "Số CCCD/Hộ chiếu")]
         public string PrimaryGuestPassportNumber { get; set; } = string.Empty;
 
@@ -51,7 +52,14 @@ namespace PhucNguyenResort.ViewModels.Bookings
         [Display(Name = "Quốc tịch")]
         public string PrimaryGuestNationality { get; set; } = string.Empty;
 
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD) để tiếp tục.")]
         [Display(Name = "Đồng ý điều khoản PDPD")]
         public bool PdpdConsentChecked { get; set; }
+    }
+
+    public class TourSelectionViewModel
+    {
+        public int ScheduleId { get; set; }
+        public int Participants { get; set; }
     }
 }

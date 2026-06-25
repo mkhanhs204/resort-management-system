@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.FoodOrders;
@@ -23,6 +24,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "PhucNguyenResort.Auth";
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    })
+    .AddCookie("ExternalCookie")
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.SignInScheme = "ExternalCookie";
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
     });
 
 builder.Services.AddAuthorization();
@@ -41,11 +49,15 @@ builder.Services.AddDbContext<ResortDbContext>(options =>
 builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Kots.IKotService, PhucNguyenResort.Services.Kots.KotService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Tables.IDiningTableService, PhucNguyenResort.Services.Tables.DiningTableService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Rooms.IRoomService, PhucNguyenResort.Services.Rooms.RoomService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.RoomCategories.IRoomCategoryService, PhucNguyenResort.Services.RoomCategories.RoomCategoryService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Users.IUserService, PhucNguyenResort.Services.Users.UserService>();
-builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourService, PhucNguyenResort.Services.Tours.TourService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourCatalogService, PhucNguyenResort.Services.Tours.TourCatalogService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourScheduleService, PhucNguyenResort.Services.Tours.TourScheduleService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourBookingService, PhucNguyenResort.Services.Tours.TourBookingService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ICustomerTourBookingService, PhucNguyenResort.Services.Tours.CustomerTourBookingService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Home.IHomeService, PhucNguyenResort.Services.Home.HomeService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingService, PhucNguyenResort.Services.Bookings.BookingService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingGuestService, PhucNguyenResort.Services.Bookings.BookingGuestService>();
@@ -58,6 +70,9 @@ builder.Services.AddScoped<PhucNguyenResort.Services.Email.IEmailSender, PhucNgu
 // 4. ĐĂNG KÝ CÁC BACKGROUND JOBS RUNNING (Tiến trình chạy ngầm)
 // ==========================================
 builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PdpdDataPurgeJob>();
+builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourBookingCleanupJob>();
+builder.Services.AddHostedService<PhucNguyenResort.Services.Email.OtpCleanupJob>();
+builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PendingBookingCleanupJob>();
 
 // Service tự động cập nhật đồng bộ trạng thái Tour theo thời gian thực vừa thêm
 builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourStatusWorker>();

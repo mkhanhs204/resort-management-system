@@ -1,85 +1,331 @@
 @model PhucNguyenResort.ViewModels.Bookings.PreCheckinViewModel
+@using PhucNguyenResort.Enums
+
 @{
     ViewData["Title"] = "Thủ tục Check-In";
 }
 
-<div class="container" style="margin-top: 130px; margin-bottom: 50px;">
-    <h3 class="font-weight-bold mb-4" style="color: #dfa974;">THỰC HIỆN CHECK-IN CHO ĐƠN ĐẶT #@Model.BookingId</h3>
+<link rel="stylesheet" href="~/css/checkin-premium.css" asp-append-version="true" />
+
+<div class="container-fluid checkin-container">
+    <div class="checkin-header-section d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div>
+            <span class="checkin-badge">Lễ Tân / Front Desk</span>
+            <h1 class="checkin-title">Thủ Tục Check-In Booking #@Model.BookingId</h1>
+        </div>
+        <a asp-action="Index" class="btn-premium-back shadow-sm">
+            <i class="fas fa-arrow-left fa-sm mr-2"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background-color: #ecfdf5; color: #065f46;">
+            <i class="fas fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color: #065f46; opacity: 0.8;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background-color: #fef2f2; color: #991b1b;">
+            <i class="fas fa-exclamation-circle mr-2"></i> @TempData["Error"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color: #991b1b; opacity: 0.8;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
 
     <form asp-action="CheckIn" method="post">
-        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: #fef2f2; color: #991b1b;"></div>
         <input type="hidden" asp-for="BookingId" />
 
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-dark text-white font-weight-bold">Thông tin phòng đặt</div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Số phòng:</strong> @Model.RoomNumber</p>
-                        <p><strong>Loại phòng:</strong> @Model.CategoryName</p>
+        <div class="row">
+            <!-- Left: Guest Manifest details -->
+            <div class="col-lg-8">
+                <div class="premium-card">
+                    <div class="premium-card-header d-flex justify-content-between align-items-center">
+                        <h5 class="premium-card-title">
+                            <i class="fas fa-users mr-2"></i> Danh Sách Khách Lưu Trú
+                        </h5>
+                        <a asp-action="ExportManifest" asp-route-id="@Model.BookingId" target="_blank" class="btn-outline-gold">
+                            <i class="fas fa-print mr-1"></i> In Tờ Khai Tạm Trút
+                        </a>
                     </div>
-                    <div class="col-md-6">
-                        <p><strong>Ngày Check-In:</strong> @Model.CheckInDate.ToString("dd/MM/yyyy")</p>
-                        <p><strong>Ngày Check-Out:</strong> @Model.CheckOutDate.ToString("dd/MM/yyyy")</p>
+                    <div class="premium-card-body">
+                        <div class="accordion" id="guestAccordion">
+                            @for (int i = 0; i < Model.Guests.Count; i++)
+                            {
+                                var isPrimary = Model.Guests[i].IsPrimaryBooker;
+                                <div class="premium-guest-card @(isPrimary ? "primary-guest" : "")">
+                                    <div class="guest-card-header @(i == 0 ? "" : "collapsed")" data-toggle="collapse" data-target="#collapseGuest-@i" aria-expanded="@(i == 0 ? "true" : "false")" aria-controls="collapseGuest-@i" style="cursor: pointer;">
+                                        <h5 class="guest-card-title">
+                                            <span class="guest-number-circle mr-2">@(i + 1)</span>
+                                            <span id="guest-name-summary-@i" class="guest-name-text">
+                                                @(string.IsNullOrWhiteSpace(Model.Guests[i].FullName) ? $"Khách #{i + 1}" : Model.Guests[i].FullName)
+                                            </span>
+                                            @if (isPrimary)
+                                            {
+                                                <span class="guest-badge primary ml-2">Trưởng đoàn</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="guest-badge ml-2">Thành viên</span>
+                                            }
+                                        </h5>
+                                        <input type="hidden" asp-for="Guests[i].IsPrimaryBooker" />
+                                        <div class="d-flex align-items-center">
+                                            <span class="guest-summary-info mr-3 d-none d-sm-inline-block text-muted small" id="guest-info-summary-@i" style="font-size: 0.85rem; font-weight: 500;">
+                                                @(Model.Guests[i].Gender.HasValue ? (Model.Guests[i].Gender.Value == GenderType.Male ? "Nam" : (Model.Guests[i].Gender.Value == GenderType.Female ? "Nữ" : "Khác")) : "")
+                                                @(!string.IsNullOrWhiteSpace(Model.Guests[i].PassportNumber) ? $" - CCCD/HC: {Model.Guests[i].PassportNumber}" : "")
+                                            </span>
+                                            <i class="fas fa-chevron-down accordion-arrow"></i>
+                                        </div>
+                                    </div>
+
+                                    <div id="collapseGuest-@i" class="collapse @(i == 0 ? "show" : "")" aria-labelledby="guestHeading-@i" data-parent="#guestAccordion">
+                                        <div class="guest-card-body pt-4">
+                                            <div class="form-row">
+                                                <div class="form-group col-md-8">
+                                                    <label asp-for="Guests[i].FullName" class="label-premium">Họ và Tên</label>
+                                                    <input type="text" asp-for="Guests[i].FullName" class="form-control-premium" placeholder="NGUYEN VAN A" />
+                                                    <span asp-validation-for="Guests[i].FullName" class="text-danger small mt-1 d-block"></span>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label asp-for="Guests[i].Gender" class="label-premium">Giới Tính</label>
+                                                    <select asp-for="Guests[i].Gender" class="form-control-premium">
+                                                        <option value="">-- Chọn --</option>
+                                                        <option value="Male">Nam</option>
+                                                        <option value="Female">Nữ</option>
+                                                        <option value="Other">Khác</option>
+                                                    </select>
+                                                    <span asp-validation-for="Guests[i].Gender" class="text-danger small mt-1 d-block"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group col-md-4">
+                                                    <label asp-for="Guests[i].DateOfBirth" class="label-premium">Ngày Sinh</label>
+                                                    <input type="date" asp-for="Guests[i].DateOfBirth" class="form-control-premium" />
+                                                    <span asp-validation-for="Guests[i].DateOfBirth" class="text-danger small mt-1 d-block"></span>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label asp-for="Guests[i].PassportNumber" class="label-premium">Số CCCD / Hộ Chiếu</label>
+                                                    <input type="text" asp-for="Guests[i].PassportNumber" class="form-control-premium" placeholder="Số định danh" />
+                                                    <span asp-validation-for="Guests[i].PassportNumber" class="text-danger small mt-1 d-block"></span>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label asp-for="Guests[i].Nationality" class="label-premium">Quốc Tịch</label>
+                                                    <input type="text" asp-for="Guests[i].Nationality" class="form-control-premium" placeholder="Vietnam" />
+                                                    <span asp-validation-for="Guests[i].Nationality" class="text-danger small mt-1 d-block"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+
+                        <div class="pdpd-alert-premium" role="alert">
+                            <div class="d-flex">
+                                <i class="fas fa-shield-alt mr-3 mt-1" style="font-size: 1.25rem;"></i>
+                                <div>
+                                    <strong>Tuân thủ PDPD:</strong> Bằng việc nhấn nút hoàn tất, bạn xác nhận đã đối chiếu thông tin vật lý (CCCD/Hộ chiếu) của khách hàng trùng khớp với thông tin đã nhập, và khách hàng đã đồng ý cho phép xử lý dữ liệu phục vụ tạm trú.
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-submit-main" class="btn-submit-premium-main shadow">
+                            <i class="fas fa-check-circle mr-2"></i> <span>Xác Nhận Check-In & Giao Phòng</span>
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <h4 class="font-weight-bold mb-3">Danh sách thành viên lưu trú</h4>
-        <div class="text-danger mb-3" asp-validation-summary="ModelOnly"></div>
-
-        @if (Model.Guests != null)
-        {
-            for (int i = 0; i < Model.Guests.Count; i++)
-            {
-                <div class="card shadow-sm border-0 mb-3">
-                    <div class="card-header font-weight-bold" style="background-color: #f8f9fa;">
-                        @(Model.Guests[i].IsPrimaryBooker ? "Thành viên 1: Người đặt phòng chính" : $"Thành viên {i + 1}")
-                        <input type="hidden" asp-for="Guests[i].IsPrimaryBooker" />
+            <!-- Right: Room & Booking Info -->
+            <div class="col-lg-4">
+                <div class="premium-card">
+                    <div class="premium-card-header">
+                        <h5 class="premium-card-title">
+                            <i class="fas fa-info-circle mr-2"></i> Thông Tin Đặt Phòng
+                        </h5>
                     </div>
-                    <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label class="font-weight-bold">Họ và tên</label>
-                                <input asp-for="Guests[i].FullName" class="form-control form-control-sm" />
-                                <span asp-validation-for="Guests[i].FullName" class="text-danger small"></span>
+                    <div class="premium-card-body">
+                        <div class="text-center mb-4">
+                            <div class="room-details-icon-wrapper">
+                                <i class="fas fa-hotel fa-lg"></i>
                             </div>
-                            <div class="form-group col-md-3">
-                                <label class="font-weight-bold">Ngày sinh</label>
-                                <input asp-for="Guests[i].DateOfBirth" type="date" class="form-control form-control-sm" value="@(Model.Guests[i].DateOfBirth?.ToString("yyyy-MM-dd"))" />
-                                <span asp-validation-for="Guests[i].DateOfBirth" class="text-danger small"></span>
+                            <h5 class="text-dark font-weight-bold mb-2" style="font-size: 1.1rem; letter-spacing: -0.2px;">Xếp Phòng Cho Đặt Phòng</h5>
+                            <span class="room-category-pill">@Model.CategoryName</span>
+                        </div>
+
+                        <hr style="border-top: 1px solid #f1f5f9;" />
+
+                        @if (Model.CurrentBookingStatus != BookingStatus.Arrived)
+                        {
+                            <div class="mb-4">
+                                <div class="custom-control custom-checkbox" style="background-color: #f8fafc; padding: 12px 16px 12px 40px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    <input asp-for="IsArrivalOnly" type="checkbox" class="custom-control-input" id="IsArrivalOnlyCheckbox">
+                                    <label class="custom-control-label" for="IsArrivalOnlyCheckbox" style="font-weight: 500; color: #334155; padding-top: 2px;">
+                                        Chỉ đăng ký khách đến (Chưa giao phòng)
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-group col-md-2">
-                                <label class="font-weight-bold">Giới tính</label>
-                                <input asp-for="Guests[i].Gender" class="form-control form-control-sm" placeholder="Nam/Nữ" />
-                                <span asp-validation-for="Guests[i].Gender" class="text-danger small"></span>
+                        }
+                        else
+                        {
+                            <input type="hidden" asp-for="IsArrivalOnly" value="false" />
+                            <div class="alert alert-info border-0 shadow-sm mb-4" style="border-radius: 8px; background-color: #e0f2fe; color: #0284c7; padding: 12px 16px;">
+                                <i class="fas fa-info-circle mr-2"></i> Khách đã hoàn tất đăng ký đến (Arrived). Vui lòng chọn phòng để bàn giao.
                             </div>
-                            <div class="form-group col-md-3">
-                                <label class="font-weight-bold">Số CCCD / Hộ chiếu</label>
-                                <input asp-for="Guests[i].PassportNumber" class="form-control form-control-sm" />
-                                <span asp-validation-for="Guests[i].PassportNumber" class="text-danger small"></span>
+                        }
+
+                        <div class="mb-4" id="room-assignment-section">
+                            <h6 class="font-weight-bold text-dark mb-3" style="font-size: 0.95rem;">
+                                <i class="fas fa-bed mr-2" style="color: var(--accent-color);"></i> Gán Phòng Vật Lý
+                            </h6>
+                            
+                            @for (int j = 0; j < Model.RoomAssignments.Count; j++)
+                            {
+                                <div class="physical-room-item">
+                                    <input type="hidden" asp-for="RoomAssignments[j].BookingDetailId" />
+                                    <input type="hidden" asp-for="RoomAssignments[j].RoomCategoryId" />
+                                    <input type="hidden" asp-for="RoomAssignments[j].CategoryName" />
+                                    
+                                    <label class="physical-room-label">
+                                        Chi tiết phòng #@(j + 1): @Model.RoomAssignments[j].CategoryName
+                                    </label>
+                                    
+                                    <select asp-for="RoomAssignments[j].SelectedRoomId" class="form-control-premium">
+                                        <option value="">-- Chọn phòng trống --</option>
+                                        @if (Model.RoomAssignments[j].AvailableRooms != null)
+                                        {
+                                            @foreach (var room in Model.RoomAssignments[j].AvailableRooms)
+                                            {
+                                                <option value="@room.Id">Phòng @room.RoomNumber</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="RoomAssignments[j].SelectedRoomId" class="text-danger small d-block mt-1"></span>
+                                </div>
+                            }
+                        </div>
+
+                        <hr style="border-top: 1px solid #f1f5f9;" />
+
+                        <div class="mb-4">
+                            <h6 class="font-weight-bold text-dark mb-3" style="font-size: 0.95rem;">
+                                <i class="fas fa-calendar-alt mr-2" style="color: var(--accent-color);"></i> Thời Gian Lưu Trú
+                            </h6>
+                            <div class="stay-period-widget">
+                                <div class="row align-items-center">
+                                    <div class="col-5">
+                                        <div class="date-block">
+                                            <span class="date-label">Ngày đến</span>
+                                            <span class="date-value">@Model.CheckInDate.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 date-arrow-col">
+                                        <i class="fas fa-long-arrow-alt-right fa-lg"></i>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="date-block text-right">
+                                            <span class="date-label">Ngày đi</span>
+                                            <span class="date-value">@Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label class="font-weight-bold">Quốc tịch</label>
-                                <input asp-for="Guests[i].Nationality" class="form-control form-control-sm" />
-                                <span asp-validation-for="Guests[i].Nationality" class="text-danger small"></span>
+
+                        <div class="mb-4">
+                            <h6 class="font-weight-bold text-dark mb-2" style="font-size: 0.95rem;">
+                                <i class="fas fa-user-shield mr-2" style="color: var(--accent-color);"></i> Bảo Mật (PDPD Consent)
+                            </h6>
+                            <div class="d-flex align-items-center mt-2">
+                                @if (Model.PdpdConsentChecked)
+                                {
+                                    <span class="consent-badge-premium success">
+                                        <i class="fas fa-check-circle"></i> Đã đồng ý trực tuyến
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="consent-badge-premium warning">
+                                        <i class="fas fa-exclamation-triangle"></i> Chưa đồng ý trực tuyến
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <hr style="border-top: 1px solid #f1f5f9;" />
+
+                        <div class="pt-2">
+                            <div class="info-bullet-item">
+                                <i class="fas fa-info-circle text-info" style="margin-top: 2px;"></i>
+                                <span>Yêu cầu khách xuất trình giấy tờ tùy thân thực tế để đối chiếu kỹ lưỡng trước khi gán phòng.</span>
+                            </div>
+                            <div class="info-bullet-item">
+                                <i class="fas fa-file-excel text-success" style="margin-top: 2px;"></i>
+                                <span>Bạn có thể xuất tệp tờ khai tạm trú bên cột trái để gửi cho cơ quan Công an quản lý địa bàn.</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            }
-        }
-
-        <div class="text-right mt-4">
-            <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
-            <button type="submit" class="btn text-white" style="background-color: #dfa974;">Hoàn tất Check-In</button>
+            </div>
         </div>
     </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            // Live update guest name in accordion header
+            $('input[id^="Guests_"][id$="__FullName"]').on('input', function () {
+                var id = $(this).attr('id');
+                var index = id.split('_')[1];
+                var val = $(this).val().trim();
+                $('#guest-name-summary-' + index).text(val ? val : 'Khách #' + (parseInt(index) + 1));
+            });
+
+            // Live update guest gender and passport number in accordion header
+            $('select[id^="Guests_"][id$="__Gender"], input[id^="Guests_"][id$="__PassportNumber"]').on('change input', function () {
+                var id = $(this).attr('id');
+                var index = id.split('_')[1];
+                
+                var genderVal = $('#Guests_' + index + '__Gender').val();
+                var genderText = "";
+                if (genderVal === "Male") genderText = "Nam";
+                else if (genderVal === "Female") genderText = "Nữ";
+                else if (genderVal === "Other") genderText = "Khác";
+
+                var passportVal = $('#Guests_' + index + '__PassportNumber').val().trim();
+                var passportText = passportVal ? " - CCCD/HC: " + passportVal : "";
+
+                $('#guest-info-summary-' + index).text(genderText + passportText);
+            });
+
+            // Toggle room assignment section
+            $('#IsArrivalOnlyCheckbox').on('change', function() {
+                var isChecked = $(this).is(':checked');
+                if (isChecked) {
+                    $('#room-assignment-section').slideUp();
+                    $('#btn-submit-main span').text('Xác Nhận Đăng Ký Khách Đến');
+                } else {
+                    $('#room-assignment-section').slideDown();
+                    $('#btn-submit-main span').text('Xác Nhận Check-In & Giao Phòng');
+                }
+            });
+            // trigger on load if exists
+            if ($('#IsArrivalOnlyCheckbox').length > 0) {
+                $('#IsArrivalOnlyCheckbox').trigger('change');
+            } else {
+                $('#btn-submit-main span').text('Xác Nhận Bàn Giao Phòng');
+            }
+        });
+    </script>
 }

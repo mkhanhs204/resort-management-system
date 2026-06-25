@@ -4,137 +4,21 @@
     ViewData["Title"] = "Manage Tours";
 }
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
-
-<style>
-    .tour-list-wrapper {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        color: #1e293b;
-        background: #f8fafc;
-    }
-
-    .header-panel-luxury {
-        background: #ffffff;
-        border-radius: 16px;
-        border: 1px solid rgba(226, 232, 240, 0.8);
-    }
-
-    .btn-luxury-gold {
-        background: #c29953;
-        color: #ffffff !important;
-        font-weight: 600;
-        font-size: 13px;
-        padding: 10px 20px;
-        border-radius: 12px;
-        border: none;
-        transition: all 0.2s;
-    }
-
-        .btn-luxury-gold:hover {
-            background: #b08743;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(194, 153, 83, 0.25);
-        }
-
-    /* Cấu trúc Table cao cấp */
-    .table-luxury-tours {
-        border-collapse: separate;
-        border-spacing: 0 12px;
-        width: 100%;
-    }
-
-        .table-luxury-tours thead tr th {
-            border: none;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: #64748b;
-            padding: 14px 20px;
-        }
-
-        .table-luxury-tours tbody tr {
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.01);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-            .table-luxury-tours tbody tr:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
-                background: #ffffff !important;
-            }
-
-        .table-luxury-tours tbody td {
-            padding: 16px 20px !important;
-            border-top: 1px solid #f1f5f9 !important;
-            border-bottom: 1px solid #f1f5f9 !important;
-            vertical-align: middle !important;
-        }
-
-            .table-luxury-tours tbody td:first-child {
-                border-left: 1px solid #f1f5f9 !important;
-                border-top-left-radius: 16px;
-                border-bottom-left-radius: 16px;
-            }
-
-            .table-luxury-tours tbody td:last-child {
-                border-right: 1px solid #f1f5f9 !important;
-                border-top-right-radius: 16px;
-                border-bottom-right-radius: 16px;
-            }
-
-    .tour-thumbnail {
-        width: 65px;
-        height: 44px;
-        object-fit: cover;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-    }
-
-    .badge-pax-custom {
-        background: rgba(14, 165, 233, 0.08);
-        color: #0284c7;
-        font-weight: 700;
-        font-size: 12px;
-        padding: 6px 12px;
-        border-radius: 8px;
-    }
-
-    .btn-action-circle {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        margin: 0 2px;
-        transition: all 0.2s;
-        background: #f8fafc;
-    }
-
-        .btn-action-circle:hover {
-            transform: scale(1.1);
-        }
-</style>
-
-<div class="tour-list-wrapper container-fluid px-2">
-    <div class="d-flex align-items-center justify-content-between p-4 mb-4 header-panel-luxury shadow-sm">
-        <div class="d-flex align-items-center">
-            <div class="bg-light p-3 rounded-3 mr-3 text-warning"><i class="fa fa-map-o fa-2x"></i></div>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
             <div>
-                <h2 class="h4 font-weight-bold mb-1" style="font-family: 'Lora', serif; color: #0f172a;">Manage Tours</h2>
-                <p class="text-muted small mb-0">Tour Catalog Management — Master Data (UC04)</p>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-map-o mr-2" style="color: #dfa974;"></i> Manage Tours
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Tour Catalog Management — Master Data (UC04)</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
             </div>
         </div>
-        <a asp-action="Create" class="btn btn-luxury-gold shadow-sm" id="btn-create-tour">
-            <i class="fa fa-plus mr-1"></i> Create New Tour
-        </a>
     </div>
+</div>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -149,86 +33,93 @@
         </div>
     }
 
-    <div class="table-responsive">
-        <table class="table table-luxury-tours text-center align-middle mb-0" id="tours-table">
-            <thead>
-                <tr>
-                    <th style="width: 60px;">#</th>
-                    <th class="text-left" style="min-width: 220px;">Tour Name</th>
-                    <th>Price (VND)</th>
-                    <th>Capacity</th>
-                    <th>Duration</th>
-                    <th>Location</th>
-                    <th>Image</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    int rowNum = 1;
-                    foreach (var item in Model)
+<div class="card-box shadow-sm" style="border-top: 4px solid #dfa974; font-family: 'Cabin', sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;">Tour List <span class="badge badge-primary ml-2" id="tour-count">@(Model?.Count() ?? 0)</span></span>
+        <a asp-action="Create" class="btn btn-primary btn-sm" style="background-color: #dfa974; border-color: #dfa974;" id="btn-create-tour">
+            <i class="fa fa-plus"></i> Create New Tour
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0" id="tours-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Tour Name</th>
+                        <th>Price (VND)</th>
+                        <th>Capacity</th>
+                        <th>Duration</th>
+                        <th>Location</th>
+                        <th>Image</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        int rowNum = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@rowNum</td>
+                                <td><strong>@Html.DisplayFor(modelItem => item.TourName)</strong></td>
+                                <td>@(item.Price?.ToString("N0")) ₫</td>
+                                <td>
+                                    <span class="badge badge-info">@(item.MaxCapacity) pax</span>
+                                </td>
+                                <td>@(item.DurationHours) h</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Location))
+                                    {
+                                        <i class="fa fa-map-marker text-danger"></i> @item.Location
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.TourName" style="width:50px;height:35px;object-fit:cover;border-radius:4px;" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted"><i class="fa fa-image"></i></span>
+                                    }
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <a asp-action="Details" asp-route-id="@item.TourId"
+                                       class="btn btn-sm btn-outline-info" title="Details" id="btn-details-@item.TourId">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.TourId"
+                                       class="btn btn-sm btn-outline-warning" title="Edit" id="btn-edit-@item.TourId">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.TourId"
+                                       class="btn btn-sm btn-outline-danger" title="Delete" id="btn-delete-@item.TourId">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            rowNum++;
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td class="text-muted font-weight-bold">@rowNum.ToString("D2")</td>
-                            <td class="text-left font-weight-bold text-dark">
-                                @Html.DisplayFor(modelItem => item.TourName)
-                            </td>
-                            <td class="font-weight-bold text-danger">
-                                @(item.Price?.ToString("N0")) ₫
-                            </td>
-                            <td>
-                                <span class="badge-pax-custom">@(item.MaxCapacity) pax</span>
-                            </td>
-                            <td class="font-weight-bold text-secondary">@(item.DurationHours) h</td>
-                            <td class="text-muted small">
-                                @if (!string.IsNullOrEmpty(item.Location))
-                                {
-                                    <span class="text-dark font-weight-medium"><i class="fa fa-map-marker text-danger mr-1"></i> @item.Location</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">—</span>
-                                }
-                            </td>
-                            <td>
-                                @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                {
-                                    <img src="@item.ImageUrl" alt="@item.TourName" class="tour-thumbnail" onerror="this.onerror=null; this.src='https://placehold.co/70x46?text=Resort';" />
-                                }
-                                else
-                                {
-                                    <div class="tour-thumbnail d-flex align-items-center justify-content-center text-muted"><i class="fa fa-image"></i></div>
-                                }
-                            </td>
-                            <td class="text-nowrap">
-                                <a asp-action="Details" asp-route-id="@item.TourId" class="btn-action-circle text-info" title="Details" id="btn-details-@item.TourId">
-                                    <i class="fa fa-eye"></i>
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@item.TourId" class="btn-action-circle text-warning" title="Edit" id="btn-edit-@item.TourId">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.TourId" class="btn-action-circle text-danger" title="Delete" id="btn-delete-@item.TourId">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fa fa-info-circle"></i> No tours found. 
+                                <a asp-action="Create">Create the first tour</a>.
                             </td>
                         </tr>
-                        rowNum++;
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="8" class="text-center text-muted py-5 bg-white" style="border-radius: 16px;">
-                            <div class="py-3">
-                                <i class="fa fa-info-circle fa-2x text-muted mb-2"></i>
-                                <br />No tours found. <a asp-action="Create" class="font-weight-bold" style="color: #c29953;">Create the first tour</a>.
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

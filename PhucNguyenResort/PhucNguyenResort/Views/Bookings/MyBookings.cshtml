@@ -85,11 +85,22 @@
                                 break;
                         }
 
+                        @{
+                            var groupedRooms = booking.BookingDetails
+                                .GroupBy(bd => bd.RoomCategory?.CategoryName)
+                                .Select(g => $"{g.Count()}x {g.Key}")
+                                .ToList();
+                            string roomsDisplay = string.Join(", ", groupedRooms);
+                            var firstDetail = booking.BookingDetails.FirstOrDefault();
+                            
+                            var assignedRooms = booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
+                        }
+
                         <!-- Left: Image Section -->
                         <div class="booking-card-image">
-                            @if (!string.IsNullOrEmpty(booking.Room?.Category?.ImageUrl))
+                            @if (firstDetail != null && !string.IsNullOrEmpty(firstDetail.RoomCategory?.ImageUrl))
                             {
-                                <img src="@booking.Room.Category.ImageUrl" alt="@booking.Room.Category.CategoryName" />
+                                <img src="@firstDetail.RoomCategory.ImageUrl" alt="Room" />
                             }
                             else
                             {
@@ -101,19 +112,44 @@
                         <div class="booking-card-info">
                             <div>
                                 <div class="booking-id">Mã BKG: #@booking.BookingId</div>
-                                <h3>@booking.Room?.Category?.CategoryName <span style="font-size: 1rem; color: var(--text-muted); font-weight: normal;">(Phòng @booking.Room?.RoomNumber)</span></h3>
+                                <h3>
+                                    @roomsDisplay
+                                    @if (assignedRooms.Any())
+                                    {
+                                        @foreach (var roomNum in assignedRooms)
+                                        {
+                                            <span class="room-number-tag">Phòng @roomNum</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="room-number-tag" style="background-color: #f3f4f6; color: #4b5563; border-color: #e2e8f0; font-weight: 500;">Chưa xếp phòng</span>
+                                    }
+                                </h3>
                                 
                                 <div class="stay-timeline">
                                     <div class="timeline-node">
                                         <span>Check-In</span>
-                                        <strong>@booking.CheckInDate.ToString("dd/MM/yyyy")</strong>
+                                        <strong>@booking.CheckInDate.ToString("dd/MM/yyyy") 14:00</strong>
+                                        @if (booking.ActualCheckInTime != null)
+                                        {
+                                            <span class="actual-time" style="display: block; font-size: 11px; color: #16a34a; font-weight: 500; margin-top: 2px;">
+                                                <i class="fa fa-clock-o"></i> Thực tế: @booking.ActualCheckInTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </span>
+                                        }
                                     </div>
                                     <div class="timeline-arrow">
                                         <i class="fa fa-long-arrow-right"></i>
                                     </div>
                                     <div class="timeline-node">
                                         <span>Check-Out</span>
-                                        <strong>@booking.CheckOutDate.ToString("dd/MM/yyyy")</strong>
+                                        <strong>@booking.CheckOutDate.ToString("dd/MM/yyyy") 12:00</strong>
+                                        @if (booking.ActualCheckOutTime != null)
+                                        {
+                                            <span class="actual-time" style="display: block; font-size: 11px; color: #2563eb; font-weight: 500; margin-top: 2px;">
+                                                <i class="fa fa-clock-o"></i> Thực tế: @booking.ActualCheckOutTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </span>
+                                        }
                                     </div>
                                 </div>
 
