@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Dashboard</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
 
-    <!-- Css Styles from template to maintain consistent UI components -->
     <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/elegant-icons.css" type="text/css">
@@ -17,13 +15,11 @@
     <link rel="stylesheet" href="~/css/nice-select.css" type="text/css">
     <link rel="stylesheet" href="~/css/style.css" type="text/css">
     
-    <!-- Dashboard specific styles -->
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" type="text/css">
 </head>
 <body>
 
     <div id="wrapper">
-        <!-- Sidebar -->
         <nav id="sidebar">
             <div class="sidebar-header">
                 <a href="/" style="text-decoration: none; display: block;">
@@ -37,7 +33,6 @@
                     <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
                 </li>
                 
-                <!-- Admin & Business Manager Section -->
                 @if (User.IsInRole("System Admin") || User.IsInRole("Business Manager"))
                 {
                     <li>
@@ -74,7 +69,6 @@
 
                 @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager") || User.IsInRole("Housekeeping Staff"))
                 {
-                    <!-- Room Management -->
                     <li>
                         <p>ROOMS</p>
                     </li>
@@ -106,7 +100,6 @@
 
                 @if (User.IsInRole("Maintenance Staff"))
                 {
-                    <!-- Maintenance Section -->
                     <li>
                         <p>MAINTENANCE</p>
                     </li>
@@ -117,7 +110,6 @@
 
                 @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
                 {
-                    <!-- F&B and Kitchen Section -->
                     <li>
                         <p>FOOD & BEVERAGE</p>
                     </li>
@@ -147,23 +139,31 @@
                     }
                 }
 
-                @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide"))
+                @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
                 {
-                    <!-- Services & Tours -->
                     <li>
                         <p>SERVICES & TOURS</p>
                     </li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
-                        <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
-                    </li>
+                    
+                    @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
+                            <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "TourGuide" ? "active" : "")">
+                            <a asp-controller="TourGuide" asp-action="Index"><i class="fa fa-clock-o"></i> Lịch Trình Của Tôi</a>
+                        </li>
+                    }
                 }
             </ul>
         </nav>
 
-        <!-- Page Content -->
         <div id="content">
             
-            <!-- Top Navbar -->
             <nav class="dashboard-nav">
                 <div class="nav-left">
                     <button type="button" id="sidebarCollapse" class="btn btn-outline-dark d-md-none">
@@ -181,7 +181,6 @@
                 </div>
             </nav>
 
-            <!-- Main Body -->
             <div class="main-body">
                 @RenderBody()
             </div>
@@ -189,7 +188,6 @@
         </div>
     </div>
 
-    <!-- Js Plugins -->
     <script src="~/js/jquery-3.3.1.min.js"></script>
     <script src="~/js/bootstrap.min.js"></script>
     <script src="~/js/jquery.nice-select.min.js"></script>

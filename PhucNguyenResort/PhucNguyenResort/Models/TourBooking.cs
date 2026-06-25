@@ -2,25 +2,35 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PhucNguyenResort.Enums;
 
-namespace PhucNguyenResort.Models;
-
-public class TourBooking
+namespace PhucNguyenResort.Models
 {
-    public int TourBookingId { get; set; }
-    public int? BookingId { get; set; }
-    public int? UserId { get; set; }
-    public int ScheduleId { get; set; }
+    public class TourBooking
+    {
+        public int TourBookingId { get; set; }
+        public int? BookingId { get; set; }
+        public int? UserId { get; set; }
+        public int ScheduleId { get; set; }
 
-    [Range(1, 1000)]
-    public int? Participants { get; set; }
+        [Range(1, 1000)]
+        public int? Participants { get; set; }
 
-    [Range(0, 999999999)]
-    public decimal? TotalAmount { get; set; }
+        [Range(0, 999999999)]
+        public decimal? TotalAmount { get; set; }
 
-    public TourBookingStatus BookingStatus { get; set; } = TourBookingStatus.Pending;
+        public TourBookingStatus BookingStatus { get; set; } = TourBookingStatus.Pending;
 
-    public Booking? Booking { get; set; }
-    public TourSchedule? Schedule { get; set; }
-    public User? User { get; set; }
-    public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        public Booking? Booking { get; set; }
+        public TourSchedule? Schedule { get; set; }
+
+        // GIẢI PHÁP SỬA LỖI CS1061: Ánh xạ thực thể đồng bộ alias cho TourSchedule
+        [NotMapped]
+        public TourSchedule? TourSchedule
+        {
+            get => Schedule;
+            set => Schedule = value;
+        }
+
+        public User? User { get; set; }
+        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    }
 }

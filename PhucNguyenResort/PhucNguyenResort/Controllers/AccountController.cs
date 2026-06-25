@@ -7,7 +7,6 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Helpers;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.ViewModels.Auth;
-using PhucNguyenResort.Helpers;
 using System.Security.Claims;
 
 namespace PhucNguyenResort.Controllers
@@ -125,15 +124,31 @@ namespace PhucNguyenResort.Controllers
                 return View(model);
             }
 
-            var roleName = user.Role?.RoleName ?? "Customer";
+            // Lấy Tên Role và chuẩn hóa chuỗi (Xóa khoảng trắng thừa)
+            var roleName = (user.Role?.RoleName ?? "Customer").Trim();
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Name, user.Email), // Để User.Identity.Name hiển thị Email giống hình bạn chụp ban đầu
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, roleName)
+                new Claim(ClaimTypes.Role, roleName) // Nạp Role gốc từ DB
             };
+
+            // 🔥 ĐỒNG BỘ NÂNG CAO: Kiểm tra không phân biệt hoa thường, dấu cách để nạp full biến thể Role Tour Guide
+            var normalizedRole = roleName.ToLower().Replace(" ", "");
+            if (normalizedRole == "tourguide" || normalizedRole == "huongdanvien")
+            {
+                // Thêm đầy đủ 3 kiểu viết phổ biến để Layout và Controller nào cũng khớp quyền thành công
+                if (!roleName.Equals("Tour Guide", StringComparison.OrdinalIgnoreCase))
+                    claims.Add(new Claim(ClaimTypes.Role, "Tour Guide"));
+
+                if (!roleName.Equals("TourGuide", StringComparison.OrdinalIgnoreCase))
+                    claims.Add(new Claim(ClaimTypes.Role, "TourGuide"));
+
+                if (!roleName.Equals("Hướng Dẫn Viên", StringComparison.OrdinalIgnoreCase))
+                    claims.Add(new Claim(ClaimTypes.Role, "Hướng Dẫn Viên"));
+            }
 
             var claimsIdentity = new ClaimsIdentity(
                 claims,
@@ -152,12 +167,13 @@ namespace PhucNguyenResort.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
+            // Xử lý chuyển hướng an toàn sau khi Login thành công
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
 
-            if (roleName != "Customer")
+            if (!roleName.Equals("Customer", StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "Dashboard");
             }

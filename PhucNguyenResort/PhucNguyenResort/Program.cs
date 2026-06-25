@@ -7,8 +7,11 @@ using PhucNguyenResort.Services.RestaurantMenus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
+// ==========================================
+// 1. CẤU HÌNH HỆ THỐNG CƠ BẢN (MVC, AUTH, PROTECTION)
+// ==========================================
 builder.Services.AddControllersWithViews();
+builder.Services.AddDataProtection();
 
 // Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -24,20 +27,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-// Services
+// ==========================================
+// 2. KẾT NỐI DATABASE (DbContext)
+// ==========================================
+builder.Services.AddDbContext<ResortDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+// ==========================================
+// 3. ĐĂNG KÝ CÁC ĐỐI TƯỢNG SERVICES (Dependency Injection)
+// ==========================================
 builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Tables.IDiningTableService, PhucNguyenResort.Services.Tables.DiningTableService>();
-
-// DbContext
-builder.Services.AddDbContext<ResortDbContext>(options =>
-{
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-// Services
 builder.Services.AddScoped<PhucNguyenResort.Services.Rooms.IRoomService, PhucNguyenResort.Services.Rooms.RoomService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.RoomCategories.IRoomCategoryService, PhucNguyenResort.Services.RoomCategories.RoomCategoryService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Users.IUserService, PhucNguyenResort.Services.Users.UserService>();
@@ -49,20 +53,29 @@ builder.Services.AddScoped<PhucNguyenResort.Services.Reception.IReceptionService
 builder.Services.AddScoped<PhucNguyenResort.Services.Payments.IVnPayService, PhucNguyenResort.Services.Payments.VnPayService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Refunds.IRefundService, PhucNguyenResort.Services.Refunds.RefundService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Email.IEmailSender, PhucNguyenResort.Services.Email.EmailSender>();
-builder.Services.AddDataProtection();
+
+// ==========================================
+// 4. ĐĂNG KÝ CÁC BACKGROUND JOBS RUNNING (Tiến trình chạy ngầm)
+// ==========================================
 builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PdpdDataPurgeJob>();
+
+// Service tự động cập nhật đồng bộ trạng thái Tour theo thời gian thực vừa thêm
+builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourStatusWorker>();
 
 var app = builder.Build();
 
-// Auto Migration
+// ==========================================
+// 5. AUTO MIGRATION (Tự động cập nhật cấu trúc DB)
+// ==========================================
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider
-        .GetRequiredService<ResortDbContext>();
-
+    var dbContext = scope.ServiceProvider.GetRequiredService<ResortDbContext>();
     dbContext.Database.Migrate();
 }
 
+// ==========================================
+// 6. CẤU HÌNH HTTP REQUEST PIPELINE (MIDDLEWARES)
+// ==========================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

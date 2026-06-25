@@ -19,6 +19,10 @@ public class TourSchedule
 
     public int? GuideId { get; set; }
 
+    // Thêm thuộc tính này để fix lỗi CS1061 mà không làm thay đổi Database
+    [NotMapped]
+    public string Status { get; set; } = "Upcoming";
+
     public Tour? Tour { get; set; }
     public User? Guide { get; set; }
     public ICollection<TourBooking> TourBookings { get; set; } = new List<TourBooking>();

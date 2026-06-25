@@ -3,75 +3,171 @@
     Layout = "_DashboardLayout";
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-map-o mr-2" style="color: #17a2b8;"></i> Tour Guide — Schedules & Attendance
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">View assigned tours, check guest lists, manage attendance.</p>
-            </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
-    </div>
-</div>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-<!-- KPI Cards -->
-<div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #17a2b8;">
-            <h4 style="color: #17a2b8;"><i class="fa fa-calendar"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Upcoming Scheduled Tours</p>
-        </div>
-    </div>
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107;">
-            <h4 style="color: #ffc107;"><i class="fa fa-play-circle"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Ongoing Tours</p>
-        </div>
-    </div>
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
-            <h4 style="color: #28a745;"><i class="fa fa-check-circle"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Completed Today</p>
-        </div>
-    </div>
-</div>
+<style>
+    .luxury-container {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #1e293b;
+        background: #f8fafc;
+    }
 
-<!-- Upcoming Tour Schedules (Placeholder Table) -->
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card-box" style="border-left: 5px solid #17a2b8;">
-            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
-                <i class="fa fa-list-alt mr-2" style="color: #17a2b8;"></i> Upcoming Tour Schedules
-            </h5>
-            <div class="table-responsive">
-                <table class="table table-hover" style="font-family: 'Cabin', sans-serif;">
-                    <thead>
-                        <tr class="bg-light">
-                            <th>Schedule ID</th>
-                            <th>Tour Name</th>
-                            <th>Date</th>
-                            <th>Start Time</th>
-                            <th>Slots Left</th>
-                            <th>Status</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fa fa-info-circle mr-2"></i> Tour schedule data will be loaded when backend is connected.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    .header-box-luxury {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
+    }
+
+    .premium-kpi-card {
+        border: none;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .premium-kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+        }
+
+    .icon-circle-wrapper {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+    }
+
+    /* Bảng dạng thẻ tách rời siêu đẹp */
+    .table-floating-luxury {
+        border-collapse: separate;
+        border-spacing: 0 12px;
+        width: 100%;
+    }
+
+        .table-floating-luxury thead tr th {
+            border: none;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #64748b;
+            padding: 12px 20px;
+        }
+
+        .table-floating-luxury tbody tr {
+            background: #ffffff;
+            border-radius: 16px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.01);
+        }
+
+            .table-floating-luxury tbody tr:hover {
+                transform: scale(1.002);
+                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+                background: #ffffff !important;
+            }
+
+        .table-floating-luxury tbody td {
+            padding: 18px 20px !important;
+            border-top: 1px solid #f1f5f9 !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            vertical-align: middle !important;
+        }
+
+            .table-floating-luxury tbody td:first-child {
+                border-left: 1px solid #f1f5f9 !important;
+                border-top-left-radius: 16px;
+                border-bottom-left-radius: 16px;
+            }
+
+            .table-floating-luxury tbody td:last-child {
+                border-right: 1px solid #f1f5f9 !important;
+                border-top-right-radius: 16px;
+                border-bottom-right-radius: 16px;
+            }
+</style>
+
+<div class="luxury-container container-fluid px-2">
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center header-box-luxury p-4">
+                <div>
+                    <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #0f172a; margin-bottom: 5px;">
+                        <i class="fa fa-map-o mr-2" style="color: #c29953;"></i> Tour Guide — Schedules & Attendance
+                    </h2>
+                    <p class="text-muted mb-0 small">View assigned tours, check guest lists, manage attendance.</p>
+                </div>
+                <div class="text-muted small font-weight-bold">
+                    <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4 text-center">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card premium-kpi-card h-100 p-4" style="border-top: 4px solid #0891b2;">
+                <div class="icon-circle-wrapper" style="background: rgba(8, 145, 178, 0.08); color: #0891b2;">
+                    <i class="fa fa-calendar fa-lg"></i>
+                </div>
+                <h3 style="font-family: 'Lora', serif; font-weight: bold; color: #0f172a;">--</h3>
+                <p class="text-muted mb-0 small font-weight-bold text-uppercase" style="letter-spacing: 0.5px;">Upcoming Scheduled Tours</p>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card premium-kpi-card h-100 p-4" style="border-top: 4px solid #d97706;">
+                <div class="icon-circle-wrapper" style="background: rgba(217, 119, 6, 0.08); color: #d97706;">
+                    <i class="fa fa-play-circle fa-lg"></i>
+                </div>
+                <h3 style="font-family: 'Lora', serif; font-weight: bold; color: #0f172a;">--</h3>
+                <p class="text-muted mb-0 small font-weight-bold text-uppercase" style="letter-spacing: 0.5px;">Ongoing Tours</p>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card premium-kpi-card h-100 p-4" style="border-top: 4px solid #16a34a;">
+                <div class="icon-circle-wrapper" style="background: rgba(22, 163, 74, 0.08); color: #16a34a;">
+                    <i class="fa fa-check-circle fa-lg"></i>
+                </div>
+                <h3 style="font-family: 'Lora', serif; font-weight: bold; color: #0f172a;">--</h3>
+                <p class="text-muted mb-0 small font-weight-bold text-uppercase" style="letter-spacing: 0.5px;">Completed Today</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-none p-2" style="background: none;">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa fa-list-alt mr-2 text-secondary" style="font-size: 18px;"></i>
+                    <h5 class="m-0 font-weight-bold text-dark" style="font-family: 'Lora', serif;">Upcoming Tour Schedules</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-floating-luxury text-center align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Schedule ID</th>
+                                <th class="text-left">Tour Name</th>
+                                <th>Date</th>
+                                <th>Start Time</th>
+                                <th>Slots Left</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-5 bg-white font-weight-bold" style="border-radius: 16px;">
+                                    <i class="fa fa-info-circle mr-2 text-info"></i> Tour schedule data will be loaded when backend is connected.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
