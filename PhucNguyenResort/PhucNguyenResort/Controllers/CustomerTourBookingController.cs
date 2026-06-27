@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.Payments;
 using PhucNguyenResort.Services.Tours;
+using PhucNguyenResort.Services.CustomerTourServices;
 using PhucNguyenResort.ViewModels.Payments;
 using PhucNguyenResort.ViewModels.Tours;
 using System.Security.Claims;

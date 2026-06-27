@@ -2,7 +2,7 @@ using PhucNguyenResort.ViewModels.Tours;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PhucNguyenResort.Services.Tours
+namespace PhucNguyenResort.Services.CustomerTourServices
 {
     /// <summary>
     /// Service interface for customer-facing tour booking operations.

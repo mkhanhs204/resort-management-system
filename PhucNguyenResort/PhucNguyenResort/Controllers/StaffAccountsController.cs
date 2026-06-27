@@ -10,7 +10,7 @@ using PhucNguyenResort.Helpers;
 using Microsoft.AspNetCore.Authorization;
 namespace PhucNguyenResort.Controllers
 {
-    [Authorize(Roles = "System Admin,Business Manager")]
+    [Authorize(Roles = "System Admin")]
     public class StaffAccountsController : Controller
     {
         private readonly IUserService _userService;
