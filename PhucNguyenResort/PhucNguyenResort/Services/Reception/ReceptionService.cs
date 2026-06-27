@@ -5,6 +5,8 @@ using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Bookings;
 using PhucNguyenResort.ViewModels.Bookings;
 using PhucNguyenResort.Helpers;
+using PhucNguyenResort.Services.Email;
+using Microsoft.AspNetCore.Hosting;
 
 namespace PhucNguyenResort.Services.Reception
 {
@@ -12,11 +14,15 @@ namespace PhucNguyenResort.Services.Reception
     {
         private readonly ResortDbContext _context;
         private readonly IBookingGuestService _bookingGuestService;
+        private readonly IEmailSender _emailSender;
+        private readonly IWebHostEnvironment _env;
 
-        public ReceptionService(ResortDbContext context, IBookingGuestService bookingGuestService)
+        public ReceptionService(ResortDbContext context, IBookingGuestService bookingGuestService, IEmailSender emailSender, IWebHostEnvironment env)
         {
             _context = context;
             _bookingGuestService = bookingGuestService;
+            _emailSender = emailSender;
+            _env = env;
         }
 
         public async Task<List<Booking>> GetBookingsAsync(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter = null)
@@ -126,6 +132,7 @@ namespace PhucNguyenResort.Services.Reception
                 CheckInDate = booking.CheckInDate,
                 CheckOutDate = booking.CheckOutDate,
                 PdpdConsentChecked = booking.PdpdConsentChecked,
+                CurrentBookingStatus = booking.BookingStatus,
                 Guests = guestList,
                 RoomAssignments = roomAssignments
             };
@@ -134,6 +141,7 @@ namespace PhucNguyenResort.Services.Reception
         public async Task<(bool Success, string ErrorMessage)> ProcessCheckInAsync(PreCheckinViewModel model)
         {
             var booking = await _context.Bookings
+                .Include(b => b.User)
                 .Include(b => b.BookingDetails)
                 .ThenInclude(d => d.Room)
                 .FirstOrDefaultAsync(b => b.BookingId == model.BookingId);
@@ -142,11 +150,13 @@ namespace PhucNguyenResort.Services.Reception
                 return (false, "Không tìm thấy thông tin đặt phòng.");
             }
 
-            if (booking.BookingStatus != BookingStatus.Reserved && booking.BookingStatus != BookingStatus.PendingPayment)
+            if (booking.BookingStatus != BookingStatus.Reserved && booking.BookingStatus != BookingStatus.PendingPayment && booking.BookingStatus != BookingStatus.Arrived)
             {
                 return (false, "Đơn đặt phòng này không ở trạng thái có thể Check-in.");
             }
 
+            if (!model.IsArrivalOnly)
+            {
             if (model.RoomAssignments == null || model.RoomAssignments.Count == 0)
             {
                 return (false, "Danh sách gán phòng trống.");
@@ -189,6 +199,11 @@ namespace PhucNguyenResort.Services.Reception
                     return (false, $"Phòng {room.RoomNumber} đang trong tình trạng bảo trì.");
                 }
 
+                    if (room.Status == RoomStatus.Occupied)
+                    {
+                        return (false, $"Phòng {room.RoomNumber} đang có khách lưu trú (chưa Check-out).");
+                    }
+
                 var isOverlapping = await _context.BookingDetails
                     .AnyAsync(bd => bd.RoomId == roomId
                                  && bd.Booking != null
@@ -201,6 +216,7 @@ namespace PhucNguyenResort.Services.Reception
                 if (isOverlapping)
                 {
                     return (false, $"Phòng {room.RoomNumber} đã được gán hoặc đang được sử dụng bởi một đơn đặt phòng khác trong thời gian này.");
+                    }
                 }
             }
 
@@ -212,23 +228,136 @@ namespace PhucNguyenResort.Services.Reception
             {
                 await _bookingGuestService.SaveBookingGuestsAsync(model.BookingId, validGuests, true);
 
-                foreach (var assignment in model.RoomAssignments)
+                if (model.IsArrivalOnly)
                 {
-                    var detail = booking.BookingDetails.FirstOrDefault(d => d.BookingDetailId == assignment.BookingDetailId);
-                    if (detail != null)
+                    if (booking.ActualCheckInTime == null)
                     {
-                        detail.RoomId = assignment.SelectedRoomId;
-                        var room = await _context.Rooms.FindAsync(assignment.SelectedRoomId.Value);
-                        if (room != null)
+                        booking.ActualCheckInTime = DateTime.Now;
+                    }
+                    booking.BookingStatus = BookingStatus.Arrived;
+
+                    var folio = await _context.GuestFolios.FirstOrDefaultAsync(f => f.BookingId == booking.BookingId);
+                    if (folio == null)
+                    {
+                        folio = new GuestFolio
                         {
-                            room.Status = RoomStatus.Occupied;
+                            BookingId = booking.BookingId,
+                            TotalRoomCharges = 0,
+                            TotalFoodCharges = 0,
+                            TotalTourCharges = 0,
+                            TotalAmount = 0,
+                            Status = FolioStatus.Unpaid
+                        };
+                        _context.GuestFolios.Add(folio);
+                    }
+                }
+                else
+                {
+                    foreach (var assignment in model.RoomAssignments)
+                    {
+                        var detail = booking.BookingDetails.FirstOrDefault(d => d.BookingDetailId == assignment.BookingDetailId);
+                        if (detail != null)
+                        {
+                            detail.RoomId = assignment.SelectedRoomId;
+                            var room = await _context.Rooms.FindAsync(assignment.SelectedRoomId.Value);
+                            if (room != null)
+                            {
+                                room.Status = RoomStatus.Occupied;
+                            }
+                        }
+                    }
+
+                    if (booking.ActualCheckInTime == null)
+                    {
+                        booking.ActualCheckInTime = DateTime.Now;
+                    }
+                    if (booking.RoomHandoverTime == null)
+                    {
+                        booking.RoomHandoverTime = DateTime.Now;
+                    }
+                    booking.BookingStatus = BookingStatus.CheckedIn;
+
+                    var baseFolio = await _context.GuestFolios.FirstOrDefaultAsync(f => f.BookingId == booking.BookingId);
+                    if (baseFolio == null)
+                    {
+                        baseFolio = new GuestFolio
+                        {
+                            BookingId = booking.BookingId,
+                            TotalRoomCharges = 0,
+                            TotalFoodCharges = 0,
+                            TotalTourCharges = 0,
+                            TotalAmount = 0,
+                            Status = FolioStatus.Unpaid
+                        };
+                        _context.GuestFolios.Add(baseFolio);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    if (booking.RoomHandoverTime.Value.Date <= booking.CheckInDate.Date)
+                    {
+                        var handoverTime = booking.RoomHandoverTime.Value.TimeOfDay;
+                        if (handoverTime < TimeSpan.FromHours(14))
+                        {
+                            decimal roomPrice = booking.BookingDetails.Sum(bd => bd.Price ?? 0);
+                            decimal surcharge = 0;
+
+                            if (handoverTime < TimeSpan.FromHours(6))
+                            {
+                                surcharge = roomPrice * 1.0m; // Trước 6h: 100%
+                            }
+                            else if (handoverTime < TimeSpan.FromHours(9))
+                            {
+                                surcharge = roomPrice * 0.5m; // 6h - 9h: 50%
+                            }
+                            else if (handoverTime < TimeSpan.FromHours(11))
+                            {
+                                surcharge = roomPrice * 0.3m; // 9h - 11h: 30%
+                            }
+                            else
+                            {
+                                surcharge = 0; // 11h - 14h: Miễn phí
+                            }
+
+                            if (surcharge > 0)
+                            {
+                                var folio = await _context.GuestFolios.FirstOrDefaultAsync(f => f.BookingId == booking.BookingId);
+                                if (folio == null)
+                                {
+                                    folio = new GuestFolio
+                                    {
+                                        BookingId = booking.BookingId,
+                                        TotalRoomCharges = 0,
+                                        TotalFoodCharges = 0,
+                                        TotalTourCharges = 0,
+                                        TotalAmount = 0,
+                                        Status = FolioStatus.Unpaid
+                                    };
+                                    _context.GuestFolios.Add(folio);
+                                    await _context.SaveChangesAsync();
+                                }
+
+                                folio.TotalRoomCharges += surcharge;
+                                folio.TotalAmount += surcharge;
+
+                                var transaction = new FolioTransaction
+                                {
+                                    FolioId = folio.FolioId,
+                                    TransactionType = FolioTransactionType.RoomCharge,
+                                    Amount = surcharge,
+                                    CreatedAt = DateTime.Now
+                                };
+                                _context.FolioTransactions.Add(transaction);
+                            }
                         }
                     }
                 }
 
-                booking.BookingStatus = BookingStatus.CheckedIn;
-
                 await _context.SaveChangesAsync();
+
+                if (!model.IsArrivalOnly)
+                {
+                    SendCheckInEmail(booking);
+                }
 
                 return (true, string.Empty);
             }
@@ -254,11 +383,17 @@ namespace PhucNguyenResort.Services.Reception
                 .Distinct()
                 .ToListAsync();
 
-            return await _context.Rooms
+            var query = _context.Rooms
                 .Where(r => r.CategoryId == categoryId
                          && r.Status != RoomStatus.Maintenance
-                         && !bookedRoomIds.Contains(r.RoomId))
-                .ToListAsync();
+                         && !bookedRoomIds.Contains(r.RoomId));
+
+            if (checkIn.Date <= DateTime.Today)
+            {
+                query = query.Where(r => r.Status != RoomStatus.Occupied);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<List<Room>> GetAvailableRoomsForDatesAsync(DateTime checkIn, DateTime checkOut)
@@ -275,11 +410,17 @@ namespace PhucNguyenResort.Services.Reception
                 .Distinct()
                 .ToListAsync();
 
-            return await _context.Rooms
+            var query = _context.Rooms
                 .Include(r => r.Category)
                 .Where(r => r.Status != RoomStatus.Maintenance
-                         && !bookedRoomIds.Contains(r.RoomId))
-                .ToListAsync();
+                         && !bookedRoomIds.Contains(r.RoomId));
+
+            if (checkIn.Date <= DateTime.Today)
+            {
+                query = query.Where(r => r.Status != RoomStatus.Occupied);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<(byte[]? FileContent, string FileName, string ErrorMessage)> GetManifestDataAsync(int id)
@@ -527,11 +668,13 @@ namespace PhucNguyenResort.Services.Reception
             var booking = new Booking
             {
                 UserId = user.UserId,
+                User = user,
                 CheckInDate = model.CheckInDate,
                 CheckOutDate = model.CheckOutDate,
                 NumberOfAdults = model.NumberOfAdults,
                 NumberOfChildren = model.NumberOfChildren,
                 BookingStatus = model.InstantCheckIn ? BookingStatus.CheckedIn : BookingStatus.Reserved,
+                ActualCheckInTime = model.InstantCheckIn ? DateTime.Now : (DateTime?)null,
                 TotalAmount = totalAmount,
                 DepositAmount = model.PaidAmount,
                 CreatedAt = DateTime.Now,
@@ -544,6 +687,7 @@ namespace PhucNguyenResort.Services.Reception
                 {
                     RoomCategoryId = room.CategoryId,
                     RoomId = room.RoomId,
+                    Room = room,
                     Price = room.Category?.PricePerNight
                 };
                 booking.BookingDetails.Add(detail);
@@ -557,10 +701,30 @@ namespace PhucNguyenResort.Services.Reception
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
+            if (model.InstantCheckIn)
+            {
+                var folio = new GuestFolio
+                {
+                    BookingId = booking.BookingId,
+                    TotalRoomCharges = 0,
+                    TotalFoodCharges = 0,
+                    TotalTourCharges = 0,
+                    TotalAmount = 0,
+                    Status = FolioStatus.Unpaid
+                };
+                _context.GuestFolios.Add(folio);
+                await _context.SaveChangesAsync();
+            }
+
             // 8. Lưu thông tin khách hàng đi cùng
             if (model.InstantCheckIn && model.Guests != null && model.Guests.Any())
             {
                 await _bookingGuestService.SaveBookingGuestsAsync(booking.BookingId, model.Guests, true);
+            }
+
+            if (model.InstantCheckIn)
+            {
+                SendCheckInEmail(booking);
             }
 
             return new WalkInResult
@@ -568,6 +732,422 @@ namespace PhucNguyenResort.Services.Reception
                 Success = true,
                 BookingId = booking.BookingId
             };
+        }
+        protected virtual DateTime GetCurrentDateTime()
+        {
+            return DateTime.Now;
+        }
+
+        public async Task<CheckOutViewModel?> PrepareCheckOutViewModelAsync(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.BookingDetails)
+                .ThenInclude(bd => bd.Room)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null || booking.BookingStatus != BookingStatus.CheckedIn)
+            {
+                return null;
+            }
+
+            var folio = await _context.GuestFolios
+                .Include(f => f.FolioTransactions)
+                .FirstOrDefaultAsync(f => f.BookingId == bookingId);
+
+            if (folio == null)
+            {
+                folio = new GuestFolio
+                {
+                    BookingId = bookingId,
+                    TotalRoomCharges = 0,
+                    TotalFoodCharges = 0,
+                    TotalTourCharges = 0,
+                    TotalAmount = 0,
+                    Status = FolioStatus.Unpaid
+                };
+                _context.GuestFolios.Add(folio);
+                await _context.SaveChangesAsync();
+                
+                folio.FolioTransactions = new List<FolioTransaction>();
+            }
+
+            // Compensate for existing folios that missed the base room charge during check-in
+            decimal baseRoomCharge = booking.TotalAmount ?? 0;
+            bool hasBaseCharge = folio.FolioTransactions.Any(t => t.TransactionType == FolioTransactionType.RoomCharge && t.Amount == baseRoomCharge) || folio.TotalRoomCharges >= baseRoomCharge;
+            
+            decimal displayTotalRoomCharges = folio.TotalRoomCharges;
+            decimal displayTotalAmount = folio.TotalAmount;
+            
+            if (!hasBaseCharge && baseRoomCharge > 0)
+            {
+                displayTotalRoomCharges += baseRoomCharge;
+                displayTotalAmount += baseRoomCharge;
+            }
+
+            var model = new CheckOutViewModel
+            {
+                BookingId = booking.BookingId,
+                GuestName = booking.User?.FullName ?? "N/A",
+                CheckInDate = booking.CheckInDate,
+                CheckOutDate = booking.CheckOutDate,
+                ActualCheckInTime = booking.ActualCheckInTime,
+                FolioId = folio.FolioId,
+                DepositAmount = booking.DepositAmount ?? 0,
+                TotalRoomCharges = displayTotalRoomCharges,
+                TotalFoodCharges = folio.TotalFoodCharges,
+                TotalTourCharges = folio.TotalTourCharges,
+                TotalAmount = displayTotalAmount
+            };
+
+            var rooms = booking.BookingDetails
+                .Where(bd => bd.Room != null)
+                .Select(bd => bd.Room!.RoomNumber)
+                .ToList();
+            model.RoomNumbers = string.Join(", ", rooms);
+
+            // Calculate Late Check-out Surcharge
+            var now = GetCurrentDateTime();
+            var checkoutTime = new DateTime(now.Year, now.Month, now.Day, 12, 0, 0); // 12:00 PM standard
+            if (now.Date == booking.CheckOutDate.Date && now > checkoutTime)
+            {
+                decimal surchargeRatio = 0;
+                var hour = now.Hour;
+                
+                if (hour >= 12 && hour < 15) surchargeRatio = 0.3m;
+                else if (hour >= 15 && hour < 18) surchargeRatio = 0.5m;
+                else if (hour >= 18) surchargeRatio = 1.0m;
+
+                if (surchargeRatio > 0)
+                {
+                    decimal oneNightPrice = 0;
+                    foreach (var bd in booking.BookingDetails.Where(bd => bd.Room != null))
+                    {
+                        var roomPrice = await _context.Rooms
+                            .Include(r => r.Category)
+                            .Where(r => r.RoomId == bd.RoomId)
+                            .Select(r => r.Category.PricePerNight)
+                            .FirstOrDefaultAsync();
+                        oneNightPrice += roomPrice ?? 0;
+                    }
+                    
+                    model.LateCheckOutSurcharge = oneNightPrice * surchargeRatio;
+                    model.TotalAmount += model.LateCheckOutSurcharge;
+                }
+            }
+
+            model.BalanceDue = Math.Max(0, model.TotalAmount - model.DepositAmount);
+
+            // Mapping transactions
+            var transactions = folio.FolioTransactions.Select(t => new FolioTransactionDto
+            {
+                TransactionId = t.TransactionId,
+                TransactionTypeName = t.TransactionType switch
+                {
+                    FolioTransactionType.RoomCharge => "Tiền phòng",
+                    FolioTransactionType.FoodCharge => "Tiền ăn uống",
+                    FolioTransactionType.TourCharge => "Tiền tour",
+                    FolioTransactionType.Adjustment => "Điều chỉnh",
+                    FolioTransactionType.Payment => "Thanh toán",
+                    FolioTransactionType.Refund => "Hoàn tiền",
+                    _ => t.TransactionType.ToString()
+                },
+                Amount = t.Amount,
+                CreatedAt = t.CreatedAt
+            }).ToList();
+
+            if (!hasBaseCharge && baseRoomCharge > 0)
+            {
+                transactions.Insert(0, new FolioTransactionDto
+                {
+                    TransactionId = 0,
+                    TransactionTypeName = "Tiền phòng đặt trước",
+                    Amount = baseRoomCharge,
+                    CreatedAt = booking.CreatedAt
+                });
+            }
+            model.Transactions = transactions;
+
+            return model;
+        }
+
+        public async Task<(bool Success, string ErrorMessage)> ProcessCheckOutAsync(CheckOutViewModel model)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.BookingDetails)
+                .ThenInclude(bd => bd.Room)
+                .FirstOrDefaultAsync(b => b.BookingId == model.BookingId);
+
+            if (booking == null)
+            {
+                return (false, "Không tìm thấy thông tin đặt phòng.");
+            }
+
+            if (booking.BookingStatus != BookingStatus.CheckedIn)
+            {
+                return (false, "Đơn đặt phòng này không ở trạng thái Check-in.");
+            }
+
+            var folio = await _context.GuestFolios
+                .Include(f => f.FolioTransactions)
+                .FirstOrDefaultAsync(f => f.FolioId == model.FolioId);
+
+            if (folio == null)
+            {
+                return (false, "Không tìm thấy Guest Folio.");
+            }
+
+            if (model.BalanceDue > 0 && model.SelectedPaymentMethod == null)
+            {
+                return (false, "Vui lòng chọn phương thức thanh toán.");
+            }
+
+            var now = GetCurrentDateTime();
+
+            // Add late surcharge transaction if applicable
+            if (model.LateCheckOutSurcharge > 0)
+            {
+                var txn = new FolioTransaction
+                {
+                    FolioId = folio.FolioId,
+                    TransactionType = FolioTransactionType.RoomCharge,
+                    Amount = model.LateCheckOutSurcharge,
+                    CreatedAt = now
+                };
+                _context.FolioTransactions.Add(txn);
+                folio.TotalRoomCharges += model.LateCheckOutSurcharge;
+                folio.TotalAmount += model.LateCheckOutSurcharge;
+            }
+
+            // Compensate for existing folios that missed the base room charge
+            decimal baseRoomCharge = booking.TotalAmount ?? 0;
+            bool hasBaseCharge = folio.FolioTransactions.Any(t => t.TransactionType == FolioTransactionType.RoomCharge && t.Amount == baseRoomCharge) || folio.TotalRoomCharges >= baseRoomCharge;
+            if (!hasBaseCharge && baseRoomCharge > 0)
+            {
+                folio.TotalRoomCharges += baseRoomCharge;
+                folio.TotalAmount += baseRoomCharge;
+                _context.FolioTransactions.Add(new FolioTransaction
+                {
+                    FolioId = folio.FolioId,
+                    TransactionType = FolioTransactionType.RoomCharge,
+                    Amount = baseRoomCharge,
+                    CreatedAt = booking.CreatedAt
+                });
+            }
+
+            // Update Folio
+            folio.Status = FolioStatus.Paid;
+
+            // Create Invoice
+            var invoice = new Invoice
+            {
+                FolioId = folio.FolioId,
+                InvoiceNumber = $"INV-{now:yyyyMMdd}-{folio.FolioId}",
+                TotalAmount = model.TotalAmount,
+                FinalAmount = model.TotalAmount,
+                InvoiceStatus = InvoiceStatus.Paid,
+                IssuedAt = now
+            };
+            _context.Invoices.Add(invoice);
+
+            // Create Payment if there is balance due
+            if (model.BalanceDue > 0)
+            {
+                var payment = new Payment
+                {
+                    InvoiceId = invoice.InvoiceId,
+                    Invoice = invoice,
+                    Amount = model.BalanceDue,
+                    PaidAt = now,
+                    PaymentMethod = model.SelectedPaymentMethod
+                };
+                _context.Payments.Add(payment);
+            }
+
+            // Update Booking Status and Actual Check-out time
+            booking.BookingStatus = BookingStatus.CheckedOut;
+            booking.ActualCheckOutTime = now;
+
+            // Update Room Status
+            foreach (var detail in booking.BookingDetails.Where(bd => bd.RoomId.HasValue))
+            {
+                var room = await _context.Rooms.FindAsync(detail.RoomId.Value);
+                if (room != null)
+                {
+                    room.Status = RoomStatus.NeedsCleaning;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Gửi email thông báo Check-out
+            SendCheckOutEmail(booking, invoice);
+
+            return (true, string.Empty);
+        }
+
+        private void SendCheckInEmail(Booking booking)
+        {
+            if (_emailSender == null || _env == null || booking.User == null || string.IsNullOrEmpty(booking.User.Email))
+            {
+                return;
+            }
+
+            try
+            {
+                var templatePath = System.IO.Path.Combine(_env.ContentRootPath, "EmailTemplates", "CheckInSuccess.html");
+                if (System.IO.File.Exists(templatePath))
+                {
+                    var htmlBody = System.IO.File.ReadAllText(templatePath);
+                    var roomName = booking.BookingDetails != null && booking.BookingDetails.Any(bd => bd.Room != null) 
+                        ? string.Join(", ", booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) 
+                        : "Chưa xếp phòng";
+                    var guestCount = (booking.NumberOfAdults ?? 0) + (booking.NumberOfChildren ?? 0);
+
+                    htmlBody = htmlBody.Replace("{{CustomerName}}", booking.User.FullName ?? "Quý khách")
+                                       .Replace("{{BookingId}}", booking.BookingId.ToString())
+                                       .Replace("{{RoomName}}", roomName)
+                                       .Replace("{{ActualCheckInTime}}", (booking.ActualCheckInTime ?? DateTime.Now).ToString("dd/MM/yyyy HH:mm"))
+                                       .Replace("{{CheckOutDate}}", booking.CheckOutDate.ToString("dd/MM/yyyy"))
+                                       .Replace("{{GuestCount}}", guestCount.ToString());
+
+                    // Fire and forget
+                    _ = _emailSender.SendEmailAsync(booking.User.Email, "Thông báo Nhận phòng (Check-in) Thành công - PhucNguyen Resort", htmlBody);
+                }
+            }
+            catch
+            {
+                // Silence exceptions to avoid failing check-in due to mail errors
+            }
+        }
+
+        public async Task<InvoiceViewModel?> PrepareInvoiceViewModelAsync(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.BookingDetails)
+                .ThenInclude(bd => bd.Room)
+                .Include(b => b.GuestFolio)
+                .ThenInclude(f => f!.FolioTransactions)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null || booking.GuestFolio == null) return null;
+
+            var folio = booking.GuestFolio;
+            var invoice = await _context.Invoices
+                .Include(i => i.Payments)
+                .OrderByDescending(i => i.IssuedAt)
+                .FirstOrDefaultAsync(i => i.FolioId == folio.FolioId);
+
+            if (invoice == null) return null;
+
+            var rooms = booking.BookingDetails
+                .Where(bd => bd.Room != null)
+                .Select(bd => bd.Room!.RoomNumber)
+                .ToList();
+            
+            var roomNumbers = string.Join(", ", rooms);
+            
+            var paymentMethod = invoice.Payments.Any() 
+                ? invoice.Payments.First().PaymentMethod.ToString() 
+                : "Tiền mặt"; // Default fallback
+
+            var model = new InvoiceViewModel
+            {
+                BookingId = booking.BookingId,
+                InvoiceNumber = invoice.InvoiceNumber ?? $"INV-{booking.BookingId}",
+                IssuedAt = invoice.IssuedAt,
+                GuestName = booking.User?.FullName ?? "Quý khách",
+                GuestPhone = booking.User?.PhoneNumber ?? "",
+                RoomNumbers = roomNumbers,
+                CheckInDate = booking.CheckInDate,
+                CheckOutDate = booking.CheckOutDate,
+                ActualCheckInTime = booking.ActualCheckInTime,
+                ActualCheckOutTime = booking.ActualCheckOutTime,
+                TotalRoomCharges = folio.TotalRoomCharges,
+                TotalFoodCharges = folio.TotalFoodCharges,
+                TotalTourCharges = folio.TotalTourCharges,
+                TotalAmount = invoice.TotalAmount ?? 0,
+                DepositAmount = booking.DepositAmount ?? 0,
+                AmountPaid = invoice.Payments.Sum(p => p.Amount ?? 0),
+                PaymentMethod = paymentMethod
+            };
+
+            // Calculate Late Surcharge if it exists in transactions
+            var lateTxn = folio.FolioTransactions.FirstOrDefault(t => t.TransactionType == FolioTransactionType.RoomCharge && t.Amount > 0 && t.CreatedAt >= booking.CheckOutDate.AddHours(12));
+            if (lateTxn != null)
+            {
+                // Simple heuristic for late check-out surcharge in folio
+                // Actual system might have a specific type, but this works
+            }
+            // Actually, we can just use the transactions list for details.
+            
+            model.Transactions = folio.FolioTransactions.Select(t => new FolioTransactionDto
+            {
+                TransactionId = t.TransactionId,
+                TransactionTypeName = t.TransactionType switch
+                {
+                    FolioTransactionType.RoomCharge => "Tiền phòng",
+                    FolioTransactionType.FoodCharge => "Tiền ăn uống",
+                    FolioTransactionType.TourCharge => "Tiền tour",
+                    FolioTransactionType.Adjustment => "Điều chỉnh",
+                    FolioTransactionType.Payment => "Thanh toán",
+                    FolioTransactionType.Refund => "Hoàn tiền",
+                    _ => t.TransactionType.ToString()
+                },
+                Amount = t.Amount,
+                CreatedAt = t.CreatedAt
+            }).ToList();
+            
+            decimal baseRoomCharge = booking.TotalAmount ?? 0;
+            bool hasBaseCharge = folio.FolioTransactions.Any(t => t.TransactionType == FolioTransactionType.RoomCharge && t.Amount == baseRoomCharge);
+            if (!hasBaseCharge && baseRoomCharge > 0)
+            {
+                model.Transactions.Insert(0, new FolioTransactionDto
+                {
+                    TransactionId = 0,
+                    TransactionTypeName = "Tiền phòng đặt trước",
+                    Amount = baseRoomCharge,
+                    CreatedAt = booking.CreatedAt
+                });
+            }
+
+            return model;
+        }
+
+        private void SendCheckOutEmail(Booking booking, Invoice invoice)
+        {
+            if (_emailSender == null || _env == null || booking.User == null || string.IsNullOrEmpty(booking.User.Email))
+            {
+                return;
+            }
+
+            try
+            {
+                var templatePath = System.IO.Path.Combine(_env.ContentRootPath, "EmailTemplates", "CheckOutSuccess.html");
+                if (System.IO.File.Exists(templatePath))
+                {
+                    var htmlBody = System.IO.File.ReadAllText(templatePath);
+                    var roomName = booking.BookingDetails != null && booking.BookingDetails.Any(bd => bd.Room != null) 
+                        ? string.Join(", ", booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) 
+                        : "Chưa xếp phòng";
+
+                    htmlBody = htmlBody.Replace("{{CustomerName}}", booking.User.FullName ?? "Quý khách")
+                                       .Replace("{{BookingId}}", booking.BookingId.ToString())
+                                       .Replace("{{RoomName}}", roomName)
+                                       .Replace("{{ActualCheckOutTime}}", (booking.ActualCheckOutTime ?? DateTime.Now).ToString("dd/MM/yyyy HH:mm"))
+                                       .Replace("{{InvoiceNumber}}", invoice.InvoiceNumber ?? "")
+                                       .Replace("{{TotalAmount}}", (invoice.TotalAmount ?? 0).ToString("N0"))
+                                       .Replace("{{FinalAmount}}", (invoice.FinalAmount ?? 0).ToString("N0"));
+
+                    _ = _emailSender.SendEmailAsync(booking.User.Email, "Cảm ơn Quý khách - Thông báo Check-out thành công từ PhucNguyen Resort", htmlBody);
+                }
+            }
+            catch
+            {
+                // Silence exceptions
+            }
         }
     }
 }

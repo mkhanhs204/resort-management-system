@@ -56,9 +56,9 @@ namespace PhucNguyenResort.Controllers
             }
 
             var booking = await _receptionService.GetBookingByIdAsync(id);
-            if (booking != null && booking.BookingStatus != BookingStatus.Reserved && booking.BookingStatus != BookingStatus.PendingPayment)
+            if (booking != null && booking.BookingStatus != BookingStatus.Reserved && booking.BookingStatus != BookingStatus.PendingPayment && booking.BookingStatus != BookingStatus.Arrived)
             {
-                TempData["Error"] = "Đơn đặt phòng này không ở trạng thái có thể Check-in.";
+                TempData["Error"] = "Đơn đặt phòng này không ở trạng thái có thể Check-in hoặc Giao phòng.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -125,27 +125,30 @@ namespace PhucNguyenResort.Controllers
             }
 
             // Validation for room assignments
-            if (model.RoomAssignments == null || model.RoomAssignments.Count == 0)
+            if (!model.IsArrivalOnly)
             {
-                ModelState.AddModelError(string.Empty, "Danh sách gán phòng trống.");
-            }
-            else
-            {
-                var selectedRoomIds = new List<int>();
-                for (int i = 0; i < model.RoomAssignments.Count; i++)
+                if (model.RoomAssignments == null || model.RoomAssignments.Count == 0)
                 {
-                    var assignment = model.RoomAssignments[i];
-                    if (!assignment.SelectedRoomId.HasValue)
+                    ModelState.AddModelError(string.Empty, "Danh sách gán phòng trống.");
+                }
+                else
+                {
+                    var selectedRoomIds = new List<int>();
+                    for (int i = 0; i < model.RoomAssignments.Count; i++)
                     {
-                        ModelState.AddModelError($"RoomAssignments[{i}].SelectedRoomId", "Vui lòng chọn một phòng vật lý.");
-                    }
-                    else
-                    {
-                        if (selectedRoomIds.Contains(assignment.SelectedRoomId.Value))
+                        var assignment = model.RoomAssignments[i];
+                        if (!assignment.SelectedRoomId.HasValue)
                         {
-                            ModelState.AddModelError($"RoomAssignments[{i}].SelectedRoomId", "Một phòng vật lý không thể được gán cho nhiều chi tiết đặt phòng cùng lúc.");
+                            ModelState.AddModelError($"RoomAssignments[{i}].SelectedRoomId", "Vui lòng chọn một phòng vật lý.");
                         }
-                        selectedRoomIds.Add(assignment.SelectedRoomId.Value);
+                        else
+                        {
+                            if (selectedRoomIds.Contains(assignment.SelectedRoomId.Value))
+                            {
+                                ModelState.AddModelError($"RoomAssignments[{i}].SelectedRoomId", "Một phòng vật lý không thể được gán cho nhiều chi tiết đặt phòng cùng lúc.");
+                            }
+                            selectedRoomIds.Add(assignment.SelectedRoomId.Value);
+                        }
                     }
                 }
             }
@@ -365,6 +368,76 @@ namespace PhucNguyenResort.Controllers
             return Json(result);
         }
 
+        // GET: /Reception/CheckOut/{id}
+        public async Task<IActionResult> CheckOut(int id)
+        {
+            var model = await _receptionService.PrepareCheckOutViewModelAsync(id);
+            if (model == null)
+            {
+                TempData["Error"] = "Không tìm thấy thông tin đặt phòng hoặc đơn đặt phòng không ở trạng thái có thể Check-out.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(model);
+        }
+
+        // POST: /Reception/CheckOut
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckOut(CheckOutViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Reload model data
+                var fullModel = await _receptionService.PrepareCheckOutViewModelAsync(model.BookingId);
+                if (fullModel != null)
+                {
+                    model.GuestName = fullModel.GuestName;
+                    model.CheckInDate = fullModel.CheckInDate;
+                    model.CheckOutDate = fullModel.CheckOutDate;
+                    model.ActualCheckInTime = fullModel.ActualCheckInTime;
+                    model.RoomNumbers = fullModel.RoomNumbers;
+                    model.TotalRoomCharges = fullModel.TotalRoomCharges;
+                    model.TotalFoodCharges = fullModel.TotalFoodCharges;
+                    model.TotalTourCharges = fullModel.TotalTourCharges;
+                    model.LateCheckOutSurcharge = fullModel.LateCheckOutSurcharge;
+                    model.TotalAmount = fullModel.TotalAmount;
+                    model.DepositAmount = fullModel.DepositAmount;
+                    model.BalanceDue = fullModel.BalanceDue;
+                    model.Transactions = fullModel.Transactions;
+                }
+                return View(model);
+            }
+
+            var result = await _receptionService.ProcessCheckOutAsync(model);
+            
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = $"Thực hiện Check-out thành công cho Booking #{model.BookingId}!";
+                return RedirectToAction(nameof(PrintInvoice), new { id = model.BookingId });
+            }
+            
+            ModelState.AddModelError(string.Empty, result.ErrorMessage);
+            var reloadedModel = await _receptionService.PrepareCheckOutViewModelAsync(model.BookingId);
+            if (reloadedModel != null)
+            {
+                model.GuestName = reloadedModel.GuestName;
+                model.CheckInDate = reloadedModel.CheckInDate;
+                model.CheckOutDate = reloadedModel.CheckOutDate;
+                model.ActualCheckInTime = reloadedModel.ActualCheckInTime;
+                model.RoomNumbers = reloadedModel.RoomNumbers;
+                model.TotalRoomCharges = reloadedModel.TotalRoomCharges;
+                model.TotalFoodCharges = reloadedModel.TotalFoodCharges;
+                model.TotalTourCharges = reloadedModel.TotalTourCharges;
+                model.LateCheckOutSurcharge = reloadedModel.LateCheckOutSurcharge;
+                model.TotalAmount = reloadedModel.TotalAmount;
+                model.DepositAmount = reloadedModel.DepositAmount;
+                model.BalanceDue = reloadedModel.BalanceDue;
+                model.Transactions = reloadedModel.Transactions;
+            }
+            return View(model);
+        }
+
         private string GeneratePreCheckinToken(Booking booking)
         {
             var input = $"{booking.BookingId}-{booking.CheckInDate.Ticks}-PNSecretKey2026";
@@ -374,6 +447,18 @@ namespace PhucNguyenResort.Controllers
                 var hash = sha256.ComputeHash(bytes);
                 return Convert.ToHexString(hash).ToLower();
             }
+        }
+
+        // GET: /Reception/PrintInvoice/{id}
+        public async Task<IActionResult> PrintInvoice(int id)
+        {
+            var model = await _receptionService.PrepareInvoiceViewModelAsync(id);
+            if (model == null)
+            {
+                TempData["Error"] = "Không tìm thấy thông tin hóa đơn cho đặt phòng này.";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
         }
     }
 }

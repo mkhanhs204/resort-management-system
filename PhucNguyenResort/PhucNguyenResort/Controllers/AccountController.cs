@@ -156,7 +156,7 @@ namespace PhucNguyenResort.Controllers
             {
                 await _emailSender.SendEmailAsync(email, subject, body);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // In a production system, we'd log the exception: ex.Message
                 TempData["ErrorMessage"] = "Tài khoản đã được tạo nhưng không thể gửi mã xác nhận qua email. Vui lòng thử lại.";
@@ -303,7 +303,7 @@ namespace PhucNguyenResort.Controllers
                 await _emailSender.SendEmailAsync(email, subject, body);
                 return Json(new { success = true, message = "Mã xác thực mới đã được gửi thành công!" });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "Không thể gửi email. Vui lòng thử lại sau." });
             }

@@ -139,8 +139,8 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-submit-premium-main shadow">
-                            <i class="fas fa-check-circle mr-2"></i> Xác Nhận Check-In & Lưu Thông Tin
+                        <button type="submit" id="btn-submit-main" class="btn-submit-premium-main shadow">
+                            <i class="fas fa-check-circle mr-2"></i> <span>Xác Nhận Check-In & Giao Phòng</span>
                         </button>
                     </div>
                 </div>
@@ -165,7 +165,26 @@
 
                         <hr style="border-top: 1px solid #f1f5f9;" />
 
-                        <div class="mb-4">
+                        @if (Model.CurrentBookingStatus != BookingStatus.Arrived)
+                        {
+                            <div class="mb-4">
+                                <div class="custom-control custom-checkbox" style="background-color: #f8fafc; padding: 12px 16px 12px 40px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    <input asp-for="IsArrivalOnly" type="checkbox" class="custom-control-input" id="IsArrivalOnlyCheckbox">
+                                    <label class="custom-control-label" for="IsArrivalOnlyCheckbox" style="font-weight: 500; color: #334155; padding-top: 2px;">
+                                        Chỉ đăng ký khách đến (Chưa giao phòng)
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" asp-for="IsArrivalOnly" value="false" />
+                            <div class="alert alert-info border-0 shadow-sm mb-4" style="border-radius: 8px; background-color: #e0f2fe; color: #0284c7; padding: 12px 16px;">
+                                <i class="fas fa-info-circle mr-2"></i> Khách đã hoàn tất đăng ký đến (Arrived). Vui lòng chọn phòng để bàn giao.
+                            </div>
+                        }
+
+                        <div class="mb-4" id="room-assignment-section">
                             <h6 class="font-weight-bold text-dark mb-3" style="font-size: 0.95rem;">
                                 <i class="fas fa-bed mr-2" style="color: var(--accent-color);"></i> Gán Phòng Vật Lý
                             </h6>
@@ -290,6 +309,24 @@
 
                 $('#guest-info-summary-' + index).text(genderText + passportText);
             });
+
+            // Toggle room assignment section
+            $('#IsArrivalOnlyCheckbox').on('change', function() {
+                var isChecked = $(this).is(':checked');
+                if (isChecked) {
+                    $('#room-assignment-section').slideUp();
+                    $('#btn-submit-main span').text('Xác Nhận Đăng Ký Khách Đến');
+                } else {
+                    $('#room-assignment-section').slideDown();
+                    $('#btn-submit-main span').text('Xác Nhận Check-In & Giao Phòng');
+                }
+            });
+            // trigger on load if exists
+            if ($('#IsArrivalOnlyCheckbox').length > 0) {
+                $('#IsArrivalOnlyCheckbox').trigger('change');
+            } else {
+                $('#btn-submit-main span').text('Xác Nhận Bàn Giao Phòng');
+            }
         });
     </script>
 }

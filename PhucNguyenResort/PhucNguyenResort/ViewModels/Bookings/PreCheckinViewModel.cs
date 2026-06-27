@@ -13,6 +13,11 @@ namespace PhucNguyenResort.ViewModels.Bookings
         public DateTime CheckOutDate { get; set; }
 
         public bool PdpdConsentChecked { get; set; }
+        
+        [Display(Name = "Chỉ đăng ký khách đến (Khách chưa nhận phòng)")]
+        public bool IsArrivalOnly { get; set; }
+
+        public PhucNguyenResort.Enums.BookingStatus CurrentBookingStatus { get; set; }
 
         public List<BookingGuestDto> Guests { get; set; } = new List<BookingGuestDto>();
 

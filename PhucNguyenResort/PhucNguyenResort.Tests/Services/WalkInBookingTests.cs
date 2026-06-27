@@ -6,6 +6,8 @@ using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Bookings;
 using PhucNguyenResort.Services.Reception;
 using PhucNguyenResort.ViewModels.Bookings;
+using PhucNguyenResort.Services.Email;
+using Microsoft.AspNetCore.Hosting;
 using PhucNguyenResort.Helpers;
 using System;
 using System.Collections.Generic;
@@ -43,7 +45,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -106,7 +110,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -152,7 +158,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -195,7 +203,9 @@ namespace PhucNguyenResort.Tests.Services
                     .Setup(s => s.SaveBookingGuestsAsync(It.IsAny<int>(), It.IsAny<List<BookingGuestDto>>(), It.IsAny<bool>()))
                     .ReturnsAsync(true);
 
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -262,7 +272,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -306,7 +318,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -362,7 +376,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -401,7 +417,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -452,7 +470,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -486,7 +506,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var model = new WalkInBookingViewModel
                 {

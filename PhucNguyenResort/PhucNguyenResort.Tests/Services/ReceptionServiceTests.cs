@@ -6,6 +6,8 @@ using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Bookings;
 using PhucNguyenResort.Services.Reception;
 using PhucNguyenResort.ViewModels.Bookings;
+using PhucNguyenResort.Services.Email;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -33,8 +35,12 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 context.Rooms.Add(new Room { RoomId = testRoomId, RoomNumber = "101", CategoryId = 1, Status = RoomStatus.Available });
+                var user = new User { UserId = 1, FullName = "Test User", Email = "test@example.com" };
+                context.Users.Add(user);
                 var booking = new Booking
                 {
+                    UserId = 1,
+                    User = user,
                     BookingId = testBookingId,
                     BookingStatus = BookingStatus.Reserved
                 };
@@ -51,7 +57,9 @@ namespace PhucNguyenResort.Tests.Services
                     .Setup(s => s.SaveBookingGuestsAsync(testBookingId, It.IsAny<List<BookingGuestDto>>(), It.IsAny<bool>()))
                     .ReturnsAsync(true);
 
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var viewModel = new PreCheckinViewModel
                 {
@@ -98,8 +106,12 @@ namespace PhucNguyenResort.Tests.Services
 
             using (var context = new ResortDbContext(options))
             {
+                var user = new User { UserId = 1, FullName = "Test User", Email = "test@example.com" };
+                context.Users.Add(user);
                 context.Bookings.Add(new Booking
                 {
+                    UserId = 1,
+                    User = user,
                     BookingId = testBookingId,
                     BookingStatus = BookingStatus.Cancelled // Invalid status for check-in
                 });
@@ -109,7 +121,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var viewModel = new PreCheckinViewModel
                 {
@@ -122,7 +136,7 @@ namespace PhucNguyenResort.Tests.Services
 
                 // Assert
                 Assert.False(result.Success);
-                Assert.Equal("Đơn đặt phòng này không ở trạng thái có thể Check-in.", result.ErrorMessage);
+                Assert.Equal("Đơn đặt phòng này không ở trạng thái có thể Check-in hoặc giao phòng.", result.ErrorMessage);
 
                 var unchangedBooking = await context.Bookings.FindAsync(testBookingId);
                 Assert.NotNull(unchangedBooking);
@@ -139,7 +153,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var viewModel = new PreCheckinViewModel
                 {
@@ -205,7 +221,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 // Act
                 var availableRooms = await service.GetAvailableRoomsForCategoryAsync(1, checkIn, checkOut);
@@ -228,8 +246,12 @@ namespace PhucNguyenResort.Tests.Services
 
             using (var context = new ResortDbContext(options))
             {
+                var user = new User { UserId = 1, FullName = "Test User", Email = "test@example.com" };
+                context.Users.Add(user);
                 var booking = new Booking
                 {
+                    UserId = 1,
+                    User = user,
                     BookingId = testBookingId,
                     BookingStatus = BookingStatus.Reserved
                 };
@@ -241,7 +263,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var viewModel = new PreCheckinViewModel
                 {
@@ -276,8 +300,12 @@ namespace PhucNguyenResort.Tests.Services
 
             using (var context = new ResortDbContext(options))
             {
+                var user = new User { UserId = 1, FullName = "Test User", Email = "test@example.com" };
+                context.Users.Add(user);
                 var booking = new Booking
                 {
+                    UserId = 1,
+                    User = user,
                     BookingId = testBookingId,
                     BookingStatus = BookingStatus.Reserved
                 };
@@ -289,7 +317,9 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockGuestService = new Mock<IBookingGuestService>();
-                var service = new ReceptionService(context, mockGuestService.Object);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
 
                 var viewModel = new PreCheckinViewModel
                 {
