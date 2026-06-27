@@ -88,8 +88,8 @@ namespace PhucNguyenResort.Controllers
                                 htmlBody = htmlBody.Replace("{{CustomerName}}", booking.User.FullName)
                                                    .Replace("{{BookingId}}", booking.BookingId.ToString())
                                                    .Replace("{{RoomName}}", booking.BookingDetails != null && booking.BookingDetails.Any(bd => bd.Room != null) ? string.Join(", ", booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : "Chưa xếp phòng")
-                                                   .Replace("{{CheckInDate}}", booking.CheckInDate.ToString("dd/MM/yyyy"))
-                                                   .Replace("{{CheckOutDate}}", booking.CheckOutDate.ToString("dd/MM/yyyy"))
+                                                   .Replace("{{CheckInDate}}", booking.CheckInDate.ToString("dd/MM/yyyy") + " 14:00")
+                                                   .Replace("{{CheckOutDate}}", booking.CheckOutDate.ToString("dd/MM/yyyy") + " 12:00")
                                                    .Replace("{{TotalAmount}}", (booking.TotalAmount ?? 0).ToString("N0"))
                                                    .Replace("{{DepositAmount}}", (booking.DepositAmount ?? 0).ToString("N0"))
                                                    .Replace("{{TourDetails}}", tourHtml);

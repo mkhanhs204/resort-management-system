@@ -130,14 +130,26 @@
                                 <div class="stay-timeline">
                                     <div class="timeline-node">
                                         <span>Check-In</span>
-                                        <strong>@booking.CheckInDate.ToString("dd/MM/yyyy")</strong>
+                                        <strong>@booking.CheckInDate.ToString("dd/MM/yyyy") 14:00</strong>
+                                        @if (booking.ActualCheckInTime != null)
+                                        {
+                                            <span class="actual-time" style="display: block; font-size: 11px; color: #16a34a; font-weight: 500; margin-top: 2px;">
+                                                <i class="fa fa-clock-o"></i> Thực tế: @booking.ActualCheckInTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </span>
+                                        }
                                     </div>
                                     <div class="timeline-arrow">
                                         <i class="fa fa-long-arrow-right"></i>
                                     </div>
                                     <div class="timeline-node">
                                         <span>Check-Out</span>
-                                        <strong>@booking.CheckOutDate.ToString("dd/MM/yyyy")</strong>
+                                        <strong>@booking.CheckOutDate.ToString("dd/MM/yyyy") 12:00</strong>
+                                        @if (booking.ActualCheckOutTime != null)
+                                        {
+                                            <span class="actual-time" style="display: block; font-size: 11px; color: #2563eb; font-weight: 500; margin-top: 2px;">
+                                                <i class="fa fa-clock-o"></i> Thực tế: @booking.ActualCheckOutTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </span>
+                                        }
                                     </div>
                                 </div>
 
