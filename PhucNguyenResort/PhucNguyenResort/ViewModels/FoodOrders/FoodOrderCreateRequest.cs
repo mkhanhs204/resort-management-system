@@ -9,5 +9,8 @@ public class FoodOrderCreateRequest
 
     public int? BookingDetailId { get; set; }
 
+    public DateTime? RequestedDeliveryAt { get; set; }
+    public string? CustomerNote { get; set; }
+
     public List<FoodOrderItemRequest> Items { get; set; } = new();
 }

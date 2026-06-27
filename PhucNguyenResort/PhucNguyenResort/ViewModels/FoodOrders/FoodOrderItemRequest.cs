@@ -9,4 +9,6 @@ public class FoodOrderItemRequest
 
     [Range(1, 1000)]
     public int Quantity { get; set; }
+
+    public string? ItemNote { get; set; }
 }

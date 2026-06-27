@@ -1253,6 +1253,10 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<DateTime?>("ChargedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CustomerNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<bool>("IsChargedToRoom")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -1269,6 +1273,9 @@ namespace PhucNguyenResort.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime?>("RequestedDeliveryAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal?>("TotalAmount")
                         .HasPrecision(18, 2)
@@ -1499,6 +1506,10 @@ namespace PhucNguyenResort.Web.Migrations
 
                     b.Property<int?>("FoodOrderId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ItemNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int?>("MenuItemId")
                         .HasColumnType("int");
