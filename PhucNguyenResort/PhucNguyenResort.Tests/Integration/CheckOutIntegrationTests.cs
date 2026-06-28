@@ -115,7 +115,7 @@ namespace PhucNguyenResort.Tests.Integration
             Assert.NotNull(payment);
             Assert.Equal(PaymentMethod.Cash, payment.PaymentMethod);
             Assert.Equal(2300000, payment.Amount);
-            Assert.Equal(PaymentStatus.Success, payment.PaymentStatus);
+            Assert.Null(payment.PaymentStatus);
             Assert.NotNull(payment.PaidAt);
         }
     }

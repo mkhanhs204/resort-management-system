@@ -5287,6 +5287,11 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<bool>("IsBlocked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -5316,6 +5321,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user01@phucnguyenresort.test",
                             FullName = "Nguyen Van An",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEAPfHpZqsicuzNWwEz2A+27fHA4T7jfsm+ZJVi/FMknonhnS15owgiKdE/xqvZZHvA==",
                             PhoneNumber = "0900000001",
                             RoleId = 1
@@ -5327,6 +5333,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user02@phucnguyenresort.test",
                             FullName = "Tran Thi Binh",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEMqJfvDTu1nRZ1tWnVSdC2TxoksCbzZBG0Z5+hSqJBH6ubpqvEb9ytkmbnjrBlCJNQ==",
                             PhoneNumber = "0900000002",
                             RoleId = 2
@@ -5338,6 +5345,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user03@phucnguyenresort.test",
                             FullName = "Le Minh Chau",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEL7OmuUdZtRjIWsMK4GpOru5NwFTcgkWIMT0XsKM12jVPo5pBAI3n0mPC42TwT4gQA==",
                             PhoneNumber = "0900000003",
                             RoleId = 3
@@ -5349,6 +5357,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user04@phucnguyenresort.test",
                             FullName = "Pham Quoc Dung",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEPpO/sBlLtEog0z9muGuZ9dJU2By/al3/9rnCHHgIHGaUn3cCQxp8+rOHVNo771raA==",
                             PhoneNumber = "0900000004",
                             RoleId = 4
@@ -5360,6 +5369,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user05@phucnguyenresort.test",
                             FullName = "Hoang Thu Ha",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAELLhWKBA7UEbgmc/qhu3mxKfNo1Y1UI6zVG4H6XqUfwyhBZIvWkZmDZrkXQK/KaAXQ==",
                             PhoneNumber = "0900000005",
                             RoleId = 5
@@ -5371,6 +5381,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user06@phucnguyenresort.test",
                             FullName = "Vo Tuan Kiet",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEMos2lHKwL8xBwVjMAzlIWjtRXvVolAJDK4aTarDmRFhEgqc2mtMqB16Gvi4Y7hd7g==",
                             PhoneNumber = "0900000006",
                             RoleId = 6
@@ -5382,6 +5393,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user07@phucnguyenresort.test",
                             FullName = "Dang Ngoc Linh",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEENQal0elXTjB9MuTiDqZw+Ju1XFx+c6PHLzlv+vB49TGulgOELiwxVLzBLR3zWcsA==",
                             PhoneNumber = "0900000007",
                             RoleId = 7
@@ -5393,6 +5405,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user08@phucnguyenresort.test",
                             FullName = "Bui Gia Minh",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEJT25/CCK5rCrhV6iqZaRiccHs5/2PjxovAkY33vQQnePVOlNtFItn9Ej8hl8/GaVg==",
                             PhoneNumber = "0900000008",
                             RoleId = 8
@@ -5404,6 +5417,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user09@phucnguyenresort.test",
                             FullName = "Do Phuong Nam",
                             IsActive = false,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEP/y/42LBSamtT9RhWTarQ8Arul0XOAu1F1fy0D9x/QhZvsyBZsXcw4BK2FianAmlQ==",
                             PhoneNumber = "0900000009",
                             RoleId = 9
@@ -5415,6 +5429,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user10@phucnguyenresort.test",
                             FullName = "Ngo Thanh Oanh",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEHhfJbFM/03T1KAicxYcV1bTBoKZiD9CS841SnAOmTfifLMab/d2Ler9troq3w/uxQ==",
                             PhoneNumber = "0900000010",
                             RoleId = 3
@@ -5426,6 +5441,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user11@phucnguyenresort.test",
                             FullName = "Huynh Duc Phat",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEPaitqXlGlPfjdR10IkWztfw5bkaSETVCtiz1raV6zzlXBjpPzIMqeY4bfviE6e3Wg==",
                             PhoneNumber = "0900000011",
                             RoleId = 3
@@ -5437,6 +5453,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user12@phucnguyenresort.test",
                             FullName = "Phan My Quyen",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEDGl1/D1FrIqtwdXMp4MHKTcKLhrgp0BM7tRkmCJKU4CLs78GCzRBm6BNMw2g5wsMg==",
                             PhoneNumber = "0900000012",
                             RoleId = 3
@@ -5448,6 +5465,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user13@phucnguyenresort.test",
                             FullName = "Vu Khanh Son",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEOUNXbZx/sSqOf8XhutyA8c0i1jpPfwprTXZMpZ+ddTO0eZ6DeGC6SappK1tnuLQtQ==",
                             PhoneNumber = "0900000013",
                             RoleId = 3
@@ -5459,6 +5477,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user14@phucnguyenresort.test",
                             FullName = "Truong Hai Tam",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEJJGfYgjY5DIU1LvrA7IqfQ9N0dG1VIKmKczDlrjsfeYlLZMV3uGZM3KB8t7jPVC0g==",
                             PhoneNumber = "0900000014",
                             RoleId = 3
@@ -5470,6 +5489,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user15@phucnguyenresort.test",
                             FullName = "Ly Bao Uyen",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAELC/3eh2uKrbHlslXEaKmDbBCqjLTpF7KJkmuTokz/4ZZtRftNGdc1r18mlfAWJ/zg==",
                             PhoneNumber = "0900000015",
                             RoleId = 3
@@ -5481,6 +5501,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user16@phucnguyenresort.test",
                             FullName = "Mai Hoai Viet",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEK8Tu2bzYxEFkVglibJ2FMF/v+tZLjtO8PlvonraPzVigrXUv+ezf6txnN9tzmUKRg==",
                             PhoneNumber = "0900000016",
                             RoleId = 3
@@ -5492,6 +5513,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user17@phucnguyenresort.test",
                             FullName = "Dinh Nhat Vy",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEEu1vtHH1DPKJyipEF9CLiGKB5nlEfAALCHhcLHUl6Gj7930Z5fC8qFxmwbLTbFcnA==",
                             PhoneNumber = "0900000017",
                             RoleId = 3
@@ -5503,6 +5525,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user18@phucnguyenresort.test",
                             FullName = "Cao Dat",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEBfvYhV6RZ4eaYPLilejiLRhlW1+Yc+NqGZ5EBekRqifvfY6ys/tZUV/GwRQrpr9sw==",
                             PhoneNumber = "0900000018",
                             RoleId = 7
@@ -5514,6 +5537,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user19@phucnguyenresort.test",
                             FullName = "Ta Anh",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEGtWiO8pUkr97O2XfZppC3E24zWNciBmmNkqv/H5mHZXU64zaC04ozH9WwBorN8/WA==",
                             PhoneNumber = "0900000019",
                             RoleId = 7
@@ -5525,6 +5549,7 @@ namespace PhucNguyenResort.Web.Migrations
                             Email = "user20@phucnguyenresort.test",
                             FullName = "Lam Bao",
                             IsActive = true,
+                            IsBlocked = false,
                             PasswordHash = "AQAAAAIAAYagAAAAEOWoOu1dgyXSeUHjo7zAm5WWbYnrLWNWkMpjSUCTsJ3Vlznm0hcvxtyPQ/7cgwZNng==",
                             PhoneNumber = "0900000020",
                             RoleId = 7

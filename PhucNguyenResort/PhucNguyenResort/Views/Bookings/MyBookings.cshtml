@@ -215,6 +215,8 @@
                                 }
                                 else if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedOut)
                                 {
+                                    <a asp-controller="Bookings" asp-action="ViewInvoice" asp-route-id="@booking.BookingId" target="_blank" class="btn-action-premium btn-action-primary"><i class="fa fa-file-text-o"></i> Xem Hóa Đơn</a>
+                                    
                                     bool hasReviewed = booking.Reviews != null && booking.Reviews.Any(r => r.BookingId == booking.BookingId);
                                     if (hasReviewed)
                                     {

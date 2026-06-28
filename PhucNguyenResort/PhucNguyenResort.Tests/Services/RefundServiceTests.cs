@@ -3,9 +3,11 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Refunds;
+using PhucNguyenResort.Services.Email;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Moq;
 
 namespace PhucNguyenResort.Tests.Services
 {
@@ -38,7 +40,8 @@ namespace PhucNguyenResort.Tests.Services
 
             using (var context = new ResortDbContext(options))
             {
-                var service = new RefundService(context);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var service = new RefundService(context, mockEmailSender.Object);
 
                 // Act
                 var result = await service.ProcessRefundAsync(5);
@@ -61,7 +64,8 @@ namespace PhucNguyenResort.Tests.Services
 
             using (var context = new ResortDbContext(options))
             {
-                var service = new RefundService(context);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var service = new RefundService(context, mockEmailSender.Object);
 
                 // Act
                 var result = await service.ProcessRefundAsync(999);
@@ -92,7 +96,8 @@ namespace PhucNguyenResort.Tests.Services
 
             using (var context = new ResortDbContext(options))
             {
-                var service = new RefundService(context);
+                var mockEmailSender = new Mock<IEmailSender>();
+                var service = new RefundService(context, mockEmailSender.Object);
 
                 // Act
                 var result = await service.ProcessRefundAsync(6);
