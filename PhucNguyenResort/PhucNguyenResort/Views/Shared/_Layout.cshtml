@@ -101,6 +101,7 @@
                 <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
                 <li class="@IsActive("FoodOrders")"><a asp-controller="FoodOrders" asp-action="RoomService">Room Service</a></li>
+                <li class="@IsActive("TableReservations")"><a asp-controller="TableReservations" asp-action="Search">Reserve Table</a></li>
 
                 @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                 {
@@ -113,6 +114,7 @@
                         <a href="#">Xin chào, @User.Identity.Name <i class="fa fa-angle-down"></i></a>
                         <ul class="dropdown">
                             <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                            <li><a asp-controller="TableReservations" asp-action="MyReservations">My Table Reservations</a></li>
                             <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
                             <li><a asp-controller="CustomerTourBooking" asp-action="MyTourBookings">Lịch sử đặt tour</a></li>
                             <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
@@ -229,6 +231,8 @@
 
                                     <li class="@IsActive("FoodOrders")"><a asp-controller="FoodOrders" asp-action="RoomService">Dịch Vụ</a></li>
 
+                                    <li class="@IsActive("TableReservations")"><a asp-controller="TableReservations" asp-action="Search">Đặt Bàn</a></li>
+
                                     @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                                     {
                                         <li class="@IsActive("Dashboard")"><a asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
@@ -240,6 +244,7 @@
                                              <a href="#">Xin chào, @User.Identity.Name <i class="fa fa-angle-down"></i></a>
                                              <ul class="dropdown">
                                                  <li><a asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                                                 <li><a asp-controller="TableReservations" asp-action="MyReservations">My Table Reservations</a></li>
                                                  <li><a asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
                                                  <li><a asp-controller="CustomerTourBooking" asp-action="MyTourBookings">Lịch sử đặt tour</a></li>
                                                  <li><a asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>

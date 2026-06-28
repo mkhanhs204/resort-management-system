@@ -1,3 +1,5 @@
+@using PhucNguyenResort.Enums
+@model PhucNguyenResort.ViewModels.TableReservations.FnBTableReservationDashboardViewModel
 @{
     ViewData["Title"] = "F&B Staff Dashboard";
     Layout = "_DashboardLayout";
@@ -8,7 +10,7 @@
         <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
             <div>
                 <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-cutlery mr-2" style="color: #007bff;"></i> F&B Staff — Restaurant & Room Service
+                    <i class="fa fa-cutlery mr-2" style="color: #007bff;"></i> F&B Staff - Restaurant & Room Service
                 </h2>
                 <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Manage KOT orders, table reservations, and charge meals to guest rooms.</p>
             </div>
@@ -19,32 +21,30 @@
     </div>
 </div>
 
-<!-- KPI Cards -->
 <div class="row mb-4">
     <div class="col-lg-4 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #007bff;">
             <h4 style="color: #007bff;"><i class="fa fa-table"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@Model.TotalTables</h3>
             <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Total Restaurant Tables</p>
         </div>
     </div>
     <div class="col-lg-4 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
             <h4 style="color: #28a745;"><i class="fa fa-check-square-o"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@Model.AvailableTables</h3>
             <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Available Tables</p>
         </div>
     </div>
     <div class="col-lg-4 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545;">
             <h4 style="color: #dc3545;"><i class="fa fa-users"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@Model.OccupiedTables</h3>
             <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Occupied Tables</p>
         </div>
     </div>
 </div>
 
-<!-- Quick Actions -->
 <div class="row mb-4">
     <div class="col-lg-12">
         <div class="card-box" style="border-left: 5px solid #007bff;">
@@ -58,9 +58,9 @@
                     </a>
                 </div>
                 <div class="col-md-4 mb-2">
-                    <button class="btn btn-outline-primary btn-block" style="font-family: 'Cabin', sans-serif;" disabled>
+                    <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-outline-primary btn-block" style="font-family: 'Cabin', sans-serif;">
                         <i class="fa fa-calendar-plus-o mr-2"></i> Manage Table Reservations
-                    </button>
+                    </a>
                 </div>
                 <div class="col-md-4 mb-2">
                     <button class="btn btn-outline-primary btn-block" style="font-family: 'Cabin', sans-serif;" disabled>
@@ -72,17 +72,23 @@
     </div>
 </div>
 
-<!-- Today's Table Reservations (Placeholder) -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card-box">
-            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
-                <i class="fa fa-clock-o mr-2" style="color: #007bff;"></i> Today's Table Reservations
-            </h5>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 0;">
+                    <i class="fa fa-clock-o mr-2" style="color: #007bff;"></i> Today's Table Reservations
+                </h5>
+                <div style="font-family: 'Cabin', sans-serif;">
+                    <span class="badge badge-warning mr-1">@Model.PendingReservationsToday Pending</span>
+                    <span class="badge badge-success">@Model.ConfirmedReservationsToday Confirmed</span>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover" style="font-family: 'Cabin', sans-serif;">
                     <thead>
                         <tr class="bg-light">
+                            <th>Code</th>
                             <th>Table No.</th>
                             <th>Guest Name</th>
                             <th>Time</th>
@@ -91,16 +97,70 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">
-                                <i class="fa fa-info-circle mr-2"></i> Reservation data will be loaded when backend is connected.
-                            </td>
-                        </tr>
+                        @if (Model.TodayReservations == null || !Model.TodayReservations.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="fa fa-info-circle mr-2"></i> No table reservations for today.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var reservation in Model.TodayReservations.Take(8))
+                            {
+                                <tr>
+                                    <td><strong>@reservation.ReservationCode</strong></td>
+                                    <td>Table @reservation.TableNumber</td>
+                                    <td>
+                                        @reservation.CustomerName
+                                        @if (!string.IsNullOrWhiteSpace(reservation.CustomerPhone))
+                                        {
+                                            <br /><small class="text-muted">@reservation.CustomerPhone</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        @reservation.ReservationTime.ToString(@"hh\:mm")
+                                        <br /><small class="text-muted">@reservation.DurationMinutes min</small>
+                                    </td>
+                                    <td>@reservation.PartySize</td>
+                                    <td>
+                                        @if (reservation.Status == TableReservationStatus.Pending)
+                                        {
+                                            <span class="badge badge-warning">Pending</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Confirmed)
+                                        {
+                                            <span class="badge badge-success">Confirmed</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Seated)
+                                        {
+                                            <span class="badge badge-primary">Seated</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Completed)
+                                        {
+                                            <span class="badge badge-secondary">Completed</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.NoShow)
+                                        {
+                                            <span class="badge badge-dark">No Show</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">Cancelled</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
                     </tbody>
                 </table>
+            </div>
+            <div class="text-right">
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-sm btn-primary">
+                    <i class="fa fa-calendar-check-o mr-1"></i> View all reservations
+                </a>
             </div>
         </div>
     </div>
 </div>
-
-

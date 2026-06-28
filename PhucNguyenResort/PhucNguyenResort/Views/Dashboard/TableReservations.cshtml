@@ -1,0 +1,281 @@
+@using PhucNguyenResort.Enums
+@model IReadOnlyList<PhucNguyenResort.ViewModels.TableReservations.TableReservationStaffListViewModel>
+@{
+    ViewData["Title"] = "Manage Table Reservations";
+    Layout = "_DashboardLayout";
+    var selectedDate = ViewBag.SelectedDate as DateTime?;
+    var selectedStatus = ViewBag.SelectedStatus as TableReservationStatus?;
+    var canManageReservationStatus = ViewBag.CanManageReservationStatus as bool? ?? User.IsInRole("F&B Staff");
+    var backAction = ViewBag.BackAction as string ?? "FnB";
+    var emptyColspan = canManageReservationStatus ? 9 : 8;
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-calendar-check-o mr-2" style="color: #007bff;"></i> Manage Table Reservations
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">
+                    @(canManageReservationStatus ? "Review customer reservations and update their service status." : "Monitor customer table reservations across restaurant operations.")
+                </p>
+            </div>
+            <a asp-controller="Dashboard" asp-action="@backAction" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left mr-1"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fa fa-exclamation-triangle mr-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="card-box mb-4" style="border-left: 5px solid #007bff;">
+    <form asp-controller="Dashboard" asp-action="TableReservations" method="get" class="row align-items-end" style="font-family: 'Cabin', sans-serif;">
+        <div class="col-md-4 mb-2">
+            <label class="font-weight-bold">Reservation date</label>
+            <input type="date" name="date" value="@(selectedDate?.ToString("yyyy-MM-dd"))" class="form-control" />
+        </div>
+        <div class="col-md-4 mb-2">
+            <label class="font-weight-bold">Status</label>
+            <select name="status" class="form-control">
+                <option value="">All statuses</option>
+                @foreach (var status in Enum.GetValues<TableReservationStatus>())
+                {
+                    <option value="@status" selected="@(selectedStatus == status)">@status</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4 mb-2">
+            <button type="submit" class="btn btn-primary mr-2">
+                <i class="fa fa-search mr-1"></i> Filter
+            </button>
+            <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-outline-secondary">
+                Clear
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card-box" style="border-top: 5px solid #007bff;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" style="font-family: 'Cabin', sans-serif;">
+            <thead class="bg-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Guest</th>
+                    <th>Table</th>
+                    <th>Date & Time</th>
+                    <th>Party</th>
+                    <th>Status</th>
+                    <th>Billing</th>
+                    <th>Requests</th>
+                    @if (canManageReservationStatus)
+                    {
+                        <th class="text-right">Action</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="@emptyColspan" class="text-center text-muted py-4">
+                            <i class="fa fa-inbox fa-2x mb-2"></i><br />No table reservations found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var reservation in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@reservation.ReservationCode</strong>
+                                <br /><small class="text-muted">#@reservation.ReservationId</small>
+                            </td>
+                            <td>
+                                @reservation.CustomerName
+                                @if (!string.IsNullOrWhiteSpace(reservation.CustomerPhone))
+                                {
+                                    <br /><small class="text-muted">@reservation.CustomerPhone</small>
+                                }
+                            </td>
+                            <td>
+                                Table <strong>@reservation.TableNumber</strong>
+                                <br /><small class="text-muted">Capacity @reservation.Capacity</small>
+                            </td>
+                            <td>
+                                @reservation.ReservationDate.ToString("dd/MM/yyyy")
+                                <br /><small class="text-muted">@reservation.ReservationTime.ToString(@"hh\:mm") - @reservation.DurationMinutes min</small>
+                            </td>
+                            <td>@reservation.PartySize</td>
+                            <td>
+                                @if (reservation.Status == TableReservationStatus.Pending)
+                                {
+                                    <span class="badge badge-warning">Pending</span>
+                                }
+                                else if (reservation.Status == TableReservationStatus.Confirmed)
+                                {
+                                    <span class="badge badge-success">Confirmed</span>
+                                }
+                                else if (reservation.Status == TableReservationStatus.Seated)
+                                {
+                                    <span class="badge badge-primary">Seated</span>
+                                }
+                                else if (reservation.Status == TableReservationStatus.Completed)
+                                {
+                                    <span class="badge badge-secondary">Completed</span>
+                                }
+                                else if (reservation.Status == TableReservationStatus.NoShow)
+                                {
+                                    <span class="badge badge-dark">No Show</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">Cancelled</span>
+                                }
+                            </td>
+                            <td style="min-width: 210px;">
+                                @if (!reservation.BookingId.HasValue)
+                                {
+                                    <span class="badge badge-light border text-muted">No room booking</span>
+                                }
+                                else if (reservation.IsChargedToRoom)
+                                {
+                                    <span class="badge badge-success">Charged</span>
+                                    <br />
+                                    <small class="text-muted">
+                                        @reservation.ChargedAmount.ToString("N0") VND
+                                        @if (reservation.ChargedAt.HasValue)
+                                        {
+                                            <span> at @reservation.ChargedAt.Value.ToString("dd/MM HH:mm")</span>
+                                        }
+                                    </small>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-light border text-muted">Pending checkout</span>
+                                }
+                                @if (canManageReservationStatus && reservation.Status == TableReservationStatus.Seated)
+                                {
+                                    <br />
+                                    <a asp-controller="TableFoodOrders" asp-action="Checkout" asp-route-reservationId="@reservation.ReservationId" class="btn btn-sm btn-outline-warning mt-2">
+                                        <i class="fa fa-credit-card mr-1"></i> Checkout
+                                    </a>
+                                }
+                            </td>
+                            <td style="max-width: 220px;">
+                                @if (string.IsNullOrWhiteSpace(reservation.SpecialRequests))
+                                {
+                                    <span class="text-muted">None</span>
+                                }
+                                else
+                                {
+                                    <span>@reservation.SpecialRequests</span>
+                                }
+                            </td>
+                            @if (canManageReservationStatus)
+                            {
+                                <td class="text-right" style="min-width: 220px;">
+                                    @if (reservation.CanConfirm)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="ConfirmTableReservation" method="post" class="d-inline">
+                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fa fa-check mr-1"></i> Confirm
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (reservation.CanSeat)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="SeatTableReservation" method="post" class="d-inline ml-1">
+                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                            <button type="submit" class="btn btn-sm btn-info">
+                                                <i class="fa fa-cutlery mr-1"></i> Seat
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (reservation.CanComplete)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="CompleteTableReservation" method="post" class="d-inline ml-1">
+                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="fa fa-flag-checkered mr-1"></i> Complete
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (reservation.Status == TableReservationStatus.Seated)
+                                    {
+                                        <span class="badge badge-warning ml-1">Checkout required</span>
+                                    }
+                                    @if (reservation.Status == TableReservationStatus.Seated)
+                                    {
+                                        <a asp-controller="TableFoodOrders" asp-action="Create" asp-route-reservationId="@reservation.ReservationId" class="btn btn-sm btn-success ml-1">
+                                            <i class="fa fa-plus mr-1"></i> Order
+                                        </a>
+                                        <a asp-controller="TableFoodOrders" asp-action="ByReservation" asp-route-reservationId="@reservation.ReservationId" class="btn btn-sm btn-outline-primary ml-1">
+                                            <i class="fa fa-list mr-1"></i> Orders
+                                        </a>
+                                    }
+                                    @if (reservation.CanMarkNoShow)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="MarkTableReservationNoShow" method="post" class="d-inline ml-1" onsubmit="return confirm('Mark this reservation as no-show?');">
+                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                            <button type="submit" class="btn btn-sm btn-dark">
+                                                <i class="fa fa-user-times mr-1"></i> No Show
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (reservation.Status == TableReservationStatus.Confirmed && reservation.NoShowAvailableAt.HasValue)
+                                    {
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary ml-1"
+                                                disabled
+                                                title="No-show is available after @reservation.NoShowAvailableAt.Value.ToString("dd/MM/yyyy HH:mm")">
+                                            <i class="fa fa-user-times mr-1"></i> No Show
+                                        </button>
+                                        <small class="text-muted d-block mt-1">
+                                            Available after @reservation.NoShowAvailableAt.Value.ToString("HH:mm")
+                                        </small>
+                                    }
+                                    @if (reservation.CanCancel)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="CancelTableReservation" method="post" class="d-inline ml-1" onsubmit="return confirm('Cancel this table reservation?');">
+                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                            <input type="hidden" name="reason" value="Cancelled by F&B staff" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-times mr-1"></i> Cancel
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (!reservation.CanConfirm && !reservation.CanSeat && !reservation.CanComplete && !reservation.CanMarkNoShow && !reservation.CanCancel)
+                                    {
+                                        <span class="text-muted">No action</span>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -5,6 +5,8 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.FoodOrders;
 using PhucNguyenResort.Services.MenuCategories;
 using PhucNguyenResort.Services.RestaurantMenus;
+using PhucNguyenResort.Services.TableFoodOrders;
+using PhucNguyenResort.Services.TableReservations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
+builder.Services.AddScoped<ITableReservationService, TableReservationService>();
+builder.Services.AddScoped<ITableFoodOrderService, TableFoodOrderService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Kots.IKotService, PhucNguyenResort.Services.Kots.KotService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Tables.IDiningTableService, PhucNguyenResort.Services.Tables.DiningTableService>();
 

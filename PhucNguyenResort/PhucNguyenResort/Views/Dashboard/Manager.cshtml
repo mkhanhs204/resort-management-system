@@ -1,3 +1,5 @@
+@using PhucNguyenResort.Enums
+@model PhucNguyenResort.ViewModels.TableReservations.FnBTableReservationDashboardViewModel
 @{
     ViewData["Title"] = "Business Manager Dashboard";
     Layout = "_DashboardLayout";
@@ -10,7 +12,7 @@
                 <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
                     <i class="fa fa-bar-chart mr-2" style="color: #28a745;"></i> Business Manager
                 </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Revenue analytics, occupancy rates, and resort operations overview.</p>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Monitor resort operations and manage business configuration.</p>
             </div>
             <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
                 <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
@@ -19,41 +21,39 @@
     </div>
 </div>
 
-<!-- KPI Cards -->
 <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
-            <h4 style="color: #28a745;"><i class="fa fa-money"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Total Revenue</p>
+            <h4 style="color: #28a745;"><i class="fa fa-table"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@Model.TotalTables</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Restaurant Tables</p>
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #007bff;">
-            <h4 style="color: #007bff;"><i class="fa fa-percent"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--%</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Occupancy Rate</p>
+            <h4 style="color: #007bff;"><i class="fa fa-check-square-o"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@Model.AvailableTables</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Available Tables</p>
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107;">
-            <h4 style="color: #ffc107;"><i class="fa fa-star"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">-- / 5.0</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Average Guest Rating</p>
+            <h4 style="color: #ffc107;"><i class="fa fa-clock-o"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@Model.PendingReservationsToday</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Pending Today</p>
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #17a2b8;">
-            <h4 style="color: #17a2b8;"><i class="fa fa-comments"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Total Reviews</p>
+            <h4 style="color: #17a2b8;"><i class="fa fa-calendar-check-o"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@Model.ConfirmedReservationsToday</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Confirmed Today</p>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <!-- Quick Management Links -->
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-5 mb-4">
         <div class="card-box h-100" style="border-left: 5px solid #28a745;">
             <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
                 <i class="fa fa-link mr-2" style="color: #dfa974;"></i> Quick Management Links
@@ -67,28 +67,100 @@
                     <span><i class="fa fa-cutlery mr-2 text-success"></i> F&B Menu Items</span>
                     <span class="badge badge-success badge-pill"><i class="fa fa-chevron-right"></i></span>
                 </a>
-                <a asp-controller="Tours" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span><i class="fa fa-map-marker mr-2 text-warning"></i> Tour Packages</span>
+                <a asp-controller="Tables" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="fa fa-table mr-2 text-info"></i> Restaurant Tables</span>
+                    <span class="badge badge-info badge-pill"><i class="fa fa-chevron-right"></i></span>
+                </a>
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="fa fa-calendar-check-o mr-2 text-warning"></i> Table Reservations</span>
                     <span class="badge badge-warning badge-pill"><i class="fa fa-chevron-right"></i></span>
                 </a>
-                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span><i class="fa fa-file-pdf-o mr-2 text-danger"></i> Export Reports (PDF/Excel)</span>
+                <a asp-controller="Tours" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="fa fa-map-marker mr-2 text-danger"></i> Tour Packages</span>
                     <span class="badge badge-danger badge-pill"><i class="fa fa-chevron-right"></i></span>
+                </a>
+                <a asp-controller="Refunds" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="fa fa-money mr-2 text-secondary"></i> Refund Requests</span>
+                    <span class="badge badge-secondary badge-pill"><i class="fa fa-chevron-right"></i></span>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Recent Customer Reviews (Placeholder) -->
-    <div class="col-lg-6 mb-4">
-        <div class="card-box h-100" style="border-left: 5px solid #ffc107;">
-            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
-                <i class="fa fa-star mr-2" style="color: #ffc107;"></i> Recent Customer Reviews
-            </h5>
-            <div class="text-center text-muted py-5" style="font-family: 'Cabin', sans-serif;">
-                <i class="fa fa-info-circle fa-2x mb-3 d-block"></i>
-                <p>Review data will be loaded when backend is connected.</p>
+    <div class="col-lg-7 mb-4">
+        <div class="card-box h-100" style="border-left: 5px solid #007bff;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 0;">
+                    <i class="fa fa-calendar-check-o mr-2" style="color: #007bff;"></i> Today's Table Reservations
+                </h5>
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-sm btn-outline-primary">
+                    View all
+                </a>
             </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="font-family: 'Cabin', sans-serif;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Code</th>
+                            <th>Guest</th>
+                            <th>Table</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TodayReservations == null || !Model.TodayReservations.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fa fa-info-circle mr-2"></i> No table reservations for today.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var reservation in Model.TodayReservations.Take(6))
+                            {
+                                <tr>
+                                    <td><strong>@reservation.ReservationCode</strong></td>
+                                    <td>@reservation.CustomerName</td>
+                                    <td>Table @reservation.TableNumber</td>
+                                    <td>@reservation.ReservationTime.ToString(@"hh\:mm")</td>
+                                    <td>
+                                        @if (reservation.Status == TableReservationStatus.Pending)
+                                        {
+                                            <span class="badge badge-warning">Pending</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Confirmed)
+                                        {
+                                            <span class="badge badge-success">Confirmed</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Seated)
+                                        {
+                                            <span class="badge badge-primary">Seated</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Completed)
+                                        {
+                                            <span class="badge badge-secondary">Completed</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.NoShow)
+                                        {
+                                            <span class="badge badge-dark">No Show</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">Cancelled</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <small class="text-muted" style="font-family: 'Cabin', sans-serif;">
+                Business Manager can monitor reservations here. Status updates are handled by F&B staff.
+            </small>
         </div>
     </div>
 </div>

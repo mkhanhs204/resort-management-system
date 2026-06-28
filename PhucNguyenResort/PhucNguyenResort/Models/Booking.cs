@@ -42,6 +42,7 @@ public class Booking
     public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
     public ICollection<BookingGuest> BookingGuests { get; set; } = new List<BookingGuest>();
     public ICollection<FoodOrder> FoodOrders { get; set; } = new List<FoodOrder>();
+    public ICollection<TableReservation> TableReservations { get; set; } = new List<TableReservation>();
     public ICollection<TourBooking> TourBookings { get; set; } = new List<TourBooking>();
     public GuestFolio? GuestFolio { get; set; }
     public ICollection<Review> Reviews { get; set; } = new List<Review>();

@@ -1,9 +1,9 @@
-namespace PhucNguyenResort.Enums;
+﻿namespace PhucNguyenResort.Enums;
 
 public enum BookingStatus
 {
     Reserved,
-    Arrived,
+    Arrived, // Khách hàng đã đến nhưng chưa check-in
     CheckedIn,
     CheckedOut,
     Cancelled,

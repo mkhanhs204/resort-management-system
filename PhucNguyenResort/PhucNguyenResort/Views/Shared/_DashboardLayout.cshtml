@@ -132,6 +132,9 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tables" ? "active" : "")">
                             <a asp-controller="Tables" asp-action="Index"><i class="fa fa-table"></i> Manage Tables</a>
                         </li>
+                        <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "TableReservations" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="TableReservations"><i class="fa fa-calendar-check-o"></i> Table Reservations</a>
+                        </li>
                     }
                     @if (User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
                     {
