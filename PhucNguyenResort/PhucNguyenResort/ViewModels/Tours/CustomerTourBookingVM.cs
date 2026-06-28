@@ -161,6 +161,7 @@ namespace PhucNguyenResort.ViewModels.Tours
     public class MyTourBookingItemVM
     {
         public int TourBookingId { get; set; }
+        public int TourId { get; set; }
         public string TourName { get; set; } = string.Empty;
         public string? TourImage { get; set; }
         public string? Location { get; set; }
@@ -172,6 +173,8 @@ namespace PhucNguyenResort.ViewModels.Tours
         public bool CanCancel { get; set; }
         public string? PaymentMethod { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? CancellationReason { get; set; }
+        public bool HasReviewed { get; set; }
     }
 
     /// <summary>

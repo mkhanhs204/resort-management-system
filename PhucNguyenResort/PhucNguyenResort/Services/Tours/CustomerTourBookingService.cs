@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhucNguyenResort.Services.CustomerTourServices
+namespace PhucNguyenResort.Services.Tours
 {
     /// <summary>
     /// Customer-facing tour booking service.
@@ -339,6 +339,11 @@ namespace PhucNguyenResort.Services.CustomerTourServices
                 .OrderByDescending(tb => tb.TourBookingId)
                 .ToListAsync();
 
+            var userReviewedTourIds = await _context.Reviews
+                .Where(r => r.UserId == userId && r.TourId != null)
+                .Select(r => r.TourId!.Value)
+                .ToListAsync();
+
             return bookings.Select(tb =>
             {
                 // Determine payment method
@@ -361,6 +366,7 @@ namespace PhucNguyenResort.Services.CustomerTourServices
                 return new MyTourBookingItemVM
                 {
                     TourBookingId = tb.TourBookingId,
+                    TourId = tb.Schedule?.TourId ?? 0,
                     TourName = tb.Schedule?.Tour?.TourName ?? "N/A",
                     TourImage = tb.Schedule?.Tour?.ImageUrl,
                     Location = tb.Schedule?.Tour?.Location,
@@ -371,13 +377,15 @@ namespace PhucNguyenResort.Services.CustomerTourServices
                     BookingStatus = tb.BookingStatus.ToString(),
                     CanCancel = canCancel,
                     PaymentMethod = paymentMethod,
-                    CreatedAt = tb.CreatedAt
+                    CreatedAt = tb.CreatedAt,
+                    CancellationReason = tb.CancellationReason,
+                    HasReviewed = userReviewedTourIds.Contains(tb.Schedule?.TourId ?? 0)
                 };
             }).ToList();
         }
 
         /// <inheritdoc/>
-        public async Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId)
+        public async Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId, string? reason = null)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -453,6 +461,7 @@ namespace PhucNguyenResort.Services.CustomerTourServices
                 }
 
                 tourBooking.BookingStatus = TourBookingStatus.Cancelled;
+                tourBooking.CancellationReason = reason;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();

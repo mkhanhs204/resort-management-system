@@ -960,7 +960,8 @@ namespace PhucNguyenResort.Services.Reception
                     Invoice = invoice,
                     Amount = model.BalanceDue,
                     PaidAt = now,
-                    PaymentMethod = model.SelectedPaymentMethod
+                    PaymentMethod = model.SelectedPaymentMethod.Value,
+                    PaymentStatus = PaymentStatus.Success
                 };
                 _context.Payments.Add(payment);
             }

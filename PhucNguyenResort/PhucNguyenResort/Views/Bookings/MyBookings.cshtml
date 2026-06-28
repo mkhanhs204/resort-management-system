@@ -213,6 +213,22 @@
                                 {
                                     <a asp-action="PreCheckin" asp-route-id="@booking.BookingId" class="btn-action-premium btn-action-primary"><i class="fa fa-id-card-o"></i> Xem Khai Báo</a>
                                 }
+                                else if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedOut)
+                                {
+                                    bool hasReviewed = booking.Reviews != null && booking.Reviews.Any(r => r.BookingId == booking.BookingId);
+                                    if (hasReviewed)
+                                    {
+                                        <button type="button" class="btn btn-secondary w-100" style="background-color: #9ca3af; border-color: #9ca3af; margin-top: 10px; cursor: not-allowed;" disabled>
+                                            <i class="fa fa-star"></i> Đã Đánh Giá
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Review" asp-action="Submit" asp-route-bookingId="@booking.BookingId" class="btn btn-warning w-100 text-white" style="background-color: #f59e0b; border-color: #f59e0b; margin-top: 10px;">
+                                            <i class="fa fa-star"></i> Đánh Giá
+                                        </a>
+                                    }
+                                }
                                 else
                                 {
                                     <span class="text-center text-muted small py-2" style="border: 1px dashed var(--border-color); border-radius: 8px; font-weight: 500;">

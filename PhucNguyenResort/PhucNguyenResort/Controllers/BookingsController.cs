@@ -232,6 +232,7 @@ namespace PhucNguyenResort.Controllers
                 .Include(b => b.TourBookings)
                     .ThenInclude(tb => tb.Schedule)
                         .ThenInclude(ts => ts.Tour)
+                .Include(b => b.Reviews)
                 .Where(b => b.UserId == userId)
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();

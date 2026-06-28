@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.Payments;
 using PhucNguyenResort.Services.Tours;
-using PhucNguyenResort.Services.CustomerTourServices;
+using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.ViewModels.Payments;
 using PhucNguyenResort.ViewModels.Tours;
 using System.Security.Claims;
@@ -288,12 +288,12 @@ namespace PhucNguyenResort.Controllers
         [HttpPost]
         [Authorize(Roles = "Customer")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CancelTourBooking(int id)
+        public async Task<IActionResult> CancelTourBooking(int id, string? reason)
         {
             var userId = await GetCurrentUserIdAsync();
             if (userId == null) return RedirectToAction("Logout", "Account");
 
-            var result = await _tourBookingService.CancelTourBookingAsync(id, userId.Value);
+            var result = await _tourBookingService.CancelTourBookingAsync(id, userId.Value, reason);
 
             if (result.Success)
             {

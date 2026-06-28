@@ -2,7 +2,7 @@ using PhucNguyenResort.ViewModels.Tours;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PhucNguyenResort.Services.CustomerTourServices
+namespace PhucNguyenResort.Services.Tours
 {
     /// <summary>
     /// Service interface for customer-facing tour booking operations.
@@ -38,7 +38,7 @@ namespace PhucNguyenResort.Services.CustomerTourServices
         /// <summary>
         /// Cancel a tour booking and restore available slots.
         /// </summary>
-        Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId);
+        Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId, string? reason = null);
 
         /// <summary>
         /// Confirm a pending tour booking after VNPay payment success.

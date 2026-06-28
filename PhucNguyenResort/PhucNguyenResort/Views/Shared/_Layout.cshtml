@@ -101,6 +101,7 @@
                 <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
                 <li class="@IsActive("FoodOrders")"><a asp-controller="FoodOrders" asp-action="RoomService">Room Service</a></li>
+                <li class="@IsActive("Review")"><a asp-controller="Review" asp-action="PublicList">Khách Đánh Giá</a></li>
 
                 @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                 {
@@ -228,6 +229,8 @@
                                     <li class="@IsActive("Home", "Contact")"><a asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
 
                                     <li class="@IsActive("FoodOrders")"><a asp-controller="FoodOrders" asp-action="RoomService">Dịch Vụ</a></li>
+
+                                    <li class="@IsActive("Review")"><a asp-controller="Review" asp-action="PublicList">Khách Đánh Giá</a></li>
 
                                     @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
                                     {
