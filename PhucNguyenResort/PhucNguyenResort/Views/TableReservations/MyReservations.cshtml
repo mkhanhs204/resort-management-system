@@ -1,0 +1,108 @@
+@using PhucNguyenResort.Enums
+@model IReadOnlyList<PhucNguyenResort.ViewModels.TableReservations.TableReservationListViewModel>
+
+@{
+    ViewData["Title"] = "My Table Reservations";
+}
+
+<div class="tr-page">
+    <div class="tr-container">
+        <div class="tr-header">
+            <div>
+                <span class="tr-eyebrow">Restaurant</span>
+                <h1>My Reservations</h1>
+                <p>Track upcoming and past restaurant table reservations.</p>
+            </div>
+            <a asp-action="Search" class="tr-btn tr-btn-primary">
+                <i class="fa fa-plus"></i> New Reservation
+            </a>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="tr-alert tr-alert-success">
+                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="tr-alert tr-alert-danger">
+                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="tr-empty">
+                <i class="fa fa-calendar-o"></i>
+                <h3>No Reservations Yet</h3>
+                <p>You have not reserved a restaurant table yet.</p>
+                <a asp-action="Search" class="tr-btn tr-btn-primary">
+                    <i class="fa fa-cutlery"></i> Reserve a Table
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="tr-reservation-list">
+                @foreach (var reservation in Model)
+                {
+                    var statusClass = reservation.Status switch
+                    {
+                        TableReservationStatus.Pending => "pending",
+                        TableReservationStatus.Confirmed => "confirmed",
+                        TableReservationStatus.Seated => "seated",
+                        TableReservationStatus.Completed => "completed",
+                        TableReservationStatus.Cancelled => "cancelled",
+                        TableReservationStatus.NoShow => "noshow",
+                        _ => "pending"
+                    };
+
+                    <div class="tr-reservation-card">
+                        <div class="tr-card-top">
+                            <div>
+                                <div class="tr-code">@reservation.ReservationCode</div>
+                                <div class="tr-table-muted">@reservation.TableName - Table @reservation.TableNumber</div>
+                            </div>
+                            <span class="tr-status @statusClass">@reservation.Status</span>
+                        </div>
+
+                        <div class="tr-table-meta">
+                            @if (!string.IsNullOrWhiteSpace(reservation.Area))
+                            {
+                                <span><i class="fa fa-map-marker"></i> @reservation.Area</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(reservation.TableType))
+                            {
+                                <span><i class="fa fa-tag"></i> @reservation.TableType</span>
+                            }
+                            <span><i class="fa fa-calendar"></i> @reservation.ReservationDate.ToString("MMM dd, yyyy")</span>
+                            <span><i class="fa fa-clock-o"></i> @reservation.ReservationTime.ToString(@"hh\:mm")</span>
+                            <span><i class="fa fa-users"></i> @reservation.PartySize guests</span>
+                        </div>
+
+                        <div class="tr-card-bottom">
+                            <a asp-action="Details" asp-route-id="@reservation.ReservationId" class="tr-btn tr-btn-outline tr-btn-sm">
+                                View Details <i class="fa fa-arrow-right"></i>
+                            </a>
+                            @if (reservation.CanCancel)
+                            {
+                                <form asp-action="Cancel" asp-route-id="@reservation.ReservationId" method="post" class="tr-inline-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="reason" value="Cancelled by customer." />
+                                    <button type="submit" class="tr-btn tr-btn-danger tr-btn-sm" onclick="return confirm('Cancel this reservation?');">
+                                        <i class="fa fa-times"></i> Cancel
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/table-reservations.css" />
+}
