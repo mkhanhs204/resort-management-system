@@ -9,7 +9,7 @@ using PhucNguyenResort.Helpers;
 using Microsoft.AspNetCore.Authorization;
 namespace PhucNguyenResort.Controllers
 {
-    [Authorize(Roles = "System Admin,Business Manager")]
+    [Authorize(Roles = "System Admin")]
     public class StaffAccountsController : Controller
     {
         private readonly IUserService _userService;
@@ -24,13 +24,13 @@ namespace PhucNguyenResort.Controllers
         // GET: StaffAccounts
         public async Task<IActionResult> Index()
         {
-            var staff = await _userService.GetAllStaffAsync();
-            return View(staff);
+            var users = await _userService.GetAllUsersAsync();
+            return View(users);
         }
 
         private async Task PopulateRolesDropDownList(object? selectedRole = null)
         {
-            var rolesQuery = _context.Roles.Where(r => r.RoleId != 3).OrderBy(r => r.RoleName);
+            var rolesQuery = _context.Roles.OrderBy(r => r.RoleName);
             ViewBag.RoleId = new SelectList(await rolesQuery.AsNoTracking().ToListAsync(), "RoleId", "RoleName", selectedRole);
         }
 
@@ -83,7 +83,7 @@ namespace PhucNguyenResort.Controllers
                 return NotFound();
             }
 
-            var user = await _userService.GetStaffByIdAsync(id.Value);
+            var user = await _userService.GetUserByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -122,7 +122,7 @@ namespace PhucNguyenResort.Controllers
                     return View(model);
                 }
 
-                var userToUpdate = await _userService.GetStaffByIdAsync(id);
+                var userToUpdate = await _userService.GetUserByIdAsync(id);
                 if (userToUpdate == null)
                 {
                     return NotFound();
@@ -150,13 +150,28 @@ namespace PhucNguyenResort.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
         {
-            var user = await _userService.GetStaffByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            await _userService.ToggleStaffStatusAsync(id);
+            await _userService.ToggleUserStatusAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: StaffAccounts/ToggleBlockStatus/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleBlockStatus(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            await _userService.ToggleUserBlockStatusAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

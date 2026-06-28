@@ -49,9 +49,9 @@ public class TourBookingCleanupJob : BackgroundService
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ResortDbContext>();
 
-        var expirationTime = DateTime.Now.AddMinutes(-15);
+        var expirationTime = DateTime.Now.AddMinutes(-1);
 
-        // Tìm các booking đang chờ thanh toán (Pending) và đã tạo quá 15 phút
+        // Tìm các booking đang chờ thanh toán (Pending) và đã tạo quá 1 phút
         var expiredBookings = await context.TourBookings
             .Include(tb => tb.Schedule)
             .Where(tb => tb.BookingStatus == TourBookingStatus.Pending && tb.CreatedAt < expirationTime)
@@ -72,7 +72,7 @@ public class TourBookingCleanupJob : BackgroundService
                     booking.Schedule.AvailableSlots += booking.Participants ?? 0;
                 }
                 
-                _logger.LogInformation($"Auto-cancelled TourBookingId: {booking.TourBookingId} because it was pending for > 15 minutes.");
+                _logger.LogInformation($"Auto-cancelled TourBookingId: {booking.TourBookingId} because it was pending for > 1 minutes.");
             }
 
             await context.SaveChangesAsync();

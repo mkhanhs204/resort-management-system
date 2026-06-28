@@ -136,7 +136,7 @@ namespace PhucNguyenResort.Tests.Services
 
                 // Assert
                 Assert.False(result.Success);
-                Assert.Equal("Đơn đặt phòng này không ở trạng thái có thể Check-in hoặc giao phòng.", result.ErrorMessage);
+                Assert.Equal("Đơn đặt phòng này không ở trạng thái có thể Check-in.", result.ErrorMessage);
 
                 var unchangedBooking = await context.Bookings.FindAsync(testBookingId);
                 Assert.NotNull(unchangedBooking);

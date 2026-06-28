@@ -13,6 +13,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(x => x.UserId);
         builder.HasIndex(x => x.Email).IsUnique();
         builder.Property(x => x.IsActive).HasDefaultValue(true);
+        builder.Property(x => x.IsBlocked).HasDefaultValue(false);
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
         builder.HasOne(x => x.Role).WithMany(x => x.Users).HasForeignKey(x => x.RoleId).OnDelete(DeleteBehavior.Restrict);
     }

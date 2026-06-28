@@ -7,7 +7,7 @@ using PhucNguyenResort.ViewModels.Bookings;
 
 namespace PhucNguyenResort.Controllers
 {
-    [Authorize(Roles = "Receptionist, Admin")]
+    [Authorize(Roles = "Receptionist, Admin, Business Manager")]
     public class ReceptionController : Controller
     {
         private readonly IReceptionService _receptionService;
@@ -47,6 +47,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: /Reception/CheckIn/{id}
+        [Authorize(Roles = "Receptionist, Admin")]
         public async Task<IActionResult> CheckIn(int id)
         {
             var model = await _receptionService.PrepareCheckInViewModelAsync(id);
@@ -68,6 +69,7 @@ namespace PhucNguyenResort.Controllers
         // POST: /Reception/CheckIn/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Receptionist, Admin")]
         public async Task<IActionResult> CheckIn(PreCheckinViewModel model)
         {
             // Validations for guests
@@ -226,6 +228,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: /Reception/ExportManifest/{id}
+        [Authorize(Roles = "Receptionist, Admin")]
         public async Task<IActionResult> ExportManifest(int id)
         {
             var model = await _receptionService.PrepareCheckInViewModelAsync(id);
@@ -237,6 +240,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: /Reception/WalkInBooking
+        [Authorize(Roles = "Receptionist, Admin")]
         public async Task<IActionResult> WalkInBooking()
         {
             var model = new WalkInBookingViewModel
@@ -253,6 +257,7 @@ namespace PhucNguyenResort.Controllers
         // POST: /Reception/WalkInBooking
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Receptionist, Admin")]
         public async Task<IActionResult> WalkInBooking(WalkInBookingViewModel model)
         {
             if (model.InstantCheckIn)
@@ -369,6 +374,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: /Reception/CheckOut/{id}
+        [Authorize(Roles = "Receptionist, Admin")]
         public async Task<IActionResult> CheckOut(int id)
         {
             var model = await _receptionService.PrepareCheckOutViewModelAsync(id);
@@ -384,6 +390,7 @@ namespace PhucNguyenResort.Controllers
         // POST: /Reception/CheckOut
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Receptionist, Admin")]
         public async Task<IActionResult> CheckOut(CheckOutViewModel model)
         {
             if (!ModelState.IsValid)

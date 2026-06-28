@@ -40,7 +40,7 @@ namespace PhucNguyenResort.Controllers
         public async Task<IActionResult> Create()
         {
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName");
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName");
+            ViewBag.Guides = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName");
             return View();
         }
 
@@ -54,7 +54,7 @@ namespace PhucNguyenResort.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName", schedule.TourId);
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", schedule.GuideId);
+            ViewBag.Guides = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", schedule.GuideId);
             return View(schedule);
         }
 
@@ -66,7 +66,7 @@ namespace PhucNguyenResort.Controllers
             if (schedule == null) return NotFound();
 
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName", schedule.TourId);
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", schedule.GuideId);
+            ViewBag.Guides = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", schedule.GuideId);
             return View(schedule);
         }
 
@@ -82,7 +82,7 @@ namespace PhucNguyenResort.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName", schedule.TourId);
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", schedule.GuideId);
+            ViewBag.Guides = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", schedule.GuideId);
             return View(schedule);
         }
 

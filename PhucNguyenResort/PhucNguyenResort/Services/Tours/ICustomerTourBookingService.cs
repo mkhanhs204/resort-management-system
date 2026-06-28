@@ -38,7 +38,7 @@ namespace PhucNguyenResort.Services.Tours
         /// <summary>
         /// Cancel a tour booking and restore available slots.
         /// </summary>
-        Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId);
+        Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId, string? reason = null);
 
         /// <summary>
         /// Confirm a pending tour booking after VNPay payment success.

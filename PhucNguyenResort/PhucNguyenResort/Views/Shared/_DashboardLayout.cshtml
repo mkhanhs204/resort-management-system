@@ -63,8 +63,8 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
                             <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
                         </li>
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reviews" ? "active" : "")">
-                            <a href="#"><i class="fa fa-star"></i> Customer Reviews</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Review" ? "active" : "")">
+                            <a asp-controller="Review" asp-action="Manage"><i class="fa fa-star"></i> Customer Reviews</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Refunds" ? "active" : "")">
                             <a asp-controller="Refunds" asp-action="Index"><i class="fa fa-money"></i> Refunds</a>

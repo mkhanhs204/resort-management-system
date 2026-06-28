@@ -338,7 +338,13 @@
                                 @if (item.BookingStatus == "Pending")
                                 {
                                     <div style="font-size: 12px; color: #e74c3c; margin-top: 6px; font-style: italic;">
-                                        <i class="fa fa-info-circle"></i> Tự động hủy lúc @item.CreatedAt.AddMinutes(15).ToString("HH:mm")
+                                        <i class="fa fa-info-circle"></i> Tự động hủy lúc @item.CreatedAt.AddMinutes(1).ToString("HH:mm")
+                                    </div>
+                                }
+                                @if (item.BookingStatus == "Cancelled" && !string.IsNullOrEmpty(item.CancellationReason))
+                                {
+                                    <div style="font-size: 13px; color: #666; margin-top: 6px; font-style: italic;">
+                                        Lý do: @item.CancellationReason
                                     </div>
                                 }
                             </div>
@@ -362,13 +368,24 @@
                             }
                             @if (item.CanCancel)
                             {
-                                <form asp-action="CancelTourBooking" asp-route-id="@item.TourBookingId" method="post"
-                                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt tour này không?');" style="display:inline-block;">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn-cancel">
-                                        <i class="fa fa-times"></i> Hủy Tour
+                                <button type="button" class="btn-cancel btn-cancel-tour" data-id="@item.TourBookingId">
+                                    <i class="fa fa-times"></i> Hủy Tour
+                                </button>
+                            }
+                            @if (item.BookingStatus == "Completed")
+                            {
+                                if (item.HasReviewed)
+                                {
+                                    <button type="button" class="btn-pay" style="background-color: #9ca3af; border-color: #9ca3af; margin-top: 5px; cursor: not-allowed;" disabled>
+                                        <i class="fa fa-star"></i> Đã Đánh Giá
                                     </button>
-                                </form>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Review" asp-action="Submit" asp-route-tourId="@item.TourId" class="btn-pay" style="background-color: #f59e0b; border-color: #f59e0b; margin-top: 5px;">
+                                        <i class="fa fa-star"></i> Đánh Giá Tour
+                                    </a>
+                                }
                             }
                         </div>
                     </div>
@@ -388,3 +405,48 @@
         }
     </div>
 </div>
+
+<!-- Cancel Tour Modal -->
+<div class="modal fade" id="cancelTourModal" tabindex="-1" role="dialog" aria-labelledby="cancelTourModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden;">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelTourModalLabel"><i class="fa fa-exclamation-triangle"></i> Hủy Đặt Tour</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="CancelTourBooking" method="post">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="cancelTourId" name="id" value="" />
+                    
+                    <div class="alert alert-warning mb-3" style="border-radius: 8px;">
+                        <strong>Lưu ý:</strong> Vui lòng xem kỹ quy định hủy tour. Việc hủy có thể không được hoàn tiền tùy thuộc vào thời điểm hủy.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cancelTourReason" class="font-weight-bold">Lý do hủy (Không bắt buộc)</label>
+                        <textarea class="form-control" id="cancelTourReason" name="reason" rows="2" placeholder="Ví dụ: Thay đổi lịch trình cá nhân..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius: 8px;">Đóng</button>
+                    <button type="submit" class="btn btn-danger" style="border-radius: 8px;">Xác Nhận Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.btn-cancel-tour').click(function() {
+                var tourId = $(this).data('id');
+                $('#cancelTourId').val(tourId);
+                $('#cancelTourReason').val('');
+                $('#cancelTourModal').modal('show');
+            });
+        });
+    </script>
+}

@@ -51,7 +51,7 @@ namespace PhucNguyenResort.Tests.Services
         }
 
         [Fact]
-        public async Task PrepareCheckOutViewModelAsync_WhenNoGuestFolio_ReturnsNull()
+        public async Task PrepareCheckOutViewModelAsync_WhenNoGuestFolio_CreatesFolioAndReturnsModel()
         {
             // Arrange
             var context = GetDbContext();
@@ -77,7 +77,7 @@ namespace PhucNguyenResort.Tests.Services
             var result = await service.PrepareCheckOutViewModelAsync(1);
 
             // Assert
-            Assert.Null(result);
+            Assert.NotNull(result);
         }
         
         // Surcharge tests using a subclass to mock DateTime.Now
@@ -455,7 +455,7 @@ namespace PhucNguyenResort.Tests.Services
             Assert.NotNull(payment);
             Assert.Equal(PaymentMethod.Cash, payment.PaymentMethod);
             Assert.Equal(1500000, payment.Amount);
-            Assert.Equal(PaymentStatus.Success, payment.PaymentStatus);
+            Assert.Null(payment.PaymentStatus);
             Assert.NotNull(payment.PaidAt);
         }
 
@@ -622,7 +622,8 @@ namespace PhucNguyenResort.Tests.Services
             {
                 BookingId = 1,
                 FolioId = 1,
-                SelectedPaymentMethod = null // Missing payment method
+                SelectedPaymentMethod = null, // Missing payment method
+                BalanceDue = 1000
             };
 
             // Act

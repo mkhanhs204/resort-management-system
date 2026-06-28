@@ -222,6 +222,7 @@ namespace PhucNguyenResort.Services.Tours
 
                 // Validate Charge to Room (BR-TOUR-02)
                 int? linkedBookingId = null;
+                GuestFolio? guestFolio = null;
                 if (model.PaymentMethod == "ChargeToRoom")
                 {
                     if (!model.RoomBookingId.HasValue)
@@ -254,13 +255,22 @@ namespace PhucNguyenResort.Services.Tours
                     }
 
                     linkedBookingId = roomBooking.BookingId;
+                    guestFolio = roomBooking.GuestFolio;
 
                     // Add charge to GuestFolio
-                    if (roomBooking.GuestFolio != null)
+                    if (guestFolio == null)
                     {
-                        roomBooking.GuestFolio.TotalTourCharges += totalAmount;
-                        roomBooking.GuestFolio.TotalAmount += totalAmount;
+                        // Auto-create Folio if it's missing for some reason
+                        guestFolio = new GuestFolio
+                        {
+                            BookingId = roomBooking.BookingId,
+                            Status = FolioStatus.Unpaid
+                        };
+                        _context.GuestFolios.Add(guestFolio);
                     }
+                    
+                    guestFolio.TotalTourCharges += totalAmount;
+                    guestFolio.TotalAmount += totalAmount;
                 }
 
                 // Deduct available slots
@@ -287,6 +297,21 @@ namespace PhucNguyenResort.Services.Tours
 
                 _context.TourBookings.Add(tourBooking);
                 await _context.SaveChangesAsync();
+
+                if (guestFolio != null && model.PaymentMethod == "ChargeToRoom")
+                {
+                    var folioTransaction = new FolioTransaction
+                    {
+                        Folio = guestFolio, // Use navigation property so EF handles ID if it's new
+                        TransactionType = FolioTransactionType.TourCharge,
+                        ReferenceId = tourBooking.TourBookingId,
+                        Amount = totalAmount,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.FolioTransactions.Add(folioTransaction);
+                    await _context.SaveChangesAsync();
+                }
+
                 await transaction.CommitAsync();
 
                 return new TourBookingResultVM
@@ -314,6 +339,11 @@ namespace PhucNguyenResort.Services.Tours
                 .OrderByDescending(tb => tb.TourBookingId)
                 .ToListAsync();
 
+            var userReviewedTourIds = await _context.Reviews
+                .Where(r => r.UserId == userId && r.TourId != null)
+                .Select(r => r.TourId!.Value)
+                .ToListAsync();
+
             return bookings.Select(tb =>
             {
                 // Determine payment method
@@ -336,6 +366,7 @@ namespace PhucNguyenResort.Services.Tours
                 return new MyTourBookingItemVM
                 {
                     TourBookingId = tb.TourBookingId,
+                    TourId = tb.Schedule?.TourId ?? 0,
                     TourName = tb.Schedule?.Tour?.TourName ?? "N/A",
                     TourImage = tb.Schedule?.Tour?.ImageUrl,
                     Location = tb.Schedule?.Tour?.Location,
@@ -346,13 +377,15 @@ namespace PhucNguyenResort.Services.Tours
                     BookingStatus = tb.BookingStatus.ToString(),
                     CanCancel = canCancel,
                     PaymentMethod = paymentMethod,
-                    CreatedAt = tb.CreatedAt
+                    CreatedAt = tb.CreatedAt,
+                    CancellationReason = tb.CancellationReason,
+                    HasReviewed = userReviewedTourIds.Contains(tb.Schedule?.TourId ?? 0)
                 };
             }).ToList();
         }
 
         /// <inheritdoc/>
-        public async Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId)
+        public async Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId, string? reason = null)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -415,9 +448,20 @@ namespace PhucNguyenResort.Services.Tours
                     var chargeAmount = tourBooking.TotalAmount ?? 0;
                     folio.TotalTourCharges = Math.Max(0, folio.TotalTourCharges - chargeAmount);
                     folio.TotalAmount = Math.Max(0, folio.TotalAmount - chargeAmount);
+
+                    var folioTransaction = new FolioTransaction
+                    {
+                        FolioId = folio.FolioId,
+                        TransactionType = FolioTransactionType.Refund,
+                        ReferenceId = tourBooking.TourBookingId,
+                        Amount = chargeAmount,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.FolioTransactions.Add(folioTransaction);
                 }
 
                 tourBooking.BookingStatus = TourBookingStatus.Cancelled;
+                tourBooking.CancellationReason = reason;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();

@@ -1,0 +1,153 @@
+@model PhucNguyenResort.ViewModels.Reviews.SubmitReviewVM
+@{
+    ViewData["Title"] = "Đánh Giá Dịch Vụ";
+}
+
+@section Styles {
+    <style>
+        .review-section {
+            padding: 80px 0;
+            background: #fdfaf6;
+        }
+        .review-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .review-title {
+            font-family: 'Lora', serif;
+            color: #19191a;
+            font-size: 32px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 40px;
+            color: #e6e6e6;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            margin: 0 5px;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #dfa974;
+        }
+        .submit-btn {
+            background: #dfa974;
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background: #c39366;
+            transform: translateY(-2px);
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #e1e1e1;
+            padding: 15px;
+        }
+        .form-control:focus {
+            border-color: #dfa974;
+            box-shadow: 0 0 0 0.2rem rgba(223, 169, 116, 0.25);
+        }
+    </style>
+}
+
+<!-- Breadcrumb Section -->
+<div class="breadcrumb-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-text">
+                    <h2>Đánh Giá Dịch Vụ</h2>
+                    <div class="bt-option">
+                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
+                        <span>Đánh Giá</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="review-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="review-card">
+                    <h3 class="review-title">Chia sẻ trải nghiệm của bạn</h3>
+                    <p class="text-center text-muted mb-4">Cảm ơn bạn đã lựa chọn Phúc Nguyễn Resort. Đánh giá của bạn giúp chúng tôi phục vụ tốt hơn.</p>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger mb-0"></div>
+                        </div>
+                    }
+
+                    <form asp-action="Submit" method="post">
+                        <!-- Hidden Inputs -->
+                        <input type="hidden" asp-for="BookingId" />
+                        <input type="hidden" asp-for="TourId" />
+
+                        <!-- Rating Stars -->
+                        <div class="form-group text-center">
+                            <label class="font-weight-bold mb-3 d-block">Mức độ hài lòng của bạn</label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" asp-for="Rating" value="5" />
+                                <label for="star5" title="5 stars"><i class="fa fa-star"></i></label>
+                                
+                                <input type="radio" id="star4" asp-for="Rating" value="4" />
+                                <label for="star4" title="4 stars"><i class="fa fa-star"></i></label>
+                                
+                                <input type="radio" id="star3" asp-for="Rating" value="3" />
+                                <label for="star3" title="3 stars"><i class="fa fa-star"></i></label>
+                                
+                                <input type="radio" id="star2" asp-for="Rating" value="2" />
+                                <label for="star2" title="2 stars"><i class="fa fa-star"></i></label>
+                                
+                                <input type="radio" id="star1" asp-for="Rating" value="1" required />
+                                <label for="star1" title="1 star"><i class="fa fa-star"></i></label>
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+
+                        <!-- Comment Box -->
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold" asp-for="Comment">Nhận xét chi tiết (Tuỳ chọn)</label>
+                            <textarea asp-for="Comment" class="form-control" rows="5" placeholder="Chia sẻ cảm nhận của bạn về phòng ốc, tiện nghi, nhân viên..."></textarea>
+                            <span asp-validation-for="Comment" class="text-danger"></span>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <button type="submit" class="submit-btn">Gửi Đánh Giá</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

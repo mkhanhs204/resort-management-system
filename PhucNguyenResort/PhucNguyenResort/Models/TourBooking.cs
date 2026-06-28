@@ -19,6 +19,9 @@ public class TourBooking
 
     public TourBookingStatus BookingStatus { get; set; } = TourBookingStatus.Pending;
 
+    [StringLength(500)]
+    public string? CancellationReason { get; set; }
+
     [StringLength(100)]
     public string? PrimaryGuestName { get; set; }
 
