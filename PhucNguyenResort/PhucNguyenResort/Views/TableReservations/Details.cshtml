@@ -1,0 +1,154 @@
+@using PhucNguyenResort.Enums
+@model PhucNguyenResort.ViewModels.TableReservations.TableReservationDetailViewModel
+
+@{
+    ViewData["Title"] = "Reservation " + Model.ReservationCode;
+    var statusClass = Model.Status switch
+    {
+        TableReservationStatus.Pending => "pending",
+        TableReservationStatus.Confirmed => "confirmed",
+        TableReservationStatus.Seated => "seated",
+        TableReservationStatus.Completed => "completed",
+        TableReservationStatus.Cancelled => "cancelled",
+        TableReservationStatus.NoShow => "noshow",
+        _ => "pending"
+    };
+    var canCancel = (Model.Status == TableReservationStatus.Pending || Model.Status == TableReservationStatus.Confirmed)
+        && Model.ReservationDate.Date.Add(Model.ReservationTime) > DateTime.Now;
+}
+
+<div class="tr-page">
+    <div class="tr-container tr-container-narrow">
+        <div class="tr-back-nav">
+            <a asp-action="MyReservations"><i class="fa fa-arrow-left"></i> My Reservations</a>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="tr-alert tr-alert-success">
+                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="tr-alert tr-alert-danger">
+                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="tr-detail-card">
+            <div class="tr-detail-hero">
+                <div class="tr-table-image tr-detail-image">
+                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div class="tr-image-fallback" style="display:none;">
+                            <i class="fa fa-cutlery"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="tr-image-fallback">
+                            <i class="fa fa-cutlery"></i>
+                        </div>
+                    }
+                </div>
+                <div>
+            <div class="tr-detail-header">
+                <div>
+                    <span class="tr-eyebrow">Reservation</span>
+                    <h1>@Model.ReservationCode</h1>
+                    <p class="tr-detail-subtitle">@Model.TableName</p>
+                </div>
+                <span class="tr-status @statusClass">@Model.Status</span>
+            </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="tr-table-description">@Model.Description</p>
+                    }
+                    <div class="tr-table-meta tr-confirm-meta">
+                        @if (!string.IsNullOrWhiteSpace(Model.Area))
+                        {
+                            <span><i class="fa fa-map-marker"></i> @Model.Area</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.TableType))
+                        {
+                            <span><i class="fa fa-tag"></i> @Model.TableType</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.LocationNote))
+                        {
+                            <span><i class="fa fa-location-arrow"></i> @Model.LocationNote</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="tr-detail-grid">
+                <div><span>Table</span><strong>@Model.TableName</strong></div>
+                <div><span>Table Number</span><strong>@Model.TableNumber</strong></div>
+                <div><span>Capacity</span><strong>@Model.Capacity guests</strong></div>
+                <div><span>Date</span><strong>@Model.ReservationDate.ToString("MMM dd, yyyy")</strong></div>
+                <div><span>Time</span><strong>@Model.ReservationTime.ToString(@"hh\:mm")</strong></div>
+                <div><span>Party Size</span><strong>@Model.PartySize guests</strong></div>
+                <div><span>Duration</span><strong>@Model.DurationMinutes minutes</strong></div>
+                <div><span>Created</span><strong>@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")</strong></div>
+                <div><span>Confirmed</span><strong>@(Model.ConfirmedAt?.ToString("MMM dd, yyyy HH:mm") ?? "Not yet")</strong></div>
+                <div><span>Room Booking</span><strong>@(Model.BookingId.HasValue ? $"Booking #{Model.BookingId}" : "Not linked")</strong></div>
+                <div>
+                    <span>Room Bill</span>
+                    <strong>
+                        @(Model.IsChargedToRoom ? $"Charged {Model.ChargedAmount:N0} VND" : "Not charged")
+                    </strong>
+                </div>
+            </div>
+
+            @if (Model.IsChargedToRoom && Model.ChargedAt.HasValue)
+            {
+                <div class="tr-note">
+                    <span>Charge to Room</span>
+                    <p>This restaurant charge was added to your room bill at @Model.ChargedAt.Value.ToString("MMM dd, yyyy HH:mm").</p>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.SpecialRequests))
+            {
+                <div class="tr-note">
+                    <span>Special Requests</span>
+                    <p>@Model.SpecialRequests</p>
+                </div>
+            }
+
+            @if (Model.Status == TableReservationStatus.Cancelled)
+            {
+                <div class="tr-note tr-note-danger">
+                    <span>Cancellation</span>
+                    <p>@(Model.CancellationReason ?? "No cancellation reason provided.")</p>
+                    @if (Model.CancelledAt.HasValue)
+                    {
+                        <small>@Model.CancelledAt.Value.ToString("MMM dd, yyyy HH:mm")</small>
+                    }
+                </div>
+            }
+
+            <div class="tr-actions">
+                <a asp-action="Search" class="tr-btn tr-btn-outline">
+                    <i class="fa fa-plus"></i> New Reservation
+                </a>
+                @if (canCancel)
+                {
+                    <form asp-action="Cancel" asp-route-id="@Model.ReservationId" method="post" class="tr-inline-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="reason" value="Cancelled by customer." />
+                        <button type="submit" class="tr-btn tr-btn-danger" onclick="return confirm('Cancel this reservation?');">
+                            <i class="fa fa-times"></i> Cancel Reservation
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/table-reservations.css" />
+}

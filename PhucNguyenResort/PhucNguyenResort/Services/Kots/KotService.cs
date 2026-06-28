@@ -21,6 +21,9 @@ public class KotService : IKotService
                 .ThenInclude(fo => fo!.BookingDetail)
                     .ThenInclude(bd => bd!.Room)
             .Include(k => k.FoodOrder)
+                .ThenInclude(fo => fo!.TableReservation)
+                    .ThenInclude(tr => tr!.Table)
+            .Include(k => k.FoodOrder)
                 .ThenInclude(fo => fo.FoodOrderItems)
                     .ThenInclude(i => i.MenuItem)
             .AsQueryable();
@@ -41,11 +44,14 @@ public class KotService : IKotService
         {
             KotId = k.KotId,
             FoodOrderId = k.FoodOrderId,
+            OrderType = k.FoodOrder?.OrderType ?? FoodOrderType.RoomService,
             Status = k.Status,
             CreatedAt = k.CreatedAt,
             RequestedDeliveryAt = k.FoodOrder?.RequestedDeliveryAt,
             CustomerNote = k.FoodOrder?.CustomerNote,
             RoomNumber = k.FoodOrder?.BookingDetail?.Room?.RoomNumber,
+            TableName = k.FoodOrder?.TableReservation?.Table?.TableName,
+            TableNumber = k.FoodOrder?.TableReservation?.Table?.TableNumber,
             Items = k.FoodOrder?.FoodOrderItems?.Select(i => new PhucNguyenResort.ViewModels.Kots.KotItemViewModel
             {
                 MenuItemName = i.MenuItem?.ItemName ?? "Unknown Item",

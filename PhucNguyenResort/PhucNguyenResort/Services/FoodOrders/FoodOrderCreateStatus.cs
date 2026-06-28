@@ -15,5 +15,7 @@ public enum FoodOrderCreateStatus
     BookingRoomNotFound,
     BookingRoomNotAssigned,
     InvalidDeliveryTime,
-    InvalidNote
+    InvalidNote,
+    ReservationNotFound,
+    ReservationNotSeated
 }
