@@ -340,6 +340,12 @@ namespace PhucNguyenResort.Controllers
                 return View(model);
             }
 
+            if (user.IsBlocked)
+            {
+                ModelState.AddModelError(string.Empty, "Tài khoản của bạn đã bị khóa bởi quản trị viên.");
+                return View(model);
+            }
+
             var isValidPassword = PasswordHelper.VerifyPassword(user, user.PasswordHash, model.Password);
             if (!isValidPassword)
             {
@@ -455,6 +461,12 @@ namespace PhucNguyenResort.Controllers
             {
                 user.IsActive = true;
                 await _context.SaveChangesAsync();
+            }
+
+            if (user.IsBlocked)
+            {
+                TempData["ErrorMessage"] = "Tài khoản của bạn đã bị khóa bởi quản trị viên.";
+                return RedirectToAction(nameof(Login));
             }
 
             await HttpContext.SignOutAsync("ExternalCookie");

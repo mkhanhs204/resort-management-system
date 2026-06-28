@@ -16,15 +16,27 @@ namespace PhucNguyenResort.Controllers
             _refundService = refundService;
         }
 
-        public async Task<IActionResult> Index(RefundStatus? status)
+        public async Task<IActionResult> Index(RefundStatus? status, int page = 1)
         {
+            int pageSize = 10;
             if (status.HasValue)
             {
                 ViewBag.CurrentStatus = status.Value;
             }
             
             var refunds = await _refundService.GetRefundsAsync(status);
-            return View(refunds);
+            
+            var totalItems = refunds.Count();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            page = page < 1 ? 1 : page;
+            page = page > totalPages && totalPages > 0 ? totalPages : page;
+
+            var pagedRefunds = refunds.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(pagedRefunds);
         }
 
         [HttpPost]

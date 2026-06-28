@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "PhucNguyenResort.Auth";
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<ResortDbContext>();
+                var userIdString = context.Principal?.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (int.TryParse(userIdString, out int userId))
+                {
+                    var isBlocked = await dbContext.Users
+                        .Where(u => u.UserId == userId)
+                        .Select(u => u.IsBlocked)
+                        .FirstOrDefaultAsync();
+
+                    if (isBlocked)
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    }
+                }
+            }
+        };
     })
     .AddCookie("ExternalCookie")
     .AddGoogle(googleOptions =>

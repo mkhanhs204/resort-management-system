@@ -213,6 +213,10 @@
                                 {
                                     <a asp-action="PreCheckin" asp-route-id="@booking.BookingId" class="btn-action-premium btn-action-primary"><i class="fa fa-id-card-o"></i> Xem Khai Báo</a>
                                 }
+                                else if (booking.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedOut)
+                                {
+                                    <a asp-controller="Bookings" asp-action="ViewInvoice" asp-route-id="@booking.BookingId" target="_blank" class="btn-action-premium btn-action-primary"><i class="fa fa-file-text-o"></i> Xem Hóa Đơn</a>
+                                }
                                 else
                                 {
                                     <span class="text-center text-muted small py-2" style="border: 1px dashed var(--border-color); border-radius: 8px; font-weight: 500;">

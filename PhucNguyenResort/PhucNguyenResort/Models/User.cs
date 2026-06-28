@@ -22,6 +22,7 @@ public class User
 
     public int RoleId { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsBlocked { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public Role? Role { get; set; }

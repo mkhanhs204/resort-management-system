@@ -239,6 +239,41 @@ namespace PhucNguyenResort.Controllers
             return View(bookings);
         }
 
+        // GET: /Bookings/ViewInvoice/{id}
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> ViewInvoice(int id)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null || booking.UserId != userId)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            if (booking.BookingStatus != BookingStatus.CheckedOut)
+            {
+                TempData["Error"] = "Hóa đơn chỉ có sẵn sau khi trả phòng.";
+                return RedirectToAction(nameof(MyBookings));
+            }
+
+            var receptionService = HttpContext.RequestServices.GetService(typeof(PhucNguyenResort.Services.Reception.IReceptionService)) as PhucNguyenResort.Services.Reception.IReceptionService;
+            if (receptionService != null)
+            {
+                var model = await receptionService.PrepareInvoiceViewModelAsync(id);
+                if (model != null)
+                {
+                    return View("~/Views/Reception/PrintInvoice.cshtml", model);
+                }
+            }
+
+            return NotFound("Không thể tải hóa đơn.");
+        }
+
         // POST: /Bookings/Cancel/5
         [HttpPost]
         [Authorize(Roles = "Customer, Receptionist, Admin")]
