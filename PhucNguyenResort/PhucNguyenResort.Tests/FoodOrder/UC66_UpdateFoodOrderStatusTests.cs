@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Models;
+using PhucNguyenResort.Services.Email;
 using PhucNguyenResort.Services.FoodOrders;
 using System;
 using System.Threading.Tasks;
@@ -31,7 +33,7 @@ namespace PhucNguyenResort.Tests.FoodOrder
                 .Options;
 
             _dbContext = new ResortDbContext(options);
-            _foodOrderService = new FoodOrderService(_dbContext);
+            _foodOrderService = new FoodOrderService(_dbContext, new Mock<IEmailSender>().Object);
 
             SeedDataAsync().Wait();
         }
