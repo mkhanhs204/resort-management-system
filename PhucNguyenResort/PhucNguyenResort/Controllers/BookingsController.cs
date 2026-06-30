@@ -214,6 +214,35 @@ namespace PhucNguyenResort.Controllers
             return View(model);
         }
 
+        // GET: /Bookings/Details/5
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.RoomCategory)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.Room)
+                .Include(b => b.BookingGuests)
+                .Include(b => b.TourBookings)
+                    .ThenInclude(tb => tb.Schedule)
+                        .ThenInclude(ts => ts.Tour)
+                .FirstOrDefaultAsync(b => b.BookingId == id && b.UserId == userId);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            return View(booking);
+        }
+
         // GET: /Bookings/MyBookings
         [Authorize(Roles = "Customer")]
         public async Task<IActionResult> MyBookings()
