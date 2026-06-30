@@ -330,6 +330,66 @@
                     </div>
                 }
             </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center" style="gap: 5px;">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage - 1 })" aria-label="Previous" style="color: #dfa974; border-radius: 5px;">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+
+                        @{
+                            int startPage = Math.Max(1, Model.CurrentPage - 2);
+                            int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+                            if (startPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = 1 })" style="color: #dfa974; border-radius: 5px;">1</a>
+                                </li>
+                                if (startPage > 2)
+                                {
+                                    <li class="page-item disabled"><span class="page-link" style="border:none; background:transparent;">...</span></li>
+                                }
+                            }
+
+                            for (int i = startPage; i <= endPage; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = i })" style="@(i == Model.CurrentPage ? "background-color: #dfa974; border-color: #dfa974; color: white; border-radius: 5px;" : "color: #dfa974; border-radius: 5px;")">@i</a>
+                                </li>
+                            }
+
+                            if (endPage < Model.TotalPages)
+                            {
+                                if (endPage < Model.TotalPages - 1)
+                                {
+                                    <li class="page-item disabled"><span class="page-link" style="border:none; background:transparent;">...</span></li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.TotalPages })" style="color: #dfa974; border-radius: 5px;">@Model.TotalPages</a>
+                                </li>
+                            }
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage + 1 })" aria-label="Next" style="color: #dfa974; border-radius: 5px;">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
         }
         else
         {

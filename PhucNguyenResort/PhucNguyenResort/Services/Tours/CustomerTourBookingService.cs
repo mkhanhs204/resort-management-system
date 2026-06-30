@@ -24,7 +24,7 @@ namespace PhucNguyenResort.Services.Tours
         }
 
         /// <inheritdoc/>
-        public async Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy)
+        public async Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy, int page = 1, int pageSize = 9)
         {
             var query = _context.Tours
                 .Include(t => t.TourSchedules)
@@ -71,12 +71,17 @@ namespace PhucNguyenResort.Services.Tours
                 _ => tourCards.OrderBy(t => t.TourName).ToList()
             };
 
+            int totalCount = tourCards.Count;
+            var pagedTours = tourCards.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
             return new TourListVM
             {
-                Tours = tourCards,
+                Tours = pagedTours,
                 SearchKeyword = searchKeyword,
                 SortBy = sortBy,
-                TotalCount = tourCards.Count
+                TotalCount = totalCount,
+                CurrentPage = page,
+                PageSize = pageSize
             };
         }
 

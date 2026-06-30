@@ -38,9 +38,9 @@ namespace PhucNguyenResort.Controllers
         /// GET: /CustomerTourBooking — Browse all available tours.
         /// Accessible by Guest + Customer.
         /// </summary>
-        public async Task<IActionResult> Index(string? search, string? sortBy)
+        public async Task<IActionResult> Index(string? search, string? sortBy, int page = 1)
         {
-            var model = await _tourBookingService.GetTourListAsync(search, sortBy);
+            var model = await _tourBookingService.GetTourListAsync(search, sortBy, page, 9);
             return View(model);
         }
 
