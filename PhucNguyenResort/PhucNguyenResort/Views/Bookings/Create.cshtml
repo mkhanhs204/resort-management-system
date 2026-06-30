@@ -1,501 +1,298 @@
 @model PhucNguyenResort.ViewModels.Bookings.CreateBookingViewModel
 
 @{
-    ViewData["Title"] = "Đặt Phòng - Phuc Nguyen Resort";
+    ViewData["Title"] = "Hoàn Tất Đặt Phòng - Phuc Nguyen Resort";
     var selectedCategories = ViewBag.SelectedCategories as List<PhucNguyenResort.Models.RoomCategory>;
-    var tours = ViewBag.UpcomingTours as List<PhucNguyenResort.Models.TourSchedule>;
+    
+    // For calculation display
+    decimal totalPrice = 0;
+    string mainImage = "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+    string categoryName = "";
+    int totalNights = (Model.CheckOutDate - Model.CheckInDate).Days;
+    if (totalNights <= 0) totalNights = 1;
 
-    int maxTotalAdults = 0;
-    int maxTotalChildren = 0;
-    if (selectedCategories != null && Model.RoomSelections != null)
+    if (selectedCategories != null && Model.RoomSelections != null && Model.RoomSelections.Count > 0)
     {
-        foreach (var selection in Model.RoomSelections)
+        var firstSelection = Model.RoomSelections.First();
+        var category = selectedCategories.FirstOrDefault(c => c.CategoryId == firstSelection.CategoryId);
+        if (category != null)
         {
-            var category = selectedCategories.FirstOrDefault(c => c.CategoryId == selection.CategoryId);
-            if (category != null)
+            if (!string.IsNullOrEmpty(category.ImageUrl)) mainImage = category.ImageUrl;
+            categoryName = category.CategoryName;
+            
+            foreach (var sel in Model.RoomSelections)
             {
-                maxTotalAdults += (category.MaxAdults ?? 2) * selection.Quantity;
-                maxTotalChildren += (category.MaxChildren ?? 1) * selection.Quantity;
+                var cat = selectedCategories.FirstOrDefault(c => c.CategoryId == sel.CategoryId);
+                if (cat != null)
+                {
+                    totalPrice += (cat.PricePerNight ?? 0) * sel.Quantity * totalNights;
+                }
             }
         }
     }
-    // Fallback if something goes wrong
-    if (maxTotalAdults == 0) maxTotalAdults = 50;
-    if (maxTotalChildren == 0) maxTotalChildren = 50;
+    
+    decimal tax = totalPrice * 0.1m;
+    decimal grandTotal = totalPrice + tax;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/booking-create.css" />
-}
+<div class="pt-28 pb-section-gap-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+    <!-- Progress Bar -->
+    <div class="max-w-3xl mx-auto mb-12 hidden md:block">
+        <div class="relative flex justify-between items-center w-full">
+            <div class="absolute top-1/2 left-0 w-full h-[2px] bg-surface-variant -z-10 -translate-y-1/2"></div>
+            <div class="absolute top-1/2 left-0 w-[66%] h-[2px] bg-primary -z-10 -translate-y-1/2 transition-all duration-700"></div>
+            <div class="flex flex-col items-center gap-2 bg-background px-4">
+                <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-sm">1</div>
+                <span class="text-label-sm text-primary">Chọn Phòng</span>
+            </div>
+            <div class="flex flex-col items-center gap-2 bg-background px-4">
+                <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-sm">2</div>
+                <span class="text-label-sm text-primary">Thông Tin</span>
+            </div>
+            <div class="flex flex-col items-center gap-2 bg-background px-4">
+                <div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center text-label-sm border border-outline-variant">3</div>
+                <span class="text-label-sm text-on-surface-variant">Thanh Toán</span>
+            </div>
+        </div>
+    </div>
+    
+    <form asp-action="Create" method="post" id="bookingForm">
+        <div asp-validation-summary="ModelOnly" class="bg-error-container text-on-error-container p-4 rounded-lg mb-6 text-label-sm"></div>
+        
+        @for (int i = 0; i < Model.RoomSelections.Count; i++)
+        {
+            <input type="hidden" name="RoomSelections[@i].CategoryId" value="@Model.RoomSelections[i].CategoryId" />
+            <input type="hidden" name="RoomSelections[@i].Quantity" value="@Model.RoomSelections[i].Quantity" />
+        }
+        <input type="hidden" asp-for="CheckInDate" />
+        <input type="hidden" asp-for="CheckOutDate" />
 
-<!-- Breadcrumb Section Begin -->
-<div class="breadcrumb-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="breadcrumb-text">
-                    <h2>Hoàn Tất Đặt Phòng</h2>
-                    <div class="bt-option">
-                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
-                        <span>Đặt Phòng</span>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+            <!-- Left Column: Forms & Summary -->
+            <div class="lg:col-span-8 space-y-stack-lg">
+                <!-- Room Summary Card -->
+                <div class="bg-surface-container-lowest border border-outline-variant/15 rounded-xl overflow-hidden luxury-shadow">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="md:w-1/3">
+                            <img class="h-full w-full object-cover min-h-[200px]" src="@mainImage" alt="Room Image" />
+                        </div>
+                        <div class="p-stack-md md:p-stack-lg flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-label-sm text-primary uppercase tracking-widest mb-2 block">@categoryName</span>
+                                    <h2 class="font-headline-sm text-headline-sm text-on-surface mb-2">Thông tin phòng đã chọn</h2>
+                                </div>
+                                <div class="flex items-center text-primary">
+                                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    <span class="font-label-lg ml-1">4.9</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-4 mt-4">
+                                <div class="flex items-center gap-2 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                                    <span class="text-label-sm">@Model.CheckInDate.ToString("dd/MM") - @Model.CheckOutDate.ToString("dd/MM, yyyy")</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-[18px]">person</span>
+                                    <span class="text-label-sm">@Model.NumberOfAdults Người Lớn, @Model.NumberOfChildren Trẻ Em</span>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full text-label-sm">Bữa sáng miễn phí</span>
+                                <span class="px-3 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full text-label-sm">Đón sân bay</span>
+                                <span class="px-3 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full text-label-sm">Wifi tốc độ cao</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guest Info Form (Updated with ViewModel requirements) -->
+                <div class="bg-surface-container-lowest border border-outline-variant/15 rounded-xl p-stack-lg luxury-shadow">
+                    <h3 class="font-headline-sm text-headline-sm mb-6 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">person_outline</span>
+                        Thông Tin Khách Hàng (Khai báo lưu trú)
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+                        <div class="space-y-1">
+                            <label class="text-label-sm text-on-surface-variant">Họ và Tên (như CCCD) <span class="text-error">*</span></label>
+                            <input type="text" asp-for="PrimaryGuestName" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container" placeholder="Ví dụ: NGUYEN VAN A" />
+                            <span asp-validation-for="PrimaryGuestName" class="text-error text-[12px]"></span>
+                        </div>
+                        
+                        <div class="space-y-1">
+                            <label class="text-label-sm text-on-surface-variant">Số CCCD/Hộ chiếu <span class="text-error">*</span></label>
+                            <input type="text" asp-for="PrimaryGuestPassportNumber" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container" placeholder="Số định danh cá nhân" />
+                            <span asp-validation-for="PrimaryGuestPassportNumber" class="text-error text-[12px]"></span>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-label-sm text-on-surface-variant">Ngày sinh <span class="text-error">*</span></label>
+                            <input type="date" asp-for="PrimaryGuestDateOfBirth" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container" />
+                            <span asp-validation-for="PrimaryGuestDateOfBirth" class="text-error text-[12px]"></span>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-label-sm text-on-surface-variant">Giới tính <span class="text-error">*</span></label>
+                            <select asp-for="PrimaryGuestGender" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container">
+                                <option value="">-- Chọn giới tính --</option>
+                                <option value="Male">Nam</option>
+                                <option value="Female">Nữ</option>
+                                <option value="Other">Khác</option>
+                            </select>
+                            <span asp-validation-for="PrimaryGuestGender" class="text-error text-[12px]"></span>
+                        </div>
+                        
+                        <div class="space-y-1">
+                            <label class="text-label-sm text-on-surface-variant">Quốc tịch <span class="text-error">*</span></label>
+                            <input type="text" asp-for="PrimaryGuestNationality" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container" value="Vietnam" />
+                            <span asp-validation-for="PrimaryGuestNationality" class="text-error text-[12px]"></span>
+                        </div>
+
+                        <!-- Email/Phone mapping to dummy for visual match -->
+                        <div class="space-y-1">
+                            <label class="text-label-sm text-on-surface-variant">Email (Tài khoản hiện tại)</label>
+                            <input type="email" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container opacity-70" value="@User.Identity.Name" readonly />
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 md:col-span-2">
+                            <div class="space-y-1">
+                                <label class="text-label-sm text-on-surface-variant">Người Lớn</label>
+                                <div class="flex items-center border border-outline-variant/20 rounded-lg bg-surface-container-low h-[48px]">
+                                    <button class="px-3 text-primary" type="button" onclick="changeVal('NumberOfAdults', -1)"><span class="material-symbols-outlined">remove</span></button>
+                                    <input asp-for="NumberOfAdults" id="NumberOfAdults" class="w-full border-none bg-transparent text-center focus:ring-0" readonly type="text" />
+                                    <button class="px-3 text-primary" type="button" onclick="changeVal('NumberOfAdults', 1)"><span class="material-symbols-outlined">add</span></button>
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-label-sm text-on-surface-variant">Trẻ Em</label>
+                                <div class="flex items-center border border-outline-variant/20 rounded-lg bg-surface-container-low h-[48px]">
+                                    <button class="px-3 text-primary" type="button" onclick="changeVal('NumberOfChildren', -1)"><span class="material-symbols-outlined">remove</span></button>
+                                    <input asp-for="NumberOfChildren" id="NumberOfChildren" class="w-full border-none bg-transparent text-center focus:ring-0" readonly type="text" />
+                                    <button class="px-3 text-primary" type="button" onclick="changeVal('NumberOfChildren', 1)"><span class="material-symbols-outlined">add</span></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 mt-2">
+                            <label class="flex items-start gap-3 cursor-pointer p-4 border border-outline-variant/20 rounded-lg bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+                                <input type="checkbox" asp-for="PdpdConsentChecked" class="mt-1 text-primary focus:ring-primary border-outline-variant rounded" required />
+                                <span class="text-label-sm text-on-surface-variant leading-relaxed">
+                                    Tôi đồng ý cho phép Phúc Nguyên Resort thu thập và lưu trữ thông tin cá nhân nhạy cảm (số CCCD/Hộ chiếu và Ngày sinh) để khai báo tạm trú theo Nghị định 356/2025/NĐ-CP (PDPD).
+                                </span>
+                            </label>
+                            <span asp-validation-for="PdpdConsentChecked" class="text-error text-[12px] block mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="bg-surface-container-lowest border border-outline-variant/15 rounded-xl p-stack-lg luxury-shadow">
+                    <h3 class="font-headline-sm text-headline-sm mb-6 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+                        Phương Thức Thanh Toán
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+                        <label class="relative flex items-center p-4 border border-primary bg-primary-container/10 rounded-xl cursor-pointer group">
+                            <input checked class="text-primary focus:ring-primary border-outline-variant" name="payment" type="radio" />
+                            <div class="ml-4">
+                                <span class="font-label-lg block text-on-surface">Thanh toán qua VNPay</span>
+                                <span class="text-label-sm text-on-surface-variant">Hỗ trợ thẻ ATM, QR Code, Thẻ tín dụng</span>
+                            </div>
+                            <span class="material-symbols-outlined ml-auto text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                        </label>
+                        <label class="relative flex items-center p-4 border border-outline-variant/20 rounded-xl cursor-pointer hover:border-primary/50 transition-colors">
+                            <input class="text-primary focus:ring-primary border-outline-variant" name="payment" type="radio" disabled />
+                            <div class="ml-4 opacity-50">
+                                <span class="font-label-lg block text-on-surface">Thanh toán tại quầy</span>
+                                <span class="text-label-sm text-on-surface-variant">Chỉ dành cho khách vãng lai</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="flex flex-wrap justify-center gap-stack-lg pt-4 pb-8 lg:pb-0">
+                    <div class="flex items-center gap-2 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default">
+                        <span class="material-symbols-outlined text-primary">security</span>
+                        <span class="text-label-sm font-semibold uppercase tracking-widest">SSL Secured</span>
+                    </div>
+                    <div class="flex items-center gap-2 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default">
+                        <span class="material-symbols-outlined text-primary">verified_user</span>
+                        <span class="text-label-sm font-semibold uppercase tracking-widest">Verified Payment</span>
+                    </div>
+                    <div class="flex items-center gap-2 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default">
+                        <span class="material-symbols-outlined text-primary">lock</span>
+                        <span class="text-label-sm font-semibold uppercase tracking-widest">Privacy Protected</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary (Sticky) -->
+            <div class="lg:col-span-4 lg:sticky lg:top-28 space-y-gutter">
+                <div class="bg-surface-container-lowest border border-outline-variant/15 rounded-xl p-stack-lg luxury-shadow">
+                    <h3 class="font-headline-sm text-headline-sm mb-6 pb-4 border-b border-outline-variant/10">Chi Tiết Đặt Phòng</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-body-md">
+                            <span class="text-on-surface-variant">@categoryName (@totalNights đêm)</span>
+                            <span class="font-semibold">@totalPrice.ToString("N0")đ</span>
+                        </div>
+                        <div class="flex justify-between items-center text-body-md">
+                            <span class="text-on-surface-variant">Dịch vụ đưa đón</span>
+                            <span class="text-primary font-medium">Miễn phí</span>
+                        </div>
+                        <div class="flex justify-between items-center text-body-md">
+                            <span class="text-on-surface-variant">Thuế & Phí dịch vụ (10%)</span>
+                            <span class="font-semibold">@tax.ToString("N0")đ</span>
+                        </div>
+                        <div class="pt-4 border-t border-outline-variant/10 mt-4">
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-label-lg uppercase tracking-wider text-on-surface-variant">Tổng Thanh Toán</span>
+                                <span class="text-primary font-bold text-[28px] leading-none">@grandTotal.ToString("N0")đ</span>
+                            </div>
+                            <span class="text-label-sm text-on-surface-variant text-right block italic">*Đã bao gồm tất cả các loại phí</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary-container text-on-primary-container py-4 rounded-xl font-label-lg text-[16px] font-bold mt-8 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary-container/20">
+                        HOÀN TẤT ĐẶT PHÒNG
+                    </button>
+                    
+                    <p class="text-center text-label-sm text-on-surface-variant mt-4 px-4">
+                        Bằng cách nhấn hoàn tất, bạn đồng ý với <a class="text-primary underline" href="#">Điều khoản & Chính sách</a> của chúng tôi.
+                    </p>
+                </div>
+                
+                <!-- Mini Contact Support -->
+                <div class="bg-surface-container p-6 rounded-xl border border-outline-variant/10 hidden md:block">
+                    <h4 class="font-label-lg text-on-surface mb-3 uppercase tracking-widest">Cần hỗ trợ?</h4>
+                    <div class="space-y-3">
+                        <a href="tel:02581234567" class="flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">phone_in_talk</span>
+                            <span class="text-body-md">0258 123 4567 (24/7)</span>
+                        </a>
+                        <div class="flex items-center gap-3 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
+                            <span class="text-body-md">Chat trực tuyến ngay</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
-<!-- Breadcrumb Section End -->
-
-<section class="premium-booking-section spad pt-0">
-    <div class="container">
-
-        <form asp-action="Create" method="post" id="bookingForm">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 12px; font-size: 0.9rem;"></div>
-            @for (int i = 0; i < Model.RoomSelections.Count; i++)
-            {
-                <input type="hidden" name="RoomSelections[@i].CategoryId" value="@Model.RoomSelections[i].CategoryId" />
-                <input type="hidden" name="RoomSelections[@i].Quantity" value="@Model.RoomSelections[i].Quantity" />
-            }
-
-            <div class="row">
-                <!-- Left Column: Input Forms -->
-                <div class="col-lg-7 col-md-12">
-                    
-                    <!-- Room Showcase -->
-                    @if (selectedCategories != null)
-                    {
-                        foreach (var selection in Model.RoomSelections)
-                        {
-                            var category = selectedCategories.FirstOrDefault(c => c.CategoryId == selection.CategoryId);
-                            if (category != null)
-                            {
-                                <div class="room-showcase-horizontal mb-3">
-                                    <div class="room-showcase-img">
-                                        @if (!string.IsNullOrEmpty(category.ImageUrl))
-                                        {
-                                            <img src="@category.ImageUrl" alt="@category.CategoryName" />
-                                        }
-                                        else
-                                        {
-                                            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Resort Room" />
-                                        }
-                                    </div>
-                                    <div class="room-showcase-details">
-                                        <h3>@category.CategoryName <span class="badge badge-warning text-white ml-2">x @selection.Quantity</span></h3>
-                                        <div class="price" data-price="@category.PricePerNight" data-qty="@selection.Quantity">
-                                            @category.PricePerNight?.ToString("N0") VNĐ <span>/ Đêm</span>
-                                        </div>
-                                        <div class="features-container mt-2">
-                                            <span class="feature-badge"><i class="fa fa-users"></i> Tối đa: @category.MaxAdults NL, @category.MaxChildren TE</span>
-                                            <span class="feature-badge"><i class="fa fa-wifi"></i> Free Wifi</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        }
-                    }
-
-                    <!-- Section 1: Dates & Guests -->
-                    <div class="premium-card">
-                        <h5><i class="fa fa-calendar-check-o"></i> 1. Thời Gian & Số Khách</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="CheckInDate">Ngày Nhận Phòng</label>
-                                    <input type="date" asp-for="CheckInDate" class="form-control-modern" />
-                                    <span asp-validation-for="CheckInDate" class="text-danger small"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="CheckOutDate">Ngày Trả Phòng</label>
-                                    <input type="date" asp-for="CheckOutDate" class="form-control-modern" />
-                                    <span asp-validation-for="CheckOutDate" class="text-danger small"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="NumberOfAdults">Người Lớn <small class="text-muted">(Tối đa: @maxTotalAdults)</small></label>
-                                    <input type="number" asp-for="NumberOfAdults" class="form-control-modern" min="1" max="@maxTotalAdults" value="@Model.NumberOfAdults" oninput="this.value = Math.min(Math.max(this.value, this.min), this.max);" />
-                                    <span asp-validation-for="NumberOfAdults" class="text-danger small"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="NumberOfChildren">Trẻ Em <small class="text-muted">(Tối đa: @maxTotalChildren)</small></label>
-                                    <input type="number" asp-for="NumberOfChildren" class="form-control-modern" min="0" max="@maxTotalChildren" value="@Model.NumberOfChildren" oninput="this.value = Math.min(Math.max(this.value, this.min), this.max);" />
-                                    <span asp-validation-for="NumberOfChildren" class="text-danger small"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section 2: Tour Addons -->
-                    @if (tours != null && tours.Any())
-                    {
-                        <div class="premium-card">
-                            <h5><i class="fa fa-compass"></i> 2. Trải Nghiệm Thêm</h5>
-                            <div class="tour-list-modern">
-                                @{
-                                    int tourIdx = 0;
-                                }
-                                @foreach (var tour in tours)
-                                {
-                                    <div class="tour-card-modern d-flex justify-content-between align-items-center p-3 mb-3" data-schedule-id="@tour.ScheduleId" style="border: 1px solid var(--border-color); border-radius: 12px; background: #fff; transition: all 0.3s ease;">
-                                        <div class="tour-details-modern flex-grow-1">
-                                            <strong style="font-size: 16px; color: var(--primary-color); display: block; margin-bottom: 4px;">@tour.Tour?.TourName</strong>
-                                            <span class="time d-block text-muted" style="font-size: 13px; margin-bottom: 4px;">
-                                                <i class="fa fa-calendar text-warning mr-1"></i> @tour.TourDate?.ToString("dd/MM/yyyy") @(tour.StartTime != null ? " - " + tour.StartTime?.ToString(@"hh\:mm") : "")
-                                            </span>
-                                            <span class="slots-left text-danger" style="font-size: 13px; font-weight: 600;">
-                                                <i class="fa fa-users mr-1"></i> Còn @(tour.AvailableSlots ?? 0) chỗ trống
-                                            </span>
-                                        </div>
-                                        <div class="tour-pricing-action-wrapper d-flex align-items-center">
-                                            <div class="tour-card-price mr-4" style="font-size: 16px; font-weight: 700; color: var(--accent-color);">
-                                                + @tour.Tour?.Price?.ToString("N0") VNĐ <span style="font-size: 12px; font-weight: 400; color: #64748b;">/ slot</span>
-                                            </div>
-                                            
-                                            <input type="hidden" name="SelectedTours[@tourIdx].ScheduleId" value="@tour.ScheduleId" />
-                                            
-                                            <div class="quantity-selector-tour">
-                                                <div class="input-group tour-qty-group" style="width: 120px; border-radius: 30px; border: 1px solid #e2e8f0; overflow: hidden; background: #f8fafc; height: 38px;">
-                                                    <div class="input-group-prepend">
-                                                        <button class="btn btn-qty-tour" type="button" onclick="decrementTourQty(this)" style="background: transparent; border: none; width: 35px; color: #64748b; font-weight: 700; cursor: pointer;">-</button>
-                                                    </div>
-                                                    <input type="number" name="SelectedTours[@tourIdx].Participants" class="form-control text-center tour-qty" value="0" min="0" max="@(tour.AvailableSlots ?? 0)" readonly data-price="@(tour.Tour?.Price ?? 0)" data-name="@tour.Tour?.TourName" style="border: none; background: transparent !important; font-weight: 700; font-size: 14px; color: var(--primary-color); padding: 0;" />
-                                                    <div class="input-group-append">
-                                                        <button class="btn btn-qty-tour" type="button" onclick="incrementTourQty(this)" style="background: transparent; border: none; width: 35px; color: #64748b; font-weight: 700; cursor: pointer;">+</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    tourIdx++;
-                                }
-                            </div>
-                        </div>
-                    }
-
-                    <!-- Section 3: Stay Registration -->
-                    <div class="premium-card">
-                        <h5><i class="fa fa-id-card-o"></i> @(tours != null && tours.Any() ? "3" : "2"). Khai Báo Tạm Trú Người Đặt Chính</h5>
-                        
-                        <div class="form-group-modern">
-                            <label asp-for="PrimaryGuestName">Họ và tên (như trên CCCD)</label>
-                            <input type="text" asp-for="PrimaryGuestName" class="form-control-modern" placeholder="Ví dụ: NGUYEN VAN A" />
-                            <span asp-validation-for="PrimaryGuestName" class="text-danger small"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="PrimaryGuestDateOfBirth">Ngày sinh</label>
-                                    <input type="date" asp-for="PrimaryGuestDateOfBirth" class="form-control-modern" />
-                                    <span asp-validation-for="PrimaryGuestDateOfBirth" class="text-danger small"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="PrimaryGuestGender">Giới tính</label>
-                                    <select asp-for="PrimaryGuestGender" class="form-control-modern">
-                                        <option value="">-- Chọn giới tính --</option>
-                                        <option value="Male">Nam</option>
-                                        <option value="Female">Nữ</option>
-                                        <option value="Other">Khác</option>
-                                    </select>
-                                    <span asp-validation-for="PrimaryGuestGender" class="text-danger small"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="PrimaryGuestPassportNumber">Số CCCD / Hộ chiếu</label>
-                                    <input type="text" asp-for="PrimaryGuestPassportNumber" class="form-control-modern" placeholder="Số định danh cá nhân" />
-                                    <span asp-validation-for="PrimaryGuestPassportNumber" class="text-danger small"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label asp-for="PrimaryGuestNationality">Quốc tịch</label>
-                                    <input type="text" asp-for="PrimaryGuestNationality" class="form-control-modern" placeholder="Ví dụ: Vietnam" value="Vietnam" />
-                                    <span asp-validation-for="PrimaryGuestNationality" class="text-danger small"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PDPD Consent Checkbox -->
-                        <div class="mt-3 d-flex align-items-start">
-                            <input type="checkbox" id="pdpdConsent" name="PdpdConsentChecked" value="true" required="required" data-val="true" data-val-required="Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD)." data-msg-required="Bạn phải đồng ý với điều khoản bảo vệ dữ liệu cá nhân (PDPD)." style="cursor: pointer; width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent-color);">
-                            <label class="ml-2" for="pdpdConsent" style="font-size: 11.5px; color: var(--text-muted); cursor: pointer; line-height: 1.45;">
-                                Tôi đồng ý cho phép Phúc Nguyên Resort thu thập và lưu trữ thông tin cá nhân nhạy cảm (số CCCD/Hộ chiếu và Ngày sinh) của các thành viên trong đoàn để khai báo tạm trú theo Nghị định 356/2025/NĐ-CP (PDPD).
-                            </label>
-                        </div>
-                        <span asp-validation-for="PdpdConsentChecked" class="text-danger small d-block mb-1"></span>
-                    </div>
-
-                </div>
-
-                <!-- Right Column: Sticky Summary Widget -->
-                <div class="col-lg-5 col-md-12 sticky-sidebar-column">
-                    <div class="payment-summary-widget">
-                        <h4>Tóm Tắt Đặt Phòng</h4>
-                        
-                        <ul class="summary-info-list">
-                            <li>
-                                <span>Phòng đặt:</span>
-                                <span>Đã chọn @Model.RoomSelections.Sum(r => r.Quantity) phòng</span>
-                            </li>
-                            <li>
-                                <span>Nhận phòng:</span>
-                                <span id="summary-checkin">--/--/----</span>
-                            </li>
-                            <li>
-                                <span>Trả phòng:</span>
-                                <span id="summary-checkout">--/--/----</span>
-                            </li>
-                            <li>
-                                <span>Số đêm nghỉ:</span>
-                                <span id="summary-nights">0 đêm</span>
-                            </li>
-                            <li>
-                                <span>Số khách lưu trú:</span>
-                                <span id="summary-guests">--</span>
-                            </li>
-                        </ul>
-
-                        <div class="price-breakdown">
-                            <div class="price-breakdown-row">
-                                <span id="room-subtotal-label">Tiền phòng (0 đêm)</span>
-                                <span id="room-subtotal-val">0 VNĐ</span>
-                            </div>
-                            <div class="price-breakdown-row" id="tour-subtotal-row" style="display: none;">
-                                <span>Trải nghiệm dịch vụ:</span>
-                                <span id="tour-subtotal-val">0 VNĐ</span>
-                            </div>
-                            <div id="tour-breakdown-details" style="display: none; flex-direction: column; padding-left: 15px; border-left: 2px solid var(--accent-color); margin-bottom: 10px;">
-                                <!-- Detailed tour items will be injected here -->
-                            </div>
-                            <div class="price-breakdown-row total">
-                                <span>Tổng cộng:</span>
-                                <span id="total-amount-val">0 VNĐ</span>
-                            </div>
-                            <div class="price-breakdown-row deposit">
-                                <span>Tiền đặt cọc (40%):</span>
-                                <span id="deposit-amount-val">0 VNĐ</span>
-                            </div>
-                        </div>
-
-                        <div class="alert-premium-info">
-                            <i class="fa fa-info-circle"></i>
-                            <div>
-                                Quý khách cần đặt cọc trước <strong>40%</strong> tổng giá trị đơn phòng thông qua cổng VNPAY để giữ phòng.
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn-premium-vnpay">
-                            Thanh Toán Cọc Qua VNPAY <i class="fa fa-arrow-right"></i>
-                        </button>
-
-                        <div class="payment-badge">
-                            <i class="fa fa-shield" style="color: #10b981;"></i> An toàn & Bảo mật bởi <strong>VNPAY</strong>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </form>
-    </div>
-</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // Quantity adjustment functions
-        window.decrementTourQty = function(btn) {
-            var input = btn.closest('.tour-qty-group').querySelector('.tour-qty');
-            var val = parseInt(input.value) || 0;
-            var min = parseInt(input.min) || 0;
-            if (val > min) {
-                input.value = val - 1;
-                var card = btn.closest('.tour-card-modern');
-                if (val - 1 === 0) {
-                    card.classList.remove('selected');
-                } else {
-                    card.classList.add('selected');
-                }
-                // Trigger calculation
-                window.calculatePricesGlobal();
+        function changeVal(id, amount) {
+            let el = document.getElementById(id);
+            let current = parseInt(el.value) || 0;
+            let newVal = current + amount;
+            if(newVal >= 0) {
+                el.value = newVal;
             }
-        };
-
-        window.incrementTourQty = function(btn) {
-            var input = btn.closest('.tour-qty-group').querySelector('.tour-qty');
-            var val = parseInt(input.value) || 0;
-            var max = parseInt(input.max) || 0;
-            if (val < max) {
-                input.value = val + 1;
-                var card = btn.closest('.tour-card-modern');
-                card.classList.add('selected');
-                // Trigger calculation
-                window.calculatePricesGlobal();
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var checkInInput = document.querySelector('input[name="CheckInDate"]');
-            var checkOutInput = document.querySelector('input[name="CheckOutDate"]');
-            var adultsInput = document.querySelector('input[name="NumberOfAdults"]');
-            var childrenInput = document.querySelector('input[name="NumberOfChildren"]');
-            
-            // Set max birthdate to 18 years ago from today (minimum age: 18)
-            var dobInput = document.querySelector('input[name="PrimaryGuestDateOfBirth"]');
-            if (dobInput) {
-                var today = new Date();
-                var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-                var dd = String(maxDate.getDate()).padStart(2, '0');
-                var mm = String(maxDate.getMonth() + 1).padStart(2, '0');
-                var yyyy = maxDate.getFullYear();
-                dobInput.max = yyyy + '-' + mm + '-' + dd;
-            }
-            
-            // Dynamic display elements
-            var summaryCheckIn = document.getElementById('summary-checkin');
-            var summaryCheckOut = document.getElementById('summary-checkout');
-            var summaryNights = document.getElementById('summary-nights');
-            var summaryGuests = document.getElementById('summary-guests');
-            
-            var roomSubtotalLabel = document.getElementById('room-subtotal-label');
-            var roomSubtotalVal = document.getElementById('room-subtotal-val');
-            var tourSubtotalVal = document.getElementById('tour-subtotal-val');
-            var tourSubtotalRow = document.getElementById('tour-subtotal-row');
-            var tourBreakdownDetails = document.getElementById('tour-breakdown-details');
-            var totalAmountVal = document.getElementById('total-amount-val');
-            var depositAmountVal = document.getElementById('deposit-amount-val');
-            
-            // Format number helper (e.g. 1,000,000)
-            function formatVnd(amount) {
-                return amount.toLocaleString('vi-VN') + ' VNĐ';
-            }
-            
-            // Format date helper (e.g. 14/06/2026)
-            function formatDate(dateStr) {
-                if (!dateStr) return '--/--/----';
-                var d = new Date(dateStr);
-                if (isNaN(d.getTime())) return dateStr;
-                var dd = String(d.getDate()).padStart(2, '0');
-                var mm = String(d.getMonth() + 1).padStart(2, '0');
-                var yyyy = d.getFullYear();
-                return dd + '/' + mm + '/' + yyyy;
-            }
-            
-            function calculatePrices() {
-                var checkInDate = new Date(checkInInput.value);
-                var checkOutDate = new Date(checkOutInput.value);
-                
-                var nights = 0;
-                if (!isNaN(checkInDate.getTime()) && !isNaN(checkOutDate.getTime()) && checkOutDate > checkInDate) {
-                    nights = Math.round((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
-                }
-                
-                // Update summary text
-                summaryCheckIn.textContent = formatDate(checkInInput.value);
-                summaryCheckOut.textContent = formatDate(checkOutInput.value);
-                summaryNights.textContent = nights + ' đêm';
-                
-                var adults = parseInt(adultsInput.value) || 0;
-                var children = parseInt(childrenInput.value) || 0;
-                summaryGuests.textContent = adults + ' Người lớn, ' + children + ' Trẻ em';
-                
-                // Calculate room total
-                var roomTotal = 0;
-                document.querySelectorAll('.room-showcase-details .price').forEach(function(el) {
-                    var p = parseFloat(el.getAttribute('data-price')) || 0;
-                    var q = parseInt(el.getAttribute('data-qty')) || 0;
-                    roomTotal += (p * q * nights);
-                });
-                
-                roomSubtotalLabel.textContent = 'Tiền phòng (' + nights + ' đêm)';
-                roomSubtotalVal.textContent = formatVnd(roomTotal);
-                
-                // Calculate tours total
-                var tourTotal = 0;
-                var selectedToursCount = 0;
-                var selectedToursHtml = '';
-                
-                document.querySelectorAll('.tour-qty').forEach(function(input) {
-                    var qty = parseInt(input.value) || 0;
-                    var card = input.closest('.tour-card-modern');
-                    if (qty > 0) {
-                        card.classList.add('selected');
-                        var price = parseFloat(input.getAttribute('data-price')) || 0;
-                        var name = input.getAttribute('data-name') || '';
-                        tourTotal += price * qty;
-                        selectedToursCount++;
-                        
-                        selectedToursHtml += `
-                            <div class="price-breakdown-row" style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
-                                <span>&bull; ${name} (x${qty})</span>
-                                <span>${formatVnd(price * qty)}</span>
-                            </div>
-                        `;
-                    } else {
-                        card.classList.remove('selected');
-                    }
-                });
-                
-                // Show/hide tour row in summary
-                if (selectedToursCount > 0) {
-                    tourSubtotalRow.style.display = 'flex';
-                    tourSubtotalVal.textContent = formatVnd(tourTotal);
-                    tourBreakdownDetails.style.display = 'flex';
-                    tourBreakdownDetails.innerHTML = selectedToursHtml;
-                } else {
-                    tourSubtotalRow.style.display = 'none';
-                    tourBreakdownDetails.style.display = 'none';
-                    tourBreakdownDetails.innerHTML = '';
-                }
-                
-                // Calculate grand total and deposit
-                var grandTotal = roomTotal + tourTotal;
-                var deposit = grandTotal * 0.4;
-                
-                totalAmountVal.textContent = formatVnd(grandTotal);
-                depositAmountVal.textContent = formatVnd(deposit);
-            }
-            
-            // Expose globally so external click handlers can trigger it
-            window.calculatePricesGlobal = calculatePrices;
-            
-            // Set up date constraints
-            checkInInput.addEventListener('change', function() {
-                var checkInDate = new Date(this.value);
-                var minCheckOutDate = new Date(checkInDate);
-                minCheckOutDate.setDate(minCheckOutDate.getDate() + 1);
-                
-                var dd = String(minCheckOutDate.getDate()).padStart(2, '0');
-                var mm = String(minCheckOutDate.getMonth() + 1).padStart(2, '0');
-                var yyyy = minCheckOutDate.getFullYear();
-                
-                checkOutInput.min = yyyy + '-' + mm + '-' + dd;
-                
-                if (new Date(checkOutInput.value) <= checkInDate) {
-                    checkOutInput.value = yyyy + '-' + mm + '-' + dd;
-                }
-                calculatePrices();
-            });
-            
-            // Add listeners
-            checkOutInput.addEventListener('change', calculatePrices);
-            adultsInput.addEventListener('input', calculatePrices);
-            childrenInput.addEventListener('input', calculatePrices);
-            
-            // Initial run
-            calculatePrices();
-        });
+        }
     </script>
 }
