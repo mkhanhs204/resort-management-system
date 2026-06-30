@@ -1,0 +1,110 @@
+@model PhucNguyenResort.ViewModels.TableReservations.TableReservationCreateViewModel
+
+@{
+    ViewData["Title"] = "Confirm Table Reservation";
+}
+
+<div class="tr-page">
+    <div class="tr-container tr-container-narrow">
+        <div class="tr-back-nav">
+            <a asp-action="Search"><i class="fa fa-arrow-left"></i> Back to search</a>
+        </div>
+
+        <div class="tr-confirm-card">
+            <div class="tr-confirm-layout">
+                <div class="tr-table-image tr-confirm-image">
+                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div class="tr-image-fallback" style="display:none;">
+                            <i class="fa fa-cutlery"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="tr-image-fallback">
+                            <i class="fa fa-cutlery"></i>
+                        </div>
+                    }
+                </div>
+                <div>
+            <div class="tr-confirm-header">
+                <span class="tr-eyebrow">Confirm Reservation</span>
+                <h1>@Model.TableName</h1>
+                <p>Table @Model.TableNumber</p>
+            </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="tr-table-description tr-confirm-description">@Model.Description</p>
+                    }
+                    <div class="tr-table-meta tr-confirm-meta">
+                        @if (!string.IsNullOrWhiteSpace(Model.Area))
+                        {
+                            <span><i class="fa fa-map-marker"></i> @Model.Area</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.TableType))
+                        {
+                            <span><i class="fa fa-tag"></i> @Model.TableType</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.LocationNote))
+                        {
+                            <span><i class="fa fa-location-arrow"></i> @Model.LocationNote</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div asp-validation-summary="ModelOnly" class="tr-alert tr-alert-danger"></div>
+
+            <div class="tr-summary-grid">
+                <div><span>Date</span><strong>@Model.ReservationDate.ToString("MMM dd, yyyy")</strong></div>
+                <div><span>Time</span><strong>@Model.ReservationTime.ToString(@"hh\:mm")</strong></div>
+                <div><span>Guests</span><strong>@Model.PartySize</strong></div>
+                <div><span>Capacity</span><strong>@Model.Capacity</strong></div>
+            </div>
+
+            <div class="tr-alert tr-alert-warning">
+                <i class="fa fa-clock-o"></i>
+                Please arrive within 30 minutes of your reservation time. After this hold period, the table may be released or marked as no-show.
+            </div>
+
+            <form asp-action="Create" method="post" class="tr-create-form">
+                @Html.AntiForgeryToken()
+                <input asp-for="TableId" type="hidden" />
+                <input asp-for="TableNumber" type="hidden" />
+                <input asp-for="TableName" type="hidden" />
+                <input asp-for="ImageUrl" type="hidden" />
+                <input asp-for="Description" type="hidden" />
+                <input asp-for="Area" type="hidden" />
+                <input asp-for="TableType" type="hidden" />
+                <input asp-for="LocationNote" type="hidden" />
+                <input asp-for="Capacity" type="hidden" />
+                <input asp-for="ReservationDate" type="hidden" />
+                <input asp-for="ReservationTime" type="hidden" />
+                <input asp-for="DurationMinutes" type="hidden" />
+                <input asp-for="PartySize" type="hidden" />
+
+                <div class="tr-field">
+                    <label asp-for="SpecialRequests">Special Requests</label>
+                    <textarea asp-for="SpecialRequests" class="tr-input tr-textarea" maxlength="500" rows="4" placeholder="Window seat, birthday setup, dietary note..."></textarea>
+                    <span asp-validation-for="SpecialRequests" class="text-danger"></span>
+                </div>
+
+                <div class="tr-actions">
+                    <a asp-action="Search" class="tr-btn tr-btn-outline">Cancel</a>
+                    <button type="submit" class="tr-btn tr-btn-primary">
+                        <i class="fa fa-check"></i> Submit Reservation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/table-reservations.css" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,150 @@
+@model PhucNguyenResort.ViewModels.TableFoodOrders.TableFoodOrderCheckoutViewModel
+@{
+    ViewData["Title"] = "Table Checkout";
+    Layout = "_DashboardLayout";
+    var hasOrders = Model.Orders.Any(o => o.OrderStatus != PhucNguyenResort.Enums.FoodOrderStatus.Cancelled);
+    var isSettled = Model.IsChargedToRoom || Model.IsPaidAtRestaurant;
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-credit-card mr-2" style="color: #007bff;"></i> Table Checkout
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">
+                    @Model.ReservationCode - @Model.TableName (@Model.TableNumber) - Party @Model.PartySize
+                </p>
+            </div>
+            <div>
+                <a asp-action="ByReservation" asp-route-reservationId="@Model.ReservationId" class="btn btn-outline-primary mr-2">
+                    <i class="fa fa-list mr-1"></i> Orders
+                </a>
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-outline-secondary">
+                    <i class="fa fa-arrow-left mr-1"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card-box" style="border-top: 5px solid #007bff;">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-family: 'Cabin', sans-serif;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Orders.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">No table food orders found.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var order in Model.Orders)
+                            {
+                                <tr>
+                                    <td>#@order.FoodOrderId</td>
+                                    <td>@order.OrderStatus</td>
+                                    <td>
+                                        @if (order.IsChargedToRoom)
+                                        {
+                                            <span class="badge badge-success">Charged to room</span>
+                                        }
+                                        else if (order.IsPaidAtRestaurant)
+                                        {
+                                            <span class="badge badge-info">Paid at restaurant</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-light border text-muted">Unpaid</span>
+                                        }
+                                    </td>
+                                    <td class="text-right">@order.TotalAmount.ToString("N0") VND</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card-box" style="border-left: 5px solid #ffc107;">
+            <h4 class="mb-3" style="font-family: 'Lora', serif;">Summary</h4>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Billable total</span>
+                <strong>@Model.TotalAmount.ToString("N0") VND</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <span>Room booking</span>
+                <strong>@(Model.LinkedBookingDisplay ?? "None")</strong>
+            </div>
+
+            @if (!hasOrders)
+            {
+                <div class="alert alert-info mb-0">No billable orders are available for checkout.</div>
+            }
+            else if (isSettled)
+            {
+                <div class="alert alert-success mb-0">
+                    This table bill has already been settled.
+                </div>
+            }
+            else if (Model.CanChargeToRoom)
+            {
+                <form asp-action="ChargeToRoom" method="post" onsubmit="return confirm('Charge this table bill to the selected room booking?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="reservationId" value="@Model.ReservationId" />
+                    <div class="form-group">
+                        <label class="font-weight-bold">Confirm room booking</label>
+                        <select name="bookingId" class="form-control" required>
+                            <option value="">Select booking</option>
+                            @foreach (var booking in Model.BookingOptions)
+                            {
+                                <option value="@booking.BookingId" selected="@(Model.SelectedBookingId == booking.BookingId)">
+                                    @booking.DisplayText
+                                </option>
+                            }
+                        </select>
+                        <small class="text-muted d-block mt-1">
+                            The table bill will be added to the selected booking's guest folio.
+                        </small>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-block">
+                        <i class="fa fa-hotel mr-1"></i> Charge to Room
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form asp-action="PayAtRestaurant" method="post" onsubmit="return confirm('Mark this table bill as paid at restaurant?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="reservationId" value="@Model.ReservationId" />
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fa fa-money mr-1"></i> Pay at Restaurant
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>

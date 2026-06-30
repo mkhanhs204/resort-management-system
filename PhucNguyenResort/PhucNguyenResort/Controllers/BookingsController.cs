@@ -214,6 +214,35 @@ namespace PhucNguyenResort.Controllers
             return View(model);
         }
 
+        // GET: /Bookings/Details/5
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.RoomCategory)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.Room)
+                .Include(b => b.BookingGuests)
+                .Include(b => b.TourBookings)
+                    .ThenInclude(tb => tb.Schedule)
+                        .ThenInclude(ts => ts.Tour)
+                .FirstOrDefaultAsync(b => b.BookingId == id && b.UserId == userId);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            return View(booking);
+        }
+
         // GET: /Bookings/MyBookings
         [Authorize(Roles = "Customer")]
         public async Task<IActionResult> MyBookings()
@@ -238,6 +267,41 @@ namespace PhucNguyenResort.Controllers
                 .ToListAsync();
 
             return View(bookings);
+        }
+
+        // GET: /Bookings/ViewInvoice/{id}
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> ViewInvoice(int id)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null || booking.UserId != userId)
+            {
+                return NotFound("Không tìm thấy thông tin đặt phòng.");
+            }
+
+            if (booking.BookingStatus != BookingStatus.CheckedOut)
+            {
+                TempData["Error"] = "Hóa đơn chỉ có sẵn sau khi trả phòng.";
+                return RedirectToAction(nameof(MyBookings));
+            }
+
+            var receptionService = HttpContext.RequestServices.GetService(typeof(PhucNguyenResort.Services.Reception.IReceptionService)) as PhucNguyenResort.Services.Reception.IReceptionService;
+            if (receptionService != null)
+            {
+                var model = await receptionService.PrepareInvoiceViewModelAsync(id);
+                if (model != null)
+                {
+                    return View("~/Views/Reception/PrintInvoice.cshtml", model);
+                }
+            }
+
+            return NotFound("Không thể tải hóa đơn.");
         }
 
         // POST: /Bookings/Cancel/5

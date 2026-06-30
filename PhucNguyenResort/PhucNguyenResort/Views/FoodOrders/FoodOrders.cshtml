@@ -12,13 +12,12 @@
                 <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
                     <i class="fa fa-list mr-2" style="color: #007bff;"></i> Manage Food Orders
                 </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Monitor and update guest food orders.</p>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Monitor room service and table service food orders.</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Manage Food Orders (UC66) -->
 <style>
     .timeline-container { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; margin-bottom: 10px; }
     .timeline-line { position: absolute; top: 50%; left: 0; right: 0; height: 4px; background-color: #e9ecef; z-index: 1; transform: translateY(-50%); }
@@ -57,10 +56,10 @@
                 <table class="table table-hover align-middle" style="font-family: 'Cabin', sans-serif;">
                     <thead class="bg-light">
                         <tr>
-                            <th>Order ID</th>
-                            <th>Room & Guest</th>
+                            <th>Order</th>
+                            <th>Service Location</th>
                             <th>Items</th>
-                            <th>Kitchen (KOT)</th>
+                            <th>Kitchen</th>
                             <th width="250">Order Status</th>
                             <th class="text-right">Action</th>
                         </tr>
@@ -76,29 +75,44 @@
                         }
                         else
                         {
-                            @foreach (var order in Model)
+                            foreach (var order in Model)
                             {
+                                var isTableService = order.OrderType == FoodOrderType.TableService;
+                                var locationLabel = isTableService
+                                    ? $"Table {(string.IsNullOrWhiteSpace(order.TableNumber) ? "N/A" : order.TableNumber)}"
+                                    : $"Room {(string.IsNullOrWhiteSpace(order.RoomNumber) ? "N/A" : order.RoomNumber)}";
+                                var locationDetail = isTableService
+                                    ? order.TableName
+                                    : order.CustomerName;
+                                var typeBadge = isTableService ? "badge-info" : "badge-primary";
+
                                 <tr>
-                                    <td><strong>#@order.FoodOrderId</strong><br /><small class="text-muted">@order.OrderedAt.ToString("HH:mm dd/MM")</small></td>
                                     <td>
-                                        Room <strong>@order.RoomNumber</strong><br />
-                                        <small class="text-muted">@order.CustomerName</small>
-                                        @if(!string.IsNullOrWhiteSpace(order.CustomerNote)) {
+                                        <strong>#@order.FoodOrderId</strong><br />
+                                        <small class="text-muted">@order.OrderedAt.ToString("HH:mm dd/MM")</small><br />
+                                        <span class="badge @typeBadge">@order.OrderType</span>
+                                    </td>
+                                    <td>
+                                        <strong>@locationLabel</strong><br />
+                                        <small class="text-muted">@locationDetail</small>
+                                        @if (!string.IsNullOrWhiteSpace(order.CustomerNote))
+                                        {
                                             <div style="font-size: 11px; margin-top: 4px; background: #fffbeb; border-left: 2px solid #d97706; padding: 2px 4px;"><strong>Note:</strong> @order.CustomerNote</div>
                                         }
                                     </td>
                                     <td>
                                         <ul class="list-unstyled mb-0" style="font-size: 13px;">
-                                            @foreach(var item in order.Items.Take(2))
+                                            @foreach (var item in order.Items.Take(2))
                                             {
                                                 <li>
                                                     @item.Quantity x @item.ItemName
-                                                    @if(!string.IsNullOrWhiteSpace(item.ItemNote)) {
+                                                    @if (!string.IsNullOrWhiteSpace(item.ItemNote))
+                                                    {
                                                         <div style="font-size: 11px; color: #6c757d; font-style: italic; padding-left: 10px;">- @item.ItemNote</div>
                                                     }
                                                 </li>
                                             }
-                                            @if(order.Items.Count > 2)
+                                            @if (order.Items.Count > 2)
                                             {
                                                 <li class="text-muted font-italic">+ @(order.Items.Count - 2) more...</li>
                                             }
@@ -123,15 +137,16 @@
                                         }
                                     </td>
                                     <td>
-                                        @if(order.OrderStatus == FoodOrderStatus.Cancelled)
+                                        @if (order.OrderStatus == FoodOrderStatus.Cancelled)
                                         {
-                                            <span class="badge badge-danger w-100 py-2">CANCELLED</span>
+                                            <span class="badge badge-danger w-100 py-2">Cancelled</span>
                                         }
                                         else
                                         {
-                                            string fillWidth = "0%";
+                                            var fillWidth = "0%";
                                             if (order.OrderStatus == FoodOrderStatus.Cooking) fillWidth = "50%";
                                             if (order.OrderStatus == FoodOrderStatus.Delivered) fillWidth = "100%";
+
                                             <div class="px-3 pb-3 pt-1">
                                                 <div class="timeline-container">
                                                     <div class="timeline-line"></div>
@@ -155,32 +170,38 @@
                                             @if (order.OrderStatus == FoodOrderStatus.Pending)
                                             {
                                                 <input type="hidden" name="newStatus" value="@FoodOrderStatus.Cooking" />
-                                                <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-play mr-1"></i> Bắt đầu nấu</button>
+                                                <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-play mr-1"></i> Start Cooking</button>
                                             }
                                             else if (order.OrderStatus == FoodOrderStatus.Cooking)
                                             {
-                                                bool isKotReady = order.KitchenStatus == KotStatus.Ready || order.KitchenStatus == KotStatus.Completed;
+                                                var isKotReady = order.KitchenStatus == KotStatus.Ready || order.KitchenStatus == KotStatus.Completed;
                                                 <input type="hidden" name="newStatus" value="@FoodOrderStatus.Delivered" />
-                                                <button type="submit" class="btn btn-sm btn-success" @(isKotReady ? "" : "disabled title='Bếp chưa nấu xong'")><i class="fa fa-truck mr-1"></i> Giao hàng</button>
+                                                <button type="submit" class="btn btn-sm btn-success" @(isKotReady ? "" : "disabled title='Kitchen has not marked this order ready yet'")><i class="fa fa-truck mr-1"></i> Mark Delivered</button>
                                             }
                                             else if (order.OrderStatus == FoodOrderStatus.Delivered)
                                             {
-                                                if (!order.IsChargedToRoom)
+                                                if (isTableService)
                                                 {
-                                                    <button type="submit" asp-action="ChargeFoodOrderToRoom" class="btn btn-sm btn-warning font-weight-bold" title="Ghi nợ vào sổ phòng"><i class="fa fa-money mr-1"></i> Ghi nợ phòng</button>
+                                                    <a asp-controller="TableFoodOrders" asp-action="Checkout" asp-route-reservationId="@order.TableReservationId" class="btn btn-sm btn-outline-warning font-weight-bold">
+                                                        <i class="fa fa-credit-card mr-1"></i> Table Checkout
+                                                    </a>
+                                                }
+                                                else if (!order.IsChargedToRoom)
+                                                {
+                                                    <button type="submit" asp-action="ChargeFoodOrderToRoom" class="btn btn-sm btn-warning font-weight-bold" title="Charge to room bill"><i class="fa fa-money mr-1"></i> Charge Room</button>
                                                 }
                                                 else
                                                 {
-                                                    <button type="button" class="btn btn-sm btn-secondary" disabled title="Đã tính tiền vào phòng lúc @order.ChargedAt?.ToString("HH:mm")"><i class="fa fa-check-circle mr-1"></i> Đã ghi nợ</button>
+                                                    <button type="button" class="btn btn-sm btn-secondary" disabled title="Charged at @order.ChargedAt?.ToString("HH:mm")"><i class="fa fa-check-circle mr-1"></i> Charged</button>
                                                 }
                                             }
                                         </form>
                                         @if (order.OrderStatus == FoodOrderStatus.Pending)
                                         {
-                                            <form asp-controller="Dashboard" asp-action="UpdateFoodOrderStatus" method="post" class="d-inline ml-1" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn này?');">
+                                            <form asp-controller="Dashboard" asp-action="UpdateFoodOrderStatus" method="post" class="d-inline ml-1" onsubmit="return confirm('Cancel this order?');">
                                                 <input type="hidden" name="foodOrderId" value="@order.FoodOrderId" />
                                                 <input type="hidden" name="newStatus" value="@FoodOrderStatus.Cancelled" />
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Hủy đơn"><i class="fa fa-times"></i></button>
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Cancel order"><i class="fa fa-times"></i></button>
                                             </form>
                                         }
                                     </td>

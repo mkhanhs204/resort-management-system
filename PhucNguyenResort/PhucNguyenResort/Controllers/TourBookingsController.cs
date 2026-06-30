@@ -39,7 +39,7 @@ namespace PhucNguyenResort.Controllers
         public async Task<IActionResult> Create()
         {
             ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId");
-            ViewBag.Users = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName");
+            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName");
             return View();
         }
 
@@ -60,7 +60,7 @@ namespace PhucNguyenResort.Controllers
                 }
             }
             ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId", booking.ScheduleId);
-            ViewBag.Users = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", booking.UserId);
+            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", booking.UserId);
             return View(booking);
         }
 
@@ -72,7 +72,7 @@ namespace PhucNguyenResort.Controllers
             if (booking == null) return NotFound();
 
             ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId", booking.ScheduleId);
-            ViewBag.Users = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", booking.UserId);
+            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", booking.UserId);
             return View(booking);
         }
 
@@ -88,7 +88,7 @@ namespace PhucNguyenResort.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId", booking.ScheduleId);
-            ViewBag.Users = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", booking.UserId);
+            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", booking.UserId);
             return View(booking);
         }
 

@@ -1,346 +1,164 @@
 @model PhucNguyenResort.ViewModels.Tours.TourListVM
 @{
-    ViewData["Title"] = "Tour Du Lịch";
+    ViewData["Title"] = "Kết quả Tìm kiếm Tour - Phúc Nguyên Resort";
 }
 
 @section Styles {
-<style>
-    .tour-hero {
-        background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('/img/hero/hero-1.jpg');
-        background-size: cover;
-        background-position: center;
-        padding: 120px 0 80px;
-        text-align: center;
-        color: #fff;
-    }
-    .tour-hero h1 {
-        font-family: 'Lora', serif;
-        font-size: 48px;
-        font-weight: 700;
-        margin-bottom: 15px;
-        color: #ffffff;
-    }
-    .tour-hero p {
-        font-size: 18px;
-        color: #dfa974;
-        max-width: 600px;
-        margin: 0 auto;
-        font-weight: 500;
-    }
-    .tour-filter-bar {
-        background: #fff;
-        padding: 25px 30px;
-        border-radius: 8px;
-        box-shadow: 0 5px 25px rgba(0,0,0,0.08);
-        margin-top: -45px;
-        position: relative;
-        z-index: 10;
-    }
-    .tour-filter-bar .form-control {
-        border: 1px solid #e0e0e0;
-        height: 48px;
-        border-radius: 5px;
-        font-size: 15px;
-    }
-    .tour-filter-bar .btn-search {
-        background: #dfa974;
-        color: #fff;
-        border: none;
-        height: 48px;
-        padding: 0 30px;
-        border-radius: 5px;
-        font-weight: 600;
-        transition: all 0.3s;
-    }
-    .tour-filter-bar .btn-search:hover {
-        background: #c89660;
-    }
-    .tour-grid {
-        padding: 50px 0 80px;
-    }
-    .tour-card {
-        background: #fff;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 3px 20px rgba(0,0,0,0.07);
-        transition: all 0.35s ease;
-        margin-bottom: 30px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-    .tour-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 35px rgba(0,0,0,0.12);
-    }
-    .tour-card-img {
-        position: relative;
-        height: 220px;
-        overflow: hidden;
-    }
-    .tour-card-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s;
-    }
-    .tour-card:hover .tour-card-img img {
-        transform: scale(1.06);
-    }
-    .tour-card-badge {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: #dfa974;
-        color: #fff;
-        padding: 5px 14px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-    .tour-card-badge.sold-out {
-        background: #e74c3c;
-    }
-    .tour-card-body {
-        padding: 20px 22px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .tour-card-body h4 {
-        font-family: 'Lora', serif;
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: #19191a;
-    }
-    .tour-card-body h4 a {
-        color: #19191a;
-        text-decoration: none;
-    }
-    .tour-card-body h4 a:hover {
-        color: #dfa974;
-    }
-    .tour-card-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 12px;
-        font-size: 13px;
-        color: #777;
-    }
-    .tour-card-meta span i {
-        color: #dfa974;
-        margin-right: 4px;
-        width: 16px;
-    }
-    .tour-card-desc {
-        color: #555;
-        font-size: 14px;
-        line-height: 1.6;
-        margin-bottom: 15px;
-        flex: 1;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-    .tour-card-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 1px solid #f0f0f0;
-        padding: 15px 22px;
-    }
-    .tour-price {
-        font-family: 'Lora', serif;
-        font-size: 22px;
-        font-weight: 700;
-        color: #dfa974;
-    }
-    .tour-price small {
-        font-size: 13px;
-        color: #999;
-        font-weight: 400;
-    }
-    .tour-rating {
-        color: #f5a623;
-        font-size: 14px;
-    }
-    .tour-rating span {
-        color: #999;
-        font-size: 12px;
-        margin-left: 4px;
-    }
-    .btn-detail {
-        background: transparent;
-        border: 2px solid #dfa974;
-        color: #dfa974;
-        padding: 8px 22px;
-        border-radius: 5px;
-        font-weight: 600;
-        font-size: 14px;
-        text-decoration: none;
-        transition: all 0.3s;
-    }
-    .btn-detail:hover {
-        background: #dfa974;
-        color: #fff;
-    }
-    .tour-empty {
-        text-align: center;
-        padding: 60px 20px;
-        color: #999;
-    }
-    .tour-empty i {
-        font-size: 60px;
-        color: #ddd;
-        margin-bottom: 20px;
-    }
-    .sort-select {
-        border: 1px solid #e0e0e0;
-        height: 48px;
-        border-radius: 5px;
-        font-size: 14px;
-        background-color: #fff;
-    }
-    .result-count {
-        color: #999;
-        font-size: 14px;
-        margin-bottom: 20px;
-    }
-</style>
+    <style>
+        .luxury-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.06);
+        }
+        .luxury-shadow-lg {
+            box-shadow: 0 32px 50px rgba(30, 41, 59, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
 }
 
-<!-- Hero Section -->
-<div class="tour-hero">
-    <div class="container">
-        <h1>Khám Phá Tour Du Lịch</h1>
-        <p>Tận hưởng kỳ nghỉ trọn vẹn cùng Phúc Nguyễn Resort</p>
-    </div>
-</div>
+<main class="pt-24 pb-section-gap-lg bg-background">
+    <!-- Search & Filter Bar Section -->
+    <div class="bg-surface-container-low py-8 mb-stack-lg">
+        <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+            <form asp-action="Index" method="get" class="bg-surface luxury-shadow rounded-xl p-4 flex flex-col lg:flex-row items-center gap-gutter border border-outline/10">
+                <!-- Destination -->
+                <div class="flex-1 w-full lg:border-r border-outline-variant/30 lg:pr-gutter pb-4 lg:pb-0 border-b lg:border-b-0">
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-tight">Điểm đến</label>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">location_on</span>
+                        <input type="text" name="search" value="@Model.SearchKeyword" class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md outline-none" placeholder="Bạn muốn đi đâu?" />
+                        <span class="material-symbols-outlined text-on-surface-variant text-sm cursor-pointer">expand_more</span>
+                    </div>
+                </div>
+                
+                <!-- Time -->
+                <div class="flex-1 w-full lg:border-r border-outline-variant/30 lg:pr-gutter pb-4 lg:pb-0 border-b lg:border-b-0">
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-tight">Thời gian</label>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">calendar_month</span>
+                        <input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md outline-none" placeholder="Chọn ngày" type="text" value="Tháng 12, 2024"/>
+                    </div>
+                </div>
+                
+                <!-- Tour Type -->
+                <div class="flex-1 w-full lg:border-r border-outline-variant/30 lg:pr-gutter pb-4 lg:pb-0 border-b lg:border-b-0">
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-tight">Loại hình</label>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">hiking</span>
+                        <select class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md appearance-none outline-none">
+                            <option>Tất cả các tour</option>
+                            <option>Thiên nhiên & Sinh thái</option>
+                            <option>Văn hóa & Di sản</option>
+                            <option>Mạo hiểm & Khám phá</option>
+                        </select>
+                        <span class="material-symbols-outlined text-on-surface-variant text-sm pointer-events-none -ml-6">expand_more</span>
+                    </div>
+                </div>
+                
+                <!-- Price Range -->
+                <div class="flex-1 w-full pb-4 lg:pb-0 border-b lg:border-b-0">
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-tight">Mức giá</label>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">payments</span>
+                        <select class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md appearance-none outline-none">
+                            <option>Tất cả mức giá</option>
+                            <option>Dưới 5tr VNĐ</option>
+                            <option>5tr - 10tr VNĐ</option>
+                            <option>Trên 10tr VNĐ</option>
+                        </select>
+                        <span class="material-symbols-outlined text-on-surface-variant text-sm pointer-events-none -ml-6">expand_more</span>
+                    </div>
+                </div>
 
-<!-- Search & Filter Bar -->
-<div class="container">
-    <div class="tour-filter-bar">
-        <form method="get" asp-action="Index" class="row align-items-center">
-            <div class="col-lg-6 col-md-5 mb-2 mb-md-0">
-                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm tour, địa điểm..." value="@Model.SearchKeyword" />
-            </div>
-            <div class="col-lg-3 col-md-4 mb-2 mb-md-0">
-                <select name="sortBy" class="form-control sort-select">
-                    <option value="" selected="@(string.IsNullOrEmpty(Model.SortBy))">Sắp xếp theo</option>
-                    <option value="price_asc" selected="@(Model.SortBy == "price_asc")">Giá thấp → cao</option>
-                    <option value="price_desc" selected="@(Model.SortBy == "price_desc")">Giá cao → thấp</option>
-                    <option value="name" selected="@(Model.SortBy == "name")">Tên A → Z</option>
-                    <option value="duration" selected="@(Model.SortBy == "duration")">Thời lượng</option>
-                </select>
-            </div>
-            <div class="col-lg-3 col-md-3">
-                <button type="submit" class="btn-search w-100">
-                    <i class="fa fa-search"></i> Tìm Kiếm
+                <!-- Search CTA -->
+                <button type="submit" class="bg-primary text-on-primary p-4 rounded-lg hover:bg-on-primary-fixed-variant transition-all flex items-center justify-center w-full lg:w-auto mt-4 lg:mt-0">
+                    <span class="material-symbols-outlined">search</span>
                 </button>
-            </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Header -->
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg mb-2 text-on-surface">Hành Trình Trải Nghiệm</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Tìm thấy <span class="font-bold text-primary">@Model.TotalCount tours</span> phù hợp với yêu cầu của bạn</p>
+        </div>
+        <form asp-action="Index" method="get" class="flex items-center gap-4 text-on-surface-variant">
+            <input type="hidden" name="search" value="@Model.SearchKeyword" />
+            <span class="font-label-lg text-label-lg">Sắp xếp theo:</span>
+            <select name="sortBy" onchange="this.form.submit()" class="bg-transparent border-none font-label-lg text-label-lg text-primary font-bold cursor-pointer outline-none focus:ring-0 p-0 m-0 w-auto">
+                <option value="">Phổ biến nhất</option>
+                @if(Model.SortBy == "price_asc") { <option value="price_asc" selected>Giá: Thấp đến Cao</option> } else { <option value="price_asc">Giá: Thấp đến Cao</option> }
+                @if(Model.SortBy == "price_desc") { <option value="price_desc" selected>Giá: Cao đến Thấp</option> } else { <option value="price_desc">Giá: Cao đến Thấp</option> }
+            </select>
         </form>
     </div>
-</div>
 
-<!-- Tour Grid -->
-<div class="tour-grid">
-    <div class="container">
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @TempData["Error"]
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-            </div>
-        }
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @TempData["Success"]
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-            </div>
-        }
-
-        <p class="result-count">Tìm thấy <strong>@Model.TotalCount</strong> tour</p>
-
-        @if (Model.Tours.Any())
-        {
-            <div class="row">
-                @foreach (var tour in Model.Tours)
+    <!-- Tour Grid -->
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            @if (Model.Tours != null && Model.Tours.Any())
+            {
+                foreach (var tour in Model.Tours)
                 {
-                    <div class="col-lg-4 col-md-6">
-                        <div class="tour-card">
-                            <div class="tour-card-img">
-                                @if (!string.IsNullOrEmpty(tour.ImageUrl))
-                                {
-                                    <img src="@tour.ImageUrl" alt="@tour.TourName" onerror="this.onerror=null;this.src='/img/room/room-b1.jpg';" />
-                                }
-                                else
-                                {
-                                    <img src="/img/room/room-b1.jpg" alt="Tour" />
-                                }
+                    string imageUrl = string.IsNullOrEmpty(tour.ImageUrl) ? "https://lh3.googleusercontent.com/aida-public/AB6AXuCpOUrgaZ5m78kovL_1L4FziWaSnLV-irC-x3K4XC7Fap715wN0VT65CdQPr00XoISe6-wE-HiaxWNVoptQ1uXNpfuPabNvzI3WnJfjqY4sa8XR9ldHMpUCEYCcXpnxJ3oaseLKxjV9gUv6p_roKXMoQgHJzP5YD5NfPaX0MxRJwIYMwIkPPIBNVmJ8w_3jb88qOMYeSq4bxkNfgzn5rOwLwZojg20gVNvAm8tWKVDFB_JAKbPkoM34DJoQLY8dW8LPhsLBC2RtlpCb" : tour.ImageUrl;
 
-                            </div>
-                            <div class="tour-card-body">
-                                <h4>
-                                    <a asp-action="Details" asp-route-id="@tour.TourId">@tour.TourName</a>
-                                </h4>
-                                <div class="tour-card-meta">
-                                    @if (!string.IsNullOrEmpty(tour.Location))
-                                    {
-                                        <span><i class="fa fa-map-marker"></i> @tour.Location</span>
-                                    }
-                                    <span><i class="fa fa-clock-o"></i> @tour.DurationHours giờ</span>
-                                    <span><i class="fa fa-users"></i> Tối đa @tour.MaxCapacity người</span>
-                                </div>
-                                <div class="tour-card-desc">
-                                    @(tour.Description ?? "Khám phá tour tuyệt vời tại Phúc Nguyễn Resort.")
-                                </div>
-                            </div>
-                            <div class="tour-card-footer">
-                                <div>
-                                    <div class="tour-price">
-                                        @tour.Price.ToString("N0") <small>VNĐ/người</small>
-                                    </div>
-                                    @if (tour.ReviewCount > 0)
-                                    {
-                                        <div class="tour-rating">
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                if (i <= Math.Round(tour.AverageRating))
-                                                {
-                                                    <i class="fa fa-star"></i>
-                                                }
-                                                else
-                                                {
-                                                    <i class="fa fa-star-o"></i>
-                                                }
-                                            }
-                                            <span>(@tour.ReviewCount)</span>
-                                        </div>
-                                    }
-                                </div>
-                                <a asp-action="Details" asp-route-id="@tour.TourId" class="btn-detail">
-                                    Chi Tiết
-                                </a>
+                    <article class="tour-card bg-surface-container-lowest rounded-xl overflow-hidden luxury-shadow border border-outline/5 flex flex-col group hover:-translate-y-1 transition-transform duration-300">
+                        <div class="relative h-64 overflow-hidden">
+                            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="@imageUrl" alt="@tour.TourName" />
+                            @if (!string.IsNullOrEmpty(tour.Location))
+                            {
+                                <div class="absolute top-4 left-4 bg-primary-container/90 backdrop-blur-md text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm uppercase">@tour.Location</div>
+                            }
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
+                                <span class="material-symbols-outlined text-primary fill-icon text-[16px]">star</span>
+                                <span class="font-bold text-label-sm text-on-surface">@(tour.AverageRating > 0 ? tour.AverageRating.ToString("F1") : "4.9")</span>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="font-headline-sm text-headline-sm mb-4 leading-tight group-hover:text-primary transition-colors text-on-surface line-clamp-2">@tour.TourName</h3>
+                            
+                            <p class="text-on-surface-variant text-body-md line-clamp-2 mb-4">@tour.Description</p>
 
+                            <div class="flex items-center gap-gutter mb-6 text-on-surface-variant font-body-md mt-auto">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-outline">schedule</span>
+                                    <span>@(tour.DurationHours >= 24 ? $"{tour.DurationHours/24} ngày" : $"{tour.DurationHours} giờ")</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-outline">groups</span>
+                                    <span>Tối đa @tour.MaxCapacity khách</span>
+                                </div>
+                            </div>
+                            <div class="pt-6 border-t border-outline-variant/20 flex justify-between items-center">
+                                <div>
+                                    <p class="text-label-sm text-on-surface-variant uppercase mb-1 tracking-tight">Giá từ</p>
+                                    <p class="text-headline-sm text-primary font-bold">@tour.Price.ToString("N0")đ</p>
+                                </div>
+                                <a asp-action="Details" asp-route-id="@tour.TourId" class="border border-secondary text-secondary px-5 py-2 rounded-lg font-label-lg text-label-lg hover:bg-secondary hover:text-white transition-all">Chi tiết</a>
+                            </div>
+                        </div>
+                    </article>
+                }
             <!-- Pagination -->
             @if (Model.TotalPages > 1)
             {
-                <nav aria-label="Page navigation" class="mt-4">
-                    <ul class="pagination justify-content-center" style="gap: 5px;">
+                <nav aria-label="Page navigation" class="col-span-full mt-8 flex justify-center">
+                    <ul class="flex items-center gap-2">
                         @if (Model.CurrentPage > 1)
                         {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage - 1 })" aria-label="Previous" style="color: #dfa974; border-radius: 5px;">
-                                    <span aria-hidden="true">&laquo;</span>
+                            <li>
+                                <a class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline/20 text-on-surface hover:bg-primary hover:text-on-primary transition-colors" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage - 1 })" aria-label="Previous">
+                                    <span class="material-symbols-outlined">chevron_left</span>
                                 </a>
                             </li>
                         }
@@ -351,19 +169,19 @@
 
                             if (startPage > 1)
                             {
-                                <li class="page-item">
-                                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = 1 })" style="color: #dfa974; border-radius: 5px;">1</a>
+                                <li>
+                                    <a class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline/20 text-on-surface hover:bg-primary hover:text-on-primary transition-colors" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = 1 })">1</a>
                                 </li>
                                 if (startPage > 2)
                                 {
-                                    <li class="page-item disabled"><span class="page-link" style="border:none; background:transparent;">...</span></li>
+                                    <li><span class="w-10 h-10 flex items-center justify-center text-on-surface-variant">...</span></li>
                                 }
                             }
 
                             for (int i = startPage; i <= endPage; i++)
                             {
-                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = i })" style="@(i == Model.CurrentPage ? "background-color: #dfa974; border-color: #dfa974; color: white; border-radius: 5px;" : "color: #dfa974; border-radius: 5px;")">@i</a>
+                                <li>
+                                    <a class="w-10 h-10 flex items-center justify-center rounded-lg border transition-colors @(i == Model.CurrentPage ? "bg-primary border-primary text-on-primary" : "border-outline/20 text-on-surface hover:bg-primary hover:border-primary hover:text-on-primary")" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = i })">@i</a>
                                 </li>
                             }
 
@@ -371,19 +189,19 @@
                             {
                                 if (endPage < Model.TotalPages - 1)
                                 {
-                                    <li class="page-item disabled"><span class="page-link" style="border:none; background:transparent;">...</span></li>
+                                    <li><span class="w-10 h-10 flex items-center justify-center text-on-surface-variant">...</span></li>
                                 }
-                                <li class="page-item">
-                                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.TotalPages })" style="color: #dfa974; border-radius: 5px;">@Model.TotalPages</a>
+                                <li>
+                                    <a class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline/20 text-on-surface hover:bg-primary hover:text-on-primary transition-colors" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.TotalPages })">@Model.TotalPages</a>
                                 </li>
                             }
                         }
 
                         @if (Model.CurrentPage < Model.TotalPages)
                         {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage + 1 })" aria-label="Next" style="color: #dfa974; border-radius: 5px;">
-                                    <span aria-hidden="true">&raquo;</span>
+                            <li>
+                                <a class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline/20 text-on-surface hover:bg-primary hover:text-on-primary transition-colors" href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage + 1 })" aria-label="Next">
+                                    <span class="material-symbols-outlined">chevron_right</span>
                                 </a>
                             </li>
                         }
@@ -393,11 +211,26 @@
         }
         else
         {
-            <div class="tour-empty">
-                <i class="fa fa-compass"></i>
-                <h4>Không tìm thấy tour nào</h4>
-                <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
+            <div class="col-span-full py-12 text-center bg-surface-container-low rounded-xl">
+                <span class="material-symbols-outlined text-4xl text-outline mb-2">tour</span>
+                <p class="text-on-surface-variant font-body-lg">Không tìm thấy tour nào phù hợp với tìm kiếm của bạn.</p>
             </div>
         }
+        </div>
     </div>
-</div>
+</main>
+
+@section Scripts {
+    <script>
+        // Hover effect for tour cards
+        const cards = document.querySelectorAll('.tour-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('luxury-shadow-lg');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('luxury-shadow-lg');
+            });
+        });
+    </script>
+}

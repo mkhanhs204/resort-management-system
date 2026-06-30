@@ -1,5 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using PhucNguyenResort.Enums;
+using PhucNguyenResort.Services.TableReservations;
+
 namespace PhucNguyenResort.Web.Controllers
 {
     [Authorize(Roles = "System Admin,Business Manager,Receptionist,F&B Staff,Kitchen Staff,Tour Guide,Housekeeping Staff,Maintenance Staff")]
@@ -7,13 +12,19 @@ namespace PhucNguyenResort.Web.Controllers
     {
         private readonly PhucNguyenResort.Services.FoodOrders.IFoodOrderService _foodOrderService;
         private readonly PhucNguyenResort.Services.Kots.IKotService _kotService;
+        private readonly PhucNguyenResort.Data.ResortDbContext _context;
+        private readonly ITableReservationService _tableReservationService;
 
         public DashboardController(
             PhucNguyenResort.Services.FoodOrders.IFoodOrderService foodOrderService,
-            PhucNguyenResort.Services.Kots.IKotService kotService)
+            PhucNguyenResort.Services.Kots.IKotService kotService,
+            PhucNguyenResort.Data.ResortDbContext context,
+            ITableReservationService tableReservationService)
         {
             _foodOrderService = foodOrderService;
             _kotService = kotService;
+            _context = context;
+            _tableReservationService = tableReservationService;
         }
 
         // Trang chính: Tự động chuyển hướng đến dashboard phù hợp với role của người dùng
@@ -48,23 +59,61 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 2. Business Manager Dashboard
         [Authorize(Roles = "Business Manager")]
-        public IActionResult Manager()
+        public async Task<IActionResult> Manager()
         {
-            return View();
+            var model = await _tableReservationService.GetFnBDashboardAsync(DateTime.Today);
+            return View(model);
         }
 
         // 3. Receptionist (Front Desk) Dashboard
         [Authorize(Roles = "Receptionist")]
-        public IActionResult Receptionist()
+        public async Task<IActionResult> Receptionist()
         {
-            return View();
+            var today = DateTime.Today;
+
+            var todaysArrivals = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Bookings.Where(b => b.CheckInDate.Date == today && b.BookingStatus != Enums.BookingStatus.Cancelled)
+            );
+
+            var activeStayGuests = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Bookings.Where(b => b.BookingStatus == Enums.BookingStatus.CheckedIn)
+            );
+
+            var todaysDepartures = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Bookings.Where(b => b.CheckOutDate.Date == today && b.BookingStatus != Enums.BookingStatus.Cancelled)
+            );
+
+            var availableRooms = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Rooms.Where(r => r.Status == Enums.RoomStatus.Available)
+            );
+
+            var recentBookings = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
+                _context.Bookings
+                    .Include(b => b.User)
+                    .Include(b => b.BookingDetails)
+                        .ThenInclude(bd => bd.Room)
+                    .OrderByDescending(b => b.BookingId)
+                    .Take(5)
+            );
+
+            var model = new PhucNguyenResort.ViewModels.Dashboard.ReceptionistDashboardViewModel
+            {
+                TodaysArrivals = todaysArrivals,
+                ActiveStayGuests = activeStayGuests,
+                TodaysDepartures = todaysDepartures,
+                AvailableRooms = availableRooms,
+                RecentBookings = recentBookings
+            };
+
+            return View(model);
         }
 
         // 4. F&B Staff Dashboard
         [Authorize(Roles = "F&B Staff")]
-        public IActionResult FnB()
+        public async Task<IActionResult> FnB()
         {
-            return View();
+            var model = await _tableReservationService.GetFnBDashboardAsync(DateTime.Today);
+            return View(model);
         }
 
         [Authorize(Roles = "F&B Staff")]
@@ -91,6 +140,114 @@ namespace PhucNguyenResort.Web.Controllers
             }
 
             return RedirectToAction(nameof(FoodOrders));
+        }
+
+        [Authorize(Roles = "F&B Staff,Business Manager")]
+        public async Task<IActionResult> TableReservations(DateTime? date, TableReservationStatus? status)
+        {
+            var reservations = await _tableReservationService.GetStaffReservationsAsync(date, status);
+            ViewBag.SelectedDate = date;
+            ViewBag.SelectedStatus = status;
+            ViewBag.CanManageReservationStatus = User.IsInRole("F&B Staff");
+            ViewBag.BackAction = User.IsInRole("Business Manager") ? nameof(Manager) : nameof(FnB);
+
+            return View("~/Views/Dashboard/TableReservations.cshtml", reservations);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmTableReservation(int reservationId)
+        {
+            var currentUserId = GetCurrentUserId();
+            if (!currentUserId.HasValue)
+            {
+                return Challenge();
+            }
+
+            var success = await _tableReservationService.ConfirmReservationAsync(
+                reservationId,
+                currentUserId.Value);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation confirmed successfully."
+                : "Unable to confirm this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SeatTableReservation(int reservationId)
+        {
+            var success = await _tableReservationService.SeatReservationAsync(reservationId);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Guest has been seated successfully."
+                : "Unable to seat this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteTableReservation(int reservationId)
+        {
+            var success = await _tableReservationService.CompleteReservationAsync(reservationId);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation completed successfully."
+                : "Unable to complete this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkTableReservationNoShow(int reservationId)
+        {
+            var success = await _tableReservationService.MarkReservationNoShowAsync(reservationId);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation was marked as no-show."
+                : "No-show can only be marked after the table hold period has passed.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelTableReservation(int reservationId, string? reason)
+        {
+            var currentUserId = GetCurrentUserId();
+            if (!currentUserId.HasValue)
+            {
+                return Challenge();
+            }
+
+            var success = await _tableReservationService.CancelReservationByStaffAsync(
+                reservationId,
+                currentUserId.Value,
+                reason);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation cancelled successfully."
+                : "Unable to cancel this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public IActionResult ChargeTableReservationToRoom(int reservationId, decimal amount)
+        {
+            TempData["ErrorMessage"] = "Please use table food order checkout. Manual table charge amounts are no longer supported.";
+            return RedirectToAction("Checkout", "TableFoodOrders", new { reservationId });
         }
 
         [HttpPost]
@@ -157,6 +314,15 @@ namespace PhucNguyenResort.Web.Controllers
         public IActionResult Maintenance()
         {
             return View();
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return int.TryParse(userIdValue, out var userId)
+                ? userId
+                : null;
         }
     }
 }

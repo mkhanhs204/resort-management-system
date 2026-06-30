@@ -5,9 +5,13 @@ namespace PhucNguyenResort.ViewModels.FoodOrders;
 public class FoodOrderDetailViewModel
 {
     public int FoodOrderId { get; set; }
-    public int BookingId { get; set; }
+    public FoodOrderType OrderType { get; set; }
+    public int? BookingId { get; set; }
+    public int? TableReservationId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public string RoomNumber { get; set; } = string.Empty;
+    public string TableName { get; set; } = string.Empty;
+    public string TableNumber { get; set; } = string.Empty;
     public FoodOrderStatus OrderStatus { get; set; }
     public KotStatus? KitchenStatus { get; set; }
     public decimal TotalAmount { get; set; }
