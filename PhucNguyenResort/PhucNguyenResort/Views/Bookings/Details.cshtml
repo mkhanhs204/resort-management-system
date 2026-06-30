@@ -1,0 +1,256 @@
+@model PhucNguyenResort.Models.Booking
+@using PhucNguyenResort.Enums
+
+@{
+    ViewData["Title"] = "Chi Tiết Đặt Phòng | Phúc Nguyên Resort";
+    
+    var firstDetail = Model.BookingDetails.FirstOrDefault();
+    string categoryName = firstDetail?.RoomCategory?.CategoryName ?? "Phòng Resort";
+    string imgUrl = firstDetail?.RoomCategory?.ImageUrl ?? "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+    string description = firstDetail?.RoomCategory?.Description ?? "Trải nghiệm kỳ nghỉ tuyệt vời với không gian sang trọng và tiện nghi cao cấp.";
+    
+    int totalNights = (Model.CheckOutDate - Model.CheckInDate).Days;
+    if (totalNights <= 0) totalNights = 1;
+    
+    decimal roomTotal = 0;
+    foreach(var detail in Model.BookingDetails)
+    {
+        roomTotal += (detail.RoomCategory?.PricePerNight ?? 0) * totalNights;
+    }
+    
+    decimal tax = roomTotal * 0.1m;
+    decimal grandTotal = Model.TotalAmount ?? (roomTotal + tax);
+    
+    string statusBadgeClass = "";
+    string statusText = "";
+    string statusIcon = "";
+    
+    switch (Model.BookingStatus)
+    {
+        case BookingStatus.Reserved:
+            statusBadgeClass = "bg-blue-50 text-blue-700";
+            statusText = "Đã Xác Nhận";
+            statusIcon = "check_circle";
+            break;
+        case BookingStatus.CheckedIn:
+            statusBadgeClass = "bg-emerald-50 text-emerald-700";
+            statusText = "Đang Lưu Trú";
+            statusIcon = "how_to_reg";
+            break;
+        case BookingStatus.CheckedOut:
+            statusBadgeClass = "bg-surface-container-highest text-on-surface-variant";
+            statusText = "Đã Hoàn Thành";
+            statusIcon = "task_alt";
+            break;
+        case BookingStatus.Cancelled:
+            statusBadgeClass = "bg-red-50 text-red-700";
+            statusText = "Đã Hủy";
+            statusIcon = "cancel";
+            break;
+        case BookingStatus.NoShow:
+            statusBadgeClass = "bg-red-50 text-red-700";
+            statusText = "Không Đến";
+            statusIcon = "event_busy";
+            break;
+    }
+}
+
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg pt-24">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 mb-10 text-on-surface-variant font-label-sm text-label-sm">
+        <a class="hover:text-primary transition-colors" asp-controller="Home" asp-action="Index">Trang Chủ</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <a class="hover:text-primary transition-colors" asp-action="MyBookings">Lịch Sử Đặt Phòng</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="text-on-surface font-semibold">Chi Tiết Đơn Đặt</span>
+    </nav>
+    
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+        <!-- Main Details Area -->
+        <div class="md:col-span-8 space-y-8">
+            <!-- Booking Header -->
+            <section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20 luxury-shadow">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="font-headline-sm text-headline-sm text-primary mb-1">Phúc Nguyên Resort</h1>
+                        <div class="flex items-center gap-4 mt-2">
+                            <span class="font-label-lg text-label-lg text-on-surface-variant">Mã Đặt Phòng: <span class="text-on-surface font-bold uppercase tracking-widest">#PNR-@Model.BookingId.ToString("D5")</span></span>
+                            <span class="@statusBadgeClass px-3 py-1 rounded-full text-label-sm font-bold flex items-center gap-1 border border-current border-opacity-20">
+                                <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">@statusIcon</span>
+                                @statusText
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        @if (Model.BookingStatus == BookingStatus.CheckedOut)
+                        {
+                            <button class="flex items-center gap-2 border border-secondary text-secondary px-4 py-2 rounded-lg font-label-lg hover:bg-secondary-container/30 transition-all shadow-sm">
+                                <span class="material-symbols-outlined">download</span>
+                                Tải Hóa Đơn
+                            </button>
+                        }
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Room Information -->
+            <section class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden luxury-shadow">
+                <img class="w-full h-80 object-cover" src="@imgUrl" alt="@categoryName" />
+                <div class="p-8">
+                    <h2 class="font-headline-sm text-headline-sm mb-4">@categoryName</h2>
+                    <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">
+                        @description
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                        <div class="flex items-center gap-3 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary">king_bed</span>
+                            <span class="font-label-lg">Giường Cao Cấp</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary">waves</span>
+                            <span class="font-label-lg">View Tuyệt Đẹp</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary">wifi</span>
+                            <span class="font-label-lg">Wifi Tốc Độ Cao</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary">bathtub</span>
+                            <span class="font-label-lg">Bồn Tắm Riêng</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary">coffee_maker</span>
+                            <span class="font-label-lg">Mini Bar Miễn Phí</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary">nest_cam_indoor</span>
+                            <span class="font-label-lg">Điều Khiển Thông Minh</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Stay Details -->
+            <section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20 luxury-shadow">
+                <h3 class="font-label-lg text-label-lg uppercase tracking-widest text-primary mb-6">Chi Tiết Lưu Trú</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <p class="text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Nhận phòng</p>
+                        <p class="font-headline-sm text-headline-sm text-on-surface">@Model.CheckInDate.ToString("dd MMM yyyy")</p>
+                        <p class="text-label-sm text-on-surface-variant mt-1">Từ 14:00</p>
+                    </div>
+                    <div>
+                        <p class="text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Trả phòng</p>
+                        <p class="font-headline-sm text-headline-sm text-on-surface">@Model.CheckOutDate.ToString("dd MMM yyyy")</p>
+                        <p class="text-label-sm text-on-surface-variant mt-1">Trước 12:00</p>
+                    </div>
+                    <div>
+                        <p class="text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Khách</p>
+                        <p class="font-headline-sm text-headline-sm text-on-surface">@Model.NumberOfAdults Người lớn</p>
+                        <p class="text-label-sm text-on-surface-variant mt-1">@(Model.NumberOfChildren ?? 0) Trẻ em, @totalNights Đêm</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Sidebar -->
+        <aside class="md:col-span-4 space-y-8">
+            <!-- Price Breakdown -->
+            <section class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/20 luxury-shadow">
+                <h3 class="font-label-lg text-label-lg uppercase tracking-widest text-primary mb-6">Tóm Tắt Thanh Toán</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-body-md">
+                        <span class="text-on-surface-variant">@totalNights Đêm x @(firstDetail?.RoomCategory?.PricePerNight?.ToString("N0") ?? "0")</span>
+                        <span class="font-medium text-on-surface">@roomTotal.ToString("N0") VNĐ</span>
+                    </div>
+                    <div class="flex justify-between text-body-md">
+                        <span class="text-on-surface-variant">Phí dịch vụ</span>
+                        <span class="font-medium text-primary">Miễn phí</span>
+                    </div>
+                    <div class="flex justify-between text-body-md">
+                        <span class="text-on-surface-variant">Thuế (10% VAT)</span>
+                        <span class="font-medium text-on-surface">@tax.ToString("N0") VNĐ</span>
+                    </div>
+                    
+                    @if (Model.TourBookings != null && Model.TourBookings.Any())
+                    {
+                        <div class="border-t border-outline-variant/10 pt-4 mt-2">
+                            <span class="font-label-sm text-on-surface-variant block mb-2">Dịch vụ bổ sung:</span>
+                            @foreach (var tb in Model.TourBookings)
+                            {
+                                <div class="flex justify-between text-body-md">
+                                    <span class="text-on-surface-variant">- @tb.Schedule?.Tour?.TourName</span>
+                                    <span class="font-medium text-on-surface">@(((tb.Schedule?.Tour?.Price ?? 0) * (tb.Participants ?? 0)).ToString("N0")) VNĐ</span>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="border-t border-outline-variant/20 pt-4 mt-4 flex justify-between items-center">
+                        <span class="font-bold text-on-surface">Tổng Tiền</span>
+                        <span class="font-headline-sm text-headline-sm text-primary font-bold">@grandTotal.ToString("N0") VNĐ</span>
+                    </div>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-outline-variant/20">
+                    <p class="text-label-sm text-on-surface-variant mb-2">Trạng Thái Thanh Toán</p>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-secondary">credit_score</span>
+                        <span class="font-body-md font-bold text-on-surface">Đã Thanh Toán Toàn Bộ</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Included Services -->
+            <section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20 luxury-shadow">
+                <h3 class="font-label-lg text-label-lg uppercase tracking-widest text-primary mb-6">Đặc Quyền Kèm Theo</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-primary-container">restaurant</span>
+                        <div>
+                            <p class="font-label-lg text-on-surface">Bữa sáng Buffet hàng ngày</p>
+                            <p class="text-label-sm text-on-surface-variant">Tại Nhà hàng L'Horizon</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-primary-container">spa</span>
+                        <div>
+                            <p class="font-label-lg text-on-surface">Voucher Spa 60 phút</p>
+                            <p class="text-label-sm text-on-surface-variant">Một lần cho mỗi khách</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-primary-container">airport_shuttle</span>
+                        <div>
+                            <p class="font-label-lg text-on-surface">Đón/Tiễn Sân Bay Hạng Sang</p>
+                            <p class="text-label-sm text-on-surface-variant">Limousine riêng biệt</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-primary-container">local_bar</span>
+                        <div>
+                            <p class="font-label-lg text-on-surface">Giờ Cocktail Hoàng Hôn</p>
+                            <p class="text-label-sm text-on-surface-variant">Mỗi ngày tại The Azure Lounge</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Actions -->
+            <div class="space-y-3">
+                <button onclick="alert('Đang kết nối bạn tới nhân viên hỗ trợ Concierge...');" class="w-full bg-on-surface text-surface py-4 rounded-xl font-label-lg hover:opacity-90 transition-all shadow-md">
+                    Yêu Cầu Hỗ Trợ
+                </button>
+                @if (Model.BookingStatus == BookingStatus.Reserved && Model.CheckInDate > DateTime.Today.AddDays(3))
+                {
+                    <a asp-action="Cancel" asp-route-id="@Model.BookingId" class="w-full border border-error text-error py-4 rounded-xl font-label-lg hover:bg-error-container hover:text-on-error-container transition-all flex items-center justify-center">
+                        Hủy Đơn Đặt Phòng
+                    </a>
+                    <p class="text-center text-label-sm text-on-surface-variant px-4 leading-relaxed">
+                        Miễn phí hủy phòng đến trước @(Model.CheckInDate.AddDays(-3).ToString("dd/MM/yyyy")). Áp dụng Điều khoản & Chính sách.
+                    </p>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
