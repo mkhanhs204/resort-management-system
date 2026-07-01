@@ -346,10 +346,9 @@ namespace PhucNguyenResort.Controllers
                     }
                     catch { }
                 }
-                
-                string qrData = $"{Request.Scheme}://{hostString}/Tours/CheckTicket?ticketId={booking.TourBookingId}";
-                string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={Uri.EscapeDataString(qrData)}";
-                string qrImageSrc = qrUrl;
+                var qrUrl = $"{Request.Scheme}://{hostString}/Tours/CheckTicket?ticketId={booking.TourBookingId}";
+                var qrImageSrc = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={Uri.EscapeDataString(qrUrl)}";
+
 
                 string subject = "Xác nhận đặt Tour thành công - PhucNguyen Resort";
                 string htmlBody = $@"
