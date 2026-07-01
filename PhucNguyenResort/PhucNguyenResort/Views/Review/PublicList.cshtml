@@ -3,177 +3,120 @@
     ViewData["Title"] = "Khách Hàng Đánh Giá";
 }
 
-@section Styles {
-    <style>
-        .testimonial-page {
-            padding: 80px 0;
-            background: #fdfaf6;
-        }
-        .testimonial-item {
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s;
-            height: 100%;
-        }
-        .testimonial-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        .ti-author {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .rating {
-            margin-right: 15px;
-        }
-        .rating i {
-            color: #dfa974;
-            font-size: 14px;
-        }
-        .ti-author-text h6 {
-            color: #19191a;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-        .ti-author-text span {
-            color: #dfa974;
-            font-size: 14px;
-            display: block;
-        }
-        .testimonial-item p {
-            font-size: 16px;
-            color: #707079;
-            line-height: 1.8;
-            font-style: italic;
-            margin-bottom: 0;
-        }
-        .service-badge {
-            display: inline-block;
-            background: #f5f5f5;
-            color: #888;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-top: 15px;
-        }
-        .section-title {
-            margin-bottom: 50px;
-            text-align: center;
-        }
-        .section-title h2 {
-            font-family: 'Lora', serif;
-            color: #19191a;
-            font-size: 44px;
-            font-weight: 700;
-        }
-    </style>
-}
-
-<!-- Breadcrumb Section -->
-<div class="breadcrumb-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="breadcrumb-text">
-                    <h2>Đánh Giá</h2>
-                    <div class="bt-option">
-                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
-                        <span>Khách Hàng Đánh Giá</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="pt-24 pb-section-gap-lg max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop min-h-screen">
+    <!-- Header Section -->
+    <div class="text-center mb-16 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h2 class="font-label-lg text-primary tracking-[0.2em] uppercase mb-4">Trải Nghiệm Khách Hàng</h2>
+        <h1 class="font-headline-lg text-5xl md:text-6xl text-on-surface mb-6">Cảm nhận từ khách hàng</h1>
+        <div class="w-24 h-[2px] bg-primary mx-auto"></div>
     </div>
-</div>
 
-<section class="testimonial-page">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="section-title">
-                    <span>Trải Nghiệm Khách Hàng</span>
-                    <h2>Cảm nhận từ khách hàng</h2>
-                </div>
-            </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="max-w-3xl mx-auto bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-xl mb-8 flex items-center justify-center gap-3">
+            <span class="material-symbols-outlined text-xl">check_circle</span>
+            <span class="font-body-lg">@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <!-- Filters Section -->
+    <div class="flex flex-col md:flex-row items-center justify-center gap-8 mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+        <!-- Rating Filters -->
+        <div class="flex flex-wrap items-center justify-center gap-3 bg-surface-container-lowest p-2 rounded-2xl luxury-shadow border border-outline-variant/20">
+            <a href="@Url.Action("PublicList", new { serviceType = ViewBag.CurrentServiceType })" 
+               class="px-5 py-2.5 rounded-xl font-label-md transition-all @(ViewBag.CurrentRating == null ? "bg-primary text-on-primary shadow-md" : "text-on-surface hover:bg-surface-container")">
+                Tất cả sao
+            </a>
+            @for (int i = 5; i >= 1; i--)
+            {
+                <a href="@Url.Action("PublicList", new { rating = i, serviceType = ViewBag.CurrentServiceType })" 
+                   class="px-4 py-2.5 rounded-xl font-label-md transition-all flex items-center gap-1 @(ViewBag.CurrentRating == i ? "bg-primary text-on-primary shadow-md" : "text-on-surface hover:bg-surface-container")">
+                    @i <span class="material-symbols-outlined text-[18px] @(ViewBag.CurrentRating == i ? "text-on-primary" : "text-primary")" style="font-variation-settings: 'FILL' 1;">star</span>
+                </a>
+            }
         </div>
         
-        <div class="row">
-            <div class="col-lg-12 text-center mb-4">
-                <form method="get" class="d-inline-block">
-                    <div class="btn-group mr-3" role="group" aria-label="Rating filter">
-                        <a href="@Url.Action("PublicList", new { serviceType = ViewBag.CurrentServiceType })" class="btn btn-outline-secondary @(ViewBag.CurrentRating == null ? "active" : "")">Tất cả sao</a>
-                        <a href="@Url.Action("PublicList", new { rating = 5, serviceType = ViewBag.CurrentServiceType })" class="btn btn-outline-secondary @(ViewBag.CurrentRating == 5 ? "active" : "")">5 Sao</a>
-                        <a href="@Url.Action("PublicList", new { rating = 4, serviceType = ViewBag.CurrentServiceType })" class="btn btn-outline-secondary @(ViewBag.CurrentRating == 4 ? "active" : "")">4 Sao</a>
-                        <a href="@Url.Action("PublicList", new { rating = 3, serviceType = ViewBag.CurrentServiceType })" class="btn btn-outline-secondary @(ViewBag.CurrentRating == 3 ? "active" : "")">3 Sao</a>
-                        <a href="@Url.Action("PublicList", new { rating = 2, serviceType = ViewBag.CurrentServiceType })" class="btn btn-outline-secondary @(ViewBag.CurrentRating == 2 ? "active" : "")">2 Sao</a>
-                        <a href="@Url.Action("PublicList", new { rating = 1, serviceType = ViewBag.CurrentServiceType })" class="btn btn-outline-secondary @(ViewBag.CurrentRating == 1 ? "active" : "")">1 Sao</a>
-                    </div>
-                    
-                    <div class="btn-group" role="group" aria-label="Service Type filter">
-                        <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating })" class="btn btn-outline-info @(string.IsNullOrEmpty(ViewBag.CurrentServiceType) ? "active" : "")">Mọi dịch vụ</a>
-                        <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating, serviceType = "Room" })" class="btn btn-outline-info @(ViewBag.CurrentServiceType == "Room" ? "active" : "")">Phòng nghỉ</a>
-                        <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating, serviceType = "Tour" })" class="btn btn-outline-info @(ViewBag.CurrentServiceType == "Tour" ? "active" : "")">Tour du lịch</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="alert alert-success text-center">
-                        @TempData["SuccessMessage"]
-                    </div>
-                </div>
-            </div>
-        }
-
-        <div class="row">
-            @if (Model != null && Model.Any())
-            {
-                foreach (var review in Model)
-                {
-                    <div class="col-lg-6 col-md-6 mb-4">
-                        <div class="testimonial-item">
-                            <div class="ti-author">
-                                <div class="rating">
-                                    @for (int i = 0; i < 5; i++)
-                                    {
-                                        if (i < review.Rating)
-                                        {
-                                            <i class="icon_star"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="icon_star-half_alt" style="color:#ddd;"></i>
-                                        }
-                                    }
-                                </div>
-                                <div class="ti-author-text">
-                                    <h6>@review.UserName</h6>
-                                    <span>@review.CreatedAt.ToString("dd/MM/yyyy")</span>
-                                </div>
-                            </div>
-                            <p>@(!string.IsNullOrEmpty(review.Comment) ? review.Comment : "Tuyệt vời!")</p>
-                            <div class="service-badge">
-                                <i class="fa @(review.ServiceType == "Room" ? "fa-bed" : "fa-map-o")"></i> @review.ServiceName
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="col-12 text-center">
-                    <p class="text-muted">Chưa có đánh giá nào được hiển thị.</p>
-                </div>
-            }
+        <!-- Service Type Filters -->
+        <div class="flex flex-wrap items-center justify-center gap-3 bg-surface-container-lowest p-2 rounded-2xl luxury-shadow border border-outline-variant/20">
+            <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating })" 
+               class="px-5 py-2.5 rounded-xl font-label-md transition-all @(string.IsNullOrEmpty(ViewBag.CurrentServiceType) ? "bg-secondary text-on-primary shadow-md" : "text-on-surface hover:bg-surface-container")">
+                Mọi dịch vụ
+            </a>
+            <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating, serviceType = "Room" })" 
+               class="px-5 py-2.5 rounded-xl font-label-md transition-all flex items-center gap-2 @(ViewBag.CurrentServiceType == "Room" ? "bg-secondary text-on-primary shadow-md" : "text-on-surface hover:bg-surface-container")">
+                <span class="material-symbols-outlined text-[18px]">bed</span> Phòng nghỉ
+            </a>
+            <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating, serviceType = "Tour" })" 
+               class="px-5 py-2.5 rounded-xl font-label-md transition-all flex items-center gap-2 @(ViewBag.CurrentServiceType == "Tour" ? "bg-secondary text-on-primary shadow-md" : "text-on-surface hover:bg-surface-container")">
+                <span class="material-symbols-outlined text-[18px]">tour</span> Tour du lịch
+            </a>
         </div>
     </div>
-</section>
+
+    <!-- Reviews Grid -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach (var review in Model)
+            {
+                <div class="bg-surface-container-lowest rounded-2xl p-8 luxury-shadow border border-outline-variant/10 hover:-translate-y-2 hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col h-full group">
+                    
+                    <!-- Rating & Author -->
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="font-headline-sm text-on-surface font-bold text-xl mb-1">@review.UserName</h3>
+                            <div class="text-label-sm text-on-surface-variant flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                                @review.CreatedAt.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+                        <div class="flex text-primary">
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                if (i < review.Rating)
+                                {
+                                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                }
+                                else
+                                {
+                                    <span class="material-symbols-outlined text-[20px] text-outline-variant">star</span>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Comment -->
+                    <div class="flex-grow">
+                        <p class="font-body-lg text-on-surface-variant leading-relaxed italic">
+                            @(!string.IsNullOrEmpty(review.Comment) ? review.Comment : "Trải nghiệm tuyệt vời tại Phúc Nguyên Resort!")
+                        </p>
+                    </div>
+
+                    <!-- Service Badge -->
+                    <div class="mt-8 pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant font-label-md">
+                        <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">@(review.ServiceType == "Room" ? "bed" : "map")</span>
+                        </div>
+                        <span class="truncate">@review.ServiceName</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Empty State -->
+        <div class="py-24 flex flex-col items-center justify-center text-center bg-surface-container-lowest rounded-3xl luxury-shadow border border-outline-variant/10">
+            <div class="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-5xl text-outline-variant">comments_disabled</span>
+            </div>
+            <h3 class="font-headline-md text-on-surface mb-2">Chưa có đánh giá nào</h3>
+            <p class="font-body-lg text-on-surface-variant max-w-md mx-auto">
+                Hiện tại chưa có đánh giá nào phù hợp với bộ lọc của bạn. Hãy thử thay đổi tiêu chí lọc hoặc quay lại sau.
+            </p>
+            <a href="@Url.Action("PublicList")" class="mt-8 px-8 py-3 bg-primary text-on-primary rounded-xl font-label-lg transition-all hover:bg-on-primary-fixed-variant">
+                Xóa bộ lọc
+            </a>
+        </div>
+    }
+</div>

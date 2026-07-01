@@ -38,9 +38,9 @@ namespace PhucNguyenResort.Controllers
         /// GET: /CustomerTourBooking — Browse all available tours.
         /// Accessible by Guest + Customer.
         /// </summary>
-        public async Task<IActionResult> Index(string? search, string? sortBy)
+        public async Task<IActionResult> Index(string? search, string? sortBy, int page = 1)
         {
-            var model = await _tourBookingService.GetTourListAsync(search, sortBy);
+            var model = await _tourBookingService.GetTourListAsync(search, sortBy, page, 9);
             return View(model);
         }
 
@@ -80,7 +80,12 @@ namespace PhucNguyenResort.Controllers
             if (model.AvailableSlots <= 0)
             {
                 TempData["Error"] = "Lịch trình này đã hết chỗ.";
-                return RedirectToAction("Details", new { id = model.ScheduleId });
+                var schedule = await _context.TourSchedules.FindAsync(model.ScheduleId);
+                if (schedule != null)
+                {
+                    return RedirectToAction("Details", new { id = schedule.TourId });
+                }
+                return RedirectToAction(nameof(Index));
             }
 
             return View(model);
@@ -327,8 +332,23 @@ namespace PhucNguyenResort.Controllers
 
             if (booking != null && booking.User != null && !string.IsNullOrEmpty(booking.User.Email))
             {
-                string qrData = $"{Request.Scheme}://{Request.Host}/Tours/CheckTicket?ticketId={booking.TourBookingId}";
-                string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&amp;data={System.Net.WebUtility.UrlEncode(qrData)}";
+                var hostString = Request.Host.ToString();
+                if (hostString.StartsWith("localhost", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var ip = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName())
+                                    .AddressList.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                        if (ip != null)
+                        {
+                            hostString = hostString.Replace("localhost", ip.ToString(), StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+                    catch { }
+                }
+                var qrUrl = $"{Request.Scheme}://{hostString}/Tours/CheckTicket?ticketId={booking.TourBookingId}";
+                var qrImageSrc = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={Uri.EscapeDataString(qrUrl)}";
+
 
                 string subject = "Xác nhận đặt Tour thành công - PhucNguyen Resort";
                 string htmlBody = $@"
@@ -369,6 +389,11 @@ namespace PhucNguyenResort.Controllers
                         </tr>
                     </table>
                     
+                    <div style='text-align: center; margin-top: 30px;'>
+                        <p style='font-size: 14px; color: #555; margin-bottom: 10px;'><strong>Mã QR Check-in</strong><br>Vui lòng lưu lại hình ảnh này và đưa cho nhân viên khi bắt đầu tour</p>
+                        <img src='{qrImageSrc}' alt='QR Code Check-in' style='border: 1px solid #ddd; padding: 10px; border-radius: 10px; background: #fff;' />
+                    </div>
+
                     <p style='margin-top: 20px;'>Chúng tôi rất mong được đón tiếp bạn tham gia chuyến đi đầy thú vị này. Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ lễ tân.</p>
                     <p style='margin-top: 30px; text-align: center; color: #777; font-size: 12px;'>PhucNguyen Resort &copy; {DateTime.Now.Year}</p>
                 </div>";

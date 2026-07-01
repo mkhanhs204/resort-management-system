@@ -3736,6 +3736,9 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TourBookingId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("TourId")
                         .HasColumnType("int");
 
@@ -3745,6 +3748,8 @@ namespace PhucNguyenResort.Web.Migrations
                     b.HasKey("ReviewId");
 
                     b.HasIndex("BookingId");
+
+                    b.HasIndex("TourBookingId");
 
                     b.HasIndex("TourId");
 
@@ -3760,6 +3765,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 16, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 4,
+                            TourBookingId = 1,
                             TourId = 1,
                             UserId = 1
                         },
@@ -3780,6 +3786,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 18, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 1,
+                            TourBookingId = 3,
                             TourId = 3,
                             UserId = 3
                         },
@@ -3800,6 +3807,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 20, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = false,
                             Rating = 3,
+                            TourBookingId = 5,
                             TourId = 5,
                             UserId = 5
                         },
@@ -3820,6 +3828,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 22, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
+                            TourBookingId = 7,
                             TourId = 7,
                             UserId = 7
                         },
@@ -3840,6 +3849,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 24, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 2,
+                            TourBookingId = 9,
                             TourId = 9,
                             UserId = 9
                         },
@@ -3860,6 +3870,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 26, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 4,
+                            TourBookingId = 11,
                             TourId = 11,
                             UserId = 11
                         },
@@ -3880,6 +3891,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 28, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 1,
+                            TourBookingId = 13,
                             TourId = 13,
                             UserId = 13
                         },
@@ -3900,6 +3912,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 30, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 3,
+                            TourBookingId = 15,
                             TourId = 15,
                             UserId = 15
                         },
@@ -3920,6 +3933,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 7, 2, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
+                            TourBookingId = 17,
                             TourId = 17,
                             UserId = 17
                         },
@@ -3940,6 +3954,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 7, 4, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 2,
+                            TourBookingId = 19,
                             TourId = 19,
                             UserId = 19
                         },
@@ -6491,6 +6506,10 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("PhucNguyenResort.Models.TourBooking", "TourBooking")
+                        .WithMany()
+                        .HasForeignKey("TourBookingId");
+
                     b.HasOne("PhucNguyenResort.Models.Tour", "Tour")
                         .WithMany("Reviews")
                         .HasForeignKey("TourId")
@@ -6504,6 +6523,8 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Navigation("Booking");
 
                     b.Navigation("Tour");
+
+                    b.Navigation("TourBooking");
 
                     b.Navigation("User");
                 });

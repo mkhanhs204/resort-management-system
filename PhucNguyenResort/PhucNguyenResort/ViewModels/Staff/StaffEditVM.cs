@@ -25,7 +25,8 @@ namespace PhucNguyenResort.ViewModels.Staff
         [Display(Name = "Role")]
         public int RoleId { get; set; }
 
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Mật khẩu phải có ít nhất 8 ký tự.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (@$!%*?&).")]
         [DataType(DataType.Password)]
         [Display(Name = "New Password (leave blank to keep current)")]
         public string? Password { get; set; }

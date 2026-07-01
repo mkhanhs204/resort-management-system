@@ -15,9 +15,9 @@ public class ReviewService : IReviewService
         _context = context;
     }
 
-    public async Task<bool> CanSubmitReviewAsync(int userId, int? bookingId, int? tourId)
+    public async Task<bool> CanSubmitReviewAsync(int userId, int? bookingId, int? tourBookingId)
     {
-        if (bookingId == null && tourId == null)
+        if (bookingId == null && tourBookingId == null)
             return false;
 
         if (bookingId.HasValue)
@@ -29,13 +29,11 @@ public class ReviewService : IReviewService
                 return false;
         }
 
-        if (tourId.HasValue)
+        if (tourBookingId.HasValue)
         {
             var hasCompletedTour = await _context.TourBookings
-                .Include(tb => tb.Schedule)
                 .AnyAsync(tb => tb.UserId == userId 
-                             && tb.Schedule != null 
-                             && tb.Schedule.TourId == tourId.Value 
+                             && tb.TourBookingId == tourBookingId.Value 
                              && tb.BookingStatus == TourBookingStatus.Completed);
             
             if (!hasCompletedTour)
@@ -50,13 +48,13 @@ public class ReviewService : IReviewService
         if (model.Rating == null || model.Rating < 1 || model.Rating > 5)
             throw new InvalidOperationException("REV-001: Rating must be between 1 and 5");
 
-        if (model.BookingId == null && model.TourId == null)
-            throw new InvalidOperationException("REV-002: Must provide BookingId or TourId");
+        if (model.BookingId == null && model.TourBookingId == null)
+            throw new InvalidOperationException("REV-002: Must provide BookingId or TourBookingId");
 
-        if (model.BookingId != null && model.TourId != null)
-            throw new InvalidOperationException("REV-002: Cannot provide both BookingId and TourId simultaneously");
+        if (model.BookingId != null && model.TourBookingId != null)
+            throw new InvalidOperationException("REV-002: Cannot provide both BookingId and TourBookingId simultaneously");
 
-        var canSubmit = await CanSubmitReviewAsync(userId, model.BookingId, model.TourId);
+        var canSubmit = await CanSubmitReviewAsync(userId, model.BookingId, model.TourBookingId);
         if (!canSubmit)
             throw new InvalidOperationException("REV-003: Service not completed yet");
 
@@ -64,16 +62,26 @@ public class ReviewService : IReviewService
         var isDuplicate = await _context.Reviews.AnyAsync(r => 
             r.UserId == userId && 
             ((model.BookingId.HasValue && r.BookingId == model.BookingId) || 
-             (model.TourId.HasValue && r.TourId == model.TourId)));
+             (model.TourBookingId.HasValue && r.TourBookingId == model.TourBookingId)));
 
         if (isDuplicate)
-            throw new InvalidOperationException("REV-004: Review already submitted");
+            throw new InvalidOperationException("REV-004: Review already submitted for this booking");
+
+        int? tourId = null;
+        if (model.TourBookingId.HasValue)
+        {
+            var tourBooking = await _context.TourBookings
+                .Include(tb => tb.Schedule)
+                .FirstOrDefaultAsync(tb => tb.TourBookingId == model.TourBookingId.Value);
+            tourId = tourBooking?.Schedule?.TourId;
+        }
 
         var review = new Review
         {
             UserId = userId,
             BookingId = model.BookingId,
-            TourId = model.TourId,
+            TourBookingId = model.TourBookingId,
+            TourId = tourId,
             Rating = model.Rating,
             Comment = model.Comment,
             IsVisible = true,
@@ -88,39 +96,16 @@ public class ReviewService : IReviewService
 
     public async Task<IEnumerable<ReviewListVM>> GetAllReviewsAsync()
     {
-        return await _context.Reviews
+        var reviews = await _context.Reviews
             .Include(r => r.User)
             .Include(r => r.Tour)
             .Include(r => r.Booking)
-            .Select(r => new ReviewListVM
-            {
-                ReviewId = r.ReviewId,
-                UserName = r.User != null ? r.User.FullName : "Khách",
-                Rating = r.Rating,
-                Comment = r.Comment,
-                IsVisible = r.IsVisible,
-                CreatedAt = r.CreatedAt,
-                ServiceType = r.BookingId != null ? "Room" : "Tour",
-                ServiceName = r.BookingId != null ? "Booking #" + r.BookingId : r.Tour != null ? r.Tour.TourName : ""
-            })
+                .ThenInclude(b => b!.BookingDetails)
+                    .ThenInclude(bd => bd.RoomCategory)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
-    }
 
-    public async Task<IEnumerable<ReviewListVM>> GetPublicReviewsAsync(int? tourId = null)
-    {
-        var query = _context.Reviews
-            .Include(r => r.User)
-            .Include(r => r.Tour)
-            .Include(r => r.Booking)
-            .Where(r => r.IsVisible);
-
-        if (tourId.HasValue)
-        {
-            query = query.Where(r => r.TourId == tourId.Value);
-        }
-
-        return await query.Select(r => new ReviewListVM
+        return reviews.Select(r => new ReviewListVM
         {
             ReviewId = r.ReviewId,
             UserName = r.User != null ? r.User.FullName : "Khách",
@@ -129,10 +114,42 @@ public class ReviewService : IReviewService
             IsVisible = r.IsVisible,
             CreatedAt = r.CreatedAt,
             ServiceType = r.BookingId != null ? "Room" : "Tour",
-            ServiceName = r.BookingId != null ? "Booking #" + r.BookingId : r.Tour != null ? r.Tour.TourName : ""
-        })
-        .OrderByDescending(r => r.CreatedAt)
-        .ToListAsync();
+            ServiceName = r.BookingId != null 
+                ? (r.Booking?.BookingDetails?.FirstOrDefault()?.RoomCategory?.CategoryName ?? "Phòng Resort") 
+                : r.Tour != null ? r.Tour.TourName : ""
+        });
+    }
+
+    public async Task<IEnumerable<ReviewListVM>> GetPublicReviewsAsync(int? tourId = null)
+    {
+        var query = _context.Reviews
+            .Include(r => r.User)
+            .Include(r => r.Tour)
+            .Include(r => r.Booking)
+                .ThenInclude(b => b!.BookingDetails)
+                    .ThenInclude(bd => bd.RoomCategory)
+            .Where(r => r.IsVisible);
+
+        if (tourId.HasValue)
+        {
+            query = query.Where(r => r.TourId == tourId.Value);
+        }
+
+        var reviews = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
+
+        return reviews.Select(r => new ReviewListVM
+        {
+            ReviewId = r.ReviewId,
+            UserName = r.User != null ? r.User.FullName : "Khách",
+            Rating = r.Rating,
+            Comment = r.Comment,
+            IsVisible = r.IsVisible,
+            CreatedAt = r.CreatedAt,
+            ServiceType = r.BookingId != null ? "Room" : "Tour",
+            ServiceName = r.BookingId != null 
+                ? (r.Booking?.BookingDetails?.FirstOrDefault()?.RoomCategory?.CategoryName ?? "Phòng Resort") 
+                : r.Tour != null ? r.Tour.TourName : ""
+        });
     }
 
     public async Task<ReviewListVM?> GetReviewByIdAsync(int reviewId)
@@ -141,6 +158,8 @@ public class ReviewService : IReviewService
             .Include(rev => rev.User)
             .Include(rev => rev.Tour)
             .Include(rev => rev.Booking)
+                .ThenInclude(b => b!.BookingDetails)
+                    .ThenInclude(bd => bd.RoomCategory)
             .FirstOrDefaultAsync(rev => rev.ReviewId == reviewId);
 
         if (r == null) return null;
@@ -154,7 +173,9 @@ public class ReviewService : IReviewService
             IsVisible = r.IsVisible,
             CreatedAt = r.CreatedAt,
             ServiceType = r.BookingId != null ? "Room" : "Tour",
-            ServiceName = r.BookingId != null ? "Booking #" + r.BookingId : r.Tour != null ? r.Tour.TourName : ""
+            ServiceName = r.BookingId != null 
+                ? (r.Booking?.BookingDetails?.FirstOrDefault()?.RoomCategory?.CategoryName ?? "Phòng Resort") 
+                : r.Tour != null ? r.Tour.TourName : ""
         };
     }
 

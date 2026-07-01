@@ -69,6 +69,7 @@ namespace PhucNguyenResort.Controllers
                 user.PasswordHash = PasswordHelper.HashPassword(user, model.Password);
 
                 await _userService.AddStaffAsync(user);
+                TempData["SuccessMessage"] = "Tạo tài khoản mới thành công!";
                 return RedirectToAction(nameof(Index));
             }
             await PopulateRolesDropDownList(model.RoleId);
@@ -139,6 +140,7 @@ namespace PhucNguyenResort.Controllers
                 }
 
                 await _userService.UpdateStaffAsync(userToUpdate);
+                TempData["SuccessMessage"] = "Cập nhật thông tin tài khoản thành công!";
                 return RedirectToAction(nameof(Index));
             }
             await PopulateRolesDropDownList(model.RoleId);
@@ -172,6 +174,16 @@ namespace PhucNguyenResort.Controllers
             }
 
             await _userService.ToggleUserBlockStatusAsync(id);
+            if (user.IsBlocked)
+            {
+                TempData["SuccessMessage"] = "Khóa tài khoản thành công!";
+                TempData["MessageType"] = "danger";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Mở khóa tài khoản thành công!";
+                TempData["MessageType"] = "success";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

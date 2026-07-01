@@ -53,7 +53,7 @@ Test data dùng dữ liệu SYNTHETIC. Không dùng PII thật.
 | Feature / Gap ID      | UC53, UC54, UC55                                                                                   |
 | Module                | `Check-out & Consolidated Billing - Front Desk / Billing`                                        |
 | Spec gốc             | `SWP391-BILLING-IMP-001` (EDS_CHECKOUT_BILLING.md)                                               |
-| Priority              | 🔴 P0                                                                                              |
+| Priority              | 🟢                                                                                                 |
 | Sprint                | S3 (2026-06-25 -> 2026-07-09)                                                                      |
 | Milestone             | M3 Alpha - 2026-07-11                                                                              |
 | Data Classification   | PII (Tên khách, CCCD trên Invoice)                                                              |
@@ -158,7 +158,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `BR-UC53-01`
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED — chưa implement
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-001
 
 **Preconditions**:
@@ -179,7 +179,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 
 - Method trả về ViewModel dù Booking chưa CheckedIn → lỗ hổng nghiệp vụ
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 **Implementation Note**: Kiểm tra `booking.BookingStatus != BookingStatus.CheckedIn` → return null
 
 ---
@@ -189,7 +189,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-002
 
 **Preconditions**:
@@ -210,7 +210,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 
 - NullReferenceException khi truy cập GuestFolio properties
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -219,7 +219,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()` — surcharge logic
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-003
 
 **Preconditions**:
@@ -244,7 +244,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 
 - Surcharge = 0 hoặc sai tỷ lệ phần trăm
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -253,7 +253,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()` — surcharge logic
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-004
 
 **Preconditions**:
@@ -270,7 +270,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: LateCheckOutSurcharge = 500,000 VND
 **Expected Result (FAIL)**: Sai tỷ lệ hoặc rơi vào khung giờ khác
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -279,7 +279,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()` — surcharge logic
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-005
 
 **Preconditions**:
@@ -296,7 +296,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: LateCheckOutSurcharge = 1,000,000 VND
 **Expected Result (FAIL)**: Sai tỷ lệ
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -305,7 +305,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()` — surcharge logic
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-006
 
 **Preconditions**:
@@ -322,7 +322,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: LateCheckOutSurcharge = 0
 **Expected Result (FAIL)**: Surcharge > 0 khi checkout đúng giờ
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -332,7 +332,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `BR-UC53-02`
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-007
 
 **Preconditions**:
@@ -349,7 +349,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: BalanceDue = 2,300,000 VND
 **Expected Result (FAIL)**: Sai phép tính hoặc không trừ tiền cọc
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -358,7 +358,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-008
 
 **Preconditions**:
@@ -374,7 +374,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: BalanceDue = 0
 **Expected Result (FAIL)**: BalanceDue < 0 (số âm) gây nhầm lẫn cho Lễ tân
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 **Implementation Note**: Dùng `Math.Max(0, totalAmount - depositAmount)`
 
 ---
@@ -385,7 +385,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `UC54, UC55`
 **Feature Under Test**: `ReceptionService.ProcessCheckOutAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-009
 
 **Preconditions**:
@@ -406,7 +406,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Invoice record được tạo với status Paid
 **Expected Result (FAIL)**: Invoice không được tạo hoặc status sai
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -416,7 +416,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `UC55`
 **Feature Under Test**: `ReceptionService.ProcessCheckOutAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-010
 
 **Preconditions**:
@@ -437,7 +437,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Payment record chính xác
 **Expected Result (FAIL)**: Payment không tạo hoặc Amount sai
 
-**Current Status**: 🔴 Not written
+**Current Status**:🟢
 
 ---
 
@@ -447,7 +447,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `UC53 Postcondition 3`
 **Feature Under Test**: `ReceptionService.ProcessCheckOutAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-011
 
 **Preconditions**:
@@ -466,7 +466,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Status = CheckedOut, ActualCheckOutTime ghi nhận
 **Expected Result (FAIL)**: Status vẫn CheckedIn hoặc ActualCheckOutTime = null
 
-**Current Status**: 🔴 Not written
+**Current Status**:🟢
 
 ---
 
@@ -476,7 +476,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `UC53 Postcondition 4, BR-UC53-04, UC56`
 **Feature Under Test**: `ReceptionService.ProcessCheckOutAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-012
 
 **Preconditions**:
@@ -494,7 +494,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Tất cả phòng chuyển NeedsCleaning
 **Expected Result (FAIL)**: Chỉ 1 phòng đổi, hoặc không phòng nào đổi
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -504,7 +504,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `BR-UC53-03`
 **Feature Under Test**: `ReceptionService.ProcessCheckOutAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-013
 
 **Preconditions**:
@@ -520,7 +520,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Folio status = Paid
 **Expected Result (FAIL)**: Folio vẫn Unpaid sau checkout
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -529,7 +529,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: HIGH
 **Feature Under Test**: `ReceptionService.ProcessCheckOutAsync()` — validation
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-014
 
 **Preconditions**:
@@ -547,7 +547,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Checkout bị reject, booking vẫn CheckedIn
 **Expected Result (FAIL)**: Checkout thành công mà không có PaymentMethod → lỗi dữ liệu
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -557,7 +557,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `BR02 (SWP391-HOS-02), UC54`
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-015
 
 **Preconditions**:
@@ -574,7 +574,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Food charges hiển thị đúng
 **Expected Result (FAIL)**: Food charges = 0 hoặc thiếu
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -584,7 +584,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `BR02 (SWP391-HOS-02), UC54`
 **Feature Under Test**: `ReceptionService.PrepareCheckOutViewModelAsync()`
 **Test File**: `Tests/Services/ReceptionServiceCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-016
 
 **Preconditions**:
@@ -600,7 +600,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Expected Result (PASS)**: Tour charges hiển thị đúng
 **Expected Result (FAIL)**: Tour charges = 0 hoặc thiếu
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -614,7 +614,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Legal**: `NĐ 356/2025`
 **Feature Under Test**: `ReceptionController` — [Authorize] attribute
 **Test File**: `Tests/Controllers/ReceptionControllerCheckOutTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 
 **Preconditions**:
 
@@ -634,7 +634,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 
 - Customer truy cập được trang checkout → vi phạm least privilege
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ---
 
@@ -645,7 +645,7 @@ Check-out & Consolidated Billing bao gồm các layer:
 **Severity**: CRITICAL
 **Feature Under Test**: Full flow: `GET CheckOut → POST CheckOut → Verify DB state`
 **Test File**: `Tests/Integration/CheckOutIntegrationTests.cs`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-009 → TC-COND-013
 
 **Preconditions**:
@@ -698,7 +698,7 @@ var rooms = await _context.BookingDetails
 Assert.All(rooms, r => Assert.Equal(RoomStatus.NeedsCleaning, r.Status));
 ```
 
-**Current Status**: 🔴 Not written
+**Current Status**: 🟢
 
 ## 5. Red-Green-Refactor Tracker
 

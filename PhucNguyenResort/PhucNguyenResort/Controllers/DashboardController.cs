@@ -52,8 +52,26 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 1. System Admin Dashboard
         [Authorize(Roles = "System Admin")]
-        public IActionResult Admin()
+        public async Task<IActionResult> Admin()
         {
+            var totalStaff = await _context.Users.CountAsync();
+            var activeAccounts = await _context.Users.CountAsync(u => u.IsActive && !u.IsBlocked);
+            var systemRoles = await _context.Roles.CountAsync();
+            var inactiveAccounts = totalStaff - activeAccounts;
+
+            ViewBag.TotalStaff = totalStaff;
+            ViewBag.ActiveAccounts = activeAccounts;
+            ViewBag.SystemRoles = systemRoles;
+            ViewBag.InactiveAccounts = inactiveAccounts;
+
+            var recentStaff = await _context.Users
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(5)
+                .ToListAsync();
+
+            ViewBag.RecentStaff = recentStaff;
+
             return View();
         }
 
@@ -62,6 +80,11 @@ namespace PhucNguyenResort.Web.Controllers
         public async Task<IActionResult> Manager()
         {
             var model = await _tableReservationService.GetFnBDashboardAsync(DateTime.Today);
+            
+            ViewBag.TotalRoomCategories = await _context.RoomCategories.CountAsync();
+            ViewBag.TotalTours = await _context.Tours.CountAsync();
+            ViewBag.PendingRefunds = await _context.Refunds.CountAsync(r => r.RefundStatus == PhucNguyenResort.Enums.RefundStatus.Pending);
+
             return View(model);
         }
 

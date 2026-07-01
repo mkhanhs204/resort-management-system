@@ -54,7 +54,7 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 | Feature / Gap ID      | FEAT-WALKIN-BOOKING                                                                       |
 | Module                | `Room Reservation & Front Desk - Walk-in Booking`                                       |
 | Spec gốc             | `SWP391-MOD2-IMP-003`                                                                   |
-| Priority              | 🔴 P0                                                                                     |
+| Priority              | 🟢                                                                                        |
 | Sprint                | S2                                                                                        |
 | Milestone             | M2 - Front Desk Operational Functions                                                     |
 | Data Classification   | Sensitive-PII / PII (Thông tin định danh CCCD/Passport của các khách ở tại quầy) |
@@ -66,11 +66,11 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 
 ## 2. Logic Issues Resolved
 
-| #  | Spec gốc (sai / thiếu)                        | Thực tế (schema / policy)                                                                             | Fix áp dụng trong test                                                                                                                                                                |
-| -- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| L1 | Khách đặt tại quầy không có tài khoản. | Model `Booking` yêu cầu `UserId` bắt buộc (`[Required]`).                                     | Hệ thống tự động tìm kiếm `User` qua SĐT/Email. Nếu chưa có, tự động tạo mới `User` với Role `Customer` và mật khẩu ngẫu nhiên để liên kết.             |
-| L2 | Thanh toán cọc qua VNPay.                     | Khách tại quầy thanh toán trực tiếp qua Tiền mặt (Cash), Quẹt thẻ (POS), hoặc Bank Transfer. | `WalkInBooking` sẽ ghi nhận trực tiếp giao dịch `Payment` ngoại tuyến, bỏ qua cổng VNPay và đổi trạng thái thanh toán ngay.                                          |
-| L3 | Quy trình 2 bước: tạo đơn rồi check-in.  | Gây mất thời gian cho lễ tân khi khách muốn nhận phòng ngay.                                   | Hỗ trợ checkbox `InstantCheckIn`. Khi bật, hệ thống tự động gán phòng vật lý, lưu thông tin định danh và đổi trạng thái phòng sang `Occupied` ngay lập tức. |
+| #  | Spec gốc (sai / thiếu)                        | Thực tế (schema / policy)                                                                             | Fix áp dụng trong test                                                                                                                                                               |
+| -- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L1 | Khách đặt tại quầy không có tài khoản. | Model`Booking` yêu cầu `UserId` bắt buộc (`[Required]`).                                      | Hệ thống tự động tìm kiếm`User` qua SĐT/Email. Nếu chưa có, tự động tạo mới `User` với Role `Customer` và mật khẩu ngẫu nhiên để liên kết.             |
+| L2 | Thanh toán cọc qua VNPay.                     | Khách tại quầy thanh toán trực tiếp qua Tiền mặt (Cash), Quẹt thẻ (POS), hoặc Bank Transfer. | `WalkInBooking` sẽ ghi nhận trực tiếp giao dịch `Payment` ngoại tuyến, bỏ qua cổng VNPay và đổi trạng thái thanh toán ngay.                                         |
+| L3 | Quy trình 2 bước: tạo đơn rồi check-in.  | Gây mất thời gian cho lễ tân khi khách muốn nhận phòng ngay.                                   | Hỗ trợ checkbox`InstantCheckIn`. Khi bật, hệ thống tự động gán phòng vật lý, lưu thông tin định danh và đổi trạng thái phòng sang `Occupied` ngay lập tức. |
 
 ---
 
@@ -94,7 +94,7 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 | ------------------- | -------------------------------------------------------------------------- |
 | `SRS.md` UC49     | Receptionist quản lý và tạo đơn đặt phòng trực tiếp tại quầy. |
 | `SRS.md` UC51     | Receptionist thực hiện check-in cho khách.                              |
-| `BR-WK-01`        | Ràng buộc bắt buộc phải liên kết `UserId` (tự sinh nếu mới).   |
+| `BR-WK-01`        | Ràng buộc bắt buộc phải liên kết`UserId` (tự sinh nếu mới).    |
 | `BR-WK-02`        | Chấp nhận hình thức thanh toán ngoại tuyến (Tiền mặt, POS).       |
 | `BR-WK-04`        | Quy tắc gán số phòng vật lý trực tiếp khi đặt phòng tại quầy. |
 | Luật Cư trú 2020 | Thu thập CCCD/Passport khi làm thủ tục nhận phòng trực tiếp.       |
@@ -114,11 +114,11 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 
-| Kỹ thuật (ISO 29119-4) | Áp dụng cho                           | Lý do                                                                                                                          |
-| ------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Equivalence Partitioning | SĐT khách hàng, Ngày lưu trú      | Phân vùng SĐT hợp lệ/không hợp lệ, ngày Check-in/Out hợp lệ.                                                         |
-| State Transition Testing | Room Status, Booking Status             | Kiểm tra sự chuyển trạng thái phòng `Available` -> `Occupied` và trạng thái Booking `Reserved` -> `CheckedIn`. |
-| Error Guessing           | Trùng phòng vật lý gán trực tiếp | Kiểm tra trường hợp 2 lễ tân gán cùng 1 phòng vật lý trống tại một thời điểm.                                  |
+| Kỹ thuật (ISO 29119-4) | Áp dụng cho                           | Lý do                                                                                                                         |
+| ------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Equivalence Partitioning | SĐT khách hàng, Ngày lưu trú      | Phân vùng SĐT hợp lệ/không hợp lệ, ngày Check-in/Out hợp lệ.                                                        |
+| State Transition Testing | Room Status, Booking Status             | Kiểm tra sự chuyển trạng thái phòng`Available` -> `Occupied` và trạng thái Booking `Reserved` -> `CheckedIn`. |
+| Error Guessing           | Trùng phòng vật lý gán trực tiếp | Kiểm tra trường hợp 2 lễ tân gán cùng 1 phòng vật lý trống tại một thời điểm.                                 |
 
 ### TDS-05 — Test Data Requirements
 
