@@ -3,73 +3,193 @@
 
 @{
     ViewData["Title"] = "Kiểm Tra Vé Tour";
-    Layout = "_Layout"; // Or null if you want a standalone page, but _Layout is fine
+    Layout = "_Layout";
+    
+    string statusIcon = "pending";
+    string statusTitle = "ĐANG XỬ LÝ";
+    string statusDesc = "Vé chưa được thanh toán hoặc xác nhận";
+    string headerBgClass = "bg-gradient-to-r from-amber-500 to-amber-600";
+    string headerTextClass = "text-white";
+    string iconClass = "text-white";
+
+    if (Model.BookingStatus == TourBookingStatus.Confirmed)
+    {
+        statusIcon = "check_circle";
+        statusTitle = "VÉ HỢP LỆ";
+        statusDesc = "Vé có thể sử dụng được";
+        headerBgClass = "bg-gradient-to-r from-emerald-500 to-emerald-600";
+    }
+    else if (Model.BookingStatus == TourBookingStatus.Cancelled)
+    {
+        statusIcon = "cancel";
+        statusTitle = "VÉ ĐÃ HỦY";
+        statusDesc = "Vé này không còn giá trị sử dụng";
+        headerBgClass = "bg-gradient-to-r from-red-500 to-red-600";
+    }
+    else if (Model.BookingStatus == TourBookingStatus.Completed)
+    {
+        statusIcon = "history";
+        statusTitle = "VÉ ĐÃ SỬ DỤNG";
+        statusDesc = "Khách hàng đã tham gia tour này";
+        headerBgClass = "bg-gradient-to-r from-slate-500 to-slate-600";
+    }
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-header bg-primary text-white text-center py-4">
-                    <h3 class="mb-0"><i class="fa fa-ticket mr-2"></i> Trạng Thái Vé Tour</h3>
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .luxury-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.08);
+        }
+        .ticket-cutout-left {
+            position: absolute;
+            left: -16px;
+            top: 230px;
+            width: 32px;
+            height: 32px;
+            background-color: var(--color-background);
+            border-radius: 50%;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: inset -3px 0px 5px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+        }
+        .ticket-cutout-right {
+            position: absolute;
+            right: -16px;
+            top: 230px;
+            width: 32px;
+            height: 32px;
+            background-color: var(--color-background);
+            border-radius: 50%;
+            border-left: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: inset 3px 0px 5px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+        }
+    </style>
+}
+
+<main class="pt-8 pb-section-gap-lg flex items-center justify-center min-h-[85vh] px-margin-mobile md:px-margin-desktop overflow-hidden relative bg-background">
+    <!-- Atmospheric Background Element -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-container/10 rounded-full blur-[120px] -z-10"></div>
+    
+    <!-- Ticket Card -->
+    <div class="w-full max-w-xl bg-surface rounded-[24px] luxury-shadow overflow-hidden border border-outline-variant/10 animate-in fade-in zoom-in duration-700 mt-12 md:mt-0 relative">
+        
+        <!-- Ticket cutouts for visual flair -->
+        <div class="ticket-cutout-left"></div>
+        <div class="ticket-cutout-right"></div>
+
+        <!-- Card Header -->
+        <div class="@headerBgClass py-12 flex flex-col items-center justify-center gap-3">
+            <div class="w-20 h-20 bg-white/25 backdrop-blur-md rounded-full flex items-center justify-center mb-1 shadow-inner">
+                <span class="material-symbols-outlined text-5xl @iconClass">@statusIcon</span>
+            </div>
+            <h1 class="font-headline-lg text-[32px] font-bold @headerTextClass m-0 tracking-widest uppercase">@statusTitle</h1>
+            <p class="font-body-lg text-lg @headerTextClass opacity-95 px-8 text-center m-0">@statusDesc</p>
+        </div>
+
+        <!-- Dotted line separator -->
+        <div class="relative w-full h-[1px] my-1 flex items-center justify-center overflow-hidden">
+             <div class="absolute w-[92%] border-b-[2px] border-dashed border-outline-variant/30"></div>
+        </div>
+
+        <!-- Ticket Details Section -->
+        <div class="px-10 py-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
+            <!-- Booking ID Header -->
+            <div class="flex flex-col items-center pb-2 text-center">
+                <span class="font-label-md text-on-surface-variant uppercase tracking-[0.2em] mb-2 text-xs font-bold">Mã Vé Tự Động</span>
+                <span class="bg-primary-container/20 text-primary-fixed-variant font-bold px-6 py-2 rounded-xl text-headline-sm border border-primary/10 tracking-wide">#PNR-@Model.TourBookingId</span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 pt-4">
+                <div class="space-y-1">
+                    <p class="font-label-sm text-xs text-on-surface-variant uppercase flex items-center gap-1 font-semibold tracking-wider">
+                        <span class="material-symbols-outlined text-[16px]">person</span> Tên khách hàng
+                    </p>
+                    <p class="font-body-lg text-on-surface font-semibold border-b border-outline-variant/20 pb-2">@(Model.User?.FullName ?? "N/A")</p>
                 </div>
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        @if (Model.BookingStatus == TourBookingStatus.Confirmed)
-                        {
-                            <div class="display-1 text-success mb-3"><i class="fa fa-check-circle"></i></div>
-                            <h2 class="text-success fw-bold">VÉ HỢP LỆ</h2>
-                            <p class="text-muted">Vé có thể sử dụng được</p>
-                        }
-                        else if (Model.BookingStatus == TourBookingStatus.Cancelled)
-                        {
-                            <div class="display-1 text-danger mb-3"><i class="fa fa-times-circle"></i></div>
-                            <h2 class="text-danger fw-bold">VÉ ĐÃ HỦY</h2>
-                            <p class="text-muted">Vé này không còn giá trị sử dụng</p>
-                        }
-                        else if (Model.BookingStatus == TourBookingStatus.Completed)
-                        {
-                            <div class="display-1 text-secondary mb-3"><i class="fa fa-history"></i></div>
-                            <h2 class="text-secondary fw-bold">VÉ ĐÃ SỬ DỤNG</h2>
-                            <p class="text-muted">Khách hàng đã tham gia tour này</p>
-                        }
-                        else
-                        {
-                            <div class="display-1 text-warning mb-3"><i class="fa fa-exclamation-circle"></i></div>
-                            <h2 class="text-warning fw-bold">ĐANG XỬ LÝ</h2>
-                            <p class="text-muted">Vé chưa được thanh toán hoặc xác nhận</p>
-                        }
-                    </div>
-
-                    <hr />
-
-                    <dl class="row mb-0 mt-4 text-left">
-                        <dt class="col-sm-5 text-muted">Mã vé:</dt>
-                        <dd class="col-sm-7 fw-bold">#@Model.TourBookingId</dd>
-
-                        <dt class="col-sm-5 text-muted">Tên khách hàng:</dt>
-                        <dd class="col-sm-7">@(Model.User?.FullName ?? "N/A")</dd>
-
-                        <dt class="col-sm-5 text-muted">Tên Tour:</dt>
-                        <dd class="col-sm-7 fw-bold text-primary">@(Model.Schedule?.Tour?.TourName ?? "N/A")</dd>
-
-                        <dt class="col-sm-5 text-muted">Số người tham gia:</dt>
-                        <dd class="col-sm-7">@Model.Participants người</dd>
-
-                        <dt class="col-sm-5 text-muted">Ngày đi:</dt>
-                        <dd class="col-sm-7">@(Model.Schedule?.TourDate?.ToString("dd/MM/yyyy") ?? "N/A")</dd>
-
-                        <dt class="col-sm-5 text-muted">Giờ xuất phát:</dt>
-                        <dd class="col-sm-7">@(Model.Schedule?.StartTime?.ToString(@"hh\:mm") ?? "N/A")</dd>
-                        
-                        <dt class="col-sm-5 text-muted">Thời lượng:</dt>
-                        <dd class="col-sm-7">@(Model.Schedule?.Tour?.DurationHours?.ToString() ?? "N/A") giờ</dd>
-                    </dl>
+                <div class="space-y-1">
+                    <p class="font-label-sm text-xs text-on-surface-variant uppercase flex items-center gap-1 font-semibold tracking-wider">
+                        <span class="material-symbols-outlined text-[16px]">tour</span> Tên Tour
+                    </p>
+                    <p class="font-body-lg text-primary font-bold border-b border-outline-variant/20 pb-2 line-clamp-1">@(Model.Schedule?.Tour?.TourName ?? "N/A")</p>
                 </div>
-                <div class="card-footer text-center py-3 bg-light">
-                    <p class="text-muted small mb-0">Hệ thống soát vé tự động - PhucNguyen Resort</p>
+                <div class="space-y-1">
+                    <p class="font-label-sm text-xs text-on-surface-variant uppercase flex items-center gap-1 font-semibold tracking-wider">
+                        <span class="material-symbols-outlined text-[16px]">calendar_month</span> Ngày khởi hành
+                    </p>
+                    <p class="font-body-lg text-on-surface font-semibold border-b border-outline-variant/20 pb-2">@(Model.Schedule?.TourDate?.ToString("dd/MM/yyyy") ?? "N/A")</p>
+                </div>
+                <div class="space-y-1">
+                    <p class="font-label-sm text-xs text-on-surface-variant uppercase flex items-center gap-1 font-semibold tracking-wider">
+                        <span class="material-symbols-outlined text-[16px]">schedule</span> Thời gian
+                    </p>
+                    <p class="font-body-lg text-on-surface font-semibold border-b border-outline-variant/20 pb-2">
+                        @(Model.Schedule?.StartTime?.ToString(@"hh\:mm") ?? "N/A")
+                        <span class="text-on-surface-variant text-sm font-normal ml-1">(@(Model.Schedule?.Tour?.DurationHours?.ToString() ?? "N/A")h)</span>
+                    </p>
+                </div>
+                <div class="space-y-1 sm:col-span-2">
+                    <p class="font-label-sm text-xs text-on-surface-variant uppercase flex items-center gap-1 font-semibold tracking-wider">
+                        <span class="material-symbols-outlined text-[16px]">groups</span> Số người tham gia
+                    </p>
+                    <p class="font-body-lg text-on-surface font-semibold border-b border-outline-variant/20 pb-2">@Model.Participants Người</p>
                 </div>
             </div>
+
+            <div class="text-center mt-8 pt-4">
+                <div class="inline-block bg-white p-3 rounded-xl shadow-sm border border-outline-variant/20">
+                    @{
+                        var hostString = Context.Request.Host.ToString();
+                        if (hostString.StartsWith("localhost", StringComparison.OrdinalIgnoreCase))
+                        {
+                            try
+                            {
+                                var ip = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName())
+                                            .AddressList.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                                if (ip != null)
+                                {
+                                    hostString = hostString.Replace("localhost", ip.ToString(), StringComparison.OrdinalIgnoreCase);
+                                }
+                            }
+                            catch { }
+                        }
+                        var scheme = Context.Request.Scheme;
+                        var path = Url.Action("CheckTicket", "Tours", new { ticketId = Model.TourBookingId });
+                        var checkTicketUrl = $"{scheme}://{hostString}{path}";
+                    }
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=@Uri.EscapeDataString(checkTicketUrl)" alt="QR Code" class="mx-auto" />
+                </div>
+                <p class="font-label-sm text-on-surface-variant mt-3 tracking-[0.15em] uppercase text-xs font-semibold">Quét mã để check-in</p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex justify-center mt-6 pt-4 border-t border-outline-variant/10">
+                <a asp-controller="CustomerTourBooking" asp-action="MyTourBookings" class="px-8 py-3 bg-surface-variant text-on-surface-variant hover:bg-outline-variant/20 rounded-xl font-label-lg font-semibold transition-all duration-300 flex items-center gap-2 shadow-sm">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    Quay lại Lịch sử Tour
+                </a>
+            </div>
         </div>
+
+        <!-- Visual Accent Footer -->
+        <div class="h-3 w-full @headerBgClass"></div>
     </div>
-</div>
+</main>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const icon = document.querySelector('.material-symbols-outlined.text-5xl');
+            if (icon) {
+                icon.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                icon.style.transform = 'scale(0) rotate(-45deg)';
+                setTimeout(() => {
+                    icon.style.transform = 'scale(1) rotate(0)';
+                }, 300);
+            }
+        });
+    </script>
+}

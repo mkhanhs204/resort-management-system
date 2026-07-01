@@ -12,4 +12,5 @@ public class SubmitReviewVM
 
     public int? BookingId { get; set; }   // Review phòng
     public int? TourId { get; set; }      // Review tour
+    public int? TourBookingId { get; set; } // Specific tour booking
 }

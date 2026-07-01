@@ -1,0 +1,121 @@
+@model PhucNguyenResort.ViewModels.Reviews.SubmitReviewVM
+@{
+    ViewData["Title"] = "Đánh Giá Dịch Vụ";
+}
+
+@section Styles {
+    <style>
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            margin: 0 4px;
+            color: #e2e8f0; /* slate-200 */
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #dfa974; /* Primary / Gold */
+        }
+        .star-rating label:active {
+            transform: scale(0.9);
+        }
+        /* Make the star symbol filled when active/hovered */
+        .star-rating input:checked ~ label .material-symbols-outlined,
+        .star-rating label:hover .material-symbols-outlined,
+        .star-rating label:hover ~ label .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+}
+
+<div class="pt-24 pb-section-gap-lg max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop min-h-screen">
+    
+    <!-- Page Header -->
+    <div class="text-center mb-12 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container text-primary mb-4 luxury-shadow">
+            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">reviews</span>
+        </div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-3">Đánh Giá Dịch Vụ</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto">
+            Cảm ơn bạn đã lựa chọn Phúc Nguyên Resort. Phản hồi của bạn giúp chúng tôi không ngừng hoàn thiện và nâng cao chất lượng phục vụ.
+        </p>
+    </div>
+
+    <!-- Review Form Card -->
+    <div class="bg-surface-container-lowest luxury-shadow border border-outline-variant/20 rounded-2xl p-8 md:p-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+        
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="bg-error-container/20 border border-error/30 text-error p-4 rounded-xl mb-8 flex items-start gap-3">
+                <span class="material-symbols-outlined mt-0.5">error</span>
+                <div asp-validation-summary="All" class="text-body-md font-body-md m-0 [&>ul]:m-0 [&>ul]:pl-4"></div>
+            </div>
+        }
+
+        <form asp-action="Submit" method="post" class="space-y-8">
+            <!-- Hidden Inputs -->
+            <input type="hidden" asp-for="BookingId" />
+            <input type="hidden" asp-for="TourId" />
+
+            <!-- Rating Stars Section -->
+            <div class="text-center border-b border-outline-variant/20 pb-8">
+                <label class="font-headline-sm text-headline-sm text-on-surface block mb-6">Mức độ hài lòng của bạn</label>
+                <div class="star-rating">
+                    <input type="radio" id="star5" asp-for="Rating" value="5" />
+                    <label for="star5" title="5 sao (Tuyệt vời)"><span class="material-symbols-outlined text-[48px] transition-all">star</span></label>
+                    
+                    <input type="radio" id="star4" asp-for="Rating" value="4" />
+                    <label for="star4" title="4 sao (Tốt)"><span class="material-symbols-outlined text-[48px] transition-all">star</span></label>
+                    
+                    <input type="radio" id="star3" asp-for="Rating" value="3" />
+                    <label for="star3" title="3 sao (Bình thường)"><span class="material-symbols-outlined text-[48px] transition-all">star</span></label>
+                    
+                    <input type="radio" id="star2" asp-for="Rating" value="2" />
+                    <label for="star2" title="2 sao (Tệ)"><span class="material-symbols-outlined text-[48px] transition-all">star</span></label>
+                    
+                    <input type="radio" id="star1" asp-for="Rating" value="1" required />
+                    <label for="star1" title="1 sao (Rất tệ)"><span class="material-symbols-outlined text-[48px] transition-all">star</span></label>
+                </div>
+                <span asp-validation-for="Rating" class="text-error text-label-md mt-2 block"></span>
+            </div>
+
+            <!-- Comment Box -->
+            <div class="space-y-3">
+                <label class="font-label-lg text-label-lg text-on-surface flex items-center gap-2" asp-for="Comment">
+                    <span class="material-symbols-outlined text-[20px] text-primary">edit_note</span>
+                    Nhận xét chi tiết <span class="text-on-surface-variant font-normal">(Tùy chọn)</span>
+                </label>
+                <textarea asp-for="Comment" rows="5" 
+                          class="w-full bg-surface border border-outline-variant rounded-xl p-4 font-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none resize-y" 
+                          placeholder="Chia sẻ cảm nhận của bạn về chất lượng dịch vụ, tiện nghi, nhân viên..."></textarea>
+                <span asp-validation-for="Comment" class="text-error text-label-md block"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" class="w-full bg-primary text-on-primary py-4 rounded-xl font-label-lg text-label-lg uppercase tracking-widest luxury-shadow hover:scale-[1.02] hover:bg-on-primary-fixed-variant transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">send</span>
+                    Gửi Đánh Giá
+                </button>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="javascript:history.back()" class="text-on-surface-variant font-label-md hover:text-primary transition-colors inline-flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">arrow_back</span> Quay lại
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

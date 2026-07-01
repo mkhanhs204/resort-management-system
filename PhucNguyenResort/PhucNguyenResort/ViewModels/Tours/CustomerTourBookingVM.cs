@@ -15,6 +15,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public int MaxCapacity { get; set; }
+        public int TotalAvailableSlots { get; set; }
         public int DurationHours { get; set; }
         public string? Location { get; set; }
         public string? ImageUrl { get; set; }
@@ -68,6 +69,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public List<ScheduleDisplayVM> UpcomingSchedules { get; set; } = new();
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
+        public List<PhucNguyenResort.ViewModels.Reviews.ReviewListVM> Reviews { get; set; } = new();
     }
 
     /// <summary>

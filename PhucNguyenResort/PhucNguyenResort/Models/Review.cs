@@ -10,6 +10,7 @@ public class Review
     public int? UserId { get; set; }
     public int? TourId { get; set; }
     public int? BookingId { get; set; }
+    public int? TourBookingId { get; set; }
 
     [Range(1, 5)]
     public int? Rating { get; set; }
@@ -21,4 +22,5 @@ public class Review
     public User? User { get; set; }
     public Tour? Tour { get; set; }
     public Booking? Booking { get; set; }
+    public TourBooking? TourBooking { get; set; }
 }

@@ -50,6 +50,9 @@ namespace PhucNguyenResort.Services.Tours
                 Description = t.Description,
                 Price = t.Price ?? 0,
                 MaxCapacity = t.MaxCapacity ?? 0,
+                TotalAvailableSlots = t.TourSchedules
+                    .Where(s => s.TourDate != null && s.TourDate >= DateTime.Today && (s.AvailableSlots ?? 0) > 0)
+                    .Sum(s => s.AvailableSlots ?? 0),
                 DurationHours = t.DurationHours ?? 0,
                 Location = t.Location,
                 ImageUrl = t.ImageUrl,
@@ -92,6 +95,7 @@ namespace PhucNguyenResort.Services.Tours
                 .Include(t => t.TourSchedules)
                     .ThenInclude(s => s.Guide)
                 .Include(t => t.Reviews)
+                    .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(t => t.TourId == tourId);
 
             if (tour == null) return null;
@@ -108,6 +112,17 @@ namespace PhucNguyenResort.Services.Tours
                 ImageUrl = tour.ImageUrl,
                 AverageRating = tour.Reviews.Any() ? tour.Reviews.Average(r => r.Rating ?? 0) : 0,
                 ReviewCount = tour.Reviews.Count,
+                Reviews = tour.Reviews.Where(r => r.IsVisible).Select(r => new PhucNguyenResort.ViewModels.Reviews.ReviewListVM
+                {
+                    ReviewId = r.ReviewId,
+                    UserName = string.IsNullOrEmpty(r.User?.FullName) ? "Khách hàng" : r.User.FullName,
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    IsVisible = r.IsVisible,
+                    CreatedAt = r.CreatedAt,
+                    ServiceType = "Tour",
+                    ServiceName = tour.TourName
+                }).OrderByDescending(r => r.CreatedAt).ToList(),
                 UpcomingSchedules = tour.TourSchedules
                     .Where(s => s.TourDate != null && s.TourDate >= DateTime.Today)
                     .OrderBy(s => s.TourDate)
@@ -336,6 +351,32 @@ namespace PhucNguyenResort.Services.Tours
         /// <inheritdoc/>
         public async Task<List<MyTourBookingItemVM>> GetUserTourBookingsAsync(int userId)
         {
+            // Auto-cancel pending bookings older than 1 minute
+            var expiredBookings = await _context.TourBookings
+                .Include(tb => tb.Schedule)
+                .Where(tb => tb.UserId == userId && tb.BookingStatus == TourBookingStatus.Pending)
+                .ToListAsync();
+
+            bool hasChanges = false;
+            foreach (var tb in expiredBookings)
+            {
+                if ((DateTime.Now - tb.CreatedAt).TotalMinutes >= 1)
+                {
+                    tb.BookingStatus = TourBookingStatus.Cancelled;
+                    tb.CancellationReason = "Hết hạn thanh toán VNPay";
+                    if (tb.Schedule != null && tb.Schedule.AvailableSlots.HasValue)
+                    {
+                        tb.Schedule.AvailableSlots += tb.Participants ?? 0;
+                    }
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
+            {
+                await _context.SaveChangesAsync();
+            }
+
             var bookings = await _context.TourBookings
                 .Include(tb => tb.Schedule)
                     .ThenInclude(s => s.Tour)
@@ -344,9 +385,9 @@ namespace PhucNguyenResort.Services.Tours
                 .OrderByDescending(tb => tb.TourBookingId)
                 .ToListAsync();
 
-            var userReviewedTourIds = await _context.Reviews
-                .Where(r => r.UserId == userId && r.TourId != null)
-                .Select(r => r.TourId!.Value)
+            var userReviewedTourBookingIds = await _context.Reviews
+                .Where(r => r.UserId == userId && r.TourBookingId != null)
+                .Select(r => r.TourBookingId!.Value)
                 .ToListAsync();
 
             return bookings.Select(tb =>
@@ -384,7 +425,7 @@ namespace PhucNguyenResort.Services.Tours
                     PaymentMethod = paymentMethod,
                     CreatedAt = tb.CreatedAt,
                     CancellationReason = tb.CancellationReason,
-                    HasReviewed = userReviewedTourIds.Contains(tb.Schedule?.TourId ?? 0)
+                    HasReviewed = userReviewedTourBookingIds.Contains(tb.TourBookingId)
                 };
             }).ToList();
         }

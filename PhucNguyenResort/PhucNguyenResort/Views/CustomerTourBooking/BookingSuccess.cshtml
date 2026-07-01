@@ -94,6 +94,34 @@
                 <p class="font-headline-lg text-headline-lg text-primary font-bold">@Model.TotalAmount.ToString("N0") VNĐ</p>
             </div>
 
+            <!-- QR Code Section -->
+            <div class="mt-8 pt-6 border-t border-outline-variant/10 text-center">
+                <p class="font-label-lg text-on-surface-variant mb-4 tracking-widest uppercase">Mã Khách Hàng</p>
+                <div class="inline-block bg-white p-3 rounded-xl shadow-sm border border-outline-variant/20">
+                    @{
+                        var hostString = Context.Request.Host.ToString();
+                        if (hostString.StartsWith("localhost", StringComparison.OrdinalIgnoreCase))
+                        {
+                            try
+                            {
+                                var ip = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName())
+                                            .AddressList.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                                if (ip != null)
+                                {
+                                    hostString = hostString.Replace("localhost", ip.ToString(), StringComparison.OrdinalIgnoreCase);
+                                }
+                            }
+                            catch { }
+                        }
+                        var scheme = Context.Request.Scheme;
+                        var path = Url.Action("CheckTicket", "Tours", new { ticketId = Model.TourBookingId });
+                        var checkTicketUrl = $"{scheme}://{hostString}{path}";
+                    }
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=@Uri.EscapeDataString(checkTicketUrl)" alt="QR Code" class="mx-auto" />
+                </div>
+                <p class="font-label-sm text-on-surface-variant mt-3 tracking-widest uppercase text-xs font-semibold">Chụp ảnh màn hình mã QR này để sử dụng</p>
+            </div>
+
             <!-- Action Buttons -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md pt-stack-lg">
                 <a asp-action="MyTourBookings" class="w-full bg-primary text-on-primary py-4 rounded-xl font-label-lg text-label-lg hover:opacity-90 transition-all duration-300 shadow-md text-center flex items-center justify-center">

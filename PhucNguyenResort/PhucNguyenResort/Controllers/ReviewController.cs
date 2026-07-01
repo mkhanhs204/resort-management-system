@@ -38,21 +38,31 @@ public class ReviewController : Controller
 
     [Authorize(Roles = "Customer")]
     [HttpGet]
-    public async Task<IActionResult> Submit(int? bookingId, int? tourId)
+    public async Task<IActionResult> Submit(int? bookingId, int? tourBookingId)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var canSubmit = await _reviewService.CanSubmitReviewAsync(userId, bookingId, tourId);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+        {
+            return RedirectToAction("Login", "Auth");
+        }
 
+        if (bookingId == null && tourBookingId == null)
+        {
+            TempData["ErrorMessage"] = "Không tìm thấy dịch vụ cần đánh giá.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        var canSubmit = await _reviewService.CanSubmitReviewAsync(userId, bookingId, tourBookingId);
         if (!canSubmit)
         {
-            TempData["ErrorMessage"] = "Bạn chưa hoàn thành dịch vụ hoặc không có quyền đánh giá.";
+            TempData["ErrorMessage"] = "Bạn chỉ có thể đánh giá sau khi đã hoàn thành dịch vụ hoặc bạn đã đánh giá dịch vụ này rồi.";
             return RedirectToAction("Index", "Home");
         }
 
         var model = new SubmitReviewVM
         {
             BookingId = bookingId,
-            TourId = tourId
+            TourBookingId = tourBookingId
         };
 
         return View(model);

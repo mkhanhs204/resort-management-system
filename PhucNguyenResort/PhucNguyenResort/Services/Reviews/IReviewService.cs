@@ -9,5 +9,5 @@ public interface IReviewService
     Task<IEnumerable<ReviewListVM>> GetAllReviewsAsync();
     Task<bool> ToggleVisibilityAsync(int reviewId);
     Task<ReviewListVM?> GetReviewByIdAsync(int reviewId);
-    Task<bool> CanSubmitReviewAsync(int userId, int? bookingId, int? tourId);
+    Task<bool> CanSubmitReviewAsync(int userId, int? bookingId, int? tourBookingId);
 }

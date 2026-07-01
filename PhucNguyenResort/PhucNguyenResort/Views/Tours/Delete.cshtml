@@ -1,116 +1,259 @@
 @model PhucNguyenResort.Models.Tour
 
 @{
-    ViewData["Title"] = "Delete Tour";
+    ViewData["Title"] = "Xóa Tour";
     int scheduleCount = ViewBag.ScheduleCount ?? 0;
     bool hasDependencies = scheduleCount > 0;
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-trash mr-2" style="color: #dc3545;"></i> Delete Tour
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Review dependencies before permanently removing this tour.</p>
-            </div>
-            <div>
-                <a asp-action="Index" class="btn btn-secondary" style="font-family: 'Cabin', sans-serif;" id="btn-back-to-list-header">
-                    <i class="fa fa-arrow-left"></i> Back to List
-                </a>
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #ba1a1a;
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .btn-luxury-danger {
+            background-color: #ba1a1a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-luxury-danger:hover:not(:disabled) {
+            background-color: #93000a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(186, 26, 26, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury-danger:disabled {
+            background-color: #e5e2de;
+            color: #a4b5ce;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-secondary-luxury {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary-luxury:hover {
+            background-color: #e5e2de;
+            color: #1c1c1a;
+            text-decoration: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0ede9;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            width: 35%;
+            color: #50453b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .detail-value {
+            width: 65%;
+            color: #1c1c1a;
+            font-size: 15px;
+        }
+        
+        /* Alert Styling */
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .luxury-alert.error {
+            background-color: #ffdad6;
+            color: #93000a;
+            border-left: 4px solid #ba1a1a;
+        }
+        .luxury-alert.warning {
+            background-color: #fcf9f5;
+            color: #805528;
+            border-left: 4px solid #dfa974;
+            border: 1px solid #dfa974;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Xóa Tour
+        </h2>
+        <p class="page-subtitle">Kiểm tra các dữ liệu liên quan trước khi xóa vĩnh viễn tour này.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-secondary-luxury" id="btn-back-to-list-header">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại danh sách
+        </a>
     </div>
 </div>
 
 <div class="container-fluid px-0">
     @if (hasDependencies)
     {
-        <div class="alert alert-danger" role="alert" id="alert-dependency">
-            <h4 class="alert-heading"><i class="fa fa-exclamation-triangle mr-2"></i> Cannot Delete!</h4>
-            <p>This tour has <strong>@scheduleCount active schedule(s)</strong>. You must remove all TourSchedules before deleting this tour.</p>
-            <hr>
-            <p class="mb-0 small">Error code: TOUR-003</p>
+        <div class="luxury-alert error" role="alert" id="alert-dependency">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 32px; color: #ba1a1a;">error</span>
+            <div>
+                <h4 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #ba1a1a;">Không Thể Xóa!</h4>
+                <p style="margin-bottom: 12px;">Tour này đang có <strong>@scheduleCount lịch trình đang hoạt động</strong>. Bạn phải xóa hoặc cập nhật tất cả lịch trình trước khi có thể xóa tour này.</p>
+                <div style="border-top: 1px solid rgba(186, 26, 26, 0.2); padding-top: 12px; font-size: 12px;">
+                    Mã lỗi: TOUR-003
+                </div>
+            </div>
         </div>
     }
     else
     {
-        <div class="alert alert-warning" role="alert">
-            <h4 class="alert-heading"><i class="fa fa-exclamation-triangle mr-2"></i> Confirm Delete?</h4>
-            <p class="mb-0">Are you sure you want to permanently delete this tour? This action cannot be undone.</p>
+        <div class="luxury-alert warning" role="alert">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 32px; color: #805528;">warning</span>
+            <div>
+                <h4 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #805528;">Xác Nhận Xóa?</h4>
+                <p style="margin-bottom: 0;">Bạn có chắc chắn muốn xóa vĩnh viễn tour này không? Hành động này không thể hoàn tác.</p>
+            </div>
         </div>
     }
 
-    <div class="card-box shadow-sm" style="border-top: 4px solid #dc3545; font-family: 'Cabin', sans-serif;">
-        <div class="mb-3" style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #dc3545;">
-            Deleting: Tour #@Model.TourId - @Model.TourName
+    <div class="luxury-card">
+        <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #ba1a1a; margin-bottom: 24px;">
+            Đang Xóa: Tour #@Model.TourId - @Model.TourName
         </div>
-        <div class="card-body">
+        <div>
             <div class="row">
                 <div class="col-md-7">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4 text-muted">Tour ID</dt>
-                        <dd class="col-sm-8">#@Model.TourId</dd>
+                    <div style="background-color: #fcf9f5; border-radius: 12px; padding: 20px;">
+                        <div class="detail-row">
+                            <div class="detail-label">Mã Tour</div>
+                            <div class="detail-value">#@Model.TourId</div>
+                        </div>
 
-                        <dt class="col-sm-4 text-muted">Tour Name</dt>
-                        <dd class="col-sm-8 fw-bold">@Html.DisplayFor(model => model.TourName)</dd>
+                        <div class="detail-row">
+                            <div class="detail-label">Tên Tour</div>
+                            <div class="detail-value"><strong style="font-size: 16px; color: #1c1c1a;">@Html.DisplayFor(model => model.TourName)</strong></div>
+                        </div>
 
-                        <dt class="col-sm-4 text-muted">Price</dt>
-                        <dd class="col-sm-8">@(Model.Price?.ToString("N0")) ₫</dd>
+                        <div class="detail-row">
+                            <div class="detail-label">Giá (VNĐ)</div>
+                            <div class="detail-value">@(Model.Price?.ToString("N0")) ₫</div>
+                        </div>
 
-                        <dt class="col-sm-4 text-muted">Max Capacity</dt>
-                        <dd class="col-sm-8">@(Model.MaxCapacity) pax</dd>
+                        <div class="detail-row">
+                            <div class="detail-label">Sức chứa tối đa</div>
+                            <div class="detail-value">@(Model.MaxCapacity) khách</div>
+                        </div>
 
-                        <dt class="col-sm-4 text-muted">Location</dt>
-                        <dd class="col-sm-8">
-                            @if (!string.IsNullOrEmpty(Model.Location))
-                            {
-                                @Model.Location
-                            }
-                            else
-                            {
-                                <em class="text-muted">—</em>
-                            }
-                        </dd>
+                        <div class="detail-row">
+                            <div class="detail-label">Địa điểm</div>
+                            <div class="detail-value">
+                                @if (!string.IsNullOrEmpty(Model.Location))
+                                {
+                                    @Model.Location
+                                }
+                                else
+                                {
+                                    <em style="color: #a4b5ce;">—</em>
+                                }
+                            </div>
+                        </div>
 
-                        <dt class="col-sm-4 text-muted">Active Schedules</dt>
-                        <dd class="col-sm-8">
-                            @if (hasDependencies)
-                            {
-                                <span class="badge bg-danger">@scheduleCount schedule(s) — BLOCKED</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-success">None — Safe to delete</span>
-                            }
-                        </dd>
-                    </dl>
+                        <div class="detail-row">
+                            <div class="detail-label">Lịch trình hoạt động</div>
+                            <div class="detail-value">
+                                @if (hasDependencies)
+                                {
+                                    <span style="background-color: #ffdad6; color: #ba1a1a; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;">@scheduleCount lịch trình — BỊ CHẶN</span>
+                                }
+                                else
+                                {
+                                    <span style="background-color: #e2f5ea; color: #0b5c2d; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;">Không có — Có thể xóa</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <div class="col-md-5 text-center d-flex align-items-center justify-content-center">
+                    <div class="col-md-5" style="display: flex; align-items: center; justify-content: center;">
                         <img src="@Model.ImageUrl" alt="@Model.TourName"
-                             class="img-fluid rounded border" style="max-height:180px;object-fit:cover;opacity:0.7;filter:grayscale(50%);" />
+                             style="width: 100%; max-height:240px; object-fit:cover; border-radius: 12px; opacity:0.6; filter:grayscale(60%);" />
                     </div>
                 }
             </div>
 
-            <form asp-action="Delete" id="delete-tour-form" class="mt-4 border-top pt-3 d-flex justify-content-between">
+            <form asp-action="Delete" id="delete-tour-form" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e2de; display: flex; justify-content: space-between; align-items: center;">
                 <input type="hidden" asp-for="TourId" />
-                <a asp-action="Index" class="btn btn-secondary" style="font-family: 'Cabin', sans-serif;" id="btn-cancel-delete">
-                    Cancel
+                <a asp-action="Index" class="btn-secondary-luxury" id="btn-cancel-delete">
+                    Hủy bỏ
                 </a>
                 @if (!hasDependencies)
                 {
-                    <button type="submit" class="btn btn-danger px-4" style="font-family: 'Cabin', sans-serif;" id="btn-confirm-delete">
-                        <i class="fa fa-trash mr-1"></i> Confirm Delete
+                    <button type="submit" class="btn-luxury-danger" id="btn-confirm-delete">
+                        <span class="material-symbols-outlined">delete_forever</span> Xác Nhận Xóa
                     </button>
                 }
                 else
                 {
-                    <button type="button" class="btn btn-danger px-4" disabled title="Cannot delete — active schedules exist">
-                        <i class="fa fa-ban mr-1"></i> Delete Blocked
+                    <button type="button" class="btn-luxury-danger" disabled title="Không thể xóa — Đang có lịch trình hoạt động">
+                        <span class="material-symbols-outlined">block</span> Khóa Chức Năng Xóa
                     </button>
                 }
             </form>

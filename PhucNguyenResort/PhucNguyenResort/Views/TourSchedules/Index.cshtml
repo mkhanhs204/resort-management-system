@@ -1,132 +1,361 @@
 @model IEnumerable<PhucNguyenResort.Models.TourSchedule>
 
 @{
-    ViewData["Title"] = "Manage Tour Schedules";
+    ViewData["Title"] = "Quản Lý Lịch Trình Tour";
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-calendar mr-2" style="color: #dfa974;"></i> Manage Tour Schedules
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Assign dates, times, and Tour Guides to Tour Packages.</p>
-            </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-clock-o mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef; /* surface-container-low */
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5; /* surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974; /* primary-container */
+            color: #633d11; /* on-primary-container */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+            transition: all 0.2s;
+            background: transparent;
+            margin: 0 2px;
+            text-decoration: none;
+        }
+        .action-btn:hover {
+            background: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            text-decoration: none;
+        }
+        .action-btn.delete:hover {
+            background: #ffdad6;
+            color: #ba1a1a;
+            border-color: #ba1a1a;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .luxury-badge.blue {
+            background-color: #d3e4fe;
+            color: #0b1c30;
+        }
+        .luxury-badge.green {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-badge.orange {
+            background-color: #ffecd1;
+            color: #805528;
+        }
+        .luxury-badge.red {
+            background-color: #ffdad6;
+            color: #ba1a1a;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        
+        /* Alert Styling */
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-alert.error {
+            background-color: #ffdad6;
+            color: #93000a;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Quản Lý Lịch Trình Tour
+        </h2>
+        <p class="page-subtitle">Phân công ngày, giờ và hướng dẫn viên cho các tour</p>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
     </div>
 </div>
 
-<div class="card-box shadow-sm" style="border-top: 4px solid #dfa974; font-family: 'Cabin', sans-serif;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <span style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;">
-            Assigned Schedules <span class="badge badge-primary ml-2">@(Model?.Count() ?? 0)</span>
-        </span>
-        <a asp-action="Create" class="btn btn-primary btn-sm" style="background-color: #dfa974; border-color: #dfa974;">
-            <i class="fa fa-plus"></i> Assign New Schedule
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="luxury-alert success alert-dismissible fade show" role="alert" id="alert-success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="luxury-alert error alert-dismissible fade show" role="alert" id="alert-error">
+        <span class="material-symbols-outlined fill">error</span>
+        <div>@TempData["ErrorMessage"]</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
+
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Lịch Trình Tour</span>
+            <span class="luxury-badge blue">@(Model?.Count() ?? 0)</span>
+        </div>
+        <a asp-action="Create" class="btn-luxury" id="btn-create-schedule">
+            <span class="material-symbols-outlined">add</span> Thêm Lịch Trình
         </a>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Tour Package</th>
-                        <th>Tour Guide</th>
-                        <th>Departure Time</th>
-                        <th>Status</th>
-                        <th>Available Slots</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="text-muted">#@item.ScheduleId</td>
-                                <td><strong>@(item.Tour?.TourName ?? "N/A")</strong></td>
-                                <td>
-                                    @if (item.Guide != null)
-                                    {
-                                        <span class="text-primary font-weight-bold"><i class="fa fa-user-circle"></i> @item.Guide.FullName</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-danger"><i class="fa fa-warning"></i> Not Assigned</span>
-                                    }
-                                </td>
-                                <td>
-                                    <span class="badge badge-info" style="font-size: 13px;">
-                                        <i class="fa fa-calendar-o"></i> @(item.TourDate?.ToString("dd/MM/yyyy"))
-                                    </span>
-                                    <span class="badge badge-secondary" style="font-size: 13px;">
-                                        <i class="fa fa-clock-o"></i> @(item.StartTime?.ToString(@"hh\:mm"))
-                                    </span>
-                                </td>
-                                <td>
-                                    @{
-                                        var departureDateTime = item.TourDate?.Date.Add(item.StartTime ?? TimeSpan.Zero);
-                                        var endDateTime = departureDateTime?.AddHours(item.Tour?.DurationHours ?? 0);
-                                        
-                                        if (departureDateTime == null)
-                                        {
-                                            <span class="badge badge-secondary">Unknown</span>
-                                        }
-                                        else if (DateTime.Now > endDateTime)
-                                        {
-                                            <span class="badge badge-danger">Expired</span>
-                                        }
-                                        else if (DateTime.Now >= departureDateTime && DateTime.Now <= endDateTime)
-                                        {
-                                            <span class="badge badge-warning text-white" style="background-color: #dfa974;">In Progress</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge badge-success">Upcoming</span>
-                                        }
-                                    }
-                                </td>
-                                <td>
-                                    @if(item.AvailableSlots > 0)
-                                    {
-                                        <span class="text-success font-weight-bold">@item.AvailableSlots seats left</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-danger font-weight-bold">Full</span>
-                                    }
-                                </td>
-                                <td class="text-center text-nowrap">
-                                    <a asp-action="Details" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-info" title="Details">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-warning" title="Edit">
-                                        <i class="fa fa-pencil"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-danger" title="Delete">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
+    
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="schedules-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">ID</th>
+                    <th>Tên Tour</th>
+                    <th>Hướng dẫn viên</th>
+                    <th>Khởi hành</th>
+                    <th>Trạng thái</th>
+                    <th>Chỗ trống</th>
+                    <th style="text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fa fa-info-circle"></i> No schedules assigned yet. 
-                                <a asp-action="Create">Assign the first schedule</a>.
+                            <td style="color: #827569;">#@item.ScheduleId</td>
+                            <td><strong style="color: #1c1c1a; font-weight: 600;">@(item.Tour?.TourName ?? "N/A")</strong></td>
+                            <td>
+                                @if (item.Guide != null)
+                                {
+                                    <div style="display: flex; align-items: center; gap: 4px; color: #805528; font-weight: 500;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">person</span>
+                                        @item.Guide.FullName
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="display: flex; align-items: center; gap: 4px; color: #ba1a1a;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">warning</span>
+                                        Chưa phân công
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <span class="luxury-badge blue" style="width: fit-content;">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">calendar_month</span>
+                                        @(item.TourDate?.ToString("dd/MM/yyyy"))
+                                    </span>
+                                    <span class="luxury-badge" style="width: fit-content;">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">schedule</span>
+                                        @(item.StartTime?.ToString(@"hh\:mm"))
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                @{
+                                    var departureDateTime = item.TourDate?.Date.Add(item.StartTime ?? TimeSpan.Zero);
+                                    var endDateTime = departureDateTime?.AddHours(item.Tour?.DurationHours ?? 0);
+                                    
+                                    if (departureDateTime == null)
+                                    {
+                                        <span class="luxury-badge">Không rõ</span>
+                                    }
+                                    else if (DateTime.Now > endDateTime)
+                                    {
+                                        <span class="luxury-badge red">Đã kết thúc</span>
+                                    }
+                                    else if (DateTime.Now >= departureDateTime && DateTime.Now <= endDateTime)
+                                    {
+                                        <span class="luxury-badge orange">Đang diễn ra</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="luxury-badge green">Sắp diễn ra</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @if(item.AvailableSlots > 0)
+                                {
+                                    <span style="color: #0b5c2d; font-weight: 600;">@item.AvailableSlots chỗ</span>
+                                }
+                                else
+                                {
+                                    <span style="color: #ba1a1a; font-weight: 600;">Kín chỗ</span>
+                                }
+                            </td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <a asp-action="Details" asp-route-id="@item.ScheduleId"
+                                   class="action-btn" title="Chi tiết" id="btn-details-@item.ScheduleId">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.ScheduleId"
+                                   class="action-btn" title="Chỉnh sửa" id="btn-edit-@item.ScheduleId">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.ScheduleId"
+                                   class="action-btn delete" title="Xóa" id="btn-delete-@item.ScheduleId">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                </a>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        </div>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">event_available</span>
+                                <div>Chưa có lịch trình nào. <a asp-action="Create" style="color: #805528; font-weight: 600; text-decoration: none;">Thêm lịch trình đầu tiên</a>.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 4 seconds
+        setTimeout(function () {
+            var alerts = document.querySelectorAll('#alert-success, #alert-error');
+            alerts.forEach(function (el) {
+                if (el) {
+                    el.style.transition = "opacity 0.5s ease";
+                    el.style.opacity = "0";
+                    setTimeout(() => el.remove(), 500);
+                }
+            });
+        }, 4000);
+        
+        // Handle dismiss buttons
+        document.querySelectorAll('.luxury-alert .close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var alert = this.closest('.luxury-alert');
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            });
+        });
+    </script>
+}
