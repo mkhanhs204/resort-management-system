@@ -346,12 +346,45 @@
                 @if (Model.BookingStatus == BookingStatus.Reserved)
                 {
                     bool isRefundable = (Model.CheckInDate - DateTime.Now).TotalHours > 48;
-                    <form asp-action="Cancel" asp-route-id="@Model.BookingId" method="post" onsubmit="return confirm('@(isRefundable ? "Bạn có chắc chắn muốn hủy đơn đặt phòng này? Bạn sẽ được hoàn lại tiền cọc." : "Bạn đang hủy phòng trong vòng 48h trước giờ nhận phòng. Theo chính sách, tiền cọc sẽ KHÔNG được hoàn lại. Bạn vẫn muốn tiếp tục hủy?")');">
-                        <button type="submit" class="w-full border border-error text-error py-4 rounded-xl font-label-lg hover:bg-error-container hover:text-on-error-container transition-all flex items-center justify-center">
-                            Hủy Đơn Đặt Phòng
-                        </button>
-                    </form>
-                    <p class="text-center text-label-sm text-on-surface-variant px-4 leading-relaxed mt-2">
+                    <button type="button" id="btn-show-cancel-form" class="w-full border border-error text-error py-4 rounded-xl font-label-lg hover:bg-error-container hover:text-on-error-container transition-all flex items-center justify-center">
+                        Hủy Đơn Đặt Phòng
+                    </button>
+
+                    <div id="cancel-form-area" class="hidden mt-4 p-6 border border-error/30 rounded-xl bg-error/5">
+                        <h4 class="font-headline-sm text-error mb-4">Xác nhận hủy phòng</h4>
+                        <form asp-action="Cancel" asp-route-id="@Model.BookingId" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt phòng này? Thao tác này không thể hoàn tác.');">
+                            <div class="mb-4">
+                                <label class="block text-label-sm font-bold text-on-surface mb-2">Lý do hủy phòng (Tùy chọn)</label>
+                                <textarea name="reason" class="w-full p-3 rounded-lg border border-outline-variant focus:border-error focus:ring focus:ring-error/20 bg-surface-container-lowest" rows="2" placeholder="Ví dụ: Thay đổi lịch trình..."></textarea>
+                            </div>
+                            
+                            @if (isRefundable)
+                            {
+                                <div class="mb-4">
+                                    <label class="block text-label-sm font-bold text-on-surface mb-2">Thông tin tài khoản nhận hoàn tiền <span class="text-error">*</span></label>
+                                    <p class="text-[13px] text-on-surface-variant mb-2">Vui lòng cung cấp: Số tài khoản - Ngân hàng - Chủ tài khoản để bộ phận kế toán xử lý hoàn cọc.</p>
+                                    <textarea name="bankDetails" required class="w-full p-3 rounded-lg border border-outline-variant focus:border-error focus:ring focus:ring-error/20 bg-surface-container-lowest" rows="3" placeholder="VD: 1903456789 - Techcombank - NGUYEN VAN A"></textarea>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mb-4 p-3 bg-error-container/50 text-error rounded-lg text-sm">
+                                    <span class="font-bold">Lưu ý:</span> Hủy phòng trong vòng 48h trước giờ nhận phòng sẽ <span class="font-bold">KHÔNG</span> được hoàn cọc theo chính sách của resort.
+                                </div>
+                            }
+
+                            <div class="flex gap-3 mt-6">
+                                <button type="button" id="btn-hide-cancel-form" class="flex-1 py-3 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container font-label-lg transition-all">
+                                    Đóng
+                                </button>
+                                <button type="submit" class="flex-1 py-3 rounded-lg bg-error text-white hover:opacity-90 font-label-lg transition-all">
+                                    Xác Nhận Hủy
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <p id="cancel-policy-text" class="text-center text-label-sm text-on-surface-variant px-4 leading-relaxed mt-2">
                         @if (isRefundable)
                         {
                             <text>Miễn phí hủy phòng đến trước @(Model.CheckInDate.AddHours(-48).ToString("dd/MM/yyyy HH:mm")). Áp dụng Điều khoản & Chính sách.</text>
@@ -366,3 +399,28 @@
         </aside>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnShow = document.getElementById("btn-show-cancel-form");
+            const btnHide = document.getElementById("btn-hide-cancel-form");
+            const formArea = document.getElementById("cancel-form-area");
+            const policyText = document.getElementById("cancel-policy-text");
+
+            if (btnShow && formArea && btnHide) {
+                btnShow.addEventListener("click", function () {
+                    btnShow.classList.add("hidden");
+                    if (policyText) policyText.classList.add("hidden");
+                    formArea.classList.remove("hidden");
+                });
+
+                btnHide.addEventListener("click", function () {
+                    formArea.classList.add("hidden");
+                    btnShow.classList.remove("hidden");
+                    if (policyText) policyText.classList.remove("hidden");
+                });
+            }
+        });
+    </script>
+}

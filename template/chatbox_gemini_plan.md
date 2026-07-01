@@ -122,34 +122,23 @@ namespace PhucNguyenResort.Services
                 var rawUrl = _configuration["Gemini:ApiUrl"] ?? "https://generativelanguage.googleapis.com/v1beta/models/{0}:generateContent?key={1}";
                 var apiUrl = string.Format(rawUrl, model, apiKey);
 
-                // 1. Lấy dữ liệu động từ database làm ngữ cảnh (Context)
-                string dynamicContext = await BuildResortContextAsync();
+                // 1. Lấy dữ liệu động từ database làm ngữ cảnh (Context) - ĐÃ TỐI ƯU THEO INTENT
+                string dynamicContext = await BuildOptimizedContextAsync(userMessage);
 
-                // 2. Định nghĩa System Instruction
-                string systemInstruction = "Bạn là trợ lý ảo AI của resort cao cấp 'Phúc Nguyễn Resort'. " +
-                    "Hãy trả lời khách hàng một cách thân thiện, lịch sự và chuyên nghiệp bằng Tiếng Việt. " +
-                    "Nhiệm vụ của bạn là tư vấn các dịch vụ của resort và hướng dẫn cách đăng ký dịch vụ. " +
-                    "Chỉ sử dụng thông tin được cung cấp dưới đây để trả lời câu hỏi của khách hàng. " +
-                    "Nếu thông tin không có sẵn trong ngữ cảnh, hãy khuyên khách liên hệ Hotline: +84 901 234 567 hoặc Email: info@phucnguyenresort.com.\n\n" +
-                    "--- THÔNG TIN CHI TIẾT VỀ PHÚC NGUYỄN RESORT ---\n" +
+                // 2. Định nghĩa System Instruction (Đã thêm Guardrails, Đa ngôn ngữ, và Deep Links)
+                string systemInstruction = "Bạn là trợ lý ảo AI của resort cao cấp 'Phúc Nguyễn Resort'.\n" +
+                    "Nhiệm vụ của bạn là tư vấn các dịch vụ của resort và hướng dẫn cách đặt phòng, đặt tour.\n\n" +
+                    "--- QUY TẮC CỐT LÕI (GUARDRAILS) ---\n" +
+                    "1. ĐA NGÔN NGỮ: Hãy phát hiện ngôn ngữ khách hàng đang sử dụng và trả lời bằng chính ngôn ngữ đó (ưu tiên Tiếng Việt và Tiếng Anh).\n" +
+                    "2. BẢO VỆ THƯƠNG HIỆU: Tuyệt đối KHÔNG cung cấp thông tin, so sánh hoặc nhắc đến các Resort đối thủ cạnh tranh.\n" +
+                    "3. PHẠM VI TRẢ LỜI: KHÔNG trả lời các chủ đề về chính trị, tôn giáo, y tế, hoặc các câu hỏi ngoài lề không liên quan đến du lịch/nghỉ dưỡng.\n" +
+                    "4. TÍNH CHÍNH XÁC: Chỉ sử dụng thông tin được cung cấp trong phần NGỮ CẢNH bên dưới. Nếu thông tin không có sẵn, hãy khuyên khách liên hệ Hotline: +84 901 234 567 hoặc Email: info@phucnguyenresort.com.\n" +
+                    "5. TĂNG CHUYỂN ĐỔI (CALL-TO-ACTION): Khi giới thiệu phòng hoặc tour, HÃY LUÔN kèm theo một đường dẫn đặt chỗ (Deep Link) dưới dạng Markdown. Ví dụ: `[👉 Đặt phòng ngay](/Home/SearchRooms)` hoặc `[👉 Xem chi tiết Tour](/Tours)`.\n\n" +
+                    "--- NGỮ CẢNH DỮ LIỆU THỰC TẾ ---\n" +
                     dynamicContext + "\n" +
-                    "--- QUY ĐỊNH GIỜ NHẬN/TRẢ PHÒNG & PHỤ PHÍ ---\n" +
-                    "- Giờ nhận phòng (Check-in) tiêu chuẩn: từ 14:00 chiều.\n" +
-                    "- Giờ trả phòng (Check-out) tiêu chuẩn: trước 12:00 trưa.\n" +
-                    "- Phụ thu nhận phòng sớm (tính theo giờ thực tế giao phòng):\n" +
-                    "  + Trước 06:00 sáng: phụ thu 100% tiền phòng/đêm.\n" +
-                    "  + Từ 06:00 đến trước 09:00 sáng: phụ thu 50% tiền phòng/đêm.\n" +
-                    "  + Từ 09:00 đến trước 14:00 chiều: phụ thu 30% tiền phòng/đêm.\n" +
-                    "- Phụ thu trả phòng muộn (tính theo giờ thực tế trả phòng):\n" +
-                    "  + Từ 12:00 đến trước 15:00 chiều: phụ thu 30% tiền phòng/đêm.\n" +
-                    "  + Từ 15:00 đến trước 18:00 chiều: phụ thu 50% tiền phòng/đêm.\n" +
-                    "  + Từ 18:00 trở đi: phụ thu 100% tiền phòng/đêm.\n\n" +
-                    "--- HƯỚNG DẪN ĐĂNG KÝ/ĐẶT DỊCH VỤ ---\n" +
-                    "- Đặt phòng ngủ: Khách hàng nhấn vào menu 'Phòng Ngủ' trên thanh điều hướng, chọn ngày nhận/trả phòng, chọn số lượng phòng mong muốn và tiến hành đặt trực tuyến.\n" +
-                    "- Đặt tour: Khách hàng nhấn vào menu 'Tour', xem thông tin các tour, chọn ngày đi và thực hiện đặt trực tuyến.\n" +
-                    "- Đặt bàn nhà hàng: Khách hàng truy cập menu 'Đặt Bàn', điền thông tin số khách, thời gian và xác nhận.\n" +
-                    "- Đặt đồ ăn (Room Service): Khách hàng vào menu 'Dịch Vụ' (hoặc Room Service) để đặt các món ăn trực tiếp giao tận phòng.\n" +
-                    "Lưu ý: Khách hàng có thể thanh toán trực tuyến qua cổng VNPay một cách nhanh chóng và an toàn.";
+                    "--- QUY ĐỊNH & CHÍNH SÁCH ---\n" +
+                    "- Nhận phòng: 14:00 | Trả phòng: 12:00. Phụ thu nhận sớm/trả muộn theo quy định thực tế.\n" +
+                    "- Hỗ trợ thanh toán an toàn và nhanh chóng qua cổng VNPay trực tuyến.";
 
                 // 3. Cấu trúc Payload cho Gemini API (hỗ trợ System Instruction & Chat History)
                 var contents = new List<object>();
@@ -219,53 +208,52 @@ namespace PhucNguyenResort.Services
             }
         }
 
-        private async Task<string> BuildResortContextAsync()
+        private async Task<string> BuildOptimizedContextAsync(string userMessage)
         {
             var sb = new StringBuilder();
+            var msg = userMessage.ToLower();
 
-            // Lấy danh sách loại phòng ngủ
-            sb.AppendLine("1. DANH SÁCH LOẠI PHÒNG NGỦ:");
-            var categories = await _dbContext.RoomCategories.AsNoTracking().ToListAsync();
-            foreach (var cat in categories)
-            {
-                sb.AppendLine($"- Tên phòng: {cat.CategoryName} | Giá mỗi đêm: {cat.PricePerNight:N0} VNĐ | Số người lớn tối đa: {cat.MaxAdults} | Số trẻ em tối đa: {cat.MaxChildren}");
-                if (!string.IsNullOrEmpty(cat.Description))
-                {
-                    sb.AppendLine($"  Mô tả: {cat.Description}");
-                }
+            // Phân loại ý định cơ bản bằng Keyword (Tối ưu hóa token)
+            bool isAskingRoom = msg.Contains("phòng") || msg.Contains("ngủ") || msg.Contains("giá") || msg.Contains("room") || msg.Contains("book");
+            bool isAskingTour = msg.Contains("tour") || msg.Contains("tham quan") || msg.Contains("đi chơi") || msg.Contains("trải nghiệm") || msg.Contains("guide");
+            bool isAskingFood = msg.Contains("ăn") || msg.Contains("uống") || msg.Contains("nhà hàng") || msg.Contains("thực đơn") || msg.Contains("menu") || msg.Contains("food");
+
+            // Nếu không xác định rõ, load thông tin tiêu biểu cơ bản
+            if (!isAskingRoom && !isAskingTour && !isAskingFood) {
+                isAskingRoom = true; // Default
             }
 
-            sb.AppendLine();
-
-            // Lấy danh sách các Tour du lịch
-            sb.AppendLine("2. DANH SÁCH TOUR DU LỊCH:");
-            var tours = await _dbContext.Tours.AsNoTracking().ToListAsync();
-            foreach (var tour in tours)
+            if (isAskingRoom)
             {
-                sb.AppendLine($"- Tên tour: {tour.TourName} | Giá tour: {tour.Price:N0} VNĐ/khách | Điểm xuất phát/Vị trí: {tour.Location} | Thời gian: {tour.DurationHours} tiếng | Số người tối đa: {tour.MaxCapacity}");
-                if (!string.IsNullOrEmpty(tour.Description))
+                sb.AppendLine("[DANH SÁCH LOẠI PHÒNG NGỦ]");
+                var categories = await _dbContext.RoomCategories.AsNoTracking().ToListAsync();
+                foreach (var cat in categories)
                 {
-                    sb.AppendLine($"  Chi tiết hành trình: {tour.Description}");
+                    sb.AppendLine($"- {cat.CategoryName} | Giá mỗi đêm: {cat.PricePerNight:N0} VNĐ | Tối đa: {cat.MaxAdults} Người lớn, {cat.MaxChildren} Trẻ em. {(string.IsNullOrEmpty(cat.Description) ? "" : "Đặc điểm: " + cat.Description)}");
                 }
+                sb.AppendLine();
             }
 
-            sb.AppendLine();
-
-            // Lấy danh mục đồ ăn nhà hàng (Restaurant Menu)
-            sb.AppendLine("3. THỰC ĐƠN & DỊCH VỤ ẨM THỰC:");
-            var menuCats = await _dbContext.MenuCategories
-                .Include(c => c.MenuItems)
-                .AsNoTracking()
-                .ToListAsync();
-          
-            foreach (var mc in menuCats)
+            if (isAskingTour)
             {
-                sb.AppendLine($"- Danh mục: {mc.CategoryName}");
-                var items = mc.MenuItems.Take(5); // Lấy tối đa 5 món tiêu biểu để tránh quá tải token
-                foreach (var item in items)
+                sb.AppendLine("[DANH SÁCH TOUR DU LỊCH]");
+                var tours = await _dbContext.Tours.AsNoTracking().ToListAsync();
+                foreach (var tour in tours)
                 {
-                    sb.AppendLine($"  + Món: {item.ItemName} | Giá: {item.Price:N0} VNĐ | Trạng thái: {(item.IsAvailable == true ? "Còn hàng" : "Hết món")}");
+                    sb.AppendLine($"- {tour.TourName} | Giá tour: {tour.Price:N0} VNĐ/khách | Thời gian: {tour.DurationHours} tiếng.");
                 }
+                sb.AppendLine();
+            }
+
+            if (isAskingFood)
+            {
+                sb.AppendLine("[THỰC ĐƠN NHÀ HÀNG - CÁC MÓN TIÊU BIỂU]");
+                var menuItems = await _dbContext.MenuItems.Where(m => m.IsAvailable).Take(10).AsNoTracking().ToListAsync();
+                foreach (var item in menuItems)
+                {
+                    sb.AppendLine($"- {item.ItemName} | Giá: {item.Price:N0} VNĐ");
+                }
+                sb.AppendLine();
             }
 
             return sb.ToString();
@@ -607,9 +595,7 @@ Chúng ta thiết kế một giao diện cao cấp:
 
     <!-- Message Area -->
     <div class="chatbox-messages" id="chatboxMessages">
-        <div class="message bot">
-            Xin kính chào Quý khách! Tôi là Trợ lý ảo của Phúc Nguyễn Resort. Quý khách cần hỗ trợ thêm thông tin về giá phòng ngủ, các chương trình tour du lịch hay dịch vụ ăn uống và đặt phòng thế nào ạ?
-        </div>
+        <!-- Tin nhắn sẽ được load bằng JS thông qua sessionStorage -->
     </div>
 
     <!-- Footer Input -->
@@ -636,7 +622,19 @@ Hỗ trợ quản lý lịch sử hội thoại (Chat History) dạng cấu trú
         const inputField = document.getElementById("chatboxInput");
         const messagesContainer = document.getElementById("chatboxMessages");
 
-        let chatHistory = []; // Lưu trữ lịch sử chat cục bộ
+        // Sử dụng sessionStorage để giữ lịch sử chat khi người dùng chuyển trang
+        let chatHistory = JSON.parse(sessionStorage.getItem("chatHistory")) || []; 
+
+        // Khôi phục hội thoại khi load trang
+        if (chatHistory.length > 0) {
+            chatHistory.forEach(msg => {
+                appendMessage(msg.role === "model" ? "bot" : "user", msg.text);
+            });
+            setTimeout(scrollToBottom, 100);
+        } else {
+            // Lời chào mặc định
+            appendMessage("bot", "Xin kính chào Quý khách! Tôi là Trợ lý ảo của Phúc Nguyễn Resort. Quý khách cần hỗ trợ thêm thông tin về giá phòng ngủ, các chương trình tour du lịch hay dịch vụ ăn uống thế nào ạ?");
+        }
 
         // Đóng mở Chatbox
         toggleBtn.addEventListener("click", () => {
@@ -693,6 +691,9 @@ Hỗ trợ quản lý lịch sử hội thoại (Chat History) dạng cấu trú
                     chatHistory.shift();
                     chatHistory.shift();
                 }
+
+                // Cập nhật session storage
+                sessionStorage.setItem("chatHistory", JSON.stringify(chatHistory));
             })
             .catch(err => {
                 console.error(err);
@@ -793,6 +794,14 @@ Hỗ trợ quản lý lịch sử hội thoại (Chat History) dạng cấu trú
     });
 </script>
 ```
+
+---
+
+### E. Lưu trữ Nhật ký Hội thoại (Chat Analytics) - *Bổ sung thêm*
+
+Để khai thác dữ liệu từ các cuộc hội thoại, đề xuất thêm bảng `ChatLogs` trong cơ sở dữ liệu:
+1. Mỗi khi `ChatController` nhận tin nhắn, sẽ lưu lại vào `ChatLogs` gồm: `SessionId`, `UserMessage`, `BotResponse`, `Timestamp`.
+2. Dữ liệu này cung cấp Insight cho Ban quản lý (ví dụ: "Dạo này khách hỏi về Tour nhiều nhưng ít đặt, có thể do giá cao", hoặc "Khách hay hỏi món ăn chay, cần bổ sung thực đơn").
 
 ---
 
