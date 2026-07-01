@@ -841,10 +841,12 @@ namespace PhucNguyenResort.Services.Reception
             var foodOrderTypesByReferenceId = await GetFoodOrderTypesByReferenceIdAsync(folio.FolioTransactions);
 
             // Mapping transactions
-            var transactions = folio.FolioTransactions.Select(t => new FolioTransactionDto
+            var transactions = folio.FolioTransactions
+                .OrderBy(t => t.CreatedAt)
+                .Select(t => new FolioTransactionDto
             {
                 TransactionId = t.TransactionId,
-                TransactionTypeName = ResolveTransactionTypeName(t, foodOrderTypesByReferenceId),
+                TransactionTypeName = ResolveTransactionTypeName(t, booking, foodOrderTypesByReferenceId),
                 Amount = t.Amount,
                 CreatedAt = t.CreatedAt
             }).ToList();
@@ -1079,10 +1081,12 @@ namespace PhucNguyenResort.Services.Reception
             
             var foodOrderTypesByReferenceId = await GetFoodOrderTypesByReferenceIdAsync(folio.FolioTransactions);
 
-            model.Transactions = folio.FolioTransactions.Select(t => new FolioTransactionDto
+            model.Transactions = folio.FolioTransactions
+                .OrderBy(t => t.CreatedAt)
+                .Select(t => new FolioTransactionDto
             {
                 TransactionId = t.TransactionId,
-                TransactionTypeName = ResolveTransactionTypeName(t, foodOrderTypesByReferenceId),
+                TransactionTypeName = ResolveTransactionTypeName(t, booking, foodOrderTypesByReferenceId),
                 Amount = t.Amount,
                 CreatedAt = t.CreatedAt
             }).ToList();
@@ -1125,6 +1129,7 @@ namespace PhucNguyenResort.Services.Reception
 
         private static string? ResolveTransactionTypeName(
             FolioTransaction transaction,
+            Booking booking,
             IReadOnlyDictionary<int, FoodOrderType> foodOrderTypesByReferenceId)
         {
             if (transaction.TransactionType == FolioTransactionType.FoodCharge &&
@@ -1136,9 +1141,19 @@ namespace PhucNguyenResort.Services.Reception
                     : "Tiền gọi món lên phòng";
             }
 
+            if (transaction.TransactionType == FolioTransactionType.RoomCharge)
+            {
+                if (transaction.Amount == booking.TotalAmount)
+                    return "Tiền phòng đặt trước";
+                if (transaction.CreatedAt.Date == booking.CheckInDate.Date)
+                    return "Phụ thu nhận phòng sớm";
+                if (transaction.CreatedAt.Date >= booking.CheckOutDate.Date)
+                    return "Phụ thu trả phòng muộn";
+                return "Phụ thu tiền phòng";
+            }
+
             return transaction.TransactionType switch
             {
-                FolioTransactionType.RoomCharge => "Tiền phòng",
                 FolioTransactionType.FoodCharge => "Tiền ăn uống",
                 FolioTransactionType.TourCharge => "Tiền tour",
                 FolioTransactionType.Adjustment => "Điều chỉnh",

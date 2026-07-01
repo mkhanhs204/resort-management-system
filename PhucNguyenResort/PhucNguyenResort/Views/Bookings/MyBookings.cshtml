@@ -1,238 +1,336 @@
 @model IEnumerable<PhucNguyenResort.Models.Booking>
 @using PhucNguyenResort.Enums
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Lịch Sử Đặt Phòng | Phúc Nguyên Resort";
+    var fullName = User.FindFirstValue(ClaimTypes.Name) ?? "Khách Hàng";
+    var email = User.FindFirstValue(ClaimTypes.Email) ?? "";
+    var initials = string.IsNullOrEmpty(fullName) ? "U" : fullName.Substring(0, 1).ToUpper();
 }
 
-<div class="pt-24 pb-section-gap-lg max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop min-h-screen">
-    
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="bg-primary-container/20 border border-primary/30 text-primary p-4 rounded-xl mb-6">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-    
-    @if (TempData["Error"] != null)
-    {
-        <div class="bg-error-container text-on-error-container p-4 rounded-xl mb-6">
-            @TempData["Error"]
-        </div>
-    }
+@section Styles {
+    <style>
+        .custom-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.06);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .active-link {
+            border-left: 3px solid #805528;
+            font-weight: 700;
+            color: #805528 !important;
+            background-color: #f6f3ef;
+        }
+        .luxury-card {
+            background-color: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.04);
+        }
+        .transition-soft {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+}
 
-    <!-- Page Title & Intro -->
-    <div class="mb-stack-lg text-center md:text-left mt-8">
-        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Lịch Sử Đặt Phòng</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant opacity-80">Quản lý các kỳ nghỉ của bạn tại digital sanctuary của chúng tôi.</p>
-    </div>
+<div class="pt-8 pb-section-gap-lg max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop min-h-screen">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+        
+        <!-- Sidebar (4 columns) -->
+        <aside class="md:col-span-4 space-y-stack-md">
+            <div class="luxury-card rounded-xl p-8 text-center flex flex-col items-center">
+                <div class="relative group cursor-pointer mb-6">
+                    <div class="w-32 h-32 rounded-full bg-primary-container text-white flex items-center justify-center text-4xl font-headline-lg shadow-lg">
+                        @initials
+                    </div>
+                </div>
+                <h2 class="font-headline-sm text-headline-sm text-primary mb-1">@fullName</h2>
+                <p class="font-body-md text-on-surface-variant opacity-70 mb-8">@email</p>
 
-    @if (!Model.Any())
-    {
-        <!-- Empty State -->
-        <div class="py-section-gap-lg text-center flex flex-col items-center">
-            <div class="w-32 h-32 bg-surface-container flex items-center justify-center rounded-full mb-8">
-                <span class="material-symbols-outlined text-[64px] text-outline" style="font-variation-settings: 'FILL' 0;">book_online</span>
+                <nav class="w-full space-y-2 text-left">
+                    <a asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="font-label-lg text-label-lg">Hồ Sơ Cá Nhân</span>
+                    </a>
+                    <a asp-controller="Bookings" asp-action="MyBookings" class="flex items-center gap-3 p-4 rounded-lg text-primary font-bold active-link transition-soft">
+                        <span class="material-symbols-outlined">history</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Phòng</span>
+                    </a>
+                    <a asp-controller="CustomerTourBooking" asp-action="MyTourBookings" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">tour</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Tour</span>
+                    </a>
+                    <a asp-controller="TableReservations" asp-action="MyReservations" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">restaurant</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Bàn</span>
+                    </a>
+                    <hr class="border-outline/10 my-4" />
+                    <a asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 p-4 rounded-lg text-error hover:bg-error-container/20 transition-soft">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="font-label-lg text-label-lg">Đăng Xuất</span>
+                    </a>
+                </nav>
             </div>
-            <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Bạn chưa có đơn đặt phòng nào</h2>
-            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto mb-10">Khám phá bộ sưu tập phòng nghỉ sang trọng và bắt đầu hành trình của bạn tại Phúc Nguyên ngay hôm nay.</p>
-            <a asp-controller="Home" asp-action="SearchRooms" class="bg-primary text-on-primary px-10 py-4 rounded-xl font-label-lg luxury-shadow hover:scale-105 transition-all inline-block uppercase tracking-widest">Tìm kiếm phòng ngay</a>
-        </div>
-    }
-    else
-    {
-        <!-- Filter Tabs -->
-        <div class="flex flex-wrap gap-8 border-b border-outline-variant/20 mb-section-gap-md overflow-x-auto whitespace-nowrap">
-            <button class="pb-4 font-label-lg text-label-lg filter-tab tab-active" data-filter="all">Tất cả đơn đặt</button>
-            <button class="pb-4 font-label-lg text-label-lg filter-tab text-on-surface-variant hover:text-primary transition-colors" data-filter="Reserved">Sắp diễn ra</button>
-            <button class="pb-4 font-label-lg text-label-lg filter-tab text-on-surface-variant hover:text-primary transition-colors" data-filter="CheckedIn">Đang lưu trú</button>
-            <button class="pb-4 font-label-lg text-label-lg filter-tab text-on-surface-variant hover:text-primary transition-colors" data-filter="CheckedOut">Đã hoàn thành</button>
-            <button class="pb-4 font-label-lg text-label-lg filter-tab text-on-surface-variant hover:text-primary transition-colors" data-filter="Cancelled">Đã hủy</button>
-        </div>
+        </aside>
 
-        <!-- Bookings List -->
-        <div class="space-y-gutter" id="bookings-container">
-            @foreach (var booking in Model.OrderByDescending(b => b.CreatedAt))
+        <!-- Main Content (8 columns) -->
+        <div class="md:col-span-8 space-y-gutter">
+            
+            @if (TempData["SuccessMessage"] != null)
             {
-                var tokens = ViewBag.PreCheckinTokens as Dictionary<int, string>;
-                var token = (tokens != null && tokens.ContainsKey(booking.BookingId)) ? tokens[booking.BookingId] : string.Empty;
-                var shareLink = Url.Action("PreCheckin", "Bookings", new { id = booking.BookingId, token = token }, Context.Request.Scheme);
-                
-                var groupedRooms = booking.BookingDetails
-                    .GroupBy(bd => bd.RoomCategory?.CategoryName)
-                    .Select(g => $"{g.Count()}x {g.Key}")
-                    .ToList();
-                string roomsDisplay = groupedRooms.Any() ? string.Join(", ", groupedRooms) : "Phòng Resort";
-                
-                var firstDetail = booking.BookingDetails.FirstOrDefault();
-                string imgUrl = firstDetail?.RoomCategory?.ImageUrl ?? "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+                <div class="bg-primary-container/20 text-on-primary-container p-4 rounded-xl border border-primary-container/30 text-center text-sm mb-6">
+                    <span class="material-symbols-outlined align-middle mr-2 text-primary">check_circle</span>
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            
+            @if (TempData["Error"] != null)
+            {
+                <div class="bg-error-container/20 text-error p-4 rounded-xl border border-error-container/30 text-center text-sm mb-6">
+                    <span class="material-symbols-outlined align-middle mr-2">error</span>
+                    @TempData["Error"]
+                </div>
+            }
 
-                string statusClass = "";
-                string statusText = "";
-                string statusBadgeClass = "";
-                string cardOpacityClass = "";
-                string imageFilterClass = "";
+            <div class="luxury-card rounded-xl p-8 mb-gutter">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="font-headline-md text-headline-md text-primary">Lịch Sử Đặt Phòng</h1>
+                        <p class="font-body-md text-on-surface-variant">Quản lý các kỳ nghỉ của bạn tại Phúc Nguyên Resort.</p>
+                    </div>
+                </div>
 
-                switch (booking.BookingStatus)
+                @if (!Model.Any())
                 {
-                    case BookingStatus.Reserved:
-                        statusClass = "Reserved";
-                        statusText = "Đã đặt";
-                        statusBadgeClass = "bg-blue-50 text-blue-700 border-blue-100";
-                        break;
-                    case BookingStatus.CheckedIn:
-                        statusClass = "CheckedIn";
-                        statusText = "Đang lưu trú";
-                        statusBadgeClass = "bg-emerald-50 text-emerald-700 border-emerald-100";
-                        break;
-                    case BookingStatus.CheckedOut:
-                        statusClass = "CheckedOut";
-                        statusText = "Hoàn thành";
-                        statusBadgeClass = "bg-surface-container-highest text-on-surface-variant border-outline-variant/30";
-                        cardOpacityClass = "opacity-80 hover:opacity-100";
-                        imageFilterClass = "grayscale-[30%] group-hover:grayscale-0";
-                        break;
-                    case BookingStatus.Cancelled:
-                        statusClass = "Cancelled";
-                        statusText = "Đã hủy";
-                        statusBadgeClass = "bg-red-50 text-red-700 border-red-100";
-                        cardOpacityClass = "opacity-60";
-                        break;
-                    case BookingStatus.NoShow:
-                        statusClass = "Cancelled";
-                        statusText = "Không đến";
-                        statusBadgeClass = "bg-red-50 text-red-700 border-red-100";
-                        cardOpacityClass = "opacity-60";
-                        break;
-                }
-
-                <div class="booking-card bg-surface-container-lowest luxury-shadow border border-outline-variant/20 rounded-xl overflow-hidden group hover:border-primary/30 transition-all duration-500 @cardOpacityClass" data-status="@statusClass">
-                    <div class="flex flex-col md:flex-row">
-                        <!-- Image section -->
-                        <div class="w-full md:w-80 h-48 md:h-auto overflow-hidden relative">
-                            @if (booking.BookingStatus == BookingStatus.Cancelled || booking.BookingStatus == BookingStatus.NoShow)
-                            {
-                                <div class="w-full h-full bg-surface-container-highest flex items-center justify-center min-h-[200px]">
-                                    <span class="material-symbols-outlined text-[64px] text-outline-variant">event_busy</span>
-                                </div>
-                            }
-                            else
-                            {
-                                <img src="@imgUrl" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 min-h-[200px] @imageFilterClass" alt="Room Image" />
-                            }
-                            <div class="absolute top-4 left-4">
-                                <span class="@statusBadgeClass text-label-sm font-semibold px-3 py-1 rounded-full border uppercase tracking-wider shadow-sm">
-                                    @statusText
-                                </span>
-                            </div>
+                    <!-- Empty State -->
+                    <div class="py-12 text-center flex flex-col items-center border-t border-outline/10">
+                        <div class="w-24 h-24 bg-surface-container-low flex items-center justify-center rounded-full mb-6">
+                            <span class="material-symbols-outlined text-[48px] text-outline" style="font-variation-settings: 'FILL' 0;">book_online</span>
                         </div>
+                        <h2 class="font-headline-sm text-headline-sm text-on-surface mb-2">Bạn chưa có đơn đặt phòng nào</h2>
+                        <p class="font-body-md text-on-surface-variant max-w-sm mx-auto mb-8">Khám phá bộ sưu tập phòng nghỉ sang trọng và bắt đầu hành trình của bạn ngay hôm nay.</p>
+                        <a asp-controller="Home" asp-action="SearchRooms" class="bg-primary text-on-primary px-8 py-3 rounded-lg font-label-lg shadow hover:opacity-90 transition-all inline-block">Tìm kiếm phòng ngay</a>
+                    </div>
+                }
+                else
+                {
+                    <!-- Filter Tabs -->
+                    <div class="flex flex-wrap gap-2 mb-8 pb-4 border-b border-outline/10">
+                        <button class="px-5 py-2 font-label-lg rounded-lg filter-tab tab-active bg-primary text-on-primary transition-all duration-300" data-filter="all">Tất cả đơn đặt</button>
+                        <button class="px-5 py-2 font-label-lg rounded-lg filter-tab text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-300" data-filter="Reserved">Sắp diễn ra</button>
+                        <button class="px-5 py-2 font-label-lg rounded-lg filter-tab text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-300" data-filter="CheckedIn">Đang lưu trú</button>
+                        <button class="px-5 py-2 font-label-lg rounded-lg filter-tab text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-300" data-filter="CheckedOut">Đã hoàn thành</button>
+                        <button class="px-5 py-2 font-label-lg rounded-lg filter-tab text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-300" data-filter="Cancelled">Đã hủy</button>
+                    </div>
 
-                        <!-- Content section -->
-                        <div class="flex-1 p-6 md:p-8 flex flex-col justify-between">
-                            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-                                <div>
-                                    <div class="text-label-sm text-primary font-bold mb-1 tracking-widest uppercase">PNR-@booking.BookingId.ToString("D5")</div>
-                                    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">@roomsDisplay</h3>
-                                    <div class="flex flex-wrap items-center gap-4 text-on-surface-variant text-label-lg">
-                                        <div class="flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-[18px]">calendar_today</span>
-                                            <span>@booking.CheckInDate.ToString("dd/MM/yyyy") - @booking.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                    <!-- Bookings List -->
+                    <div class="space-y-6" id="bookings-container">
+                        @foreach (var booking in Model.OrderByDescending(b => b.CreatedAt))
+                        {
+                            var tokens = ViewBag.PreCheckinTokens as Dictionary<int, string>;
+                            var token = (tokens != null && tokens.ContainsKey(booking.BookingId)) ? tokens[booking.BookingId] : string.Empty;
+                            var shareLink = Url.Action("PreCheckin", "Bookings", new { id = booking.BookingId, token = token }, Context.Request.Scheme);
+                            
+                            var groupedRooms = booking.BookingDetails
+                                .GroupBy(bd => bd.RoomCategory?.CategoryName)
+                                .Select(g => $"{g.Count()}x {g.Key}")
+                                .ToList();
+                            string roomsDisplay = groupedRooms.Any() ? string.Join(", ", groupedRooms) : "Phòng Resort";
+                            
+                            var assignedRooms = booking.BookingDetails
+                                .Where(bd => bd.Room != null && !string.IsNullOrEmpty(bd.Room.RoomNumber))
+                                .Select(bd => bd.Room.RoomNumber)
+                                .ToList();
+                            string assignedRoomsDisplay = assignedRooms.Any() ? string.Join(", ", assignedRooms) : "";
+                            
+                            var firstDetail = booking.BookingDetails.FirstOrDefault();
+                            string imgUrl = firstDetail?.RoomCategory?.ImageUrl ?? "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+
+                            string statusClass = "";
+                            string statusText = "";
+                            string statusBadgeClass = "";
+                            string cardOpacityClass = "";
+
+                            switch (booking.BookingStatus)
+                            {
+                                case BookingStatus.Reserved:
+                                    statusClass = "Reserved";
+                                    statusText = "Đã đặt";
+                                    statusBadgeClass = "bg-blue-50 text-blue-700 border-blue-100";
+                                    break;
+                                case BookingStatus.CheckedIn:
+                                    statusClass = "CheckedIn";
+                                    statusText = "Đang lưu trú";
+                                    statusBadgeClass = "bg-emerald-50 text-emerald-700 border-emerald-100";
+                                    break;
+                                case BookingStatus.CheckedOut:
+                                    statusClass = "CheckedOut";
+                                    statusText = "Hoàn thành";
+                                    statusBadgeClass = "bg-surface-container-highest text-on-surface-variant border-outline-variant/30";
+                                    cardOpacityClass = "opacity-80 hover:opacity-100";
+                                    break;
+                                case BookingStatus.Cancelled:
+                                    statusClass = "Cancelled";
+                                    statusText = "Đã hủy";
+                                    statusBadgeClass = "bg-red-50 text-red-700 border-red-100";
+                                    cardOpacityClass = "opacity-60";
+                                    break;
+                                case BookingStatus.NoShow:
+                                    statusClass = "Cancelled";
+                                    statusText = "Không đến";
+                                    statusBadgeClass = "bg-red-50 text-red-700 border-red-100";
+                                    cardOpacityClass = "opacity-60";
+                                    break;
+                            }
+
+                            <div class="booking-card bg-surface-container-lowest border border-outline-variant/20 rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 @cardOpacityClass" data-status="@statusClass">
+                                <div class="flex flex-col lg:flex-row">
+                                    <!-- Image section -->
+                                    <div class="w-full lg:w-64 h-48 lg:h-auto overflow-hidden relative">
+                                        @if (booking.BookingStatus == BookingStatus.Cancelled || booking.BookingStatus == BookingStatus.NoShow)
+                                        {
+                                            <div class="w-full h-full bg-surface-container-highest flex items-center justify-center min-h-[200px]">
+                                                <span class="material-symbols-outlined text-[48px] text-outline-variant">event_busy</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <img src="@imgUrl" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105 min-h-[200px]" alt="Room Image" />
+                                        }
+                                        <div class="absolute top-3 left-3">
+                                            <span class="@statusBadgeClass text-[11px] font-bold px-3 py-1 rounded-full border uppercase tracking-wider shadow-sm">
+                                                @statusText
+                                            </span>
                                         </div>
-                                        <div class="flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-[18px]">person</span>
-                                            <span>@booking.NumberOfAdults NL, @booking.NumberOfChildren TE</span>
+                                    </div>
+
+                                    <!-- Content section -->
+                                    <div class="flex-1 p-5 lg:p-6 flex flex-col justify-between">
+                                        <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                                            <div>
+                                                <div class="text-xs text-primary font-bold mb-1 tracking-widest uppercase">PNR-@booking.BookingId.ToString("D5")</div>
+                                                <h3 class="font-headline-sm text-lg text-on-surface mb-2 leading-tight">@roomsDisplay</h3>
+                                                <div class="flex flex-col gap-2 text-on-surface-variant text-sm mt-3">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                                                        <span>@booking.CheckInDate.ToString("dd/MM/yyyy") - @booking.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="material-symbols-outlined text-[16px]">person</span>
+                                                        <span>@booking.NumberOfAdults NL, @booking.NumberOfChildren TE</span>
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(assignedRoomsDisplay))
+                                                    {
+                                                        <div class="flex items-center gap-2 text-primary w-fit bg-primary/5 px-2 py-1 rounded border border-primary/20">
+                                                            <span class="material-symbols-outlined text-[16px]">key</span>
+                                                            <span class="font-bold text-xs">Phòng: @assignedRoomsDisplay</span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="sm:text-right mt-2 sm:mt-0">
+                                                <div class="text-xs text-on-surface-variant mb-1">Tổng cộng</div>
+                                                <div class="text-xl text-primary font-bold">@(booking.TotalAmount?.ToString("N0") ?? "0") ₫</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-6 flex flex-wrap gap-3 justify-end border-t border-outline/10 pt-4">
+                                            <a asp-controller="Bookings" asp-action="Details" asp-route-id="@booking.BookingId" class="px-5 py-2 rounded-lg border border-outline/40 text-on-surface-variant text-sm font-semibold hover:bg-surface-container transition-colors text-center inline-block">Chi tiết</a>
+                                            
+                                            @if (booking.BookingStatus == BookingStatus.Reserved)
+                                            {
+                                                <a href="@shareLink" class="px-5 py-2 rounded-lg bg-primary-container text-on-primary-container text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                                                    <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+                                                    Pre-Checkin
+                                                </a>
+                                            }
+                                            else if (booking.BookingStatus == BookingStatus.CheckedOut)
+                                            {
+                                                <a href="#" class="px-5 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/5 transition-all flex items-center justify-center gap-2">
+                                                    <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                                    Đánh giá
+                                                </a>
+                                            }
                                         </div>
                                     </div>
                                 </div>
-                                <div class="text-right mt-4 md:mt-0">
-                                    <div class="text-label-sm text-on-surface-variant mb-1">Tổng cộng</div>
-                                    <div class="text-headline-sm text-primary font-bold">@(booking.TotalAmount?.ToString("N0") ?? "0") VNĐ</div>
-                                </div>
                             </div>
-                            
-                            <div class="mt-8 flex flex-wrap gap-stack-md justify-end border-t border-outline-variant/20 pt-6">
-                                <a asp-controller="Bookings" asp-action="Details" asp-route-id="@booking.BookingId" class="px-6 py-2.5 rounded-lg border border-outline-variant/50 text-on-surface-variant font-label-lg hover:bg-surface-container transition-colors text-center inline-block">Chi tiết</a>
-                                
-                                @if (booking.BookingStatus == BookingStatus.Reserved)
-                                {
-                                    <a href="@shareLink" class="px-6 py-2.5 rounded-lg bg-primary-container text-on-primary-container font-label-lg luxury-shadow hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                                        <span class="material-symbols-outlined text-[20px]">how_to_reg</span>
-                                        Pre-Checkin
-                                    </a>
-                                }
-                                else if (booking.BookingStatus == BookingStatus.CheckedIn)
-                                {
-                                    <a href="#" class="px-6 py-2.5 rounded-lg bg-secondary text-on-primary font-label-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                                        <span class="material-symbols-outlined text-[20px]">room_service</span>
-                                        Yêu cầu dịch vụ
-                                    </a>
-                                }
-                                else if (booking.BookingStatus == BookingStatus.CheckedOut)
-                                {
-                                    <a href="#" class="px-6 py-2.5 rounded-lg border border-primary text-primary font-label-lg hover:bg-primary/5 transition-all flex items-center justify-center gap-2">
-                                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                                        Đánh giá
-                                    </a>
-                                }
-                                else if (booking.BookingStatus == BookingStatus.Cancelled || booking.BookingStatus == BookingStatus.NoShow)
-                                {
-                                    <button disabled class="px-6 py-2.5 rounded-lg border border-outline-variant/30 text-on-surface-variant font-label-lg cursor-not-allowed opacity-70">
-                                        Đã xử lý
-                                    </button>
-                                }
-                            </div>
-                        </div>
+                        }
                     </div>
-                </div>
-            }
+
+                    <!-- Load More Button -->
+                    <div id="load-more-container" class="mt-8 text-center" style="display: none;">
+                        <button id="btn-load-more" class="px-8 py-3 rounded-full border border-primary text-primary font-label-lg hover:bg-primary/5 transition-all shadow-sm">
+                            Xem thêm lịch sử
+                        </button>
+                    </div>
+                }
+            </div>
         </div>
-    }
+    </div>
 </div>
 
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const tabs = document.querySelectorAll('.filter-tab');
-            const cards = document.querySelectorAll('.booking-card');
+            const cards = Array.from(document.querySelectorAll('.booking-card'));
+            const loadMoreContainer = document.getElementById('load-more-container');
+            const btnLoadMore = document.getElementById('btn-load-more');
+            
+            const itemsPerPage = 5;
+            let currentPage = 1;
+            let currentFilter = 'all';
+            let visibleCards = [];
+
+            function updateDisplay() {
+                // Determine which cards match the filter
+                visibleCards = cards.filter(card => currentFilter === 'all' || card.getAttribute('data-status') === currentFilter);
+                
+                // Hide all cards first
+                cards.forEach(card => card.style.display = 'none');
+                
+                // Show cards up to currentPage * itemsPerPage
+                const maxIndex = currentPage * itemsPerPage;
+                visibleCards.forEach((card, index) => {
+                    if (index < maxIndex) {
+                        card.style.display = 'block';
+                    }
+                });
+
+                // Show/hide load more button
+                if (visibleCards.length > maxIndex) {
+                    loadMoreContainer.style.display = 'block';
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+            }
+
+            // Initial load
+            updateDisplay();
+
+            btnLoadMore.addEventListener('click', () => {
+                currentPage++;
+                updateDisplay();
+            });
 
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     // Remove active class from all tabs
                     tabs.forEach(t => {
-                        t.classList.remove('tab-active', 'font-bold', 'text-primary', 'border-b-2', 'border-primary');
-                        t.classList.add('text-on-surface-variant');
+                        t.classList.remove('tab-active', 'bg-primary', 'text-on-primary');
+                        t.classList.add('text-on-surface-variant', 'hover:bg-surface-container', 'hover:text-primary');
                     });
                     
                     // Add active class to clicked tab
-                    tab.classList.add('tab-active', 'font-bold', 'text-primary', 'border-b-2', 'border-primary');
-                    tab.classList.remove('text-on-surface-variant');
+                    tab.classList.add('tab-active', 'bg-primary', 'text-on-primary');
+                    tab.classList.remove('text-on-surface-variant', 'hover:bg-surface-container', 'hover:text-primary');
 
-                    const filter = tab.getAttribute('data-filter');
-
-                    // Filter cards
-                    cards.forEach(card => {
-                        if (filter === 'all' || card.getAttribute('data-status') === filter) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                });
-            });
-
-            // Atmosphere interaction: Subtle parallax on scroll for luxury cards
-            window.addEventListener('scroll', () => {
-                const scrolled = window.scrollY;
-                cards.forEach((card, index) => {
-                    if(card.style.display !== 'none') {
-                        const speed = 0.02 + (index * 0.01);
-                        // Limit parallax effect to prevent bugs
-                        const translateY = Math.min(scrolled * speed * -1, 0); 
-                        if(translateY > -50) {
-                            // Disabled transform for safer cross-browser layout
-                            // card.style.transform = `translateY(${translateY}px)`;
-                        }
-                    }
+                    currentFilter = tab.getAttribute('data-filter');
+                    currentPage = 1; // Reset page on filter change
+                    updateDisplay();
                 });
             });
         });

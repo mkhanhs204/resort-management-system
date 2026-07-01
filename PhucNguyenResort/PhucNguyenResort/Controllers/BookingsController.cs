@@ -233,6 +233,11 @@ namespace PhucNguyenResort.Controllers
                 .Include(b => b.TourBookings)
                     .ThenInclude(tb => tb.Schedule)
                         .ThenInclude(ts => ts.Tour)
+                .Include(b => b.FoodOrders)
+                    .ThenInclude(fo => fo.FoodOrderItems)
+                        .ThenInclude(i => i.MenuItem)
+                .Include(b => b.GuestFolio)
+                    .ThenInclude(gf => gf.FolioTransactions)
                 .FirstOrDefaultAsync(b => b.BookingId == id && b.UserId == userId);
 
             if (booking == null)

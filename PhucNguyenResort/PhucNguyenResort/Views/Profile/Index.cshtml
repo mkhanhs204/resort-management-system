@@ -68,29 +68,23 @@
                 </nav>
             </div>
 
-            <!-- Resort Contact Info Card -->
-            <div class="luxury-card rounded-xl p-6 bg-primary/5">
-                <h3 class="font-label-lg text-label-lg text-primary uppercase tracking-widest mb-4">Hỗ Trợ Riêng</h3>
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                        <span class="material-symbols-outlined text-primary">concierge</span>
-                    </div>
-                    <div>
-                        <p class="font-label-lg text-label-lg">Concierge 24/7</p>
-                        <p class="text-xs text-on-surface-variant">+84 236 123 4567</p>
-                    </div>
-                </div>
-                <button class="w-full py-3 border border-primary text-primary rounded-lg font-label-lg text-label-lg hover:bg-primary hover:text-white transition-all duration-300">Kết Nối Ngay</button>
-            </div>
+
         </aside>
 
         <!-- Main Content (8 columns) -->
         <div class="md:col-span-8 space-y-gutter">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="bg-primary-container/20 text-on-primary-container p-4 rounded-xl border border-primary-container/30 text-center text-sm">
+                <div class="bg-primary-container/20 text-on-primary-container p-4 rounded-xl border border-primary-container/30 text-center text-sm mb-6">
                     <span class="material-symbols-outlined align-middle mr-2 text-primary">check_circle</span>
                     @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="bg-error-container/20 text-error p-4 rounded-xl border border-error-container/30 text-center text-sm mb-6">
+                    <span class="material-symbols-outlined align-middle mr-2">error</span>
+                    @TempData["ErrorMessage"]
                 </div>
             }
 
@@ -183,35 +177,49 @@
                     }
                 </section>
 
-                <!-- Change Password (Collapsible Interaction) -->
-                <section class="luxury-card rounded-xl overflow-hidden mb-gutter">
-                    <button type="button" class="w-full p-8 flex justify-between items-center hover:bg-surface-container-low transition-colors group" id="pw-toggle">
-                        <div class="flex items-center gap-4">
-                            <span class="material-symbols-outlined text-primary">lock</span>
-                            <h3 class="font-headline-sm text-headline-sm text-primary">Đổi Mật Khẩu</h3>
-                        </div>
-                        <span class="material-symbols-outlined transform transition-transform duration-300" id="pw-chevron">expand_more</span>
-                    </button>
-                    <div class="px-8 pb-8 hidden space-y-stack-lg animate-fade-in" id="pw-content">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter pt-4">
-                            <div class="col-span-2 bg-surface-container-low p-4 rounded-lg">
-                                <p class="text-on-surface-variant text-sm flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary">info</span>
-                                    Chức năng đổi mật khẩu đang được chuyển sang trang cấu hình bảo mật riêng.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 <!-- Action Buttons -->
-                <div class="flex justify-end gap-stack-md pt-4">
+                <div class="flex justify-end gap-stack-md pt-4 mb-10">
                     <button type="reset" class="px-8 py-4 text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors">Hủy Bỏ Thay Đổi</button>
                     <button type="submit" class="px-12 py-4 bg-primary-container text-on-primary-container rounded-xl font-label-lg text-label-lg shadow-lg hover:shadow-xl scale-100 hover:scale-[1.02] active:scale-95 transition-all duration-300 font-bold uppercase tracking-widest">
                         Lưu Thông Tin
                     </button>
                 </div>
             </form>
+
+            <!-- Change Password (Collapsible Interaction) -->
+            <section class="luxury-card rounded-xl overflow-hidden mb-gutter">
+                <button type="button" class="w-full p-8 flex justify-between items-center hover:bg-surface-container-low transition-colors group" id="pw-toggle">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary">lock</span>
+                        <h3 class="font-headline-sm text-headline-sm text-primary">Đổi Mật Khẩu</h3>
+                    </div>
+                    <span class="material-symbols-outlined transform transition-transform duration-300" id="pw-chevron">expand_more</span>
+                </button>
+                <div class="px-8 pb-8 hidden space-y-stack-lg animate-fade-in" id="pw-content">
+                    <form asp-controller="Profile" asp-action="ChangePassword" method="post" class="space-y-4 pt-4 border-t border-outline/10">
+                        @Html.AntiForgeryToken()
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-2 md:col-span-2">
+                                <label for="currentPassword" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Mật Khẩu Hiện Tại <span class="text-error">*</span></label>
+                                <input type="password" id="currentPassword" name="currentPassword" required class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" placeholder="Nhập mật khẩu hiện tại" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label for="newPassword" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Mật Khẩu Mới <span class="text-error">*</span></label>
+                                <input type="password" id="newPassword" name="newPassword" required minlength="6" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" placeholder="Nhập mật khẩu mới" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label for="confirmPassword" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Xác Nhận Mật Khẩu Mới <span class="text-error">*</span></label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" placeholder="Nhập lại mật khẩu mới" />
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" class="px-8 py-3 bg-primary-container text-on-primary-container rounded-xl font-label-lg text-label-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all duration-300 font-bold uppercase tracking-widest">
+                                Cập Nhật Mật Khẩu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
     </div>
 </div>
