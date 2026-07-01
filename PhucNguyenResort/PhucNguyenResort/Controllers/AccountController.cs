@@ -503,6 +503,120 @@ namespace PhucNguyenResort.Controllers
         }
 
         [AllowAnonymous]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            if (user == null || !user.IsActive || user.IsBlocked)
+            {
+                // To prevent email enumeration, we just redirect to confirmation
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+            }
+
+            // Generate reset token
+            var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+            
+            user.ResetPasswordToken = token;
+            user.ResetPasswordTokenExpiry = DateTime.Now.AddHours(24);
+            await _context.SaveChangesAsync();
+
+            var callbackUrl = Url.Action("ResetPassword", "Account", new { token, email = user.Email }, protocol: HttpContext.Request.Scheme);
+            
+            string subject = "Đặt lại mật khẩu - Phúc Nguyên Resort";
+            string body = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+                    <h2 style='color: #d4a373; text-align: center;'>Phúc Nguyên Resort</h2>
+                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
+                    <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Vui lòng click vào nút bên dưới để tiến hành thiết lập mật khẩu mới (Link có hiệu lực trong 24 giờ):</p>
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <a href='{callbackUrl}' style='display: inline-block; padding: 12px 25px; background-color: #1d3557; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;'>ĐẶT LẠI MẬT KHẨU</a>
+                    </div>
+                    <p style='color: #e63946;'><strong>Lưu ý:</strong> Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này. Tài khoản của bạn vẫn an toàn.</p>
+                    <hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;' />
+                    <p style='font-size: 12px; color: #888; text-align: center;'>Đây là email tự động, vui lòng không phản hồi email này.</p>
+                </div>";
+
+            try 
+            {
+                await _emailSender.SendEmailAsync(model.Email, subject, body);
+            } 
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "Không thể gửi email lúc này. Vui lòng thử lại sau.");
+                return View(model);
+            }
+
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        [AllowAnonymous]
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult ResetPassword(string? token, string? email)
+        {
+            if (token == null || email == null)
+            {
+                ModelState.AddModelError(string.Empty, "Mã khôi phục hoặc email không hợp lệ.");
+                return View();
+            }
+            
+            var model = new ResetPasswordViewModel { Token = token, Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
+            }
+
+            if (user.ResetPasswordToken != model.Token || user.ResetPasswordTokenExpiry == null || user.ResetPasswordTokenExpiry < DateTime.Now)
+            {
+                ModelState.AddModelError(string.Empty, "Đường link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.");
+                return View(model);
+            }
+
+            user.PasswordHash = PasswordHelper.HashPassword(user, model.NewPassword);
+            user.ResetPasswordToken = null;
+            user.ResetPasswordTokenExpiry = null;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(ResetPasswordConfirmation));
+        }
+
+        [AllowAnonymous]
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
         public IActionResult AccessDenied()
         {
             return View();

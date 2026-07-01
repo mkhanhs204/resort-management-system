@@ -3,158 +3,289 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/aboutus-premium.css" asp-append-version="true" />
+    <style>
+        /* Import Luxury Fonts for Vietnamese Support */
+        @@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap');
+
+        /* Base Typography */
+        .page-about-us {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #FAF8F5; /* Warm luxury white */
+        }
+        
+        .font-serif {
+            font-family: 'Lora', serif;
+        }
+
+        /* Color Palette */
+        .text-gold {
+            color: #A37E4C;
+        }
+        .bg-gold {
+            background-color: #A37E4C;
+        }
+        .hover-bg-gold:hover {
+            background-color: #8A683B;
+        }
+        .border-gold {
+            border-color: #A37E4C;
+        }
+        
+        .text-charcoal {
+            color: #2D2D2D;
+        }
+        .text-body-muted {
+            color: #6B6B6B;
+        }
+
+        /* Component Styling */
+        .luxury-shadow {
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.04);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .luxury-shadow:hover {
+            box-shadow: 0 40px 80px rgba(163, 126, 76, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .image-card {
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F9F4EE 0%, #EFE5D8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #A37E4C;
+            margin: 0 auto 24px auto;
+            border: 1px solid rgba(163, 126, 76, 0.1);
+        }
+
+        .btn-luxury {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            color: #A37E4C;
+            border: 1px solid #A37E4C;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            padding: 1rem 2.5rem;
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        .btn-luxury:hover {
+            background-color: #A37E4C;
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(163, 126, 76, 0.2);
+        }
+
+        /* Subtle Animations */
+        @@keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .hero-overlay-gradient {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+        }
+    </style>
 }
 
-<!-- Hero Section Begin -->
-<section class="about-hero" style="background-image: url('/img/room/room-b2.jpg');">
-    <div class="about-hero-overlay"></div>
-    <div class="container about-hero-content">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="breadcrumb-text">
-                    <h2 class="about-hero-title">Câu Chuyện Của Chúng Tôi</h2>
-                    <div class="about-hero-breadcrumb">
-                        <a asp-controller="Home" asp-action="Index">Trang Chủ</a>
-                        <span>/ Về Chúng Tôi</span>
-                    </div>
-                </div>
-            </div>
+<div class="page-about-us">
+    <!-- Hero Section -->
+    <section class="relative h-[65vh] min-h-[550px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="/img/room/room-b2.jpg" class="w-full h-full object-cover scale-105" alt="Phúc Nguyên Resort" />
+            <div class="absolute inset-0 hero-overlay-gradient"></div>
         </div>
-    </div>
-</section>
-<!-- Hero Section End -->
+        
+        <div class="relative z-10 text-center text-white px-4 flex flex-col items-center animate-fade-up">
+            <div class="flex items-center gap-3 mb-6 opacity-90">
+                <span class="h-[1px] w-8 bg-white/60 block"></span>
+                <span class="text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase">Trang Chủ / Về Chúng Tôi</span>
+                <span class="h-[1px] w-8 bg-white/60 block"></span>
+            </div>
+            <h1 class="font-serif text-5xl md:text-6xl lg:text-7xl mb-6 font-medium leading-tight">
+                Câu Chuyện <br class="md:hidden"/> Của Chúng Tôi
+            </h1>
+            <p class="font-serif italic text-lg md:text-xl text-white/80 max-w-xl mx-auto">
+                "Khởi nguồn từ một ước mơ về chốn bình yên tĩnh lặng."
+            </p>
+        </div>
+    </section>
 
-<!-- Our Story Section Begin -->
-<section class="aboutus-page-section about-section-padding">
-    <div class="container">
-        <div class="row align-items-center">
-            <!-- Text Column -->
-            <div class="col-lg-5 mb-5 mb-lg-0">
-                <div class="ap-title">
-                    <span class="about-subtitle">Chào Mừng Đến Với Phúc Nguyên</span>
-                    <h2 class="about-title">
-                        Nơi Giao Thoa Giữa <br /> <span class="about-title-highlight">Thiên Nhiên & Đẳng Cấp</span>
+    <!-- Introduction Section -->
+    <section class="py-24 md:py-32 relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+                
+                <!-- Left Text Content -->
+                <div class="w-full lg:w-1/2 animate-fade-up">
+                    <p class="text-gold text-xs font-bold tracking-[0.2em] uppercase mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">eco</span>
+                        Chào mừng đến với Phúc Nguyên
+                    </p>
+                    <h2 class="font-serif text-4xl md:text-5xl text-charcoal mb-8 leading-tight font-medium">
+                        Nơi Giao Thoa Giữa <br/> <span class="italic text-gold">Thiên Nhiên & Đẳng Cấp</span>
                     </h2>
-                    <p class="about-text">
-                        Nằm ẩn mình trên bờ biển thơ mộng với dải cát trắng mịn, Phúc Nguyên Resort là điểm đến lý tưởng cho những ai đang tìm kiếm sự bình yên. Được thiết kế với sự kết hợp hoàn hảo giữa kiến trúc truyền thống Indochine và nét hiện đại sang trọng, chúng tôi mang đến một không gian nghỉ dưỡng tuyệt vời.
-                    </p>
-                    <p class="about-text">
-                        Được thành lập vào năm 2010, Phúc Nguyên Resort tự hào phục vụ hàng ngàn du khách trong và ngoài nước. Chúng tôi luôn cam kết mang lại trải nghiệm độc bản, từ các phòng nghỉ tiện nghi, hồ bơi vô cực nhìn ra đại dương, đến dịch vụ ẩm thực địa phương tinh tế.
-                    </p>
-                    <a asp-controller="Home" asp-action="Index" class="about-btn">KHÁM PHÁ PHÒNG NGAY</a>
-                </div>
-            </div>
-            <!-- Image Column -->
-            <div class="col-lg-6 offset-lg-1">
-                <div class="story-img-wrapper">
-                    <img src="/img/about/about-p1.jpg" alt="About Us" class="story-img">
-                    <div class="story-badge">
-                        <h4>15+ Năm</h4>
-                        <p>Kinh nghiệm phục vụ &<br> kiến tạo kỳ nghỉ hoàn hảo.</p>
+                    
+                    <div class="text-body-muted font-light leading-loose space-y-6 mb-10 text-[15px] md:text-[16px] text-justify">
+                        <p>
+                            Nằm ẩn mình trên bờ biển thơ mộng với dải cát trắng mịn, Phúc Nguyên Resort là điểm đến lý tưởng cho những ai đang tìm kiếm sự bình yên và tĩnh tại. Được thiết kế với sự kết hợp hoàn hảo giữa nét mộc mạc của kiến trúc truyền thống Indochine và sự tinh tế của nghệ thuật hiện đại, chúng tôi mang đến một không gian nghỉ dưỡng vượt trên mọi kỳ vọng.
+                        </p>
+                        <p>
+                            Thành lập từ năm 2010, Phúc Nguyên Resort đã vinh dự được chào đón và phục vụ hàng ngàn du khách thượng lưu. Chúng tôi cam kết mang lại trải nghiệm độc bản — từ những căn phòng êm ái nhìn ra vườn nhiệt đới, hồ bơi vô cực ngắm trọn hoàng hôn đại dương, cho đến hành trình khám phá ẩm thực lay động mọi giác quan.
+                        </p>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Our Story Section End -->
-
-<!-- Core Values Section Begin -->
-<section class="core-values-section">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-lg-12">
-                <span class="about-subtitle">Giá Trị Cốt Lõi</span>
-                <h2 class="about-title">Tại Sao Chọn Chúng Tôi?</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="value-card">
-                    <i class="fa fa-building-o value-icon"></i>
-                    <h4 class="value-title">Kiến Trúc Độc Bản</h4>
-                    <p class="value-text">Sự giao thoa hoàn mỹ giữa nét văn hóa truyền thống Indochine và phong cách sống hiện đại, mang lại không gian lưu trú kiệt tác.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="value-card">
-                    <i class="fa fa-heart-o value-icon"></i>
-                    <h4 class="value-title">Dịch Vụ Tận Tâm</h4>
-                    <p class="value-text">Đội ngũ nhân viên chuyên nghiệp, thân thiện, luôn sẵn sàng đáp ứng mọi nhu cầu để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="value-card">
-                    <i class="fa fa-leaf value-icon"></i>
-                    <h4 class="value-title">Gần Gũi Thiên Nhiên</h4>
-                    <p class="value-text">Bao quanh bởi biển xanh và những khu vườn nhiệt đới xanh mát, mang bạn đến gần hơn với sự tĩnh lặng của thiên nhiên.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Core Values Section End -->
-
-<!-- Signature Experiences Section Begin -->
-<section class="aboutus-page-section about-section-padding">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-lg-12">
-                <span class="about-subtitle">Trải Nghiệm</span>
-                <h2 class="about-title">Dịch Vụ Đẳng Cấp</h2>
-            </div>
-        </div>
-        <div class="about-page-services">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="experience-card" style="background-image: url('/img/about/about-p1.jpg');">
-                        <div class="experience-overlay"></div>
-                        <div class="experience-content">
-                            <h3 class="experience-title">Nhà Hàng & Bar</h3>
-                            <p class="experience-desc">Thưởng thức tinh hoa ẩm thực địa phương và quốc tế.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="experience-card" style="background-image: url('/img/about/about-p2.jpg');">
-                        <div class="experience-overlay"></div>
-                        <div class="experience-content">
-                            <h3 class="experience-title">Hồ Bơi Vô Cực</h3>
-                            <p class="experience-desc">Thư giãn tuyệt đối giữa làn nước trong xanh ngắm đại dương.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="experience-card" style="background-image: url('/img/about/about-p3.jpg');">
-                        <div class="experience-overlay"></div>
-                        <div class="experience-content">
-                            <h3 class="experience-title">Spa & Trị Liệu</h3>
-                            <p class="experience-desc">Đánh thức mọi giác quan với các liệu trình spa độc quyền.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Signature Experiences Section End -->
-
-<!-- Video Section Begin -->
-<section class="about-video-section" style="background-image: url('/img/video-bg.jpg');">
-    <div class="about-hero-overlay"></div>
-    <div class="container about-hero-content">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="about-video-text">
-                    <h2>Khám Phá Khu Nghỉ Dưỡng Của Chúng Tôi</h2>
-                    <p>Cảm nhận sự sang trọng, thiên nhiên tươi đẹp và dịch vụ hoàn hảo qua từng góc nhìn.</p>
-                    <a href="https://www.youtube.com/watch?v=EzKkl64rRbM" class="about-play-btn video-popup">
-                        <i class="fa fa-play"></i>
+                    
+                    <a asp-controller="Home" asp-action="SearchRooms" class="btn-luxury">
+                        Khám phá phòng ngay
                     </a>
                 </div>
+                
+                <!-- Right Image -->
+                <div class="w-full lg:w-1/2 relative animate-fade-up delay-200">
+                    <div class="absolute -inset-4 border border-gold/20 rounded-2xl -z-10 transform translate-x-4 translate-y-4"></div>
+                    <div class="image-card aspect-[3/4] w-full">
+                        <img src="/img/about/about-p1.jpg" class="w-full h-full object-cover transition-transform duration-[20s] hover:scale-110" alt="Indochine Interior" />
+                    </div>
+                </div>
+                
             </div>
         </div>
-    </div>
-</section>
-<!-- Video Section End -->
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="py-24 md:py-32 bg-white border-y border-gold/10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 animate-fade-up">
+                <span class="text-gold text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Góc Nhìn Phúc Nguyên</span>
+                <h2 class="font-serif text-4xl text-charcoal font-medium">Khung Cảnh Tuyệt Mỹ</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-up delay-100">
+                
+                <!-- Main Large Image -->
+                <div class="lg:col-span-8 image-card h-[400px] lg:h-[600px] group cursor-pointer">
+                    <img src="/img/about/about-p2.jpg" class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" alt="Infinity Pool" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute bottom-0 left-0 p-8 lg:p-12 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <h3 class="font-serif text-white text-3xl md:text-4xl mb-3">Hồ Bơi Vô Cực</h3>
+                        <p class="text-white/80 font-light text-sm md:text-base tracking-wide">Tầm nhìn tuyệt mỹ ôm trọn đại dương xanh thẳm.</p>
+                    </div>
+                </div>
+                
+                <!-- Right Small Images -->
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    <!-- Top Small -->
+                    <div class="image-card h-[250px] lg:h-[288px] group cursor-pointer">
+                        <img src="/img/about/about-p3.jpg" class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" alt="Fine Dining" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute bottom-0 left-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            <h4 class="font-serif text-white text-xl">Ẩm thực đa dạng</h4>
+                        </div>
+                    </div>
+                    <!-- Bottom Small -->
+                    <div class="image-card h-[250px] lg:h-[288px] group cursor-pointer">
+                        <img src="/img/room/room-b1.jpg" class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" alt="Luxury Bedroom" onerror="this.src='/img/about/about-p1.jpg'" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute bottom-0 left-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            <h4 class="font-serif text-white text-xl">Phòng nghỉ đẳng cấp</h4>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Values Section -->
+    <section class="py-24 md:py-32 relative overflow-hidden">
+        <!-- Decorative Background -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10">
+            
+            <div class="animate-fade-up">
+                <p class="text-gold text-xs font-bold tracking-[0.2em] uppercase mb-4">Giá trị cốt lõi</p>
+                <h2 class="font-serif text-4xl md:text-5xl text-charcoal mb-6 font-medium">Cam Kết Từ Trái Tim</h2>
+                <p class="text-body-muted font-light max-w-2xl mx-auto mb-20 text-[15px] md:text-base leading-relaxed">
+                    Tại Phúc Nguyên, mỗi chi tiết đều được chúng tôi nâng niu và chăm chút tỉ mỉ, để mọi khoảnh khắc đều trở thành một đoạn ký ức khó quên trong hành trình của bạn.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <!-- Value 1 -->
+                <div class="bg-white p-10 rounded-2xl luxury-shadow animate-fade-up delay-100 border border-gold/5">
+                    <div class="icon-circle">
+                        <span class="material-symbols-outlined text-[28px]">stars</span>
+                    </div>
+                    <h4 class="font-serif text-xl text-charcoal mb-4 font-medium">Trải Nghiệm Độc Bản</h4>
+                    <p class="text-body-muted font-light text-[14px] leading-loose">
+                        Cá nhân hóa mọi dịch vụ theo mong muốn và thói quen riêng của từng vị khách thượng lưu.
+                    </p>
+                </div>
+
+                <!-- Value 2 -->
+                <div class="bg-white p-10 rounded-2xl luxury-shadow animate-fade-up delay-200 border border-gold/5">
+                    <div class="icon-circle">
+                        <span class="material-symbols-outlined text-[28px]">bed</span>
+                    </div>
+                    <h4 class="font-serif text-xl text-charcoal mb-4 font-medium">Phòng Nghỉ Đẳng Cấp</h4>
+                    <p class="text-body-muted font-light text-[14px] leading-loose">
+                        Không gian sống đỉnh cao là sự hòa quyện giữa di sản văn hóa Indochine và nghệ thuật đương đại.
+                    </p>
+                </div>
+
+                <!-- Value 3 -->
+                <div class="bg-white p-10 rounded-2xl luxury-shadow animate-fade-up delay-300 border border-gold/5">
+                    <div class="icon-circle">
+                        <span class="material-symbols-outlined text-[28px]">water</span>
+                    </div>
+                    <h4 class="font-serif text-xl text-charcoal mb-4 font-medium">Tầm Nhìn Vô Cực</h4>
+                    <p class="text-body-muted font-light text-[14px] leading-loose">
+                        Thỏa mình trong làn nước xanh mát, ngắm nhìn hoàng hôn rực rỡ buông xuống nơi đại dương bao la.
+                    </p>
+                </div>
+
+                <!-- Value 4 -->
+                <div class="bg-white p-10 rounded-2xl luxury-shadow animate-fade-up delay-400 border border-gold/5">
+                    <div class="icon-circle">
+                        <span class="material-symbols-outlined text-[28px]">restaurant</span>
+                    </div>
+                    <h4 class="font-serif text-xl text-charcoal mb-4 font-medium">Ẩm Thực Tinh Hoa</h4>
+                    <p class="text-body-muted font-light text-[14px] leading-loose">
+                        Hương vị nguyên bản được chế biến tỉ mỉ bởi các siêu đầu bếp 5 sao chuẩn quốc tế.
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+</div>
+

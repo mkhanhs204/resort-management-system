@@ -346,8 +346,10 @@ namespace PhucNguyenResort.Controllers
                     }
                     catch { }
                 }
-                var qrUrl = $"{Request.Scheme}://{hostString}/Tours/CheckTicket?ticketId={booking.TourBookingId}";
-                var qrImageSrc = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={Uri.EscapeDataString(qrUrl)}";
+                
+                string qrData = $"{Request.Scheme}://{hostString}/Tours/CheckTicket?ticketId={booking.TourBookingId}";
+                string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={Uri.EscapeDataString(qrData)}";
+                string qrImageSrc = qrUrl;
 
                 string subject = "Xác nhận đặt Tour thành công - PhucNguyen Resort";
                 string htmlBody = $@"
@@ -377,7 +379,15 @@ namespace PhucNguyenResort.Controllers
                             <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Tổng tiền</td>
                             <td style='padding: 10px; border: 1px solid #ddd; color: #dfa974; font-weight: bold;'>{booking.TotalAmount?.ToString("N0")} VNĐ</td>
                         </tr>
-
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Mã Vé & QR</td>
+                            <td style='padding: 10px; border: 1px solid #ddd; text-align: center;'>
+                                <div>Mã vé: <strong>{booking.TourBookingId}</strong></div>
+                                <div style='margin-top: 10px;'>
+                                    <img src='{qrUrl}' alt='QR Code Vé Tour' style='width: 250px; height: 250px; display: inline-block;' />
+                                </div>
+                            </td>
+                        </tr>
                     </table>
                     
                     <div style='text-align: center; margin-top: 30px;'>

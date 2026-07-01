@@ -341,6 +341,475 @@
         });
     </script>
     
+    <!-- Chatbox CSS Styles -->
+    <style>
+        /* Chatbox Toggle Button */
+        .chatbox-toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #dfa974 0%, #c59360 100%);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(223, 169, 116, 0.4);
+            cursor: pointer;
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .chatbox-toggle-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 30px rgba(223, 169, 116, 0.6);
+        }
+
+        /* Chatbox Window Container */
+        .chatbox-window {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 380px;
+            height: 520px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(223, 169, 116, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+            overflow: hidden;
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .chatbox-window.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Chatbox Header */
+        .chatbox-header {
+            background: linear-gradient(135deg, #1c1c1a 0%, #2d2d2a 100%);
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(223, 169, 116, 0.2);
+        }
+        .chatbox-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chatbox-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dfa974 0%, #c59360 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .chatbox-title h5 {
+            color: #ffffff;
+            font-size: 15px;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+        .chatbox-title span {
+            font-size: 11px;
+            color: #a1a1a5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .chatbox-title span::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #2ecc71;
+        }
+        .chatbox-close {
+            color: #a1a1a5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .chatbox-close:hover {
+            color: #dfa974;
+            transform: scale(1.1);
+        }
+
+        /* Chat Messages Body */
+        .chatbox-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: rgba(250, 248, 245, 0.5);
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        .message.bot {
+            align-self: flex-start;
+            background-color: #ffffff;
+            color: #2d2d2a;
+            border-bottom-left-radius: 2px;
+            border: 1px solid rgba(223, 169, 116, 0.15);
+        }
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #dfa974 0%, #c59360 100%);
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 4px 12px rgba(223, 169, 116, 0.2);
+        }
+
+        /* Formatting in Bot messages */
+        .message.bot p { margin: 0 0 8px 0; }
+        .message.bot p:last-child { margin-bottom: 0; }
+        .message.bot ul, .message.bot ol { margin: 6px 0; padding-left: 20px; list-style-type: disc; }
+        .message.bot li { margin-bottom: 4px; }
+        .message.bot li:last-child { margin-bottom: 0; }
+        .message.bot strong { color: #1c1c1a; font-weight: 600; }
+        
+        /* Styling deep links inside bot response */
+        .message.bot a {
+            display: inline-block;
+            color: #ffffff;
+            background: linear-gradient(135deg, #dfa974 0%, #c59360 100%);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 6px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(223, 169, 116, 0.15);
+            transition: all 0.3s ease;
+        }
+        .message.bot a:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(223, 169, 116, 0.3);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            align-self: flex-start;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #ffffff;
+            padding: 12px 18px;
+            border-radius: 14px;
+            border-bottom-left-radius: 2px;
+            border: 1px solid rgba(223, 169, 116, 0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #dfa974;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @@keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Chatbox Footer Input */
+        .chatbox-footer {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-top: 1px solid rgba(223, 169, 116, 0.15);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .chatbox-input {
+            flex: 1;
+            border: 1px solid rgba(223, 169, 116, 0.25);
+            border-radius: 24px;
+            padding: 10px 18px;
+            font-size: 13.5px;
+            outline: none;
+            background-color: #faf8f5;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .chatbox-input:focus {
+            border-color: #dfa974;
+            background-color: #ffffff;
+            box-shadow: 0 0 8px rgba(223, 169, 116, 0.15);
+        }
+        .chatbox-send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dfa974 0%, #c59360 100%);
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(223, 169, 116, 0.2);
+        }
+        .chatbox-send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 14px rgba(223, 169, 116, 0.3);
+        }
+
+        /* Mobile Adaptations */
+        @@media (max-width: 480px) {
+            .chatbox-window {
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            .chatbox-toggle-btn {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+
+    <!-- Chatbox HTML -->
+    <div class="chatbox-toggle-btn" id="chatboxToggleBtn">
+        <span class="material-symbols-outlined text-[28px]">chat_bubble</span>
+    </div>
+
+    <div class="chatbox-window" id="chatboxWindow">
+        <div class="chatbox-header">
+            <div class="chatbox-brand">
+                <div class="chatbox-avatar">PN</div>
+                <div class="chatbox-title">
+                    <h5>Trợ lý Phúc Nguyen AI</h5>
+                    <span>Đang hoạt động</span>
+                </div>
+            </div>
+            <div class="chatbox-close" id="chatboxCloseBtn">
+                <span class="material-symbols-outlined text-[22px]">close</span>
+            </div>
+        </div>
+
+        <div class="chatbox-messages" id="chatboxMessages">
+            <!-- Messages loaded by JS -->
+        </div>
+
+        <div class="chatbox-footer">
+            <input type="text" class="chatbox-input" id="chatboxInput" placeholder="Nhập câu hỏi của bạn tại đây..." autocomplete="off">
+            <button class="chatbox-send-btn" id="chatboxSendBtn">
+                <span class="material-symbols-outlined text-[20px] ml-0.5">send</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Chatbox Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById("chatboxToggleBtn");
+            const chatWindow = document.getElementById("chatboxWindow");
+            const closeBtn = document.getElementById("chatboxCloseBtn");
+            const sendBtn = document.getElementById("chatboxSendBtn");
+            const inputField = document.getElementById("chatboxInput");
+            const messagesContainer = document.getElementById("chatboxMessages");
+
+            // Restore chat history from sessionStorage
+            let chatHistory = JSON.parse(sessionStorage.getItem("chatHistory")) || [];
+
+            // Toggle chatbox window
+            toggleBtn.addEventListener("click", () => {
+                chatWindow.classList.add("active");
+                toggleBtn.style.display = "none";
+                inputField.focus();
+            });
+
+            closeBtn.addEventListener("click", () => {
+                chatWindow.classList.remove("active");
+                setTimeout(() => {
+                    toggleBtn.style.display = "flex";
+                }, 300);
+            });
+
+            // Initialize Chat Box
+            if (chatHistory.length > 0) {
+                chatHistory.forEach(msg => {
+                    appendMessage(msg.role === "model" ? "bot" : "user", msg.text);
+                });
+                setTimeout(scrollToBottom, 100);
+            } else {
+                appendMessage("bot", "Xin kính chào Quý khách! Tôi là Trợ lý ảo của Phúc Nguyễn Resort. Quý khách cần hỗ trợ thêm thông tin về giá phòng ngủ, các chương trình tour du lịch hay thực đơn nhà hàng thế nào ạ?");
+            }
+
+            // Send message handler
+            function handleSend() {
+                const text = inputField.value.trim();
+                if (!text) return;
+
+                appendMessage("user", text);
+                inputField.value = "";
+
+                const loadingId = appendTypingIndicator();
+
+                fetch("/api/chat/message", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: text,
+                        history: chatHistory
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    removeTypingIndicator(loadingId);
+
+                    const botResponse = data.response || "Rất tiếc, đã có sự cố kết nối. Quý khách vui lòng thử lại.";
+                    appendMessage("bot", botResponse);
+
+                    chatHistory.push({ role: "user", text: text });
+                    chatHistory.push({ role: "model", text: botResponse });
+
+                    if (chatHistory.length > 12) {
+                        chatHistory.shift();
+                        chatHistory.shift();
+                    }
+
+                    sessionStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+                })
+                .catch(err => {
+                    console.error(err);
+                    removeTypingIndicator(loadingId);
+                    appendMessage("bot", "Hệ thống kết nối bận, xin vui lòng kiểm tra đường truyền và thử lại.");
+                });
+            }
+
+            sendBtn.addEventListener("click", handleSend);
+            inputField.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    handleSend();
+                }
+            });
+
+            function appendMessage(sender, text) {
+                const msgDiv = document.createElement("div");
+                msgDiv.classList.add("message", sender);
+
+                if (sender === "bot") {
+                    msgDiv.innerHTML = formatMarkdown(text);
+                } else {
+                    msgDiv.textContent = text;
+                }
+
+                messagesContainer.appendChild(msgDiv);
+                scrollToBottom();
+            }
+
+            function appendTypingIndicator() {
+                const id = "loading_" + Date.now();
+                const loadingDiv = document.createElement("div");
+                loadingDiv.id = id;
+                loadingDiv.classList.add("typing-indicator");
+                loadingDiv.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+                messagesContainer.appendChild(loadingDiv);
+                scrollToBottom();
+                return id;
+            }
+
+            function removeTypingIndicator(id) {
+                const loadingDiv = document.getElementById(id);
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+            }
+
+            function scrollToBottom() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function formatMarkdown(text) {
+                let html = text;
+                // Line breaks
+                html = html.replace(/\n/g, "<br>");
+                // Bold **text**
+                html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                
+                // Clean markdown lists
+                const lines = text.split('\n');
+                let inList = false;
+                let result = [];
+              
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (line.startsWith('* ') || line.startsWith('- ')) {
+                        if (!inList) {
+                            result.push('<ul>');
+                            inList = true;
+                        }
+                        result.push('<li>' + line.substring(2).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") + '</li>');
+                    } else {
+                        if (inList) {
+                            result.push('</ul>');
+                            inList = false;
+                        }
+                        if (line) {
+                            result.push('<p>' + line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") + '</p>');
+                        }
+                    }
+                }
+                if (inList) {
+                    result.push('</ul>');
+                }
+                
+                // Regex match markdown links like [Text](Url) and turn them into styled buttons/links
+                let output = result.join('');
+                output = output.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                
+                return output;
+            }
+        });
+    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
