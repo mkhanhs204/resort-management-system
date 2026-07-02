@@ -74,14 +74,15 @@ namespace PhucNguyenResort.Tests.Services.Reviews
             using (var context = new ResortDbContext(options))
             {
                 var service = new ReviewService(context);
-                var model = new SubmitReviewVM { Rating = 4, Comment = "Rất vui", TourId = 50 };
+                var tourBooking = await context.TourBookings.FirstAsync();
+                var model = new SubmitReviewVM { Rating = 4, Comment = "Rất vui", TourBookingId = tourBooking.TourBookingId };
 
                 // Act
                 var result = await service.CreateReviewAsync(1, model);
 
                 // Assert
                 Assert.True(result);
-                var review = await context.Reviews.FirstOrDefaultAsync(r => r.TourId == 50);
+                var review = await context.Reviews.FirstOrDefaultAsync(r => r.TourBookingId == tourBooking.TourBookingId);
                 Assert.NotNull(review);
                 Assert.Equal(4, review.Rating);
             }
@@ -159,7 +160,7 @@ namespace PhucNguyenResort.Tests.Services.Reviews
             using (var context = new ResortDbContext(options))
             {
                 var service = new ReviewService(context);
-                var model = new SubmitReviewVM { Rating = 4, BookingId = null, TourId = null };
+                var model = new SubmitReviewVM { Rating = 4, BookingId = null, TourBookingId = null };
 
                 // Act & Assert
                 var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateReviewAsync(1, model));
@@ -289,7 +290,7 @@ namespace PhucNguyenResort.Tests.Services.Reviews
             using (var context = new ResortDbContext(options))
             {
                 var service = new ReviewService(context);
-                var model = new SubmitReviewVM { Rating = 4, BookingId = 100, TourId = 50 };
+                var model = new SubmitReviewVM { Rating = 4, BookingId = 100, TourBookingId = 200 };
 
                 // Act & Assert
                 var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateReviewAsync(1, model));
@@ -314,7 +315,8 @@ namespace PhucNguyenResort.Tests.Services.Reviews
             using (var context = new ResortDbContext(options))
             {
                 var service = new ReviewService(context);
-                var model = new SubmitReviewVM { Rating = 3, TourId = 50 };
+                var tourBooking = await context.TourBookings.FirstAsync();
+                var model = new SubmitReviewVM { Rating = 3, TourBookingId = tourBooking.TourBookingId };
 
                 // Act & Assert
                 var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateReviewAsync(1, model));

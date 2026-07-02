@@ -15,11 +15,15 @@ namespace PhucNguyenResort.Services.Housekeeping
             _context = context;
         }
 
+        // =========================================================================
+        // 1. NÂNG CẤP LẤY DANH SÁCH: Lấy cả phòng đang bẩn HOẶC đang tiến hành dọn
+        // =========================================================================
         public async Task<List<DirtyRoomViewModel>> GetDirtyRoomsAsync()
         {
+            // Thay đổi điều kiện Where để bao gồm cả trạng thái CleaningInProgress
             var dirtyRoomsQuery = await _context.Rooms
                 .Include(r => r.Category)
-                .Where(r => r.Status == RoomStatus.NeedsCleaning)
+                .Where(r => r.Status == RoomStatus.NeedsCleaning || r.Status == RoomStatus.CleaningInProgress)
                 .ToListAsync();
 
             var result = new List<DirtyRoomViewModel>();
@@ -27,9 +31,21 @@ namespace PhucNguyenResort.Services.Housekeeping
             foreach (var room in dirtyRoomsQuery)
             {
                 var lastBooking = await _context.Bookings
-                    .Where(b => b.RoomId == room.RoomId && b.BookingStatus == BookingStatus.CheckedOut)
+                    .Where(b => b.BookingDetails.Any(bd => bd.RoomId == room.RoomId)
+                             && b.BookingStatus == BookingStatus.CheckedOut)
                     .OrderByDescending(b => b.CheckOutDate)
                     .FirstOrDefaultAsync();
+
+                // Xác định nội dung lý do hiển thị linh hoạt theo trạng thái dọn dẹp
+                string reason = "Lịch trình dọn dẹp định kỳ";
+                if (room.Status == RoomStatus.CleaningInProgress)
+                {
+                    reason = "Đang tiến hành dọn dẹp...";
+                }
+                else if (lastBooking != null)
+                {
+                    reason = "Khách vừa trả phòng (Check-out)";
+                }
 
                 result.Add(new DirtyRoomViewModel
                 {
@@ -38,7 +54,7 @@ namespace PhucNguyenResort.Services.Housekeeping
                     FloorNumber = room.FloorNumber ?? 0,
                     RoomType = room.Category != null ? room.Category.CategoryName : "Chưa phân loại",
                     Status = room.Status,
-                    DirtyReason = lastBooking != null ? "Khách vừa trả phòng (Check-out)" : "Lịch trình dọn dẹp định kỳ",
+                    DirtyReason = reason,
                     LastCheckedOutTime = lastBooking?.CheckOutDate
                 });
             }
@@ -46,6 +62,9 @@ namespace PhucNguyenResort.Services.Housekeeping
             return result;
         }
 
+        // =========================================================================
+        // 2. CẬP NHẬT HOÀN THÀNH DỌN DẸP (MARK CLEANED)
+        // =========================================================================
         public async Task<bool> UpdateCleaningStatusAsync(int roomId)
         {
             var room = await _context.Rooms.FindAsync(roomId);
@@ -56,7 +75,9 @@ namespace PhucNguyenResort.Services.Housekeeping
             return true;
         }
 
-        // LUỒNG CHUYÊN NGHIỆP: Đổi trạng thái + Tạo phiếu sửa chữa
+        // =========================================================================
+        // 3. BÁO HỎNG PHÒNG (KÈM TẠO PHIẾU BẢO TRÌ)
+        // =========================================================================
         public async Task<bool> ReportMaintenanceAsync(int roomId, string description)
         {
             var room = await _context.Rooms.FindAsync(roomId);
@@ -76,9 +97,40 @@ namespace PhucNguyenResort.Services.Housekeeping
 
             _context.MaintenanceRequests.Add(maintenanceRequest);
 
-            // 3. Lưu đồng thời cả 2 thay đổi xuống DB thông qua Unit of Work của EF Core
+            // 3. Lưu đồng thời cả 2 thay đổi xuống DB
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        // =========================================================================
+        // 4. HÀM MỚI TÍCH HỢP: Đổi trạng thái linh hoạt (Dùng cho tính năng Start Cleaning)
+        // =========================================================================
+        public async Task<bool> UpdateRoomStatusAsync(int roomId, RoomStatus status)
+        {
+            var room = await _context.Rooms.FindAsync(roomId);
+            if (room == null) return false;
+
+            room.Status = status;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // =========================================================================
+        // 5. CÁC HÀM THỐNG KÊ CARDS (KPI) CHO DASHBOARD
+        // =========================================================================
+        public async Task<int> GetCountRoomsNeedCleaningAsync()
+        {
+            return await _context.Rooms.CountAsync(r => r.Status == RoomStatus.NeedsCleaning);
+        }
+
+        public async Task<int> GetCountCurrentlyCleaningAsync()
+        {
+            return await _context.Rooms.CountAsync(r => r.Status == RoomStatus.CleaningInProgress);
+        }
+
+        public async Task<int> GetCountCleanedTodayAsync()
+        {
+            return await _context.Rooms.CountAsync(r => r.Status == RoomStatus.Available);
         }
     }
 }
