@@ -305,7 +305,28 @@
     <div class="px-margin-desktop max-w-container-max mx-auto flex justify-between items-end mb-10 reveal">
         <div>
             <span class="font-label-lg text-label-lg text-primary uppercase tracking-[0.2em] mb-3 block font-bold">Cảm Nhận</span>
-            <h2 class="font-headline-lg text-headline-lg text-on-surface">Khách Hàng Nói Gì Về Chúng Tôi</h2>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Khách Hàng Nói Gì Về Chúng Tôi</h2>
+            @{
+                var reviews = ViewBag.Reviews as IEnumerable<PhucNguyenResort.ViewModels.Reviews.ReviewListVM>;
+            }
+            @if (reviews != null && reviews.Any())
+            {
+                var averageRating = reviews.Average(r => r.Rating ?? 5);
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl font-bold text-on-surface">@averageRating.ToString("0.0")</span>
+                    <div class="flex text-primary">
+                        @for (int i = 0; i < Math.Round(averageRating); i++)
+                        {
+                            <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                        }
+                        @for (int i = (int)Math.Round(averageRating); i < 5; i++)
+                        {
+                            <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 0;">star</span>
+                        }
+                    </div>
+                    <span class="text-on-surface-variant font-medium">(@reviews.Count() đánh giá)</span>
+                </div>
+            }
         </div>
         <div class="flex space-x-4 mb-2">
             <button onclick="document.getElementById('review-slider').scrollBy({left: -424, behavior: 'smooth'})" class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center hover:border-primary hover:text-primary transition-all text-outline bg-transparent">
@@ -319,91 +340,38 @@
     
     <div class="max-w-container-max mx-auto px-margin-desktop">
         <div id="review-slider" class="flex space-x-6 overflow-x-auto pb-8 pt-4 snap-x hide-scroll reveal" style="scroll-snap-type: x mandatory; scroll-behavior: smooth;">
-            
-            <!-- Review Card 1 -->
-            <div class="min-w-[320px] md:min-w-[400px] w-[400px] bg-[#FAF8F5] rounded-2xl p-8 snap-start flex-shrink-0 group transition-shadow duration-300 flex flex-col border border-outline-variant/10">
-                <div class="flex text-primary mb-6">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                </div>
-                <p class="font-body-lg text-on-surface-variant italic mb-8 flex-1">
-                    "Một kỳ nghỉ tuyệt vời! Không gian riêng tư, bãi biển đẹp và nhân viên phục vụ cực kỳ chu đáo. Chúng tôi chắc chắn sẽ quay lại Phúc Nguyên Resort vào năm sau."
-                </p>
-                <div class="flex items-center">
-                    <img src="https://ui-avatars.com/api/?name=Nguyen+Van+A&background=dfa974&color=fff" alt="User" class="w-12 h-12 rounded-full object-cover mr-4" />
-                    <div>
-                        <h4 class="font-headline-sm text-lg text-on-surface">Nguyễn Văn A</h4>
-                        <span class="text-sm text-outline">Khách gia đình</span>
+            @if (reviews != null && reviews.Any())
+            {
+                foreach (var review in reviews)
+                {
+                    <div class="min-w-[320px] md:min-w-[400px] w-[400px] bg-[#FAF8F5] rounded-2xl p-8 snap-start flex-shrink-0 group transition-shadow duration-300 flex flex-col border border-outline-variant/10">
+                        <div class="flex text-primary mb-6">
+                            @for (int i = 0; i < (review.Rating ?? 5); i++)
+                            {
+                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                            }
+                            @for (int i = (review.Rating ?? 5); i < 5; i++)
+                            {
+                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">star</span>
+                            }
+                        </div>
+                        <p class="font-body-lg text-on-surface-variant italic mb-8 flex-1">
+                            "@review.Comment"
+                        </p>
+                        <div class="flex items-center">
+                            <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(review.UserName ?? "User")&background=dfa974&color=fff" alt="User" class="w-12 h-12 rounded-full object-cover mr-4" />
+                            <div>
+                                <h4 class="font-headline-sm text-lg text-on-surface">@review.UserName</h4>
+                                <span class="text-sm text-outline">@review.ServiceName</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Review Card 2 -->
-            <div class="min-w-[320px] md:min-w-[400px] w-[400px] bg-[#FAF8F5] rounded-2xl p-8 snap-start flex-shrink-0 group transition-shadow duration-300 flex flex-col border border-outline-variant/10">
-                <div class="flex text-primary mb-6">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                </div>
-                <p class="font-body-lg text-on-surface-variant italic mb-8 flex-1">
-                    "Thiết kế phòng rất đẹp và sang trọng. Đồ ăn tại nhà hàng phong phú và tươi ngon. Thích hợp cho các cặp đôi muốn tìm nơi hâm nóng tình cảm và tận hưởng không gian riêng."
-                </p>
-                <div class="flex items-center">
-                    <img src="https://ui-avatars.com/api/?name=Tran+Thi+B&background=dfa974&color=fff" alt="User" class="w-12 h-12 rounded-full object-cover mr-4" />
-                    <div>
-                        <h4 class="font-headline-sm text-lg text-on-surface">Trần Thị B</h4>
-                        <span class="text-sm text-outline">Cặp đôi</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Review Card 3 -->
-            <div class="min-w-[320px] md:min-w-[400px] w-[400px] bg-[#FAF8F5] rounded-2xl p-8 snap-start flex-shrink-0 group transition-shadow duration-300 flex flex-col border border-outline-variant/10">
-                <div class="flex text-primary mb-6">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star_half</span>
-                </div>
-                <p class="font-body-lg text-on-surface-variant italic mb-8 flex-1">
-                    "Dịch vụ spa tại resort thật sự thư giãn. Khung cảnh thiên nhiên bao quanh giúp tôi quên đi mọi áp lực của công việc. Nhân viên rất lịch sự và nhiệt tình hỗ trợ."
-                </p>
-                <div class="flex items-center">
-                    <img src="https://ui-avatars.com/api/?name=Le+Van+C&background=dfa974&color=fff" alt="User" class="w-12 h-12 rounded-full object-cover mr-4" />
-                    <div>
-                        <h4 class="font-headline-sm text-lg text-on-surface">Lê Văn C</h4>
-                        <span class="text-sm text-outline">Khách công tác</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Review Card 4 -->
-            <div class="min-w-[320px] md:min-w-[400px] w-[400px] bg-[#FAF8F5] rounded-2xl p-8 snap-start flex-shrink-0 group transition-shadow duration-300 flex flex-col border border-outline-variant/10">
-                <div class="flex text-primary mb-6">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                </div>
-                <p class="font-body-lg text-on-surface-variant italic mb-8 flex-1">
-                    "Giá cả hợp lý so với chất lượng dịch vụ 5 sao. Bữa sáng buffet ngon miệng và đa dạng. Trẻ con nhà tôi rất thích khu vực hồ bơi và các hoạt động ngoài trời."
-                </p>
-                <div class="flex items-center">
-                    <img src="https://ui-avatars.com/api/?name=Pham+D&background=dfa974&color=fff" alt="User" class="w-12 h-12 rounded-full object-cover mr-4" />
-                    <div>
-                        <h4 class="font-headline-sm text-lg text-on-surface">Phạm Ngọc D</h4>
-                        <span class="text-sm text-outline">Khách gia đình</span>
-                    </div>
-                </div>
-            </div>
-
+                }
+            }
+            else
+            {
+                <div class="w-full text-center text-on-surface-variant">Chưa có đánh giá nào.</div>
+            }
         </div>
     </div>
 </section>

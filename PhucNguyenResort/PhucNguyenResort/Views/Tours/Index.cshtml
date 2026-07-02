@@ -206,6 +206,27 @@
             <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Tour</span>
             <span class="luxury-badge blue">@(Model?.Count() ?? 0)</span>
         </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <label for="tourSortFilter" style="font-weight: 600; color: #50453b; margin: 0;">Sắp xếp:</label>
+            <select id="tourSortFilter" class="form-control" style="width: 150px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; height: auto; font-family: 'Inter', sans-serif;">
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+            </select>
+
+            <label for="tourNameFilter" style="font-weight: 600; color: #50453b; margin: 0; margin-left: 10px;">Lọc theo tên:</label>
+            <select id="tourNameFilter" class="form-control" style="width: 250px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; height: auto; font-family: 'Inter', sans-serif;">
+                <option value="">-- Tất cả các tour --</option>
+                @if (Model != null)
+                {
+                    foreach (var tourName in Model.Where(m => !string.IsNullOrEmpty(m.TourName)).Select(m => m.TourName).Distinct())
+                    {
+                        <option value="@tourName">@tourName</option>
+                    }
+                }
+            </select>
+        </div>
+
         <a asp-action="Create" class="btn-luxury" id="btn-create-tour">
             <span class="material-symbols-outlined">add</span> Tạo Tour Mới
         </a>
@@ -231,7 +252,7 @@
                     int rowNum = 1;
                     foreach (var item in Model)
                     {
-                        <tr>
+                        <tr data-id="@item.TourId">
                             <td style="color: #827569;">@rowNum</td>
                             <td><strong style="color: #1c1c1a; font-weight: 600;">@Html.DisplayFor(modelItem => item.TourName)</strong></td>
                             <td style="font-weight: 500; color: #805528;">@(item.Price?.ToString("N0")) ₫</td>
@@ -297,6 +318,21 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Controls -->
+    <div id="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; font-family: 'Inter', sans-serif;">
+        <div style="color: #50453b; font-size: 14px;">
+            Hiển thị <span id="page-info-start" style="font-weight: 600; color: #1c1c1a;">0</span> - <span id="page-info-end" style="font-weight: 600; color: #1c1c1a;">0</span> trong số <span id="page-info-total" style="font-weight: 600; color: #1c1c1a;">0</span> tour
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button id="btn-prev-page" class="action-btn" style="width: auto; padding: 0 12px; gap: 4px;" disabled>
+                <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span> Trước
+            </button>
+            <button id="btn-next-page" class="action-btn" style="width: auto; padding: 0 12px; gap: 4px;" disabled>
+                Sau <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+            </button>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -322,5 +358,94 @@
                 setTimeout(() => alert.remove(), 300);
             });
         });
+
+        // Handle Tour Name Filter & Sorting & Pagination
+        var currentPage = 1;
+        var pageSize = 20;
+
+        function applyFilterAndSort() {
+            var selectedTour = document.getElementById('tourNameFilter')?.value.toLowerCase().trim() || "";
+            var sortOrder = document.getElementById('tourSortFilter')?.value || "newest";
+            
+            var tbody = document.querySelector('#tours-table tbody');
+            var tableRows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Filter
+            var filteredRows = [];
+            tableRows.forEach(function(row) {
+                if (row.cells.length === 1) return; // Ignore "no tours" row
+                var tourNameCell = row.cells[1].textContent.trim().toLowerCase();
+                
+                if (selectedTour === "" || tourNameCell === selectedTour) {
+                    filteredRows.push(row);
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Sort
+            filteredRows.sort(function(a, b) {
+                var idA = parseInt(a.getAttribute('data-id') || 0);
+                var idB = parseInt(b.getAttribute('data-id') || 0);
+                if (sortOrder === "newest") return idB - idA;
+                return idA - idB;
+            });
+
+            // Pagination
+            var totalItems = filteredRows.length;
+            var totalPages = Math.ceil(totalItems / pageSize);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            var startIndex = (currentPage - 1) * pageSize;
+            var endIndex = Math.min(startIndex + pageSize, totalItems);
+
+            filteredRows.forEach(function(row, index) {
+                if (index >= startIndex && index < endIndex) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+                // Re-append to preserve sort order in DOM
+                tbody.appendChild(row);
+            });
+
+            // Update Pagination UI
+            var infoStart = document.getElementById('page-info-start');
+            var infoEnd = document.getElementById('page-info-end');
+            var infoTotal = document.getElementById('page-info-total');
+            var btnPrev = document.getElementById('btn-prev-page');
+            var btnNext = document.getElementById('btn-next-page');
+
+            if (infoStart) infoStart.textContent = totalItems === 0 ? 0 : startIndex + 1;
+            if (infoEnd) infoEnd.textContent = endIndex;
+            if (infoTotal) infoTotal.textContent = totalItems;
+            
+            if (btnPrev) btnPrev.disabled = currentPage <= 1;
+            if (btnNext) btnNext.disabled = currentPage >= totalPages;
+        }
+
+        document.getElementById('tourNameFilter')?.addEventListener('change', function() {
+            currentPage = 1;
+            applyFilterAndSort();
+        });
+        document.getElementById('tourSortFilter')?.addEventListener('change', function() {
+            currentPage = 1;
+            applyFilterAndSort();
+        });
+
+        document.getElementById('btn-prev-page')?.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                applyFilterAndSort();
+            }
+        });
+
+        document.getElementById('btn-next-page')?.addEventListener('click', function() {
+            currentPage++;
+            applyFilterAndSort();
+        });
+
+        // Initial render
+        applyFilterAndSort();
     </script>
 }

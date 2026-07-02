@@ -158,7 +158,7 @@
 <body class="bg-background text-on-surface font-body-md overflow-x-hidden">
     <!-- TopNavBar -->
     <header class="sticky top-0 w-full z-50 bg-surface backdrop-blur-md border-b border-outline-variant/10 shadow-sm transition-all duration-300" id="main-header">
-        <nav class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto transition-all duration-300" id="main-nav">
+        <nav class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto transition-all duration-300 gap-8" id="main-nav">
             <a asp-controller="Home" asp-action="Index" class="font-headline-md text-headline-md font-bold text-on-surface hover:text-primary transition-colors whitespace-nowrap mr-8">Phúc Nguyên Resort</a>
             
             <!-- Desktop Nav -->
@@ -221,10 +221,56 @@
             </div>
             
             <!-- Mobile Menu Button -->
-            <button class="xl:hidden text-on-surface hover:text-primary transition-colors">
+            <button id="mobile-menu-btn" class="xl:hidden text-on-surface hover:text-primary transition-colors">
                 <span class="material-symbols-outlined text-3xl">menu</span>
             </button>
         </nav>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden xl:hidden bg-surface border-t border-outline-variant/10 absolute top-full left-0 w-full shadow-ambient max-h-[80vh] overflow-y-auto">
+            <ul class="flex flex-col py-4 px-margin-mobile space-y-2">
+                <li><a class="block font-label-lg text-label-lg text-on-surface hover:text-primary" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
+                <li><a class="block font-label-lg text-label-lg text-on-surface hover:text-primary" asp-controller="Home" asp-action="SearchRooms">Phòng Ngủ</a></li>
+                <li><a class="block font-label-lg text-label-lg text-on-surface hover:text-primary" asp-controller="CustomerTourBooking" asp-action="Index">Tour</a></li>
+                <li>
+                    <div class="font-label-lg text-label-lg text-on-surface mb-2 font-bold">Dịch Vụ</div>
+                    <ul class="pl-4 space-y-2 border-l-2 border-primary/20">
+                        <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="FoodOrders" asp-action="RoomService">Gọi đồ ăn lên phòng</a></li>
+                        <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="TableReservations" asp-action="Search">Đặt bàn tiệc</a></li>
+                    </ul>
+                </li>
+                <li><a class="block font-label-lg text-label-lg text-on-surface hover:text-primary" asp-controller="Review" asp-action="PublicList">Đánh Giá</a></li>
+                <li><a class="block font-label-lg text-label-lg text-on-surface hover:text-primary" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Customer"))
+                {
+                    <li><a class="block font-label-lg text-label-lg text-error hover:text-error-container" asp-controller="Dashboard" asp-action="Index">Quản Trị</a></li>
+                }
+                
+                <li class="border-t border-outline-variant/20 pt-4 mt-2">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="font-label-lg text-label-lg text-on-surface mb-2 font-bold">@User.Identity.Name</div>
+                    <ul class="pl-4 space-y-2 border-l-2 border-primary/20">
+                        <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="Profile" asp-action="Index">Hồ sơ cá nhân</a></li>
+                        <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="TableReservations" asp-action="MyReservations">Lịch sử đặt bàn</a></li>
+                        <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
+                        <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="CustomerTourBooking" asp-action="MyTourBookings">Lịch sử đặt tour</a></li>
+                        <li><a class="block font-label-sm text-error hover:text-error" asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+                    </ul>
+                }
+                else
+                {
+                    <a class="block font-label-lg text-label-lg text-primary" asp-controller="Account" asp-action="Login">Đăng Nhập</a>
+                }
+                </li>
+                <li class="pt-2">
+                    <a asp-controller="Home" asp-action="SearchRooms" class="block text-center bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-label-lg text-label-lg">
+                        Đặt Ngay
+                    </a>
+                </li>
+            </ul>
+        </div>
     </header>
 
     <!-- Content -->
@@ -338,6 +384,15 @@
                     nav.classList.remove('h-16');
                 }
             });
+
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
         });
     </script>
     
