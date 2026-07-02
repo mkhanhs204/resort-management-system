@@ -15,6 +15,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public int MaxCapacity { get; set; }
+        public int TotalAvailableSlots { get; set; }
         public int DurationHours { get; set; }
         public string? Location { get; set; }
         public string? ImageUrl { get; set; }
@@ -32,6 +33,11 @@ namespace PhucNguyenResort.ViewModels.Tours
         public string? SearchKeyword { get; set; }
         public string? SortBy { get; set; } // "price_asc", "price_desc", "name", "duration"
         public int TotalCount { get; set; }
+
+        // Pagination
+        public int CurrentPage { get; set; } = 1;
+        public int PageSize { get; set; } = 9;
+        public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
     }
 
     /// <summary>
@@ -63,6 +69,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public List<ScheduleDisplayVM> UpcomingSchedules { get; set; } = new();
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
+        public List<PhucNguyenResort.ViewModels.Reviews.ReviewListVM> Reviews { get; set; } = new();
     }
 
     /// <summary>
@@ -161,6 +168,7 @@ namespace PhucNguyenResort.ViewModels.Tours
     public class MyTourBookingItemVM
     {
         public int TourBookingId { get; set; }
+        public int TourId { get; set; }
         public string TourName { get; set; } = string.Empty;
         public string? TourImage { get; set; }
         public string? Location { get; set; }
@@ -172,6 +180,8 @@ namespace PhucNguyenResort.ViewModels.Tours
         public bool CanCancel { get; set; }
         public string? PaymentMethod { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? CancellationReason { get; set; }
+        public bool HasReviewed { get; set; }
     }
 
     /// <summary>

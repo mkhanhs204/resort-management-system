@@ -1,152 +1,263 @@
 @model PhucNguyenResort.ViewModels.Users.ProfileVM
 @{
-    ViewData["Title"] = "Hồ sơ cá nhân";
+    ViewData["Title"] = "Hồ Sơ Thành Viên - Phúc Nguyên Resort";
+}
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .active-link {
+            border-left: 3px solid #805528;
+            font-weight: 700;
+            color: #805528 !important;
+            background-color: #f6f3ef;
+        }
+        .luxury-card {
+            background-color: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.04);
+        }
+        .form-input-focus:focus {
+            outline: none;
+            border-color: #DFA974;
+            box-shadow: 0 0 0 1px #DFA974;
+        }
+        .transition-soft {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
 }
 
-<div class="breadcrumb-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="breadcrumb-text">
-                    <h2>Hồ sơ tài khoản</h2>
-                    <div class="bt-option">
-                        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
-                        <span>Thông tin cá nhân</span>
+<div class="pt-8 pb-section-gap-lg max-w-container-max mx-auto px-margin-desktop">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+        <!-- Sidebar (4 columns) -->
+        <aside class="md:col-span-4 space-y-stack-md">
+            <div class="luxury-card rounded-xl p-8 text-center flex flex-col items-center">
+                <div class="relative group cursor-pointer mb-6">
+                    <div class="w-32 h-32 rounded-full bg-primary-container text-white flex items-center justify-center text-4xl font-headline-lg shadow-lg">
+                        @(Model.FullName?.Substring(0, 1).ToUpper() ?? "U")
                     </div>
                 </div>
+                <h2 class="font-headline-sm text-headline-sm text-primary mb-1">@Model.FullName</h2>
+                <p class="font-body-md text-on-surface-variant opacity-70 mb-8">@Model.Email</p>
+
+                <nav class="w-full space-y-2 text-left">
+                    <a asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 p-4 rounded-lg text-primary font-bold active-link transition-soft">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="font-label-lg text-label-lg">Hồ Sơ Cá Nhân</span>
+                    </a>
+                    <a asp-controller="Bookings" asp-action="MyBookings" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">history</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Phòng</span>
+                    </a>
+                    <a asp-controller="CustomerTourBooking" asp-action="MyTourBookings" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">tour</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Tour</span>
+                    </a>
+                    <a asp-controller="TableReservations" asp-action="MyReservations" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">restaurant</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Bàn</span>
+                    </a>
+                    <hr class="border-outline/10 my-4" />
+                    <a asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 p-4 rounded-lg text-error hover:bg-error-container/20 transition-soft">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="font-label-lg text-label-lg">Đăng Xuất</span>
+                    </a>
+                </nav>
             </div>
+
+
+        </aside>
+
+        <!-- Main Content (8 columns) -->
+        <div class="md:col-span-8 space-y-gutter">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="bg-primary-container/20 text-on-primary-container p-4 rounded-xl border border-primary-container/30 text-center text-sm mb-6">
+                    <span class="material-symbols-outlined align-middle mr-2 text-primary">check_circle</span>
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="bg-error-container/20 text-error p-4 rounded-xl border border-error-container/30 text-center text-sm mb-6">
+                    <span class="material-symbols-outlined align-middle mr-2">error</span>
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <form asp-controller="Profile" asp-action="Update" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UserId" />
+
+                <!-- Personal Info Section -->
+                <section class="luxury-card rounded-xl p-8 mb-gutter">
+                    <div class="flex justify-between items-center mb-10">
+                        <div>
+                            <h1 class="font-headline-md text-headline-md text-primary">Thông Tin Cá Nhân</h1>
+                            <p class="font-body-md text-on-surface-variant">Quản lý thông tin tài khoản của bạn.</p>
+                        </div>
+                        <span class="px-4 py-2 bg-tertiary-fixed text-on-tertiary-container rounded-full text-xs font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+                            ĐÃ XÁC MINH
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+                        <div class="flex flex-col gap-2">
+                            <label asp-for="FullName" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Họ và Tên</label>
+                            <input asp-for="FullName" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" />
+                            <span asp-validation-for="FullName" class="text-error text-sm"></span>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Địa Chỉ Email</label>
+                            <input asp-for="Email" class="bg-surface-container border border-outline/10 rounded-xl px-4 py-3 text-on-surface-variant cursor-not-allowed font-body-md outline-none" readonly />
+                            <span class="text-[10px] text-on-surface-variant/60">* Email không thể thay đổi</span>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label asp-for="PhoneNumber" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Số Điện Thoại</label>
+                            <input asp-for="PhoneNumber" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" />
+                            <span asp-validation-for="PhoneNumber" class="text-error text-sm"></span>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label asp-for="DateOfBirth" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Ngày Sinh</label>
+                            <input asp-for="DateOfBirth" type="date" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" />
+                            <span asp-validation-for="DateOfBirth" class="text-error text-sm"></span>
+                        </div>
+
+                        <div class="flex flex-col gap-2 md:col-span-2">
+                            <label asp-for="Nationality" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Quốc Tịch</label>
+                            <input asp-for="Nationality" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" placeholder="Ví dụ: Việt Nam" />
+                            <span asp-validation-for="Nationality" class="text-error text-sm"></span>
+                        </div>
+
+                        <div class="flex flex-col gap-2 md:col-span-2">
+                            <label asp-for="Address" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Địa Chỉ Thường Trú</label>
+                            <textarea asp-for="Address" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-error text-sm"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Passport/ID Section -->
+                <section class="luxury-card rounded-xl p-8 mb-gutter">
+                    <h3 class="font-headline-sm text-headline-sm text-primary mb-6">Giấy Tờ Tùy Thân</h3>
+                    
+                    <div class="flex flex-col gap-2 mb-8">
+                        <label asp-for="PassportNumberString" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Số Hộ Chiếu / CCCD</label>
+                        <input asp-for="PassportNumberString" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md w-full" placeholder="Nhập số hộ chiếu hoặc CMND" />
+                        <span asp-validation-for="PassportNumberString" class="text-error text-sm"></span>
+                    </div>
+
+                    <div class="bg-surface-container-low border-2 border-dashed border-outline/20 rounded-xl p-10 text-center flex flex-col items-center group hover:border-primary/50 transition-soft relative overflow-hidden">
+                        <input asp-for="PassportImageFile" type="file" id="passportFile" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                        <div class="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-soft">
+                            <span class="material-symbols-outlined text-primary text-4xl">contact_page</span>
+                        </div>
+                        <p class="font-headline-sm text-headline-sm mb-2" id="fileNameDisplay">Tải Lên Passport/CCCD</p>
+                        <p class="text-on-surface-variant max-w-md mb-2">Yêu cầu ảnh chụp rõ nét để thủ tục check-in diễn ra nhanh chóng hơn tại resort.</p>
+                        <span asp-validation-for="PassportImageFile" class="text-error text-sm block"></span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.PassportImage))
+                    {
+                        <div class="mt-8 flex items-center gap-6 p-4 bg-surface-container rounded-xl">
+                            <img src="@Model.PassportImage" alt="Passport" class="w-24 h-16 object-cover rounded shadow-sm opacity-80" />
+                            <div class="flex-1">
+                                <p class="font-label-lg text-label-lg">Ảnh Hiện Tại</p>
+                                <p class="text-xs text-on-surface-variant">Đã được xác minh</p>
+                            </div>
+                            <span class="material-symbols-outlined text-primary">verified</span>
+                        </div>
+                    }
+                </section>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-stack-md pt-4 mb-10">
+                    <button type="reset" class="px-8 py-4 text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors">Hủy Bỏ Thay Đổi</button>
+                    <button type="submit" class="px-12 py-4 bg-primary-container text-on-primary-container rounded-xl font-label-lg text-label-lg shadow-lg hover:shadow-xl scale-100 hover:scale-[1.02] active:scale-95 transition-all duration-300 font-bold uppercase tracking-widest">
+                        Lưu Thông Tin
+                    </button>
+                </div>
+            </form>
+
+            <!-- Change Password (Collapsible Interaction) -->
+            <section class="luxury-card rounded-xl overflow-hidden mb-gutter">
+                <button type="button" class="w-full p-8 flex justify-between items-center hover:bg-surface-container-low transition-colors group" id="pw-toggle">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary">lock</span>
+                        <h3 class="font-headline-sm text-headline-sm text-primary">Đổi Mật Khẩu</h3>
+                    </div>
+                    <span class="material-symbols-outlined transform transition-transform duration-300" id="pw-chevron">expand_more</span>
+                </button>
+                <div class="px-8 pb-8 hidden space-y-stack-lg animate-fade-in" id="pw-content">
+                    <form asp-controller="Profile" asp-action="ChangePassword" method="post" class="space-y-4 pt-4 border-t border-outline/10">
+                        @Html.AntiForgeryToken()
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-2 md:col-span-2">
+                                <label for="currentPassword" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Mật Khẩu Hiện Tại <span class="text-error">*</span></label>
+                                <input type="password" id="currentPassword" name="currentPassword" required class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" placeholder="Nhập mật khẩu hiện tại" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label for="newPassword" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Mật Khẩu Mới <span class="text-error">*</span></label>
+                                <input type="password" id="newPassword" name="newPassword" required minlength="6" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" placeholder="Nhập mật khẩu mới" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label for="confirmPassword" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Xác Nhận Mật Khẩu Mới <span class="text-error">*</span></label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md" placeholder="Nhập lại mật khẩu mới" />
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" class="px-8 py-3 bg-primary-container text-on-primary-container rounded-xl font-label-lg text-label-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all duration-300 font-bold uppercase tracking-widest">
+                                Cập Nhật Mật Khẩu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
     </div>
 </div>
-<section class="profile-section spad" style="background-color: #f8f9fa; padding: 60px 0;">
-    <div class="container">
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-left: 5px solid #dfa974;">
-                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        }
 
-        <div class="row">
-            <div class="col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm" style="border-radius: 10px;">
-                    <div class="card-body text-center" style="padding: 30px;">
-                        <div class="avatar-wrapper mb-3 mx-auto" style="width: 120px; height: 120px; background-color: #dfa974; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <span style="font-size: 45px; color: #fff; font-weight: 600;">@Model.FullName.Substring(0, 1).ToUpper()</span>
-                        </div>
-                        <h4 style="font-family: 'Lora', serif; font-weight: 700; color: #191d3a;">@Model.FullName</h4>
-                        <p class="text-muted small">@Model.Email</p>
-                        <hr>
-
-                        <div class="passport-box text-left mt-3">
-                            <h6 style="font-weight: 600; color: #191d3a; font-size: 14px; text-transform: uppercase;" class="mb-2">Ảnh hộ chiếu / ID xác minh:</h6>
-                            @if (!string.IsNullOrEmpty(Model.PassportImage))
-                            {
-                                <div class="img-thumbnail-wrapper" style="border-radius: 8px; overflow: hidden; border: 1px solid #ddd;">
-                                    <img src="@Model.PassportImage" alt="Passport" class="img-fluid" />
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="p-3 text-center text-muted" style="background: #f1f1f1; border-radius: 8px; border: 1px dashed #ccc; font-size: 13px;">
-                                    <i class="fa fa-id-card-o fa-2x d-block mb-2"></i> Chưa cập nhật ảnh hộ chiếu xác minh
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-8">
-
-
-                <div class="card border-0 shadow-sm" style="border-radius: 10px;">
-                    <div class="card-body" style="padding: 40px;">
-                        <h4 style="font-family: 'Lora', serif; font-weight: 700; color: #191d3a;" class="mb-4">Chi tiết thông tin cá nhân</h4>
-
-                        <form asp-controller="Profile" asp-action="Update" method="post" enctype="multipart/form-data">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" asp-for="UserId" />
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="FullName" class="form-label" style="font-weight: 600; color: #333;"></label>
-                                    <input asp-for="FullName" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" />
-                                    <span asp-validation-for="FullName" class="text-danger small"></span>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label" style="font-weight: 600; color: #333;">Địa chỉ Email</label>
-                                    <input asp-for="Email" class="form-control-plaintext bg-light px-3" readonly style="height: 46px; border-radius: 4px; border: 1px solid #ebebeb;" />
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="PhoneNumber" class="form-label" style="font-weight: 600; color: #333;"></label>
-                                    <input asp-for="PhoneNumber" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" />
-                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="DateOfBirth" class="form-label" style="font-weight: 600; color: #333;"></label>
-                                    <input asp-for="DateOfBirth" type="date" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" />
-                                    <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="Nationality" class="form-label" style="font-weight: 600; color: #333;"></label>
-                                    <input asp-for="Nationality" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" placeholder="Ví dụ: Việt Nam" />
-                                    <span asp-validation-for="Nationality" class="text-danger small"></span>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="PassportNumberString" class="form-label" style="font-weight: 600; color: #333;"></label>
-                                    <input asp-for="PassportNumberString" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" placeholder="Nhập số hộ chiếu hoặc CMND" />
-                                    <span asp-validation-for="PassportNumberString" class="text-danger small"></span>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Address" class="form-label" style="font-weight: 600; color: #333;"></label>
-                                <input asp-for="Address" class="form-control" style="border: 1px solid #ebebeb; height: 46px; border-radius: 4px;" placeholder="Số nhà, tên đường, thành phố..." />
-                                <span asp-validation-for="Address" class="text-danger small"></span>
-                            </div>
-
-                            <div class="mb-4">
-                                <label asp-for="PassportImageFile" class="form-label" style="font-weight: 600; color: #333;"></label>
-                                <div class="custom-file">
-                                    <input asp-for="PassportImageFile" type="file" class="custom-file-input" id="passportFile" accept="image/*">
-                                    <label class="custom-file-label" for="passportFile" style="border: 1px solid #ebebeb; height: 46px; line-height: 32px;">Chọn file hình ảnh...</label>
-                                </div>
-                                <span asp-validation-for="PassportImageFile" class="text-danger small"></span>
-                            </div>
-
-                            <div class="text-right">
-                                <button type="submit" class="btn" style="background-color: #dfa974; color: #fff; padding: 12px 30px; font-family: 'Cabin', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; border: none; border-radius: 2px; cursor: pointer; transition: 0.3s;">
-                                    Lưu Thay Đổi
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        $(".custom-file-input").on("change", function () {
-            var fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        // File upload display
+        document.getElementById('passportFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Tải Lên Passport/CCCD';
+            document.getElementById('fileNameDisplay').textContent = fileName;
+        });
+
+        // Collapsible Password Section
+        const pwToggle = document.getElementById('pw-toggle');
+        const pwContent = document.getElementById('pw-content');
+        const pwChevron = document.getElementById('pw-chevron');
+
+        pwToggle.addEventListener('click', () => {
+            const isHidden = pwContent.classList.contains('hidden');
+            if (isHidden) {
+                pwContent.classList.remove('hidden');
+                pwChevron.style.transform = 'rotate(180deg)';
+            } else {
+                pwContent.classList.add('hidden');
+                pwChevron.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        // Micro-interactions for form focus
+        const inputs = document.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.querySelector('label')?.classList.add('text-primary');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.querySelector('label')?.classList.remove('text-primary');
+            });
         });
     </script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
 }

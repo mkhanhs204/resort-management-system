@@ -288,3 +288,18 @@ body {
     color: white !important;
     box-shadow: 0 10px 20px rgba(13, 35, 58, 0.2) !important;
 }
+
+/* Fix Owl Carousel equal heights for cards */
+.home-tour-slider .owl-stage,
+.home-room-slider .owl-stage {
+    display: flex;
+}
+.home-tour-slider .owl-item,
+.home-room-slider .owl-item {
+    display: flex;
+    flex: 1 0 auto;
+}
+.home-tour-slider .owl-item .card,
+.home-room-slider .owl-item .card {
+    width: 100%;
+}

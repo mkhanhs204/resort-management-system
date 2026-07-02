@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
@@ -5,14 +6,17 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.FoodOrders;
 using PhucNguyenResort.Services.MenuCategories;
 using PhucNguyenResort.Services.RestaurantMenus;
+using PhucNguyenResort.Services.TableFoodOrders;
+using PhucNguyenResort.Services.TableReservations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ==========================================
-// 1. CẤU HÌNH HỆ THỐNG CƠ BẢN (MVC, AUTH, PROTECTION)
-// ==========================================
-builder.Services.AddControllersWithViews();
-builder.Services.AddDataProtection();
+// MVC
+var mvcBuilder = builder.Services.AddControllersWithViews();
+if (builder.Environment.IsDevelopment())
+{
+    mvcBuilder.AddRazorRuntimeCompilation();
+}
 
 // Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -24,6 +28,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "PhucNguyenResort.Auth";
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<ResortDbContext>();
+                var userIdString = context.Principal?.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (int.TryParse(userIdString, out int userId))
+                {
+                    var isBlocked = await dbContext.Users
+                        .Where(u => u.UserId == userId)
+                        .Select(u => u.IsBlocked)
+                        .FirstOrDefaultAsync();
+
+                    if (isBlocked)
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    }
+                }
+            }
+        };
     })
     .AddCookie("ExternalCookie")
     .AddGoogle(googleOptions =>
@@ -49,6 +75,8 @@ builder.Services.AddDbContext<ResortDbContext>(options =>
 builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
+builder.Services.AddScoped<ITableReservationService, TableReservationService>();
+builder.Services.AddScoped<ITableFoodOrderService, TableFoodOrderService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Kots.IKotService, PhucNguyenResort.Services.Kots.KotService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Tables.IDiningTableService, PhucNguyenResort.Services.Tables.DiningTableService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Rooms.IRoomService, PhucNguyenResort.Services.Rooms.RoomService>();
@@ -65,10 +93,9 @@ builder.Services.AddScoped<PhucNguyenResort.Services.Reception.IReceptionService
 builder.Services.AddScoped<PhucNguyenResort.Services.Payments.IVnPayService, PhucNguyenResort.Services.Payments.VnPayService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Refunds.IRefundService, PhucNguyenResort.Services.Refunds.RefundService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Email.IEmailSender, PhucNguyenResort.Services.Email.EmailSender>();
-
-// ==========================================
-// 4. ĐĂNG KÝ CÁC BACKGROUND JOBS RUNNING (Tiến trình chạy ngầm)
-// ==========================================
+builder.Services.AddScoped<PhucNguyenResort.Services.Reviews.IReviewService, PhucNguyenResort.Services.Reviews.ReviewService>();
+builder.Services.AddHttpClient<PhucNguyenResort.Services.Gemini.IGeminiService, PhucNguyenResort.Services.Gemini.GeminiService>();
+builder.Services.AddDataProtection();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PdpdDataPurgeJob>();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourBookingCleanupJob>();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Email.OtpCleanupJob>();

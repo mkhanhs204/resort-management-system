@@ -2,19 +2,19 @@
 
 Quy chuan Tai lieu Ky thuat va Dac ta Hien thuc hoa
 
-| Field          | Value                               |
-| ----------------| -------------------------------------|
+| Field          | Value                                 |
+| -------------- | ------------------------------------- |
 | Document ID    | `PHUCNGUYEN-FOODORDER-IMP-001`      |
-| Version        | 2.2                                 |
-| Date           | 2026-06-13                          |
-| Status         | Approved                            |
+| Version        | 2.2                                   |
+| Date           | 2026-06-13                            |
+| Status         | Approved                              |
 | Document Owner | `Ho Minh Khanh`                     |
 | Author         | `Ho Minh Khanh - Backend Developer` |
 | Reviewed by    | `[Truong Tran Cuong]`               |
-| DPO Sign-off   | Approved                            |
+| DPO Sign-off   | Approved                              |
 | Approved by    | `[Ho Minh Khanh]`                   |
-| Last Review    | 2026-06-13                          |
-| Based on EDS   | v2.0                                |
+| Last Review    | 2026-06-13                            |
+| Based on EDS   | v2.0                                  |
 
 > **PHAM VI TAI LIEU**: File nay CHI xu ly **UC25, UC66, UC69, UC73** (Dat do an Room Service, Quan ly trang thai don hang, Charge to Room, Quan ly KOT). UC24 (Dat ban nha hang / Table Reservation) se duoc xu ly trong file `TableReservation_EDS.md` rieng biet.
 
@@ -22,12 +22,12 @@ Quy chuan Tai lieu Ky thuat va Dac ta Hien thuc hoa
 
 **Policy 4.4 — Immutable History**: Khong bao gio xoa thong tin cu. Moi thay doi phai ghi vao bang nay.
 
-| Ngay       | Nguoi thuc hien                     | Noi dung thay doi                                                                                                                 |
-| ------------| -------------------------------------| -----------------------------------------------------------------------------------------------------------------------------------|
-| 2026-06-13 | `Ho Minh Khanh - Backend Developer` | Tao tai lieu lan dau cho Food Order & Room Service (UC25 + UC66 + UC69 + UC73)                                                           |
+| Ngay       | Nguoi thuc hien                       | Noi dung thay doi                                                                                                                 |
+| ---------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-13 | `Ho Minh Khanh - Backend Developer` | Tao tai lieu lan dau cho Food Order & Room Service (UC25 + UC66 + UC69 + UC73)                                                    |
 | 2026-06-13 | `Ho Minh Khanh - Backend Developer` | v2.0: Sua status flow, them anti-duplicate charge, sua bao mat, sua nullable model, dung seed data that                           |
 | 2026-06-13 | `Ho Minh Khanh - Backend Developer` | v2.1: Sua kieu tra ve Service (Result Object), chuan hoa Quantity validation, chuan hoa Role Constants, cap nhat policy Migration |
-| 2026-06-13 | `Ho Minh Khanh - Backend Developer` | v2.2: Yeu cau truyen currentUserId vao CreateFoodOrderAsync de check quyen so huu booking |
+| 2026-06-13 | `Ho Minh Khanh - Backend Developer` | v2.2: Yeu cau truyen currentUserId vao CreateFoodOrderAsync de check quyen so huu booking                                         |
 
 ## MUC LUC
 
@@ -58,14 +58,14 @@ Module **Food Order & Room Service** quan ly toan bo luong nghiep vu dat do an t
 
 **KHONG bao gom**: UC24 (Dat ban nha hang) — se co tai lieu EDS rieng.
 
-| Field                  | Value                                                                             |
-| ------------------------| -----------------------------------------------------------------------------------| 
-| Module Name            | `Food Order & Room Service`                                                       |
-| Bounded Context        | `F&B Operations — Order Management`                                               |
-| Data Classification    | Internal (co truy cap du lieu khach: ten, phong, booking)                         |
-| Compliance Scope       | Kiem tra quyen truy cap du lieu khach hang theo role                               |
-| Upstream Dependencies  | `Module 1 (MenuItems, MenuCategories — UC04 CRUD)`, `Module 2 (Bookings — Check-in status)` |
-| Downstream Consumers   | `Module 5 (GuestFolio, FolioTransaction — Consolidated Invoice UC57)`             |
+| Field                 | Value                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| Module Name           | `Food Order & Room Service`                                                                     |
+| Bounded Context       | `F&B Operations — Order Management`                                                            |
+| Data Classification   | Internal (co truy cap du lieu khach: ten, phong, booking)                                         |
+| Compliance Scope      | Kiem tra quyen truy cap du lieu khach hang theo role                                              |
+| Upstream Dependencies | `Module 1 (MenuItems, MenuCategories — UC04 CRUD)`, `Module 2 (Bookings — Check-in status)` |
+| Downstream Consumers  | `Module 5 (GuestFolio, FolioTransaction — Consolidated Invoice UC57)`                          |
 
 ---
 
@@ -73,22 +73,22 @@ Module **Food Order & Room Service** quan ly toan bo luong nghiep vu dat do an t
 
 **Policy**: Khong viet code neu khong biet code do phuc vu Rule nao.
 
-| Requirement ID | Loai (BR/ADR/US) | Mo ta yeu cau                                                                                               | Thanh phan Code                                                        | Compliance Target | ADR lien quan |
-| ----------------| -------------------| ---------------------------------------------------------------------------------------------------------------| ------------------------------------------------------------------------| -------------------| --------------|
-| US-FOOD-001    | User Story        | UC25: Khach da check-in xem menu va dat do an len phong (Room Service)                                 | `FoodOrdersController.RoomService()`, `FoodOrderService.CreateFoodOrderAsync()` | —                 | ADR-001       |
-| US-FOOD-002    | User Story        | UC68: F&B Staff xem danh sach don hang do an dang den                                                  | `FoodOrdersController.OrderList()`, `FoodOrderService`                 | —                 | —             |
-| US-FOOD-003    | User Story        | UC66: F&B Staff cap nhat trang thai don hang (Pending -> Cooking -> Delivered)                          | `FoodOrdersController.UpdateStatus()`, `FoodOrderService`              | —                 | ADR-002       |
-| US-FOOD-004    | User Story        | UC69: F&B Staff ghi chi phi bua an vao tien phong (Charge to Room)                                     | `FoodOrderService.ChargeToRoomAsync()`, `GuestFolio`, `FolioTransaction` | —                 | ADR-003       |
-| US-FOOD-005    | User Story        | UC73: Kitchen Staff xem KOT va cap nhat trang thai bep (Pending -> Cooking -> Ready -> Completed)  | `KotController`, `KotService`                                          | —                 | ADR-002       |
-| BR-FOOD-001   | Business Rule     | Chi Booking co trang thai `CheckedIn` moi duoc phep dat do an Room Service                                   | `FoodOrderService.CreateFoodOrderAsync()` — kiem tra `BookingStatus`   | —                 | —             |
-| BR-FOOD-002   | Business Rule     | Chi cho phep dat mon an co `IsAvailable = true` va `IsDeleted = false`                                       | `FoodOrderService.CreateFoodOrderAsync()` — filter MenuItems           | —                 | —             |
-| BR-FOOD-003   | Business Rule     | UnitPrice phai duoc snapshot tai thoi diem dat hang; thay doi gia menu sau do khong anh huong don da dat      | `FoodOrderService` — `UnitPrice = menuItem.Price`                      | —                 | ADR-004       |
-| BR-FOOD-004   | Business Rule     | **Validation Form Menu**: Tren tung mon submit quantity >= 0. Sau khi loc quantity > 0 phai co it nhat 1 mon. Moi mon quantity <= 1000. | `FoodOrderService.CreateFoodOrderAsync()` — validation                 | —                 | —             |
-| BR-FOOD-005   | Business Rule     | Moi FoodOrder tu dong tao 1 KOT tuong ung (quan he 1:1)                                                     | `FoodOrderService.CreateFoodOrderAsync()` — tao `Kot` kem theo        | —                 | —             |
-| BR-FOOD-006   | Business Rule     | Khong cho phep check-out neu con FoodOrder chua thanh toan / chua charge to room (BR02 trong SRS)            | `Module 5 — CheckoutService` *(cross-module constraint)*               | —                 | —             |
-| BR-FOOD-007   | Business Rule     | Khi Charge to Room, he thong phai tao `FolioTransaction` voi `TransactionType = FoodCharge` va cap nhat `GuestFolio.TotalFoodCharges` | `FoodOrderService.ChargeToRoomAsync()`                                 | —                 | ADR-003       |
-| BR-FOOD-008   | Business Rule     | **CHONG CHARGE TRUNG**: Mot FoodOrder chi duoc charge to room MỘT LAN duy nhat. Enforce bang field `IsChargedToRoom` + logic kiem tra `FolioTransaction` da ton tai | `FoodOrderService.ChargeToRoomAsync()` — kiem tra truoc khi tao        | —                 | ADR-005       |
-| BR-FOOD-009   | Business Rule     | **PHAN QUYEN DU LIEU**: Customer chi duoc dat mon cho booking cua chinh minh. F&B Staff/Admin co the xem nhieu order. Kitchen Staff chi xem KOT, khong xem billing | `FoodOrdersController`, `KotController` — kiem tra UserId/Role         | —                 | —             |
+| Requirement ID | Loai (BR/ADR/US) | Mo ta yeu cau                                                                                                                                                                  | Thanh phan Code                                                                     | Compliance Target | ADR lien quan |
+| -------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- | ----------------- | ------------- |
+| US-FOOD-001    | User Story       | UC25: Khach da check-in xem menu va dat do an len phong (Room Service)                                                                                                         | `FoodOrdersController.RoomService()`, `FoodOrderService.CreateFoodOrderAsync()` | —                | ADR-001       |
+| US-FOOD-002    | User Story       | UC68: F&B Staff xem danh sach don hang do an dang den                                                                                                                          | `FoodOrdersController.OrderList()`, `FoodOrderService`                          | —                | —            |
+| US-FOOD-003    | User Story       | UC66: F&B Staff cap nhat trang thai don hang (Pending -> Cooking -> Delivered)                                                                                                 | `FoodOrdersController.UpdateStatus()`, `FoodOrderService`                       | —                | ADR-002       |
+| US-FOOD-004    | User Story       | UC69: F&B Staff ghi chi phi bua an vao tien phong (Charge to Room)                                                                                                             | `FoodOrderService.ChargeToRoomAsync()`, `GuestFolio`, `FolioTransaction`      | —                | ADR-003       |
+| US-FOOD-005    | User Story       | UC73: Kitchen Staff xem KOT va cap nhat trang thai bep (Pending -> Cooking -> Ready -> Completed)                                                                              | `KotController`, `KotService`                                                   | —                | ADR-002       |
+| BR-FOOD-001    | Business Rule    | Chi Booking co trang thai`CheckedIn` moi duoc phep dat do an Room Service                                                                                                    | `FoodOrderService.CreateFoodOrderAsync()` — kiem tra `BookingStatus`           | —                | —            |
+| BR-FOOD-002    | Business Rule    | Chi cho phep dat mon an co`IsAvailable = true` va `IsDeleted = false`                                                                                                      | `FoodOrderService.CreateFoodOrderAsync()` — filter MenuItems                     | —                | —            |
+| BR-FOOD-003    | Business Rule    | UnitPrice phai duoc snapshot tai thoi diem dat hang; thay doi gia menu sau do khong anh huong don da dat                                                                       | `FoodOrderService` — `UnitPrice = menuItem.Price`                              | —                | ADR-004       |
+| BR-FOOD-004    | Business Rule    | **Validation Form Menu**: Tren tung mon submit quantity >= 0. Sau khi loc quantity > 0 phai co it nhat 1 mon. Moi mon quantity <= 1000.                                  | `FoodOrderService.CreateFoodOrderAsync()` — validation                           | —                | —            |
+| BR-FOOD-005    | Business Rule    | Moi FoodOrder tu dong tao 1 KOT tuong ung (quan he 1:1)                                                                                                                        | `FoodOrderService.CreateFoodOrderAsync()` — tao `Kot` kem theo                 | —                | —            |
+| BR-FOOD-006    | Business Rule    | Khong cho phep check-out neu con FoodOrder chua thanh toan / chua charge to room (BR02 trong SRS)                                                                              | `Module 5 — CheckoutService` *(cross-module constraint)*                       | —                | —            |
+| BR-FOOD-007    | Business Rule    | Khi Charge to Room, he thong phai tao`FolioTransaction` voi `TransactionType = FoodCharge` va cap nhat `GuestFolio.TotalFoodCharges`                                     | `FoodOrderService.ChargeToRoomAsync()`                                            | —                | ADR-003       |
+| BR-FOOD-008    | Business Rule    | **CHONG CHARGE TRUNG**: Mot FoodOrder chi duoc charge to room MỘT LAN duy nhat. Enforce bang field `IsChargedToRoom` + logic kiem tra `FolioTransaction` da ton tai | `FoodOrderService.ChargeToRoomAsync()` — kiem tra truoc khi tao                  | —                | ADR-005       |
+| BR-FOOD-009    | Business Rule    | **PHAN QUYEN DU LIEU**: Customer chi duoc dat mon cho booking cua chinh minh. F&B Staff/Admin co the xem nhieu order. Kitchen Staff chi xem KOT, khong xem billing       | `FoodOrdersController`, `KotController` — kiem tra UserId/Role                 | —                | —            |
 
 ---
 
@@ -96,44 +96,46 @@ Module **Food Order & Room Service** quan ly toan bo luong nghiep vu dat do an t
 
 ### ADR-001 — Su dung MVC Server-Side Rendering thay vi SPA + API
 
-| Field      | Value                           |
-| ------------| ---------------------------------|
-| Status     | Accepted                        |
-| Deciders   | `Team + Principal Architect`    |
-| Date       | 2026-06-04                      |
-| Supersedes | `N/A`                           |
+| Field      | Value                          |
+| ---------- | ------------------------------ |
+| Status     | Accepted                       |
+| Deciders   | `Team + Principal Architect` |
+| Date       | 2026-06-04                     |
+| Supersedes | `N/A`                        |
 
 **Boi canh (Context)**
 Du an SWP391 yeu cau xay dung he thong quan ly Resort tich hop. Team can quyet dinh giua SPA (React/Vue) + REST API hoac ASP.NET Core MVC server-side rendering.
 
 **Cac phuong an da xem xet (Options Considered)**
 
-| Phuong an     | Mo ta                              | Uu diem                                          | Nhuoc diem                                    |
-| ---------------| -------------------------------------| ---------------------------------------------------| ------------------------------------------------|
-| SPA + REST API | Frontend React/Vue, Backend Web API | + UX muot, + De scale frontend rieng               | - Phuc tap hon, can 2 project rieng biet      |
-| MVC SSR        | ASP.NET Core MVC + Razor Views     | + Don gian, 1 project, + Phu hop team 5 SV        | - Reload toan trang, kho scale frontend rieng  |
+| Phuong an      | Mo ta                               | Uu diem                                    | Nhuoc diem                                    |
+| -------------- | ----------------------------------- | ------------------------------------------ | --------------------------------------------- |
+| SPA + REST API | Frontend React/Vue, Backend Web API | + UX muot, + De scale frontend rieng       | - Phuc tap hon, can 2 project rieng biet      |
+| MVC SSR        | ASP.NET Core MVC + Razor Views      | + Don gian, 1 project, + Phu hop team 5 SV | - Reload toan trang, kho scale frontend rieng |
 
 **Quyet dinh (Decision)**
 Chon **MVC Server-Side Rendering** vi phu hop voi quy mo team (5 sinh vien), thoi gian phat trien ngan, va yeu cau du an hoc thuat.
 
 **He qua (Consequences)**
 Tich cuc:
+
 - Don gian hoa deploy va development workflow.
 - De debug va trace loi cho sinh vien.
 
 Tieu cuc / Trade-offs:
+
 - Form submission reload toan trang — giam thieu bang AJAX cho mot so chuc nang.
 
 ---
 
 ### ADR-002 — Dual Status Model: FoodOrderStatus (front-of-house) + KotStatus (back-of-house)
 
-| Field      | Value                           |
-| ------------| ---------------------------------|
-| Status     | Accepted                        |
-| Deciders   | `Student 3 + Team`              |
-| Date       | 2026-06-13                      |
-| Supersedes | `N/A`                           |
+| Field      | Value                |
+| ---------- | -------------------- |
+| Status     | Accepted             |
+| Deciders   | `Student 3 + Team` |
+| Date       | 2026-06-13           |
+| Supersedes | `N/A`              |
 
 **Boi canh (Context)**
 Trong nghiep vu nha hang thuc te, luong trang thai nhin tu phia khach hang/F&B Staff (front-of-house) va phia bep (back-of-house) la khac nhau. Can quyet dinh dung mot trang thai chung hay tach rieng.
@@ -152,12 +154,12 @@ Chon **Dual Status** vi dung voi mo hinh KOT (Kitchen Order Ticket) trong nganh 
 
 ### ADR-003 — Charge to Room qua GuestFolio & FolioTransaction
 
-| Field      | Value                           |
-| ------------| ---------------------------------|
-| Status     | Accepted                        |
-| Deciders   | `Student 3 + Student 5`         |
-| Date       | 2026-06-13                      |
-| Supersedes | `N/A`                           |
+| Field      | Value                     |
+| ---------- | ------------------------- |
+| Status     | Accepted                  |
+| Deciders   | `Student 3 + Student 5` |
+| Date       | 2026-06-13                |
+| Supersedes | `N/A`                   |
 
 **Boi canh (Context)**
 Khi F&B Staff thuc hien "Charge to Room" (UC69), chi phi bua an can duoc ghi nhan vao hoa don tong hop (Consolidated Invoice) de Receptionist thu tien khi khach Check-out.
@@ -169,12 +171,12 @@ Chon **FolioTransaction** vi phu hop voi mo hinh tai chinh khach san chuan (USAL
 
 ### ADR-004 — Snapshot UnitPrice tai thoi diem dat hang
 
-| Field      | Value                           |
-| ------------| ---------------------------------|
-| Status     | Accepted                        |
-| Deciders   | `Student 3`                     |
-| Date       | 2026-06-13                      |
-| Supersedes | `N/A`                           |
+| Field      | Value         |
+| ---------- | ------------- |
+| Status     | Accepted      |
+| Deciders   | `Student 3` |
+| Date       | 2026-06-13    |
+| Supersedes | `N/A`       |
 
 **Quyet dinh (Decision)**
 Khi tao `FoodOrderItem`, copy gia hien tai cua `MenuItem.Price` vao `FoodOrderItem.UnitPrice`. Tu do ve sau, `UnitPrice` la bat bien — thay doi gia menu khong anh huong don hang cu.
@@ -183,25 +185,26 @@ Khi tao `FoodOrderItem`, copy gia hien tai cua `MenuItem.Price` vao `FoodOrderIt
 
 ### ADR-005 — Chong charge to room trung lap (Anti-Duplicate Charge)
 
-| Field      | Value                           |
-| ------------| ---------------------------------|
-| Status     | Accepted                        |
-| Deciders   | `Student 3`                     |
-| Date       | 2026-06-13                      |
-| Supersedes | `N/A`                           |
+| Field      | Value         |
+| ---------- | ------------- |
+| Status     | Accepted      |
+| Deciders   | `Student 3` |
+| Date       | 2026-06-13    |
+| Supersedes | `N/A`       |
 
 **Boi canh (Context)**
 UC69 rat de loi neu F&B Staff bam "Charge to Room" nhieu lan cho cung mot don hang. Khong co co che chong trung se dan den sai so tien trong GuestFolio.
 
 **Cac phuong an da xem xet (Options Considered)**
 
-| Phuong an           | Mo ta                                                                           | Uu diem                    | Nhuoc diem                        |
-| ---------------------| ---------------------------------------------------------------------------------| ----------------------------| -----------------------------------|
-| Field IsChargedToRoom | Them field `IsChargedToRoom` (bool) va `ChargedAt` (DateTime?) vao FoodOrder   | + Kiem tra nhanh O(1)      | - Can migration them field        |
-| Query FolioTransaction | Kiem tra `FolioTransaction` da ton tai voi ReferenceId = FoodOrderId           | + Khong can them field     | - Can query DB moi lan           |
+| Phuong an              | Mo ta                                                                           | Uu diem                | Nhuoc diem                 |
+| ---------------------- | ------------------------------------------------------------------------------- | ---------------------- | -------------------------- |
+| Field IsChargedToRoom  | Them field`IsChargedToRoom` (bool) va `ChargedAt` (DateTime?) vao FoodOrder | + Kiem tra nhanh O(1)  | - Can migration them field |
+| Query FolioTransaction | Kiem tra`FolioTransaction` da ton tai voi ReferenceId = FoodOrderId           | + Khong can them field | - Can query DB moi lan     |
 
 **Quyet dinh (Decision)**
 Chon **Field IsChargedToRoom** ket hop **Query FolioTransaction** (defense in depth):
+
 1. Them 2 field vao model `FoodOrder`:
    - `IsChargedToRoom` (bool, default = false)
    - `ChargedAt` (DateTime?, default = null)
@@ -210,10 +213,12 @@ Chon **Field IsChargedToRoom** ket hop **Query FolioTransaction** (defense in de
 
 **He qua (Consequences)**
 Tich cuc:
+
 - F&B Staff khong the vo tinh hoac co y charge trung.
 - UI co the disable nut "Charge to Room" khi `IsChargedToRoom == true`.
 
 Tieu cuc / Trade-offs:
+
 - Can migration them 2 field moi vao bang `FoodOrders`.
 
 ---
@@ -222,31 +227,31 @@ Tieu cuc / Trade-offs:
 
 ### 4.1. Performance & Availability
 
-| Category     | Requirement                             | Target SLA | Measurement Method | Compliance Basis |
-| --------------| -----------------------------------------| ------------| --------------------| ------------------|
-| Latency      | Trang Room Service / Menu load          | < 500ms    | Manual test         | —                |
-| Latency      | Tao FoodOrder (POST)                    | < 1s       | Manual test         | —                |
-| Availability | Uptime (monthly)                        | 99%        | Uptime monitor      | —                |
+| Category     | Requirement                    | Target SLA | Measurement Method | Compliance Basis |
+| ------------ | ------------------------------ | ---------- | ------------------ | ---------------- |
+| Latency      | Trang Room Service / Menu load | < 500ms    | Manual test        | —               |
+| Latency      | Tao FoodOrder (POST)           | < 1s       | Manual test        | —               |
+| Availability | Uptime (monthly)               | 99%        | Uptime monitor     | —               |
 
 ### 4.2. Data Integrity & Retention
 
-| Category    | Requirement                                   | Target         | Verification Method | Compliance Basis |
-| -------------| -----------------------------------------------| ----------------| ---------------------| ------------------|
-| Durability  | Zero record loss cho FoodOrders               | RPO = 0        | Transaction log      | —                |
-| Consistency | FoodOrder <-> KOT 1:1 integrity               | 100%           | DB constraints       | —                |
-| Consistency | FoodOrderItem <-> MenuItem FK integrity        | 100%           | DB constraints       | —                |
-| Consistency | FolioTransaction.ReferenceId <-> FoodOrderId   | 100%           | Application logic    | —                |
-| Validation  | Server-side validation cho tat ca input        | 100% coverage  | Unit tests           | —                |
+| Category    | Requirement                                  | Target        | Verification Method | Compliance Basis |
+| ----------- | -------------------------------------------- | ------------- | ------------------- | ---------------- |
+| Durability  | Zero record loss cho FoodOrders              | RPO = 0       | Transaction log     | —               |
+| Consistency | FoodOrder <-> KOT 1:1 integrity              | 100%          | DB constraints      | —               |
+| Consistency | FoodOrderItem <-> MenuItem FK integrity      | 100%          | DB constraints      | —               |
+| Consistency | FolioTransaction.ReferenceId <-> FoodOrderId | 100%          | Application logic   | —               |
+| Validation  | Server-side validation cho tat ca input      | 100% coverage | Unit tests          | —               |
 
 ### 4.3. Security & Data Access
 
-| Category              | Requirement                                                    | Target          | Verification Method | Compliance Basis |
-| -----------------------| ----------------------------------------------------------------| -----------------| ---------------------| ------------------|
-| CSRF                  | `[ValidateAntiForgeryToken]` tren POST                         | 100% coverage   | Code review          | OWASP            |
-| Authorization         | F&B Staff / Kitchen Staff phan quyen theo role                 | Role-based       | Auth Matrix (S16)    | —                |
-| Data Isolation        | Customer chi xem/dat don cua booking cua CHINH MINH            | 100%            | Integration test     | —                |
-| Data Isolation        | Kitchen Staff chi xem KOT, KHONG xem thong tin billing/khach  | 100%            | Auth Matrix (S16)    | —                |
-| Input Sanitize        | XSS prevention tren tat ca input                               | 100%            | Integration test     | OWASP            |
+| Category       | Requirement                                                  | Target        | Verification Method | Compliance Basis |
+| -------------- | ------------------------------------------------------------ | ------------- | ------------------- | ---------------- |
+| CSRF           | `[ValidateAntiForgeryToken]` tren POST                     | 100% coverage | Code review         | OWASP            |
+| Authorization  | F&B Staff / Kitchen Staff phan quyen theo role               | Role-based    | Auth Matrix (S16)   | —               |
+| Data Isolation | Customer chi xem/dat don cua booking cua CHINH MINH          | 100%          | Integration test    | —               |
+| Data Isolation | Kitchen Staff chi xem KOT, KHONG xem thong tin billing/khach | 100%          | Auth Matrix (S16)   | —               |
+| Input Sanitize | XSS prevention tren tat ca input                             | 100%          | Integration test    | OWASP            |
 
 ---
 
@@ -533,12 +538,12 @@ F&B Staff Browser     FoodOrdersController       FoodOrderService          Resor
 
 **Quy tac chuyen trang thai hop le:**
 
-| From       | To          | Actor      | Dieu kien                                |
-| ----------- | ----------- | ----------- | ----------------------------------------- |
-| Pending    | Cooking     | F&B Staff  | —                                        |
-| Pending    | Cancelled   | F&B Staff  | Chi khi KOT chua duoc bep nhan          |
-| Cooking    | Delivered   | F&B Staff  | Khi KotStatus = Ready hoac Completed     |
-| Delivered  | *(khong)*   | —          | Trang thai cuoi — chi co the Charge      |
+| From      | To          | Actor     | Dieu kien                            |
+| --------- | ----------- | --------- | ------------------------------------ |
+| Pending   | Cooking     | F&B Staff | —                                   |
+| Pending   | Cancelled   | F&B Staff | Chi khi KOT chua duoc bep nhan       |
+| Cooking   | Delivered   | F&B Staff | Khi KotStatus = Ready hoac Completed |
+| Delivered | *(khong)* | —        | Trang thai cuoi — chi co the Charge |
 
 ### 6.4. State Machine — KotStatus (Back-of-house)
 
@@ -554,12 +559,12 @@ F&B Staff Browser     FoodOrdersController       FoodOrderService          Resor
 
 ### 7.1. Events Published (Phat ra)
 
-| Event Name                | Trigger                                    | Publisher          | Subscriber(s)                          | Async? |
-| ---------------------------| --------------------------------------------| --------------------| ----------------------------------------| --------|
-| `FoodOrderCreated`        | Khach dat mon thanh cong                   | `FoodOrderService` | *(Future: Kitchen dashboard push)*     | No     |
-| `FoodOrderStatusChanged`  | F&B Staff cap nhat trang thai              | `FoodOrderService` | *(Future: Customer notification)*      | No     |
-| `KotStatusChanged`        | Kitchen Staff cap nhat trang thai bep      | `KotService`       | *(Future: F&B Staff dashboard push)*   | No     |
-| `FoodOrderChargedToRoom`  | F&B Staff charge don hang vao tien phong   | `FoodOrderService` | `Module 5 — GuestFolio update`         | No     |
+| Event Name                 | Trigger                                  | Publisher            | Subscriber(s)                          | Async? |
+| -------------------------- | ---------------------------------------- | -------------------- | -------------------------------------- | ------ |
+| `FoodOrderCreated`       | Khach dat mon thanh cong                 | `FoodOrderService` | *(Future: Kitchen dashboard push)*   | No     |
+| `FoodOrderStatusChanged` | F&B Staff cap nhat trang thai            | `FoodOrderService` | *(Future: Customer notification)*    | No     |
+| `KotStatusChanged`       | Kitchen Staff cap nhat trang thai bep    | `KotService`       | *(Future: F&B Staff dashboard push)* | No     |
+| `FoodOrderChargedToRoom` | F&B Staff charge don hang vao tien phong | `FoodOrderService` | `Module 5 — GuestFolio update`      | No     |
 
 > **Luu y**: Giai doan hien tai chua implement event system. Hien tai su dung direct method call.
 
@@ -568,6 +573,7 @@ F&B Staff Browser     FoodOrdersController       FoodOrderService          Resor
 ## 8. Interface Specification (Dac ta Giao dien)
 
 ### 8.1. Result Objects (MOI)
+
 De controller co the xu ly loi cu the ma khong phai doan qua `bool`, cac phuong thuc cap nhat trang thai va charge se tra ve `FoodOrderActionResult`.
 
 ```csharp
@@ -585,7 +591,7 @@ public class FoodOrderActionResult
 {
     public FoodOrderActionStatus Status { get; set; }
     public string? ErrorMessage { get; set; }
-    
+  
     public static FoodOrderActionResult Succeeded() => new FoodOrderActionResult { Status = FoodOrderActionStatus.Success };
     public static FoodOrderActionResult Failed(FoodOrderActionStatus status, string message) => new FoodOrderActionResult { Status = status, ErrorMessage = message };
 }
@@ -603,13 +609,13 @@ public interface IFoodOrderService
 {
     // === EXISTING (v1.0) ===
     Task<RoomServiceOrderViewModel?> BuildRoomServiceOrderAsync(int bookingId);
-    
+  
     /// <summary>
     /// [UC25] Tao don hang do an.
     /// Bat buoc phai truyen currentUserId vao de service kiem tra quyen so huu booking hoac controller phai tu check (BR-FOOD-009).
     /// </summary>
     Task<FoodOrderCreateResult> CreateFoodOrderAsync(FoodOrderCreateRequest request, int currentUserId);
-    
+  
     Task<FoodOrderDetailViewModel?> GetFoodOrderDetailAsync(int foodOrderId);
 
     // === NEW (v2.0) ===
@@ -659,38 +665,38 @@ public interface IKotService
 
 **FoodOrdersController:**
 
-| Method | Route                                  | Auth Level    | Required Roles              | Idempotent? | Description                        |
-| --------| ----------------------------------------| ---------------| -----------------------------| -------------| ------------------------------------|
-| GET    | `/FoodOrders/RoomService?bookingId={id}` | Authenticated | `Customer` (chi booking cua minh) | Yes     | Form dat do an Room Service        |
-| POST   | `/FoodOrders/RoomService`              | Authenticated | `Customer` (chi booking cua minh) | No      | Submit dat do an                   |
-| GET    | `/FoodOrders/Details/{id}`             | Authenticated | `Customer (own), FnBStaff`  | Yes         | Chi tiet don hang                  |
-| GET    | `/FoodOrders/OrderList`                | Authenticated | `FnBStaff`                  | Yes         | Danh sach don hang (F&B Dashboard)|
-| POST   | `/FoodOrders/UpdateStatus`             | Authenticated | `FnBStaff`                  | No          | Cap nhat trang thai don hang       |
-| POST   | `/FoodOrders/ChargeToRoom`             | Authenticated | `FnBStaff`                  | No          | Ghi no vao tien phong (1 lan duy nhat)|
+| Method | Route                                      | Auth Level    | Required Roles                      | Idempotent? | Description                            |
+| ------ | ------------------------------------------ | ------------- | ----------------------------------- | ----------- | -------------------------------------- |
+| GET    | `/FoodOrders/RoomService?bookingId={id}` | Authenticated | `Customer` (chi booking cua minh) | Yes         | Form dat do an Room Service            |
+| POST   | `/FoodOrders/RoomService`                | Authenticated | `Customer` (chi booking cua minh) | No          | Submit dat do an                       |
+| GET    | `/FoodOrders/Details/{id}`               | Authenticated | `Customer (own), FnBStaff`        | Yes         | Chi tiet don hang                      |
+| GET    | `/FoodOrders/OrderList`                  | Authenticated | `FnBStaff`                        | Yes         | Danh sach don hang (F&B Dashboard)     |
+| POST   | `/FoodOrders/UpdateStatus`               | Authenticated | `FnBStaff`                        | No          | Cap nhat trang thai don hang           |
+| POST   | `/FoodOrders/ChargeToRoom`               | Authenticated | `FnBStaff`                        | No          | Ghi no vao tien phong (1 lan duy nhat) |
 
 **KotController (MOI):**
 
-| Method | Route                              | Auth Level    | Required Roles    | Idempotent? | Description                                    |
-| --------| ------------------------------------| ---------------| -------------------| -------------| ------------------------------------------------|
-| GET    | `/Kot/Dashboard`                   | Authenticated | `KitchenStaff`    | Yes         | Dashboard bep — danh sach KOT (KHONG co billing)|
-| GET    | `/Kot/Details/{id}`                | Authenticated | `KitchenStaff`    | Yes         | Chi tiet KOT (chi mon an, KHONG co thong tin khach)|
-| POST   | `/Kot/UpdateStatus`                | Authenticated | `KitchenStaff`    | No          | Cap nhat trang thai KOT                        |
+| Method | Route                 | Auth Level    | Required Roles   | Idempotent? | Description                                         |
+| ------ | --------------------- | ------------- | ---------------- | ----------- | --------------------------------------------------- |
+| GET    | `/Kot/Dashboard`    | Authenticated | `KitchenStaff` | Yes         | Dashboard bep — danh sach KOT (KHONG co billing)   |
+| GET    | `/Kot/Details/{id}` | Authenticated | `KitchenStaff` | Yes         | Chi tiet KOT (chi mon an, KHONG co thong tin khach) |
+| POST   | `/Kot/UpdateStatus` | Authenticated | `KitchenStaff` | No          | Cap nhat trang thai KOT                             |
 
 ### 9.2. Form Fields & Validation
 
 **POST `/FoodOrders/RoomService`** — Dat do an Room Service
 
-| Field                | Type    | Required | Validation Rule          | Error Message                                  |
-| ----------------------| ---------| ----------| --------------------------| ------------------------------------------------|
-| BookingId             | int     | Yes      | Must exist, CheckedIn, THUOC USER HIEN TAI | "Booking not found" / "only for checked-in" / "not your booking" |
-| Items[].MenuItemId    | int     | Yes      | Must exist, IsAvailable  | "Menu item unavailable or discontinued"        |
-| Items[].Quantity      | int     | Yes      | **Tu 0 den 1000** (khong duoc am). Sau khi bo loc cac mon co Quantity > 0, **phai co it nhat 1 mon** duoc chon. | "Quantity phai tu 0 den 1000" / "Vui long chon it nhat 1 mon an" |
+| Field              | Type | Required | Validation Rule                                                                                                             | Error Message                                                    |
+| ------------------ | ---- | -------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| BookingId          | int  | Yes      | Must exist, CheckedIn, THUOC USER HIEN TAI                                                                                  | "Booking not found" / "only for checked-in" / "not your booking" |
+| Items[].MenuItemId | int  | Yes      | Must exist, IsAvailable                                                                                                     | "Menu item unavailable or discontinued"                          |
+| Items[].Quantity   | int  | Yes      | **Tu 0 den 1000** (khong duoc am). Sau khi bo loc cac mon co Quantity > 0, **phai co it nhat 1 mon** duoc chon. | "Quantity phai tu 0 den 1000" / "Vui long chon it nhat 1 mon an" |
 
 **POST `/FoodOrders/ChargeToRoom`** — Charge to Room
 
-| Field        | Type | Required | Validation Rule                                                      | Error Message                            |
-| --------------| ------| ----------| ----------------------------------------------------------------------| ------------------------------------------|
-| FoodOrderId  | int  | Yes      | Must exist, OrderStatus == `Delivered`, IsChargedToRoom == `false`   | "Order must be Delivered" / "Already charged" |
+| Field       | Type | Required | Validation Rule                                                       | Error Message                                 |
+| ----------- | ---- | -------- | --------------------------------------------------------------------- | --------------------------------------------- |
+| FoodOrderId | int  | Yes      | Must exist, OrderStatus ==`Delivered`, IsChargedToRoom == `false` | "Order must be Delivered" / "Already charged" |
 
 ---
 
@@ -698,30 +704,30 @@ public interface IKotService
 
 ### FoodOrder Errors (Prefix: `FOOD-`)
 
-| Code       | HTTP Status | Message (EN)                                   | Message (VI)                                        | Trigger Condition                                   |
-| ------------| -------------| ------------------------------------------------| -----------------------------------------------------| -----------------------------------------------------|
-| `FOOD-001` | 400         | Validation failed                              | Du lieu khong hop le                                | Thieu required field hoac gia tri ngoai range       |
-| `FOOD-002` | 400         | Order must contain at least one item           | Don hang phai co it nhat mot mon                   | Items rong hoac tat ca quantity = 0                 |
-| `FOOD-003` | 404         | Food order not found                           | Khong tim thay don hang                            | FoodOrderId khong ton tai trong DB                  |
-| `FOOD-004` | 404         | Booking not found                              | Khong tim thay booking                             | BookingId khong ton tai trong DB                    |
-| `FOOD-005` | 403         | Room service only for checked-in bookings      | Chi khach da check-in moi duoc dat mon             | Booking.BookingStatus != CheckedIn                  |
-| `FOOD-006` | 409         | Invalid status transition                      | Chuyen trang thai khong hop le                     | Vi pham State Machine (vd: Delivered -> Pending)    |
-| `FOOD-007` | 409         | Order must be delivered before charging        | Don hang phai duoc giao truoc khi ghi no           | Charge to Room khi OrderStatus != Delivered         |
-| `FOOD-008` | 404         | Guest folio not found for this booking         | Khong tim thay so no cho booking nay               | Booking chua co GuestFolio (Module 5 chua tao)     |
-| `FOOD-009` | 409         | Menu item unavailable or discontinued          | Mon an tam het hoac da ngung kinh doanh            | MenuItem.IsAvailable=false hoac IsDeleted=true      |
-| `FOOD-010` | 403         | Insufficient permissions                       | Khong du quyen truy cap                            | User khong co role phu hop                          |
-| `FOOD-011` | 500         | Internal server error                          | Loi he thong                                       | Exception khong xu ly duoc                          |
-| `FOOD-012` | 409         | Order already charged to room                  | Don hang da duoc ghi no vao phong roi              | IsChargedToRoom == true (ADR-005: chong charge trung)|
-| `FOOD-013` | 403         | Booking does not belong to current user        | Booking khong thuoc ve nguoi dung hien tai         | Customer co dat mon cho booking cua nguoi khac      |
+| Code         | HTTP Status | Message (EN)                              | Message (VI)                               | Trigger Condition                                     |
+| ------------ | ----------- | ----------------------------------------- | ------------------------------------------ | ----------------------------------------------------- |
+| `FOOD-001` | 400         | Validation failed                         | Du lieu khong hop le                       | Thieu required field hoac gia tri ngoai range         |
+| `FOOD-002` | 400         | Order must contain at least one item      | Don hang phai co it nhat mot mon           | Items rong hoac tat ca quantity = 0                   |
+| `FOOD-003` | 404         | Food order not found                      | Khong tim thay don hang                    | FoodOrderId khong ton tai trong DB                    |
+| `FOOD-004` | 404         | Booking not found                         | Khong tim thay booking                     | BookingId khong ton tai trong DB                      |
+| `FOOD-005` | 403         | Room service only for checked-in bookings | Chi khach da check-in moi duoc dat mon     | Booking.BookingStatus != CheckedIn                    |
+| `FOOD-006` | 409         | Invalid status transition                 | Chuyen trang thai khong hop le             | Vi pham State Machine (vd: Delivered -> Pending)      |
+| `FOOD-007` | 409         | Order must be delivered before charging   | Don hang phai duoc giao truoc khi ghi no   | Charge to Room khi OrderStatus != Delivered           |
+| `FOOD-008` | 404         | Guest folio not found for this booking    | Khong tim thay so no cho booking nay       | Booking chua co GuestFolio (Module 5 chua tao)        |
+| `FOOD-009` | 409         | Menu item unavailable or discontinued     | Mon an tam het hoac da ngung kinh doanh    | MenuItem.IsAvailable=false hoac IsDeleted=true        |
+| `FOOD-010` | 403         | Insufficient permissions                  | Khong du quyen truy cap                    | User khong co role phu hop                            |
+| `FOOD-011` | 500         | Internal server error                     | Loi he thong                               | Exception khong xu ly duoc                            |
+| `FOOD-012` | 409         | Order already charged to room             | Don hang da duoc ghi no vao phong roi      | IsChargedToRoom == true (ADR-005: chong charge trung) |
+| `FOOD-013` | 403         | Booking does not belong to current user   | Booking khong thuoc ve nguoi dung hien tai | Customer co dat mon cho booking cua nguoi khac        |
 
 ### KOT Errors (Prefix: `KOT-`)
 
-| Code      | HTTP Status | Message (EN)                     | Message (VI)                              | Trigger Condition                         |
-| -----------| -------------| ----------------------------------| -------------------------------------------| -------------------------------------------|
-| `KOT-001` | 400         | Validation failed                | Du lieu khong hop le                      | Thieu required field                      |
-| `KOT-002` | 404         | KOT not found                   | Khong tim thay KOT                       | KotId khong ton tai                       |
-| `KOT-003` | 409         | Invalid KOT status transition   | Chuyen trang thai KOT khong hop le       | Vi pham State Machine                    |
-| `KOT-004` | 403         | Insufficient permissions         | Khong du quyen truy cap                  | User khong co role KitchenStaff           |
+| Code        | HTTP Status | Message (EN)                  | Message (VI)                       | Trigger Condition               |
+| ----------- | ----------- | ----------------------------- | ---------------------------------- | ------------------------------- |
+| `KOT-001` | 400         | Validation failed             | Du lieu khong hop le               | Thieu required field            |
+| `KOT-002` | 404         | KOT not found                 | Khong tim thay KOT                 | KotId khong ton tai             |
+| `KOT-003` | 409         | Invalid KOT status transition | Chuyen trang thai KOT khong hop le | Vi pham State Machine           |
+| `KOT-004` | 403         | Insufficient permissions      | Khong du quyen truy cap            | User khong co role KitchenStaff |
 
 ---
 
@@ -731,10 +737,10 @@ public interface IKotService
 
 ### 11.1. Prerequisites
 
-- [x] Database schema cho bang `FoodOrders`, `FoodOrderItems`, `Kot` da co (migration)
-- [x] Seed data cho `MenuCategories` (20 records) va `MenuItems` (20 records) da ton tai
-- [x] Seed data cho `Bookings` da co 4 booking CheckedIn: **BookingId = 2, 7, 12, 17**
-- [x] `FoodOrderService` (v1.0) da implement: BuildRoomServiceOrder, CreateFoodOrder, GetFoodOrderDetail
+- [X] Database schema cho bang `FoodOrders`, `FoodOrderItems`, `Kot` da co (migration)
+- [X] Seed data cho `MenuCategories` (20 records) va `MenuItems` (20 records) da ton tai
+- [X] Seed data cho `Bookings` da co 4 booking CheckedIn: **BookingId = 2, 7, 12, 17**
+- [X] `FoodOrderService` (v1.0) da implement: BuildRoomServiceOrder, CreateFoodOrder, GetFoodOrderDetail
 - [ ] Authentication/Authorization phai duoc implement truoc (Module 1). **Centralize Role Constants** (vi du: `AppRoles.FnBStaff`, `AppRoles.Customer`, khong hardcode string).
 - [ ] Migration them field `IsChargedToRoom`, `ChargedAt` vao bang `FoodOrders`
 
@@ -813,12 +819,12 @@ public DateTime? ChargedAt { get; set; }
 
 ### 12.1. Dieu kien kich hoat Rollback (Trigger Conditions)
 
-| Dieu kien                                                  | Nguong              | Nguoi quyet dinh |
-| ------------------------------------------------------------| ---------------------| ------------------|
-| CRUD operation gay data corruption (FoodOrder mat du lieu) | Bat ky case nao     | Tech Lead         |
-| ChargeToRoom tao SAI so tien hoac TRUNG lap               | Bat ky case nao     | Tech Lead         |
-| Migration that bai                                          | Ngay lap tuc        | Developer         |
-| State Machine cho phep chuyen trang thai sai               | > 3 lan trong 1h   | Developer         |
+| Dieu kien                                                  | Nguong           | Nguoi quyet dinh |
+| ---------------------------------------------------------- | ---------------- | ---------------- |
+| CRUD operation gay data corruption (FoodOrder mat du lieu) | Bat ky case nao  | Tech Lead        |
+| ChargeToRoom tao SAI so tien hoac TRUNG lap                | Bat ky case nao  | Tech Lead        |
+| Migration that bai                                         | Ngay lap tuc     | Developer        |
+| State Machine cho phep chuyen trang thai sai               | > 3 lan trong 1h | Developer        |
 
 ### 12.2. Rollback Procedure
 
@@ -1058,24 +1064,26 @@ GET /FoodOrders/RoomService?bookingId=1
 
 **NOTE**: `Role` mapping phai duoc lay tu Constants trung tam cua he thong, vi du `AppRoles.Customer`, `AppRoles.FnBStaff`, `AppRoles.KitchenStaff` chu khong hardcode string `"Customer"`.
 
-| Route                                       | GUEST | CUSTOMER      | ADMIN | MANAGER | RECEPTIONIST | F&B STAFF | KITCHEN STAFF |
-| ---------------------------------------------| -------| ---------------| -------| ---------| --------------| -----------| --------------|
-| GET `/FoodOrders/RoomService?bookingId=`    | X     | OK (own only) | X     | X       | X            | X         | X            |
-| POST `/FoodOrders/RoomService`              | X     | OK (own only) | X     | X       | X            | X         | X            |
-| GET `/FoodOrders/Details/{id}`              | X     | OK (own only) | OK    | OK      | X            | OK        | X            |
-| GET `/FoodOrders/OrderList`                 | X     | X             | OK    | OK      | X            | OK        | X            |
-| POST `/FoodOrders/UpdateStatus`             | X     | X             | X     | X       | X            | OK        | X            |
-| POST `/FoodOrders/ChargeToRoom`             | X     | X             | X     | X       | X            | OK        | X            |
-| GET `/Kot/Dashboard`                        | X     | X             | X     | X       | X            | X         | OK           |
-| GET `/Kot/Details/{id}`                     | X     | X             | X     | X       | X            | X         | OK           |
-| POST `/Kot/UpdateStatus`                    | X     | X             | X     | X       | X            | X         | OK           |
+| Route                                     | GUEST | CUSTOMER      | ADMIN | MANAGER | RECEPTIONIST | F&B STAFF | KITCHEN STAFF |
+| ----------------------------------------- | ----- | ------------- | ----- | ------- | ------------ | --------- | ------------- |
+| GET`/FoodOrders/RoomService?bookingId=` | X     | OK (own only) | X     | X       | X            | X         | X             |
+| POST`/FoodOrders/RoomService`           | X     | OK (own only) | X     | X       | X            | X         | X             |
+| GET`/FoodOrders/Details/{id}`           | X     | OK (own only) | OK    | OK      | X            | OK        | X             |
+| GET`/FoodOrders/OrderList`              | X     | X             | OK    | OK      | X            | OK        | X             |
+| POST`/FoodOrders/UpdateStatus`          | X     | X             | X     | X       | X            | OK        | X             |
+| POST`/FoodOrders/ChargeToRoom`          | X     | X             | X     | X       | X            | OK        | X             |
+| GET`/Kot/Dashboard`                     | X     | X             | X     | X       | X            | X         | OK            |
+| GET`/Kot/Details/{id}`                  | X     | X             | X     | X       | X            | X         | OK            |
+| POST`/Kot/UpdateStatus`                 | X     | X             | X     | X       | X            | X         | OK            |
 
 Chu thich:
+
 - OK = Duoc phep
 - OK (own only) = Chi duoc phep voi don hang/booking cua chinh minh
 - X = Bi tu choi (403 hoac redirect login)
 
 **Luu y Data Isolation:**
+
 - Customer: Chi xem/dat don cho booking cua CHINH MINH (kiem tra UserId)
 - Kitchen Staff: Chi xem KOT va mon an. KHONG duoc xem: ten khach, so phong, so tien, billing info
 - F&B Staff: Xem duoc don hang + thong tin phong de phuc vu, nhung KHONG xem du lieu ca nhan (CCCD, passport)
@@ -1086,68 +1094,68 @@ Chu thich:
 
 ### A. Glossary (Thuat ngu)
 
-| Thuat ngu          | Dinh nghia                                                                                     |
-| --------------------| -------------------------------------------------------------------------------------------------|
-| KOT                | Kitchen Order Ticket — Phieu yeu cau bep, chua danh sach mon an can nau                      |
-| Room Service       | Dich vu phuc vu do an tai phong cho khach da Check-in                                         |
-| Charge to Room     | Ghi no chi phi an uong vao tien phong, thanh toan khi Check-out                               |
-| Front-of-house     | Phia phuc vu khach (F&B Staff, Receptionist)                                                   |
-| Back-of-house      | Phia bep (Kitchen Staff)                                                                        |
-| GuestFolio         | So ghi no tong hop cua khach trong suot thoi gian luu tru                                    |
-| FolioTransaction   | Mot giao dich ghi no/ghi co trong GuestFolio                                                 |
-| Snapshot Price     | Gia ban duoc sao chep co dinh tai thoi diem dat hang                                          |
-| USALI              | Uniform System of Accounts for the Lodging Industry                                            |
-| Anti-Duplicate     | Co che chong thuc hien trung lap (vd: chong charge 2 lan)                                     |
-| Result Object      | Kieu du lieu tra ve tu Service (`FoodOrderActionResult`), chua trang thai (Enum) va Message    |
+| Thuat ngu        | Dinh nghia                                                                                    |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| KOT              | Kitchen Order Ticket — Phieu yeu cau bep, chua danh sach mon an can nau                      |
+| Room Service     | Dich vu phuc vu do an tai phong cho khach da Check-in                                         |
+| Charge to Room   | Ghi no chi phi an uong vao tien phong, thanh toan khi Check-out                               |
+| Front-of-house   | Phia phuc vu khach (F&B Staff, Receptionist)                                                  |
+| Back-of-house    | Phia bep (Kitchen Staff)                                                                      |
+| GuestFolio       | So ghi no tong hop cua khach trong suot thoi gian luu tru                                     |
+| FolioTransaction | Mot giao dich ghi no/ghi co trong GuestFolio                                                  |
+| Snapshot Price   | Gia ban duoc sao chep co dinh tai thoi diem dat hang                                          |
+| USALI            | Uniform System of Accounts for the Lodging Industry                                           |
+| Anti-Duplicate   | Co che chong thuc hien trung lap (vd: chong charge 2 lan)                                     |
+| Result Object    | Kieu du lieu tra ve tu Service (`FoodOrderActionResult`), chua trang thai (Enum) va Message |
 
 ### B. Tai lieu tham chieu
 
-| Document                                | Path                                           |
-| -----------------------------------------| -------------------------------------------------|
-| SRS — Project Specification             | `01_SRS/SWP391-HOS-02.md`                       |
-| SRS — Requirement & Design             | `01_SRS/SWP391_NHOM1.md`                        |
-| Module 3 Analysis                        | `module3.md`                                     |
-| EDS Template v2.0                        | `template/EDS_TEMPLATE_V2.0.md`                  |
-| TDD Spec — Food Order *(upcoming)*      | `03_implement/FoodOrder_TDD.md`                  |
-| FoodOrder Entity Model                   | `PhucNguyenResort/Models/FoodOrder.cs`           |
-| FoodOrderItem Entity Model              | `PhucNguyenResort/Models/FoodOrderItem.cs`       |
-| KOT Entity Model                        | `PhucNguyenResort/Models/Kot.cs`                 |
-| FoodOrder Service Interface             | `PhucNguyenResort/Services/FoodOrders/IFoodOrderService.cs` |
-| FoodOrder Service Implementation        | `PhucNguyenResort/Services/FoodOrders/FoodOrderService.cs`  |
-| FoodOrder Controller                     | `PhucNguyenResort/Controllers/FoodOrdersController.cs`      |
-| GuestFolio Entity (Module 5)            | `PhucNguyenResort/Models/GuestFolio.cs`          |
-| FolioTransaction Entity (Module 5)      | `PhucNguyenResort/Models/FolioTransaction.cs`    |
+| Document                             | Path                                                          |
+| ------------------------------------ | ------------------------------------------------------------- |
+| SRS — Project Specification         | `01_SRS/SWP391-HOS-02.md`                                   |
+| SRS — Requirement & Design          | `01_SRS/SWP391_NHOM1.md`                                    |
+| Module 3 Analysis                    | `module3.md`                                                |
+| EDS Template v2.0                    | `template/EDS_TEMPLATE_V2.0.md`                             |
+| TDD Spec — Food Order*(upcoming)* | `03_implement/FoodOrder_TDD.md`                             |
+| FoodOrder Entity Model               | `PhucNguyenResort/Models/FoodOrder.cs`                      |
+| FoodOrderItem Entity Model           | `PhucNguyenResort/Models/FoodOrderItem.cs`                  |
+| KOT Entity Model                     | `PhucNguyenResort/Models/Kot.cs`                            |
+| FoodOrder Service Interface          | `PhucNguyenResort/Services/FoodOrders/IFoodOrderService.cs` |
+| FoodOrder Service Implementation     | `PhucNguyenResort/Services/FoodOrders/FoodOrderService.cs`  |
+| FoodOrder Controller                 | `PhucNguyenResort/Controllers/FoodOrdersController.cs`      |
+| GuestFolio Entity (Module 5)         | `PhucNguyenResort/Models/GuestFolio.cs`                     |
+| FolioTransaction Entity (Module 5)   | `PhucNguyenResort/Models/FolioTransaction.cs`               |
 
 ### C. Seed Data Reference (Bookings CheckedIn)
 
-| BookingId | UserId | User Name        | RoomId | Room Number | BookingStatus |
-| -----------| --------| ------------------| --------| -------------| ---------------|
-| 2         | 2      | Tran Thi Binh    | 2      | 102         | CheckedIn     |
-| 7         | 7      | Dang Ngoc Linh   | 7      | 107         | CheckedIn     |
-| 12        | 12     | Phan My Quyen    | 12     | 112         | CheckedIn     |
-| 17        | 17     | Dinh Nhat Vy     | 17     | 117         | CheckedIn     |
+| BookingId | UserId | User Name      | RoomId | Room Number | BookingStatus |
+| --------- | ------ | -------------- | ------ | ----------- | ------------- |
+| 2         | 2      | Tran Thi Binh  | 2      | 102         | CheckedIn     |
+| 7         | 7      | Dang Ngoc Linh | 7      | 107         | CheckedIn     |
+| 12        | 12     | Phan My Quyen  | 12     | 112         | CheckedIn     |
+| 17        | 17     | Dinh Nhat Vy   | 17     | 117         | CheckedIn     |
 
 ### D. Seed Data Reference (MenuItems Available)
 
-| MenuItemId | ItemName            | CategoryName      | Price (VND)  | IsAvailable |
-| ------------| ---------------------| --------------------| -------------- | -------------|
-| 1          | Pho Bo              | Breakfast          | 85,000       | true        |
-| 2          | Bun Cha             | Appetizer          | 110,000      | true        |
-| 3          | Spring Rolls        | Soup               | 135,000      | true        |
-| 4          | Seafood Soup        | Salad              | 160,000      | true        |
-| 5          | Caesar Salad        | Seafood            | 185,000      | true        |
-| 6          | Grilled Prawns      | Vietnamese Food    | 210,000      | true        |
-| 7          | Beef Steak          | Western Food       | 235,000      | true        |
-| 8          | Vegetable Curry     | Vegetarian         | 260,000      | **false**   |
-| 9          | Chocolate Cake      | Dessert            | 285,000      | true        |
-| 10         | Vietnamese Coffee   | Coffee             | 310,000      | true        |
-| 11         | Lotus Tea           | Tea                | 335,000      | true        |
-| 12         | Mango Juice         | Juice              | 360,000      | true        |
-| 13         | Sunset Cocktail     | Cocktail           | 385,000      | **false**   |
-| 14         | Blue Lagoon Mocktail| Mocktail           | 410,000      | true        |
-| 15         | Kids Pasta          | Kids Meal          | 435,000      | true        |
-| 16         | Club Sandwich       | Room Service Set   | 460,000      | true        |
-| 17         | BBQ Platter         | BBQ                | 485,000      | true        |
-| 18         | Seafood Noodle      | Noodle             | 510,000      | true        |
-| 19         | Chicken Fried Rice  | Rice Dish          | 535,000      | true        |
-| 20         | Resort Combo        | Special Combo      | 560,000      | true        |
+| MenuItemId | ItemName             | CategoryName     | Price (VND) | IsAvailable     |
+| ---------- | -------------------- | ---------------- | ----------- | --------------- |
+| 1          | Pho Bo               | Breakfast        | 85,000      | true            |
+| 2          | Bun Cha              | Appetizer        | 110,000     | true            |
+| 3          | Spring Rolls         | Soup             | 135,000     | true            |
+| 4          | Seafood Soup         | Salad            | 160,000     | true            |
+| 5          | Caesar Salad         | Seafood          | 185,000     | true            |
+| 6          | Grilled Prawns       | Vietnamese Food  | 210,000     | true            |
+| 7          | Beef Steak           | Western Food     | 235,000     | true            |
+| 8          | Vegetable Curry      | Vegetarian       | 260,000     | **false** |
+| 9          | Chocolate Cake       | Dessert          | 285,000     | true            |
+| 10         | Vietnamese Coffee    | Coffee           | 310,000     | true            |
+| 11         | Lotus Tea            | Tea              | 335,000     | true            |
+| 12         | Mango Juice          | Juice            | 360,000     | true            |
+| 13         | Sunset Cocktail      | Cocktail         | 385,000     | **false** |
+| 14         | Blue Lagoon Mocktail | Mocktail         | 410,000     | true            |
+| 15         | Kids Pasta           | Kids Meal        | 435,000     | true            |
+| 16         | Club Sandwich        | Room Service Set | 460,000     | true            |
+| 17         | BBQ Platter          | BBQ              | 485,000     | true            |
+| 18         | Seafood Noodle       | Noodle           | 510,000     | true            |
+| 19         | Chicken Fried Rice   | Rice Dish        | 535,000     | true            |
+| 20         | Resort Combo         | Special Combo    | 560,000     | true            |

@@ -4,122 +4,298 @@
     ViewData["Title"] = "Manage Tours";
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-map-o mr-2" style="color: #dfa974;"></i> Manage Tours
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Tour Catalog Management — Master Data (UC04)</p>
-            </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef; /* surface-container-low */
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5; /* surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974; /* primary-container */
+            color: #633d11; /* on-primary-container */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+            transition: all 0.2s;
+            background: transparent;
+            margin: 0 2px;
+            text-decoration: none;
+        }
+        .action-btn:hover {
+            background: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            text-decoration: none;
+        }
+        .action-btn.delete:hover {
+            background: #ffdad6;
+            color: #ba1a1a;
+            border-color: #ba1a1a;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .luxury-badge.blue {
+            background-color: #d3e4fe;
+            color: #0b1c30;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .tour-image {
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Alert Styling */
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-alert.error {
+            background-color: #ffdad6;
+            color: #93000a;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Quản Lý Tour
+        </h2>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
     </div>
 </div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success border-0 shadow-sm px-4 py-3 mb-4" role="alert" id="alert-success" style="border-radius: 14px; background-color: #f0fdf4; color: #15803d; font-weight: 600;">
-            <i class="fa fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger border-0 shadow-sm px-4 py-3 mb-4" role="alert" id="alert-error" style="border-radius: 14px; background-color: #fef2f2; color: #b91c1c; font-weight: 600;">
-            <i class="fa fa-exclamation-triangle mr-2"></i> @TempData["ErrorMessage"]
-        </div>
-    }
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="luxury-alert success alert-dismissible fade show" role="alert" id="alert-success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="luxury-alert error alert-dismissible fade show" role="alert" id="alert-error">
+        <span class="material-symbols-outlined fill">error</span>
+        <div>@TempData["ErrorMessage"]</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
 
-<div class="card-box shadow-sm" style="border-top: 4px solid #dfa974; font-family: 'Cabin', sans-serif;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <span style="font-family: 'Lora', serif; font-size: 18px; font-weight: bold; color: #1a1a1a;">Tour List <span class="badge badge-primary ml-2" id="tour-count">@(Model?.Count() ?? 0)</span></span>
-        <a asp-action="Create" class="btn btn-primary btn-sm" style="background-color: #dfa974; border-color: #dfa974;" id="btn-create-tour">
-            <i class="fa fa-plus"></i> Create New Tour
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Tour</span>
+            <span class="luxury-badge blue">@(Model?.Count() ?? 0)</span>
+        </div>
+        <a asp-action="Create" class="btn-luxury" id="btn-create-tour">
+            <span class="material-symbols-outlined">add</span> Tạo Tour Mới
         </a>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0" id="tours-table">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Tour Name</th>
-                        <th>Price (VND)</th>
-                        <th>Capacity</th>
-                        <th>Duration</th>
-                        <th>Location</th>
-                        <th>Image</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        int rowNum = 1;
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="text-muted">@rowNum</td>
-                                <td><strong>@Html.DisplayFor(modelItem => item.TourName)</strong></td>
-                                <td>@(item.Price?.ToString("N0")) ₫</td>
-                                <td>
-                                    <span class="badge badge-info">@(item.MaxCapacity) pax</span>
-                                </td>
-                                <td>@(item.DurationHours) h</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(item.Location))
-                                    {
-                                        <i class="fa fa-map-marker text-danger"></i> @item.Location
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">—</span>
-                                    }
-                                </td>
-
-                                <td>
-                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                    {
-                                        <img src="@item.ImageUrl" alt="@item.TourName" style="width:50px;height:35px;object-fit:cover;border-radius:4px;" />
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted"><i class="fa fa-image"></i></span>
-                                    }
-                                </td>
-                                <td class="text-center text-nowrap">
-                                    <a asp-action="Details" asp-route-id="@item.TourId"
-                                       class="btn btn-sm btn-outline-info" title="Details" id="btn-details-@item.TourId">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.TourId"
-                                       class="btn btn-sm btn-outline-warning" title="Edit" id="btn-edit-@item.TourId">
-                                        <i class="fa fa-pencil"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.TourId"
-                                       class="btn btn-sm btn-outline-danger" title="Delete" id="btn-delete-@item.TourId">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            rowNum++;
-                        }
-                    }
-                    else
+    
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="tours-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Tên Tour</th>
+                    <th>Giá (VNĐ)</th>
+                    <th>Sức chứa</th>
+                    <th>Thời lượng</th>
+                    <th>Địa điểm</th>
+                    <th>Hình ảnh</th>
+                    <th style="text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int rowNum = 1;
+                    foreach (var item in Model)
                     {
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
-                                <i class="fa fa-info-circle"></i> No tours found. 
-                                <a asp-action="Create">Create the first tour</a>.
+                            <td style="color: #827569;">@rowNum</td>
+                            <td><strong style="color: #1c1c1a; font-weight: 600;">@Html.DisplayFor(modelItem => item.TourName)</strong></td>
+                            <td style="font-weight: 500; color: #805528;">@(item.Price?.ToString("N0")) ₫</td>
+                            <td>
+                                <span class="luxury-badge">@(item.MaxCapacity) khách</span>
+                            </td>
+                            <td>@(item.DurationHours) giờ</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Location))
+                                {
+                                    <div style="display: flex; align-items: center; gap: 4px; color: #50453b;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px; color: #ba1a1a;">location_on</span>
+                                        @item.Location
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span style="color: #d4c3b6;">—</span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.TourName" class="tour-image" />
+                                }
+                                else
+                                {
+                                    <div style="width: 60px; height: 40px; background: #f0ede9; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #a4b5ce;">
+                                        <span class="material-symbols-outlined">image</span>
+                                    </div>
+                                }
+                            </td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <a asp-action="Details" asp-route-id="@item.TourId"
+                                   class="action-btn" title="Chi tiết" id="btn-details-@item.TourId">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.TourId"
+                                   class="action-btn" title="Chỉnh sửa" id="btn-edit-@item.TourId">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.TourId"
+                                   class="action-btn delete" title="Xóa" id="btn-delete-@item.TourId">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                </a>
                             </td>
                         </tr>
+                        rowNum++;
                     }
-                </tbody>
-            </table>
-        </div>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">tour</span>
+                                <div>Chưa có tour nào. <a asp-action="Create" style="color: #805528; font-weight: 600; text-decoration: none;">Tạo tour đầu tiên</a>.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -129,9 +305,21 @@
             var alerts = document.querySelectorAll('#alert-success, #alert-error');
             alerts.forEach(function (el) {
                 if (el) {
-                    $(el).fadeOut(500);
+                    el.style.transition = "opacity 0.5s ease";
+                    el.style.opacity = "0";
+                    setTimeout(() => el.remove(), 500);
                 }
             });
         }, 4000);
+        
+        // Handle dismiss buttons
+        document.querySelectorAll('.luxury-alert .close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var alert = this.closest('.luxury-alert');
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            });
+        });
     </script>
 }

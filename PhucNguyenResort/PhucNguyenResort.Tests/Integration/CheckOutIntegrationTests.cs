@@ -94,14 +94,17 @@ namespace PhucNguyenResort.Tests.Integration
             Assert.True(processResult.Success);
 
             var dbBooking = await context.Bookings.FindAsync(1);
-            Assert.Equal(BookingStatus.CheckedOut, dbBooking.BookingStatus);
+            Assert.NotNull(dbBooking);
+            Assert.Equal(BookingStatus.CheckedOut, dbBooking!.BookingStatus);
             Assert.NotNull(dbBooking.ActualCheckOutTime);
 
             var dbRoom = await context.Rooms.FindAsync(101);
-            Assert.Equal(RoomStatus.NeedsCleaning, dbRoom.Status);
+            Assert.NotNull(dbRoom);
+            Assert.Equal(RoomStatus.NeedsCleaning, dbRoom!.Status);
 
             var dbFolio = await context.GuestFolios.FindAsync(1);
-            Assert.Equal(FolioStatus.Paid, dbFolio.Status);
+            Assert.NotNull(dbFolio);
+            Assert.Equal(FolioStatus.Paid, dbFolio!.Status);
 
             var invoice = await context.Invoices.FirstOrDefaultAsync(i => i.FolioId == 1);
             Assert.NotNull(invoice);

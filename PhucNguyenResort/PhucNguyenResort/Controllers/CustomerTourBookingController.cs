@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.Payments;
 using PhucNguyenResort.Services.Tours;
+using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.ViewModels.Payments;
 using PhucNguyenResort.ViewModels.Tours;
 using System.Security.Claims;
@@ -37,9 +38,9 @@ namespace PhucNguyenResort.Controllers
         /// GET: /CustomerTourBooking — Browse all available tours.
         /// Accessible by Guest + Customer.
         /// </summary>
-        public async Task<IActionResult> Index(string? search, string? sortBy)
+        public async Task<IActionResult> Index(string? search, string? sortBy, int page = 1)
         {
-            var model = await _tourBookingService.GetTourListAsync(search, sortBy);
+            var model = await _tourBookingService.GetTourListAsync(search, sortBy, page, 9);
             return View(model);
         }
 
@@ -79,7 +80,12 @@ namespace PhucNguyenResort.Controllers
             if (model.AvailableSlots <= 0)
             {
                 TempData["Error"] = "Lịch trình này đã hết chỗ.";
-                return RedirectToAction("Details", new { id = model.ScheduleId });
+                var schedule = await _context.TourSchedules.FindAsync(model.ScheduleId);
+                if (schedule != null)
+                {
+                    return RedirectToAction("Details", new { id = schedule.TourId });
+                }
+                return RedirectToAction(nameof(Index));
             }
 
             return View(model);
@@ -287,12 +293,12 @@ namespace PhucNguyenResort.Controllers
         [HttpPost]
         [Authorize(Roles = "Customer")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CancelTourBooking(int id)
+        public async Task<IActionResult> CancelTourBooking(int id, string? reason)
         {
             var userId = await GetCurrentUserIdAsync();
             if (userId == null) return RedirectToAction("Logout", "Account");
 
-            var result = await _tourBookingService.CancelTourBookingAsync(id, userId.Value);
+            var result = await _tourBookingService.CancelTourBookingAsync(id, userId.Value, reason);
 
             if (result.Success)
             {
@@ -326,6 +332,22 @@ namespace PhucNguyenResort.Controllers
 
             if (booking != null && booking.User != null && !string.IsNullOrEmpty(booking.User.Email))
             {
+                var hostString = Request.Host.ToString();
+                if (hostString.StartsWith("localhost", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var ip = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName())
+                                    .AddressList.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                        if (ip != null)
+                        {
+                            hostString = hostString.Replace("localhost", ip.ToString(), StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+                    catch { }
+                }
+                var qrUrl = $"{Request.Scheme}://{hostString}/Tours/CheckTicket?ticketId={booking.TourBookingId}";
+                var qrImageSrc = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={Uri.EscapeDataString(qrUrl)}";
 
 
                 string subject = "Xác nhận đặt Tour thành công - PhucNguyen Resort";
@@ -356,9 +378,22 @@ namespace PhucNguyenResort.Controllers
                             <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Tổng tiền</td>
                             <td style='padding: 10px; border: 1px solid #ddd; color: #dfa974; font-weight: bold;'>{booking.TotalAmount?.ToString("N0")} VNĐ</td>
                         </tr>
-
+                        <tr>
+                            <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Mã Vé & QR</td>
+                            <td style='padding: 10px; border: 1px solid #ddd; text-align: center;'>
+                                <div>Mã vé: <strong>{booking.TourBookingId}</strong></div>
+                                <div style='margin-top: 10px;'>
+                                    <img src='{qrUrl}' alt='QR Code Vé Tour' style='width: 250px; height: 250px; display: inline-block;' />
+                                </div>
+                            </td>
+                        </tr>
                     </table>
                     
+                    <div style='text-align: center; margin-top: 30px;'>
+                        <p style='font-size: 14px; color: #555; margin-bottom: 10px;'><strong>Mã QR Check-in</strong><br>Vui lòng lưu lại hình ảnh này và đưa cho nhân viên khi bắt đầu tour</p>
+                        <img src='{qrImageSrc}' alt='QR Code Check-in' style='border: 1px solid #ddd; padding: 10px; border-radius: 10px; background: #fff;' />
+                    </div>
+
                     <p style='margin-top: 20px;'>Chúng tôi rất mong được đón tiếp bạn tham gia chuyến đi đầy thú vị này. Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ lễ tân.</p>
                     <p style='margin-top: 30px; text-align: center; color: #777; font-size: 12px;'>PhucNguyen Resort &copy; {DateTime.Now.Year}</p>
                 </div>";

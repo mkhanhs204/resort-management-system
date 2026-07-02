@@ -25,16 +25,19 @@ namespace PhucNguyenResort.Web.Controllers
     {
         private readonly PhucNguyenResort.Services.FoodOrders.IFoodOrderService _foodOrderService;
         private readonly PhucNguyenResort.Services.Kots.IKotService _kotService;
-        private readonly ResortDbContext _context;
+        private readonly PhucNguyenResort.Data.ResortDbContext _context;
+        private readonly ITableReservationService _tableReservationService;
 
         public DashboardController(
             PhucNguyenResort.Services.FoodOrders.IFoodOrderService foodOrderService,
             PhucNguyenResort.Services.Kots.IKotService kotService,
-            ResortDbContext context)
+            PhucNguyenResort.Data.ResortDbContext context,
+            ITableReservationService tableReservationService)
         {
             _foodOrderService = foodOrderService;
             _kotService = kotService;
             _context = context;
+            _tableReservationService = tableReservationService;
         }
 
         // Trang chính: Tự động chuyển hướng đến dashboard phù hợp với role của người dùng
@@ -52,10 +55,94 @@ namespace PhucNguyenResort.Web.Controllers
             return View();
         }
 
-        [Authorize(Roles = "System Admin")] public IActionResult Admin() => View();
-        [Authorize(Roles = "Business Manager")] public IActionResult Manager() => View();
-        [Authorize(Roles = "Receptionist")] public IActionResult Receptionist() => View();
-        [Authorize(Roles = "F&B Staff")] public IActionResult FnB() => View();
+        // 1. System Admin Dashboard
+        [Authorize(Roles = "System Admin")]
+        public async Task<IActionResult> Admin()
+        {
+            var totalStaff = await _context.Users.CountAsync();
+            var activeAccounts = await _context.Users.CountAsync(u => u.IsActive && !u.IsBlocked);
+            var systemRoles = await _context.Roles.CountAsync();
+            var inactiveAccounts = totalStaff - activeAccounts;
+
+            ViewBag.TotalStaff = totalStaff;
+            ViewBag.ActiveAccounts = activeAccounts;
+            ViewBag.SystemRoles = systemRoles;
+            ViewBag.InactiveAccounts = inactiveAccounts;
+
+            var recentStaff = await _context.Users
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(5)
+                .ToListAsync();
+
+            ViewBag.RecentStaff = recentStaff;
+
+            return View();
+        }
+
+        // 2. Business Manager Dashboard
+        [Authorize(Roles = "Business Manager")]
+        public async Task<IActionResult> Manager()
+        {
+            var model = await _tableReservationService.GetFnBDashboardAsync(DateTime.Today);
+            
+            ViewBag.TotalRoomCategories = await _context.RoomCategories.CountAsync();
+            ViewBag.TotalTours = await _context.Tours.CountAsync();
+            ViewBag.PendingRefunds = await _context.Refunds.CountAsync(r => r.RefundStatus == PhucNguyenResort.Enums.RefundStatus.Pending);
+
+            return View(model);
+        }
+
+        // 3. Receptionist (Front Desk) Dashboard
+        [Authorize(Roles = "Receptionist")]
+        public async Task<IActionResult> Receptionist()
+        {
+            var today = DateTime.Today;
+
+            var todaysArrivals = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Bookings.Where(b => b.CheckInDate.Date == today && b.BookingStatus != Enums.BookingStatus.Cancelled)
+            );
+
+            var activeStayGuests = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Bookings.Where(b => b.BookingStatus == Enums.BookingStatus.CheckedIn)
+            );
+
+            var todaysDepartures = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Bookings.Where(b => b.CheckOutDate.Date == today && b.BookingStatus != Enums.BookingStatus.Cancelled)
+            );
+
+            var availableRooms = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
+                _context.Rooms.Where(r => r.Status == Enums.RoomStatus.Available)
+            );
+
+            var recentBookings = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
+                _context.Bookings
+                    .Include(b => b.User)
+                    .Include(b => b.BookingDetails)
+                        .ThenInclude(bd => bd.Room)
+                    .OrderByDescending(b => b.BookingId)
+                    .Take(5)
+            );
+
+            var model = new PhucNguyenResort.ViewModels.Dashboard.ReceptionistDashboardViewModel
+            {
+                TodaysArrivals = todaysArrivals,
+                ActiveStayGuests = activeStayGuests,
+                TodaysDepartures = todaysDepartures,
+                AvailableRooms = availableRooms,
+                RecentBookings = recentBookings
+            };
+
+            return View(model);
+        }
+
+        // 4. F&B Staff Dashboard
+        [Authorize(Roles = "F&B Staff")]
+        public async Task<IActionResult> FnB()
+        {
+            var model = await _tableReservationService.GetFnBDashboardAsync(DateTime.Today);
+            return View(model);
+        }
 
         [Authorize(Roles = "F&B Staff")]
         public async Task<IActionResult> FoodOrders()
@@ -73,6 +160,114 @@ namespace PhucNguyenResort.Web.Controllers
             if (result.Status == PhucNguyenResort.Services.FoodOrders.FoodOrderActionStatus.Success) TempData["SuccessMessage"] = "Food order status updated successfully.";
             else TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to update food order status.";
             return RedirectToAction(nameof(FoodOrders));
+        }
+
+        [Authorize(Roles = "F&B Staff,Business Manager")]
+        public async Task<IActionResult> TableReservations(DateTime? date, TableReservationStatus? status)
+        {
+            var reservations = await _tableReservationService.GetStaffReservationsAsync(date, status);
+            ViewBag.SelectedDate = date;
+            ViewBag.SelectedStatus = status;
+            ViewBag.CanManageReservationStatus = User.IsInRole("F&B Staff");
+            ViewBag.BackAction = User.IsInRole("Business Manager") ? nameof(Manager) : nameof(FnB);
+
+            return View("~/Views/Dashboard/TableReservations.cshtml", reservations);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmTableReservation(int reservationId)
+        {
+            var currentUserId = GetCurrentUserId();
+            if (!currentUserId.HasValue)
+            {
+                return Challenge();
+            }
+
+            var success = await _tableReservationService.ConfirmReservationAsync(
+                reservationId,
+                currentUserId.Value);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation confirmed successfully."
+                : "Unable to confirm this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SeatTableReservation(int reservationId)
+        {
+            var success = await _tableReservationService.SeatReservationAsync(reservationId);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Guest has been seated successfully."
+                : "Unable to seat this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteTableReservation(int reservationId)
+        {
+            var success = await _tableReservationService.CompleteReservationAsync(reservationId);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation completed successfully."
+                : "Unable to complete this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkTableReservationNoShow(int reservationId)
+        {
+            var success = await _tableReservationService.MarkReservationNoShowAsync(reservationId);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation was marked as no-show."
+                : "No-show can only be marked after the table hold period has passed.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelTableReservation(int reservationId, string? reason)
+        {
+            var currentUserId = GetCurrentUserId();
+            if (!currentUserId.HasValue)
+            {
+                return Challenge();
+            }
+
+            var success = await _tableReservationService.CancelReservationByStaffAsync(
+                reservationId,
+                currentUserId.Value,
+                reason);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Table reservation cancelled successfully."
+                : "Unable to cancel this table reservation.";
+
+            return RedirectToAction(nameof(TableReservations));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "F&B Staff")]
+        [ValidateAntiForgeryToken]
+        public IActionResult ChargeTableReservationToRoom(int reservationId, decimal amount)
+        {
+            TempData["ErrorMessage"] = "Please use table food order checkout. Manual table charge amounts are no longer supported.";
+            return RedirectToAction("Checkout", "TableFoodOrders", new { reservationId });
         }
 
         [HttpPost]
@@ -161,7 +356,20 @@ namespace PhucNguyenResort.Web.Controllers
             return View("~/Views/Dashboard/TourGuide.cshtml", activeSchedules);
         }
 
-        [Authorize(Roles = "Housekeeping Staff")] public IActionResult Housekeeping() => View();
-        [Authorize(Roles = "Maintenance Staff")] public IActionResult Maintenance() => View();
+        // 8. Maintenance Staff Dashboard
+        [Authorize(Roles = "Maintenance Staff")]
+        public IActionResult Maintenance()
+        {
+            return View();
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return int.TryParse(userIdValue, out var userId)
+                ? userId
+                : null;
+        }
     }
 }

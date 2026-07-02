@@ -836,20 +836,15 @@ namespace PhucNguyenResort.Services.Reception
 
             model.BalanceDue = Math.Max(0, model.TotalAmount - model.DepositAmount);
 
+            var foodOrderTypesByReferenceId = await GetFoodOrderTypesByReferenceIdAsync(folio.FolioTransactions);
+
             // Mapping transactions
-            var transactions = folio.FolioTransactions.Select(t => new FolioTransactionDto
+            var transactions = folio.FolioTransactions
+                .OrderBy(t => t.CreatedAt)
+                .Select(t => new FolioTransactionDto
             {
                 TransactionId = t.TransactionId,
-                TransactionTypeName = t.TransactionType switch
-                {
-                    FolioTransactionType.RoomCharge => "Tiền phòng",
-                    FolioTransactionType.FoodCharge => "Tiền ăn uống",
-                    FolioTransactionType.TourCharge => "Tiền tour",
-                    FolioTransactionType.Adjustment => "Điều chỉnh",
-                    FolioTransactionType.Payment => "Thanh toán",
-                    FolioTransactionType.Refund => "Hoàn tiền",
-                    _ => t.TransactionType.ToString()
-                },
+                TransactionTypeName = ResolveTransactionTypeName(t, booking, foodOrderTypesByReferenceId),
                 Amount = t.Amount,
                 CreatedAt = t.CreatedAt
             }).ToList();
@@ -958,7 +953,8 @@ namespace PhucNguyenResort.Services.Reception
                     Invoice = invoice,
                     Amount = model.BalanceDue,
                     PaidAt = now,
-                    PaymentMethod = model.SelectedPaymentMethod
+                    PaymentMethod = model.SelectedPaymentMethod.Value,
+                    PaymentStatus = PaymentStatus.Success
                 };
                 _context.Payments.Add(payment);
             }
@@ -1081,19 +1077,14 @@ namespace PhucNguyenResort.Services.Reception
             }
             // Actually, we can just use the transactions list for details.
             
-            model.Transactions = folio.FolioTransactions.Select(t => new FolioTransactionDto
+            var foodOrderTypesByReferenceId = await GetFoodOrderTypesByReferenceIdAsync(folio.FolioTransactions);
+
+            model.Transactions = folio.FolioTransactions
+                .OrderBy(t => t.CreatedAt)
+                .Select(t => new FolioTransactionDto
             {
                 TransactionId = t.TransactionId,
-                TransactionTypeName = t.TransactionType switch
-                {
-                    FolioTransactionType.RoomCharge => "Tiền phòng",
-                    FolioTransactionType.FoodCharge => "Tiền ăn uống",
-                    FolioTransactionType.TourCharge => "Tiền tour",
-                    FolioTransactionType.Adjustment => "Điều chỉnh",
-                    FolioTransactionType.Payment => "Thanh toán",
-                    FolioTransactionType.Refund => "Hoàn tiền",
-                    _ => t.TransactionType.ToString()
-                },
+                TransactionTypeName = ResolveTransactionTypeName(t, booking, foodOrderTypesByReferenceId),
                 Amount = t.Amount,
                 CreatedAt = t.CreatedAt
             }).ToList();
@@ -1112,6 +1103,62 @@ namespace PhucNguyenResort.Services.Reception
             }
 
             return model;
+        }
+
+        private async Task<Dictionary<int, FoodOrderType>> GetFoodOrderTypesByReferenceIdAsync(
+            IEnumerable<FolioTransaction> transactions)
+        {
+            var foodOrderIds = transactions
+                .Where(t => t.TransactionType == FolioTransactionType.FoodCharge && t.ReferenceId.HasValue)
+                .Select(t => t.ReferenceId!.Value)
+                .Distinct()
+                .ToList();
+
+            if (foodOrderIds.Count == 0)
+            {
+                return new Dictionary<int, FoodOrderType>();
+            }
+
+            return await _context.FoodOrders
+                .AsNoTracking()
+                .Where(order => foodOrderIds.Contains(order.FoodOrderId))
+                .ToDictionaryAsync(order => order.FoodOrderId, order => order.OrderType);
+        }
+
+        private static string? ResolveTransactionTypeName(
+            FolioTransaction transaction,
+            Booking booking,
+            IReadOnlyDictionary<int, FoodOrderType> foodOrderTypesByReferenceId)
+        {
+            if (transaction.TransactionType == FolioTransactionType.FoodCharge &&
+                transaction.ReferenceId.HasValue &&
+                foodOrderTypesByReferenceId.TryGetValue(transaction.ReferenceId.Value, out var orderType))
+            {
+                return orderType == FoodOrderType.TableService
+                    ? "Tiền ăn tại bàn"
+                    : "Tiền gọi món lên phòng";
+            }
+
+            if (transaction.TransactionType == FolioTransactionType.RoomCharge)
+            {
+                if (transaction.Amount == booking.TotalAmount)
+                    return "Tiền phòng đặt trước";
+                if (transaction.CreatedAt.Date == booking.CheckInDate.Date)
+                    return "Phụ thu nhận phòng sớm";
+                if (transaction.CreatedAt.Date >= booking.CheckOutDate.Date)
+                    return "Phụ thu trả phòng muộn";
+                return "Phụ thu tiền phòng";
+            }
+
+            return transaction.TransactionType switch
+            {
+                FolioTransactionType.FoodCharge => "Tiền ăn uống",
+                FolioTransactionType.TourCharge => "Tiền tour",
+                FolioTransactionType.Adjustment => "Điều chỉnh",
+                FolioTransactionType.Payment => "Thanh toán",
+                FolioTransactionType.Refund => "Hoàn tiền",
+                _ => transaction.TransactionType.ToString()
+            };
         }
 
         private void SendCheckOutEmail(Booking booking, Invoice invoice)

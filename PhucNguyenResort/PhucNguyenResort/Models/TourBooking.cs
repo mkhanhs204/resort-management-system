@@ -19,8 +19,11 @@ namespace PhucNguyenResort.Models
 
         public TourBookingStatus BookingStatus { get; set; } = TourBookingStatus.Pending;
 
-        [StringLength(100)]
-        public string? PrimaryGuestName { get; set; }
+    [StringLength(500)]
+    public string? CancellationReason { get; set; }
+
+    [StringLength(100)]
+    public string? PrimaryGuestName { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime? PrimaryGuestDateOfBirth { get; set; }

@@ -7,6 +7,7 @@ using PhucNguyenResort.Models;
 using PhucNguyenResort.ViewModels.Users;
 using System.Security.Claims;
 using System.Text;
+using PhucNguyenResort.Helpers;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -180,6 +181,44 @@ namespace PhucNguyenResort.Controllers
                     CheckOutDate = booking.CheckOutDate
                 })
                 .ToListAsync();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            if (!TryGetCurrentUserId(out var currentUserId))
+            {
+                return Challenge();
+            }
+
+            if (string.IsNullOrEmpty(currentPassword) || string.IsNullOrEmpty(newPassword) || newPassword != confirmPassword)
+            {
+                TempData["ErrorMessage"] = "Thông tin mật khẩu không hợp lệ hoặc mật khẩu xác nhận không khớp.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var user = await _context.Users.FindAsync(currentUserId);
+            if (user == null) return NotFound();
+
+            if (string.IsNullOrEmpty(user.PasswordHash))
+            {
+                TempData["ErrorMessage"] = "Tài khoản của bạn đăng nhập qua Google, không thể đổi mật khẩu.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var isValidPassword = PasswordHelper.VerifyPassword(user, user.PasswordHash, currentPassword);
+            if (!isValidPassword)
+            {
+                TempData["ErrorMessage"] = "Mật khẩu hiện tại không đúng.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            user.PasswordHash = PasswordHelper.HashPassword(user, newPassword);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+            return RedirectToAction(nameof(Index));
         }
 
         private bool TryGetCurrentUserId(out int currentUserId)

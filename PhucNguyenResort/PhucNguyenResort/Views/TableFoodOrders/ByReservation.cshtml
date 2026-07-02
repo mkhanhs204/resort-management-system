@@ -1,0 +1,98 @@
+@using PhucNguyenResort.Enums
+@model IReadOnlyList<PhucNguyenResort.ViewModels.TableFoodOrders.TableFoodOrderListViewModel>
+@{
+    ViewData["Title"] = "Table Food Orders";
+    Layout = "_DashboardLayout";
+    var checkout = ViewBag.Checkout as PhucNguyenResort.ViewModels.TableFoodOrders.TableFoodOrderCheckoutViewModel;
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-list mr-2" style="color: #007bff;"></i> Table Food Orders
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">
+                    @checkout?.ReservationCode - @checkout?.TableName (@checkout?.TableNumber) - Party @checkout?.PartySize
+                </p>
+            </div>
+            <div>
+                <a asp-action="Create" asp-route-reservationId="@checkout?.ReservationId" class="btn btn-primary mr-2">
+                    <i class="fa fa-plus mr-1"></i> Create Order
+                </a>
+                <a asp-action="Checkout" asp-route-reservationId="@checkout?.ReservationId" class="btn btn-warning mr-2">
+                    <i class="fa fa-credit-card mr-1"></i> Checkout
+                </a>
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-outline-secondary">
+                    <i class="fa fa-arrow-left mr-1"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="card-box" style="border-top: 5px solid #007bff;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" style="font-family: 'Cabin', sans-serif;">
+            <thead class="bg-light">
+                <tr>
+                    <th>Order</th>
+                    <th>Ordered At</th>
+                    <th>Status</th>
+                    <th>Kitchen</th>
+                    <th class="text-right">Total</th>
+                    <th>Payment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No table food orders found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var order in Model)
+                    {
+                        <tr>
+                            <td><strong>#@order.FoodOrderId</strong></td>
+                            <td>@order.OrderedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <span class="badge @(order.OrderStatus == FoodOrderStatus.Cancelled ? "badge-danger" : order.OrderStatus == FoodOrderStatus.Delivered ? "badge-success" : "badge-warning")">
+                                    @order.OrderStatus
+                                </span>
+                            </td>
+                            <td>@(order.KitchenStatus?.ToString() ?? "N/A")</td>
+                            <td class="text-right">@order.TotalAmount.ToString("N0") VND</td>
+                            <td>
+                                @if (order.IsChargedToRoom)
+                                {
+                                    <span class="badge badge-success">Charged to room</span>
+                                }
+                                else if (order.IsPaidAtRestaurant)
+                                {
+                                    <span class="badge badge-info">Paid at restaurant</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-light border text-muted">Unpaid</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

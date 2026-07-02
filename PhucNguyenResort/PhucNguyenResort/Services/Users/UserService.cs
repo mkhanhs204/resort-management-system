@@ -13,19 +13,18 @@ namespace PhucNguyenResort.Services.Users
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllStaffAsync()
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             return await _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Role != null && u.Role.RoleName != "Customer")
                 .ToListAsync();
         }
 
-        public async Task<User?> GetStaffByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(int id)
         {
             return await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.UserId == id && u.Role != null && u.Role.RoleName != "Customer");
+                .FirstOrDefaultAsync(u => u.UserId == id);
         }
 
         public async Task<User> AddStaffAsync(User user)
@@ -41,15 +40,28 @@ namespace PhucNguyenResort.Services.Users
             await _context.SaveChangesAsync();
         }
 
-        public async Task ToggleStaffStatusAsync(int id)
+        public async Task ToggleUserStatusAsync(int id)
         {
             var user = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.UserId == id && u.Role != null && u.Role.RoleName != "Customer");
+                .FirstOrDefaultAsync(u => u.UserId == id);
 
             if (user != null)
             {
                 user.IsActive = !user.IsActive;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task ToggleUserBlockStatusAsync(int id)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.UserId == id);
+
+            if (user != null)
+            {
+                user.IsBlocked = !user.IsBlocked;
                 await _context.SaveChangesAsync();
             }
         }

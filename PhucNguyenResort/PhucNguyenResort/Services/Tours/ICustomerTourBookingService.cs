@@ -13,7 +13,7 @@ namespace PhucNguyenResort.Services.Tours
         /// <summary>
         /// Get all active tours for customer browsing with optional search/sort.
         /// </summary>
-        Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy);
+        Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy, int page = 1, int pageSize = 9);
 
         /// <summary>
         /// Get tour detail with upcoming schedules.
@@ -38,7 +38,7 @@ namespace PhucNguyenResort.Services.Tours
         /// <summary>
         /// Cancel a tour booking and restore available slots.
         /// </summary>
-        Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId);
+        Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId, string? reason = null);
 
         /// <summary>
         /// Confirm a pending tour booking after VNPay payment success.

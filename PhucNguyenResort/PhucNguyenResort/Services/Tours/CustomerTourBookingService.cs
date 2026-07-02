@@ -24,7 +24,7 @@ namespace PhucNguyenResort.Services.Tours
         }
 
         /// <inheritdoc/>
-        public async Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy)
+        public async Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy, int page = 1, int pageSize = 9)
         {
             var query = _context.Tours
                 .Include(t => t.TourSchedules)
@@ -50,6 +50,9 @@ namespace PhucNguyenResort.Services.Tours
                 Description = t.Description,
                 Price = t.Price ?? 0,
                 MaxCapacity = t.MaxCapacity ?? 0,
+                TotalAvailableSlots = t.TourSchedules
+                    .Where(s => s.TourDate != null && s.TourDate >= DateTime.Today && (s.AvailableSlots ?? 0) > 0)
+                    .Sum(s => s.AvailableSlots ?? 0),
                 DurationHours = t.DurationHours ?? 0,
                 Location = t.Location,
                 ImageUrl = t.ImageUrl,
@@ -71,12 +74,17 @@ namespace PhucNguyenResort.Services.Tours
                 _ => tourCards.OrderBy(t => t.TourName).ToList()
             };
 
+            int totalCount = tourCards.Count;
+            var pagedTours = tourCards.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
             return new TourListVM
             {
-                Tours = tourCards,
+                Tours = pagedTours,
                 SearchKeyword = searchKeyword,
                 SortBy = sortBy,
-                TotalCount = tourCards.Count
+                TotalCount = totalCount,
+                CurrentPage = page,
+                PageSize = pageSize
             };
         }
 
@@ -87,6 +95,7 @@ namespace PhucNguyenResort.Services.Tours
                 .Include(t => t.TourSchedules)
                     .ThenInclude(s => s.Guide)
                 .Include(t => t.Reviews)
+                    .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(t => t.TourId == tourId);
 
             if (tour == null) return null;
@@ -103,6 +112,17 @@ namespace PhucNguyenResort.Services.Tours
                 ImageUrl = tour.ImageUrl,
                 AverageRating = tour.Reviews.Any() ? tour.Reviews.Average(r => r.Rating ?? 0) : 0,
                 ReviewCount = tour.Reviews.Count,
+                Reviews = tour.Reviews.Where(r => r.IsVisible).Select(r => new PhucNguyenResort.ViewModels.Reviews.ReviewListVM
+                {
+                    ReviewId = r.ReviewId,
+                    UserName = string.IsNullOrEmpty(r.User?.FullName) ? "Khách hàng" : r.User.FullName,
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    IsVisible = r.IsVisible,
+                    CreatedAt = r.CreatedAt,
+                    ServiceType = "Tour",
+                    ServiceName = tour.TourName
+                }).OrderByDescending(r => r.CreatedAt).ToList(),
                 UpcomingSchedules = tour.TourSchedules
                     .Where(s => s.TourDate != null && s.TourDate >= DateTime.Today)
                     .OrderBy(s => s.TourDate)
@@ -222,6 +242,7 @@ namespace PhucNguyenResort.Services.Tours
 
                 // Validate Charge to Room (BR-TOUR-02)
                 int? linkedBookingId = null;
+                GuestFolio? guestFolio = null;
                 if (model.PaymentMethod == "ChargeToRoom")
                 {
                     if (!model.RoomBookingId.HasValue)
@@ -254,13 +275,22 @@ namespace PhucNguyenResort.Services.Tours
                     }
 
                     linkedBookingId = roomBooking.BookingId;
+                    guestFolio = roomBooking.GuestFolio;
 
                     // Add charge to GuestFolio
-                    if (roomBooking.GuestFolio != null)
+                    if (guestFolio == null)
                     {
-                        roomBooking.GuestFolio.TotalTourCharges += totalAmount;
-                        roomBooking.GuestFolio.TotalAmount += totalAmount;
+                        // Auto-create Folio if it's missing for some reason
+                        guestFolio = new GuestFolio
+                        {
+                            BookingId = roomBooking.BookingId,
+                            Status = FolioStatus.Unpaid
+                        };
+                        _context.GuestFolios.Add(guestFolio);
                     }
+                    
+                    guestFolio.TotalTourCharges += totalAmount;
+                    guestFolio.TotalAmount += totalAmount;
                 }
 
                 // Deduct available slots
@@ -287,6 +317,21 @@ namespace PhucNguyenResort.Services.Tours
 
                 _context.TourBookings.Add(tourBooking);
                 await _context.SaveChangesAsync();
+
+                if (guestFolio != null && model.PaymentMethod == "ChargeToRoom")
+                {
+                    var folioTransaction = new FolioTransaction
+                    {
+                        Folio = guestFolio, // Use navigation property so EF handles ID if it's new
+                        TransactionType = FolioTransactionType.TourCharge,
+                        ReferenceId = tourBooking.TourBookingId,
+                        Amount = totalAmount,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.FolioTransactions.Add(folioTransaction);
+                    await _context.SaveChangesAsync();
+                }
+
                 await transaction.CommitAsync();
 
                 return new TourBookingResultVM
@@ -306,12 +351,43 @@ namespace PhucNguyenResort.Services.Tours
         /// <inheritdoc/>
         public async Task<List<MyTourBookingItemVM>> GetUserTourBookingsAsync(int userId)
         {
+            // Auto-cancel pending bookings older than 1 minute
+            var expiredBookings = await _context.TourBookings
+                .Include(tb => tb.Schedule)
+                .Where(tb => tb.UserId == userId && tb.BookingStatus == TourBookingStatus.Pending)
+                .ToListAsync();
+
+            bool hasChanges = false;
+            foreach (var tb in expiredBookings)
+            {
+                if ((DateTime.Now - tb.CreatedAt).TotalMinutes >= 1)
+                {
+                    tb.BookingStatus = TourBookingStatus.Cancelled;
+                    tb.CancellationReason = "Hết hạn thanh toán VNPay";
+                    if (tb.Schedule != null && tb.Schedule.AvailableSlots.HasValue)
+                    {
+                        tb.Schedule.AvailableSlots += tb.Participants ?? 0;
+                    }
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
+            {
+                await _context.SaveChangesAsync();
+            }
+
             var bookings = await _context.TourBookings
                 .Include(tb => tb.Schedule)
                     .ThenInclude(s => s.Tour)
                 .Include(tb => tb.Payments)
                 .Where(tb => tb.UserId == userId)
                 .OrderByDescending(tb => tb.TourBookingId)
+                .ToListAsync();
+
+            var userReviewedTourBookingIds = await _context.Reviews
+                .Where(r => r.UserId == userId && r.TourBookingId != null)
+                .Select(r => r.TourBookingId!.Value)
                 .ToListAsync();
 
             return bookings.Select(tb =>
@@ -336,6 +412,7 @@ namespace PhucNguyenResort.Services.Tours
                 return new MyTourBookingItemVM
                 {
                     TourBookingId = tb.TourBookingId,
+                    TourId = tb.Schedule?.TourId ?? 0,
                     TourName = tb.Schedule?.Tour?.TourName ?? "N/A",
                     TourImage = tb.Schedule?.Tour?.ImageUrl,
                     Location = tb.Schedule?.Tour?.Location,
@@ -346,13 +423,15 @@ namespace PhucNguyenResort.Services.Tours
                     BookingStatus = tb.BookingStatus.ToString(),
                     CanCancel = canCancel,
                     PaymentMethod = paymentMethod,
-                    CreatedAt = tb.CreatedAt
+                    CreatedAt = tb.CreatedAt,
+                    CancellationReason = tb.CancellationReason,
+                    HasReviewed = userReviewedTourBookingIds.Contains(tb.TourBookingId)
                 };
             }).ToList();
         }
 
         /// <inheritdoc/>
-        public async Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId)
+        public async Task<TourBookingResultVM> CancelTourBookingAsync(int tourBookingId, int userId, string? reason = null)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -415,9 +494,20 @@ namespace PhucNguyenResort.Services.Tours
                     var chargeAmount = tourBooking.TotalAmount ?? 0;
                     folio.TotalTourCharges = Math.Max(0, folio.TotalTourCharges - chargeAmount);
                     folio.TotalAmount = Math.Max(0, folio.TotalAmount - chargeAmount);
+
+                    var folioTransaction = new FolioTransaction
+                    {
+                        FolioId = folio.FolioId,
+                        TransactionType = FolioTransactionType.Refund,
+                        ReferenceId = tourBooking.TourBookingId,
+                        Amount = chargeAmount,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.FolioTransactions.Add(folioTransaction);
                 }
 
                 tourBooking.BookingStatus = TourBookingStatus.Cancelled;
+                tourBooking.CancellationReason = reason;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();

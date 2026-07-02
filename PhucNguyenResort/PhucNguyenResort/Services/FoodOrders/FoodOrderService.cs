@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Models;
+using PhucNguyenResort.Services.Email;
 using PhucNguyenResort.ViewModels.FoodOrders;
+using System.Net;
 
 namespace PhucNguyenResort.Services.FoodOrders;
 
@@ -11,10 +13,12 @@ public class FoodOrderService : IFoodOrderService
     private const int NoteMaxLength = 500;
 
     private readonly ResortDbContext _context;
+    private readonly IEmailSender _emailSender;
 
-    public FoodOrderService(ResortDbContext context)
+    public FoodOrderService(ResortDbContext context, IEmailSender emailSender)
     {
         _context = context;
+        _emailSender = emailSender;
     }
 
     public async Task<MenuCategoryBrowseViewModel> BuildMenuCategoriesAsync(int? bookingId, int? userId)
@@ -336,6 +340,7 @@ public class FoodOrderService : IFoodOrderService
 
         var foodOrder = new FoodOrder
         {
+            OrderType = FoodOrderType.RoomService,
             BookingId = request.BookingId,
             BookingDetailId = request.BookingDetailId,
             OrderStatus = FoodOrderStatus.Pending,
@@ -392,6 +397,8 @@ public class FoodOrderService : IFoodOrderService
                 .ThenInclude(booking => booking!.User)
             .Include(order => order.BookingDetail)
                 .ThenInclude(bookingDetail => bookingDetail!.Room)
+            .Include(order => order.TableReservation)
+                .ThenInclude(reservation => reservation!.Table)
             .Include(order => order.Kot)
             .Include(order => order.FoodOrderItems)
                 .ThenInclude(orderItem => orderItem.MenuItem)
@@ -413,9 +420,13 @@ public class FoodOrderService : IFoodOrderService
         return new FoodOrderDetailViewModel
         {
             FoodOrderId = foodOrder.FoodOrderId,
+            OrderType = foodOrder.OrderType,
             BookingId = foodOrder.BookingId,
+            TableReservationId = foodOrder.TableReservationId,
             CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
             RoomNumber = foodOrder.BookingDetail?.Room?.RoomNumber ?? string.Empty,
+            TableName = foodOrder.TableReservation?.Table?.TableName ?? string.Empty,
+            TableNumber = foodOrder.TableReservation?.Table?.TableNumber ?? string.Empty,
             OrderStatus = foodOrder.OrderStatus,
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
@@ -447,6 +458,8 @@ public class FoodOrderService : IFoodOrderService
                 .ThenInclude(booking => booking!.User)
             .Include(order => order.BookingDetail)
                 .ThenInclude(bookingDetail => bookingDetail!.Room)
+            .Include(order => order.TableReservation)
+                .ThenInclude(reservation => reservation!.Table)
             .Include(order => order.Kot)
             .Include(order => order.FoodOrderItems)
                 .ThenInclude(orderItem => orderItem.MenuItem)
@@ -457,9 +470,13 @@ public class FoodOrderService : IFoodOrderService
         return foodOrders.Select(foodOrder => new FoodOrderDetailViewModel
         {
             FoodOrderId = foodOrder.FoodOrderId,
+            OrderType = foodOrder.OrderType,
             BookingId = foodOrder.BookingId,
+            TableReservationId = foodOrder.TableReservationId,
             CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
             RoomNumber = foodOrder.BookingDetail?.Room?.RoomNumber ?? string.Empty,
+            TableName = foodOrder.TableReservation?.Table?.TableName ?? string.Empty,
+            TableNumber = foodOrder.TableReservation?.Table?.TableNumber ?? string.Empty,
             OrderStatus = foodOrder.OrderStatus,
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
@@ -491,6 +508,8 @@ public class FoodOrderService : IFoodOrderService
                 .ThenInclude(booking => booking!.User)
             .Include(order => order.BookingDetail)
                 .ThenInclude(bookingDetail => bookingDetail!.Room)
+            .Include(order => order.TableReservation)
+                .ThenInclude(reservation => reservation!.Table)
             .Include(order => order.Kot)
             .Include(order => order.FoodOrderItems)
                 .ThenInclude(orderItem => orderItem.MenuItem)
@@ -502,9 +521,13 @@ public class FoodOrderService : IFoodOrderService
         return foodOrders.Select(foodOrder => new FoodOrderDetailViewModel
         {
             FoodOrderId = foodOrder.FoodOrderId,
+            OrderType = foodOrder.OrderType,
             BookingId = foodOrder.BookingId,
+            TableReservationId = foodOrder.TableReservationId,
             CustomerName = foodOrder.Booking?.User?.FullName ?? string.Empty,
             RoomNumber = foodOrder.BookingDetail?.Room?.RoomNumber ?? string.Empty,
+            TableName = foodOrder.TableReservation?.Table?.TableName ?? string.Empty,
+            TableNumber = foodOrder.TableReservation?.Table?.TableNumber ?? string.Empty,
             OrderStatus = foodOrder.OrderStatus,
             KitchenStatus = foodOrder.Kot?.Status,
             TotalAmount = foodOrder.TotalAmount ?? 0,
@@ -629,6 +652,10 @@ public class FoodOrderService : IFoodOrderService
         }
 
         await _context.SaveChangesAsync();
+        await SendFoodOrderEmailAsync(
+            foodOrder.FoodOrderId,
+            "Food order status updated",
+            $"Your room service order status has been updated to {newStatus}.");
 
         return FoodOrderActionResult.Succeeded();
     }
@@ -642,6 +669,13 @@ public class FoodOrderService : IFoodOrderService
         if (foodOrder == null)
         {
             return FoodOrderActionResult.Failed(FoodOrderActionStatus.NotFound, "Food order not found.");
+        }
+
+        if (foodOrder.OrderType == FoodOrderType.TableService)
+        {
+            return FoodOrderActionResult.Failed(
+                FoodOrderActionStatus.InvalidState,
+                "Table service orders must be charged through table checkout.");
         }
 
         if (foodOrder.OrderStatus == FoodOrderStatus.Cancelled)
@@ -659,8 +693,13 @@ public class FoodOrderService : IFoodOrderService
             return FoodOrderActionResult.Failed(FoodOrderActionStatus.AlreadyCharged, "Order has already been charged to room.");
         }
 
+        if (!foodOrder.BookingId.HasValue)
+        {
+            return FoodOrderActionResult.Failed(FoodOrderActionStatus.NoFolio, "This order is not linked to a room booking.");
+        }
+
         var folio = await _context.GuestFolios
-            .FirstOrDefaultAsync(f => f.BookingId == foodOrder.BookingId);
+            .FirstOrDefaultAsync(f => f.BookingId == foodOrder.BookingId.Value);
 
         if (folio == null)
         {
@@ -685,8 +724,133 @@ public class FoodOrderService : IFoodOrderService
         _context.FolioTransactions.Add(transaction);
 
         await _context.SaveChangesAsync();
+        await SendFoodOrderEmailAsync(
+            foodOrder.FoodOrderId,
+            "Food order charged to room",
+            "Your delivered room service order has been charged to your room bill.");
 
         return FoodOrderActionResult.Succeeded();
+    }
+
+    private async Task SendFoodOrderEmailAsync(
+        int foodOrderId,
+        string subject,
+        string message,
+        string? extraMessage = null)
+    {
+        try
+        {
+            var foodOrder = await _context.FoodOrders
+                .AsNoTracking()
+                .Include(order => order.Booking).ThenInclude(booking => booking!.User)
+                .Include(order => order.BookingDetail).ThenInclude(detail => detail!.Room)
+                .Include(order => order.FoodOrderItems).ThenInclude(item => item.MenuItem).ThenInclude(menuItem => menuItem!.Category)
+                .FirstOrDefaultAsync(order => order.FoodOrderId == foodOrderId);
+
+            if (foodOrder?.Booking?.User == null ||
+                string.IsNullOrWhiteSpace(foodOrder.Booking.User.Email))
+            {
+                return;
+            }
+
+            var htmlBody = BuildFoodOrderEmailBody(foodOrder, message, extraMessage);
+            await _emailSender.SendEmailAsync(
+                foodOrder.Booking.User.Email,
+                $"{subject} - Order #{foodOrder.FoodOrderId}",
+                htmlBody);
+        }
+        catch
+        {
+            // Email delivery must not block F&B staff operations.
+        }
+    }
+
+    private static string BuildFoodOrderEmailBody(
+        FoodOrder foodOrder,
+        string message,
+        string? extraMessage)
+    {
+        static string H(string? value) => WebUtility.HtmlEncode(value ?? string.Empty);
+
+        var roomNumber = foodOrder.BookingDetail?.Room?.RoomNumber ?? "Not assigned";
+        var requestedDeliveryAt = foodOrder.RequestedDeliveryAt.HasValue
+            ? foodOrder.RequestedDeliveryAt.Value.ToString("dd/MM/yyyy HH:mm")
+            : "As soon as possible";
+        var chargedInfo = foodOrder.IsChargedToRoom
+            ? $"Charged at {foodOrder.ChargedAt?.ToString("dd/MM/yyyy HH:mm")}"
+            : "Not charged";
+        var itemRows = string.Join(
+            string.Empty,
+            foodOrder.FoodOrderItems
+                .OrderBy(item => item.OrderItemId)
+                .Select(item =>
+                {
+                    var itemName = item.MenuItem?.ItemName ?? $"Menu item #{item.MenuItemId}";
+                    var categoryName = item.MenuItem?.Category?.CategoryName ?? string.Empty;
+                    var lineTotal = item.UnitPrice * item.Quantity;
+                    var itemNote = string.IsNullOrWhiteSpace(item.ItemNote)
+                        ? string.Empty
+                        : $"<div style=\"color:#64748b;font-size:13px;margin-top:4px;\">Note: {H(item.ItemNote)}</div>";
+
+                    return $@"
+                    <tr>
+                        <td style=""padding:8px;border-bottom:1px solid #e5e7eb;"">
+                            <strong>{H(itemName)}</strong>
+                            {(string.IsNullOrWhiteSpace(categoryName) ? string.Empty : $"<div style=\"color:#64748b;font-size:13px;\">{H(categoryName)}</div>")}
+                            {itemNote}
+                        </td>
+                        <td style=""padding:8px;border-bottom:1px solid #e5e7eb;text-align:center;"">{item.Quantity}</td>
+                        <td style=""padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;"">{item.UnitPrice:N0} VND</td>
+                        <td style=""padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;"">{lineTotal:N0} VND</td>
+                    </tr>";
+                }));
+
+        return $@"
+<!DOCTYPE html>
+<html>
+<body style=""font-family:Arial,sans-serif;background:#f6f7fb;margin:0;padding:24px;color:#1f2937;"">
+    <div style=""max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;"">
+        <div style=""background:#dfa974;color:#ffffff;padding:18px 24px;"">
+            <h2 style=""margin:0;font-size:22px;"">PhucNguyen Resort</h2>
+            <p style=""margin:6px 0 0;"">Room Service Food Order Update</p>
+        </div>
+        <div style=""padding:24px;"">
+            <p>Dear {H(foodOrder.Booking?.User?.FullName)},</p>
+            <p>{H(message)}</p>
+            {(string.IsNullOrWhiteSpace(extraMessage) ? string.Empty : $"<p><strong>Note:</strong> {H(extraMessage)}</p>")}
+            <table style=""width:100%;border-collapse:collapse;margin-top:18px;"">
+                <tr><td style=""padding:8px;border-bottom:1px solid #e5e7eb;""><strong>Order ID</strong></td><td style=""padding:8px;border-bottom:1px solid #e5e7eb;"">#{foodOrder.FoodOrderId}</td></tr>
+                <tr><td style=""padding:8px;border-bottom:1px solid #e5e7eb;""><strong>Status</strong></td><td style=""padding:8px;border-bottom:1px solid #e5e7eb;"">{H(foodOrder.OrderStatus.ToString())}</td></tr>
+                <tr><td style=""padding:8px;border-bottom:1px solid #e5e7eb;""><strong>Room</strong></td><td style=""padding:8px;border-bottom:1px solid #e5e7eb;"">{H(roomNumber)}</td></tr>
+                <tr><td style=""padding:8px;border-bottom:1px solid #e5e7eb;""><strong>Ordered At</strong></td><td style=""padding:8px;border-bottom:1px solid #e5e7eb;"">{foodOrder.OrderedAt:dd/MM/yyyy HH:mm}</td></tr>
+                <tr><td style=""padding:8px;border-bottom:1px solid #e5e7eb;""><strong>Requested Delivery</strong></td><td style=""padding:8px;border-bottom:1px solid #e5e7eb;"">{H(requestedDeliveryAt)}</td></tr>
+                <tr><td style=""padding:8px;border-bottom:1px solid #e5e7eb;""><strong>Room Bill</strong></td><td style=""padding:8px;border-bottom:1px solid #e5e7eb;"">{H(chargedInfo)}</td></tr>
+            </table>
+            {(string.IsNullOrWhiteSpace(foodOrder.CustomerNote) ? string.Empty : $"<p style=\"margin-top:18px;\"><strong>Customer Note:</strong> {H(foodOrder.CustomerNote)}</p>")}
+            <table style=""width:100%;border-collapse:collapse;margin-top:18px;"">
+                <thead>
+                    <tr>
+                        <th style=""padding:8px;border-bottom:2px solid #e5e7eb;text-align:left;"">Item</th>
+                        <th style=""padding:8px;border-bottom:2px solid #e5e7eb;text-align:center;"">Qty</th>
+                        <th style=""padding:8px;border-bottom:2px solid #e5e7eb;text-align:right;"">Unit Price</th>
+                        <th style=""padding:8px;border-bottom:2px solid #e5e7eb;text-align:right;"">Line Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {itemRows}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan=""3"" style=""padding:10px;text-align:right;""><strong>Total Amount</strong></td>
+                        <td style=""padding:10px;text-align:right;""><strong>{foodOrder.TotalAmount:N0} VND</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <p style=""margin-top:24px;color:#64748b;"">Thank you for choosing PhucNguyen Resort.</p>
+        </div>
+    </div>
+</body>
+</html>";
     }
 
     private static string? NormalizeNote(string? note)

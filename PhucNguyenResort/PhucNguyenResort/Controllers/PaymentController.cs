@@ -75,11 +75,17 @@ namespace PhucNguyenResort.Controllers
                                     foreach (var tb in booking.TourBookings)
                                     {
                                         string tourName = tb.Schedule?.Tour?.TourName ?? "Tour không xác định";
+                                        string qrData = $"{Request.Scheme}://{Request.Host}/Tours/CheckTicket?ticketId={tb.TourBookingId}";
+                                        string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&amp;data={System.Net.WebUtility.UrlEncode(qrData)}";
+                                        
                                         tourHtml += $@"
                                             <div style='background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; text-align: center;'>
                                                 <h4 style='margin-top: 0;'>{tourName}</h4>
                                                 <p>Số người: <strong>{tb.Participants}</strong></p>
-                                                <p style='font-size: 12px; color: #777;'>Mã vé: {tb.TourBookingId}</p>
+                                                <p style='font-size: 12px; color: #777; margin-bottom: 10px;'>Mã vé: {tb.TourBookingId}</p>
+                                                <div style='margin-top: 10px;'>
+                                                    <img src='{qrUrl}' alt='QR Code Vé Tour' style='width: 250px; height: 250px; display: inline-block;' />
+                                                </div>
                                             </div>";
                                     }
                                 }

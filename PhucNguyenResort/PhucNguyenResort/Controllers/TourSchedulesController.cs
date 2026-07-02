@@ -40,7 +40,8 @@ namespace PhucNguyenResort.Controllers
         public async Task<IActionResult> Create()
         {
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName");
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName");
+            var allUsers = await _userService.GetAllUsersAsync();
+            ViewBag.Guides = new SelectList(allUsers.Where(u => u.Role?.RoleName == "Tour Guide"), "UserId", "FullName");
             return View();
         }
 
@@ -48,13 +49,20 @@ namespace PhucNguyenResort.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TourSchedule schedule)
         {
+            if (schedule.TourDate.HasValue && schedule.TourDate.Value.Date < System.DateTime.Now.Date)
+            {
+                ModelState.AddModelError("TourDate", "Ngày khởi hành không được nằm trong quá khứ.");
+            }
+
             if (ModelState.IsValid)
             {
                 await _scheduleService.AddScheduleAsync(schedule);
+                TempData["SuccessMessage"] = "Tạo lịch trình tour mới thành công!";
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName", schedule.TourId);
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", schedule.GuideId);
+            var allUsers = await _userService.GetAllUsersAsync();
+            ViewBag.Guides = new SelectList(allUsers.Where(u => u.Role?.RoleName == "Tour Guide"), "UserId", "FullName", schedule.GuideId);
             return View(schedule);
         }
 
@@ -66,7 +74,8 @@ namespace PhucNguyenResort.Controllers
             if (schedule == null) return NotFound();
 
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName", schedule.TourId);
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", schedule.GuideId);
+            var allUsers = await _userService.GetAllUsersAsync();
+            ViewBag.Guides = new SelectList(allUsers.Where(u => u.Role?.RoleName == "Tour Guide"), "UserId", "FullName", schedule.GuideId);
             return View(schedule);
         }
 
@@ -76,13 +85,20 @@ namespace PhucNguyenResort.Controllers
         {
             if (id != schedule.ScheduleId) return NotFound();
 
+            if (schedule.TourDate.HasValue && schedule.TourDate.Value.Date < System.DateTime.Now.Date)
+            {
+                ModelState.AddModelError("TourDate", "Ngày khởi hành không được nằm trong quá khứ.");
+            }
+
             if (ModelState.IsValid)
             {
                 await _scheduleService.UpdateScheduleAsync(schedule);
+                TempData["SuccessMessage"] = "Cập nhật lịch trình tour thành công!";
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName", schedule.TourId);
-            ViewBag.Guides = new SelectList(await _userService.GetAllStaffAsync(), "UserId", "FullName", schedule.GuideId);
+            var allUsers = await _userService.GetAllUsersAsync();
+            ViewBag.Guides = new SelectList(allUsers.Where(u => u.Role?.RoleName == "Tour Guide"), "UserId", "FullName", schedule.GuideId);
             return View(schedule);
         }
 
@@ -100,7 +116,15 @@ namespace PhucNguyenResort.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _scheduleService.DeleteScheduleAsync(id);
+            try
+            {
+                await _scheduleService.DeleteScheduleAsync(id);
+                TempData["SuccessMessage"] = "Xóa lịch trình tour thành công!";
+            }
+            catch (System.Exception)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa lịch trình này vì đã có khách hàng đặt tour (có vé). Vui lòng hủy các vé liên quan trước.";
+            }
             return RedirectToAction(nameof(Index));
         }
     }
