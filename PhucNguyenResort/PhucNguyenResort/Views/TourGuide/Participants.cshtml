@@ -1,0 +1,321 @@
+﻿@model IEnumerable<PhucNguyenResort.Models.TourBooking>
+@using PhucNguyenResort.Enums
+
+@{
+    ViewData["Title"] = "Điều Hành & Điểm Danh Hành Khách";
+    Layout = "_DashboardLayout";
+
+    var schedule = ViewBag.Schedule;
+    string tourScheduleStatus = ViewBag.TourScheduleStatus ?? "Upcoming";
+
+    // Tính toán nhanh số liệu thống kê hiển thị realtime cho Guide
+    int totalBookings = Model?.Count() ?? 0;
+    int totalTickets = Model?.Sum(b => b.Participants ?? 1) ?? 0;
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px;">
+        <div class="card-body d-flex justify-content-between align-items-center p-4 flex-wrap gap-3">
+            <div class="d-flex align-items-center">
+                <div class="p-3 bg-light text-primary rounded-3 me-3 d-none d-sm-block">
+                    <i class="fa fa-users fs-3 text-info"></i>
+                </div>
+                <div>
+                    <h3 class="font-weight-bold text-dark mb-1 fs-4">Điều Hành & Điểm Danh Đoàn</h3>
+                    <div class="text-muted small mb-0 d-flex align-items-center flex-wrap gap-2">
+                        <span><i class="fa fa-compass text-info me-1"></i> Tour: <strong>@(schedule?.Tour?.TourName ?? "N/A")</strong></span>
+                        <span><i class="fa fa-clock text-info me-1"></i> Giờ chạy: <strong>@(schedule?.StartTime?.ToString("hh\\:mm") ?? "00:00") - @(((TimeSpan?)ViewBag.EndTime)?.ToString("hh\\:mm") ?? "00:00")</strong></span>
+                        <span><i class="fa fa-calendar text-info me-1"></i> Ngày: <strong>@(schedule?.TourDate?.ToString("dd/MM/yyyy") ?? "N/A")</strong></span>
+
+                        <span class="d-none d-md-inline">|</span>
+                        @if (tourScheduleStatus == "Upcoming")
+                        {
+                            <span class="badge bg-warning text-dark"><i class="fa fa-clock me-1"></i>Sắp diễn ra</span>
+                        }
+                        else if (tourScheduleStatus == "Ongoing")
+                        {
+                            <span class="badge bg-success text-white"><i class="fa fa-sync-alt fa-spin me-1"></i>Đang diễn ra</span>
+                        }
+                        else if (tourScheduleStatus == "Completed")
+                        {
+                            <span class="badge bg-primary text-white"><i class="fa fa-check-circle me-1"></i>Đã hoàn thành</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary font-weight-bold btn-sm sm-md-normal px-3 py-2" style="border-radius: 8px;">
+                    <i class="fa fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 4px solid #17a2b8 !important;">
+                <small class="text-muted d-block text-uppercase font-weight-bold small">Tổng số đoàn</small>
+                <span class="fs-4 font-weight-bold text-dark">@totalBookings nhóm</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 4px solid #0d6efd !important;">
+                <small class="text-muted d-block text-uppercase font-weight-bold small">Tổng số vé (Người)</small>
+                <span class="fs-4 font-weight-bold text-primary" id="stat-total-tickets">@totalTickets khách</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 4px solid #198754 !important;">
+                <small class="text-muted d-block text-uppercase font-weight-bold small">Đã có mặt</small>
+                <span class="fs-4 font-weight-bold text-success" id="stat-checked-in">0</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 4px solid #dc3545 !important;">
+                <small class="text-muted d-block text-uppercase font-weight-bold small">Vắng mặt (No-Show)</small>
+                <span class="fs-4 font-weight-bold text-danger" id="stat-no-show">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-3" style="border-radius: 12px;">
+        <div class="card-body p-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="input-group" style="max-width: 400px;">
+                <span class="input-group-text bg-light border-end-0"><i class="fa fa-search text-muted"></i></span>
+                <input type="text" id="search-passenger" class="form-control bg-light border-start-0 ps-0" placeholder="Tìm tên khách, email,..." style="border-radius: 0 8px 8px 0;">
+            </div>
+            <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
+                <button type="button" id="btn-checkin-all" class="btn btn-success btn-sm font-weight-bold px-3 py-2" style="border-radius: 8px;">
+                    <i class="fa fa-check-double me-1"></i> Xác nhận Có mặt Tất cả
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 12px;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center" id="passenger-table">
+                    <thead class="table-light text-uppercase text-secondary small font-weight-bold">
+                        <tr>
+                            <th class="ps-4" style="width: 7%;">STT</th>
+                            <th class="text-start" style="width: 33%;">Hành khách / Trưởng đoàn</th>
+                            <th style="width: 15%;">Số lượng vé</th>
+                            <th style="width: 15%;">Tổng tiền</th>
+                            <th class="pe-4" style="width: 30%;">Trạng thái & Điểm danh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            int index = 1;
+                            foreach (var booking in Model)
+                            {
+                                <tr id="row-@booking.TourBookingId" class="passenger-row">
+                                    <td class="ps-4 text-secondary font-weight-bold">#@index.ToString("D2")</td>
+                                    <td class="text-start target-search">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light text-secondary d-flex align-items-center justify-content-center rounded-circle me-2" style="width: 38px; height: 38px;">
+                                                <i class="fa fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <span class="font-weight-bold text-dark d-block name-field">@(booking.User?.FullName ?? $"Khách hàng #{booking.UserId}")</span>
+                                                <div class="d-flex flex-column text-muted small">
+                                                    <span><i class="fa fa-envelope me-1"></i>@(booking.User?.Email ?? "Chưa có email")</span>
+                                                    <span class="text-primary font-weight-bold mt-1">
+                                                        <a href="tel:@(booking.User?.PhoneNumber ?? "0901234567")" class="text-decoration-none">
+                                                            <i class="fa fa-phone-alt me-1"></i>@(booking.User?.PhoneNumber ?? "0901 234 567 (Gọi khách)")
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge text-info bg-light border-info border px-2 py-1" style="font-weight: 700; border-radius: 6px;" data-tickets="@(booking.Participants ?? 1)">
+                                            <i class="fa fa-ticket-alt me-1"></i> @(booking.Participants ?? 1) Vé
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-danger font-weight-bold">@(booking.TotalAmount?.ToString("N0") ?? "0") ₫</span>
+                                    </td>
+                                    <td class="pe-4">
+                                        <select class="form-select form-select-sm font-weight-bold p-2 text-dark status-selector mx-auto"
+                                                data-id="@booking.TourBookingId"
+                                                data-current="@booking.BookingStatus"
+                                                style="border-radius: 8px; width: 230px; transition: all 0.2s;">
+                                            <option value="Confirmed" selected="@(booking.BookingStatus == TourBookingStatus.Confirmed)">⚪ Chờ khách đến</option>
+                                            <option value="CheckedIn" selected="@(booking.BookingStatus == TourBookingStatus.CheckedIn)">🚘 Khách đã có mặt</option>
+                                            <option value="NoShow" selected="@(booking.BookingStatus == TourBookingStatus.NoShow)">⚠️ Khách vắng mặt (No-Show)</option>
+                                            <option value="Completed" selected="@(booking.BookingStatus == TourBookingStatus.Completed)">✅ Đã hoàn thành</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="fa fa-info-circle me-1"></i> Lịch trình tour này hiện tại chưa có hành khách đặt chỗ.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+
+        // 1. Tự động tính toán lại số liệu thống kê realtime trên màn hình điều hành
+        function calculateStats() {
+        var checkedInTickets = 0;
+        var noShowTickets = 0;
+
+        $('.status-selector').each(function() {
+        var val = $(this).val();
+        var tickets = parseInt($(this).closest('tr').find('[data-tickets]').data('tickets')) || 1;
+
+        if (val === 'CheckedIn' || val === 'Completed') {
+        checkedInTickets += tickets;
+        } else if (val === 'NoShow') {
+        noShowTickets += tickets;
+        }
+        });
+
+        $('#stat-checked-in').text(checkedInTickets + ' khách');
+        $('#stat-no-show').text(noShowTickets + ' khách');
+        }
+
+        // 2. Định dạng màu sắc trực quan đường viền để Guide phân biệt nhanh trạng thái khách
+        function applyStyle(element) {
+        var val = element.val();
+        element.css('border-left', '5px solid #ccc');
+        if (val === 'Confirmed') element.css('border-left', '5px solid #6c757d');
+        if (val === 'CheckedIn') element.css('border-left', '5px solid #198754');
+        if (val === 'NoShow') element.css('border-left', '5px solid #dc3545');
+        if (val === 'Completed') element.css('border-left', '5px solid #0d6efd');
+        }
+
+        // Khởi tạo giao diện ban đầu
+        $('.status-selector').each(function() {
+        applyStyle($(this));
+        });
+        calculateStats();
+
+        // 3. Xử lý sự kiện Thay đổi trạng thái đơn lẻ bằng Dropdown
+        $('.status-selector').change(function () {
+        var selectElement = $(this);
+        var bookingId = selectElement.data('id');
+        var oldStatus = selectElement.data('current');
+        var newStatus = selectElement.val();
+
+        $.ajax({
+        url: '@Url.Action("UpdateStatus", "TourGuide")',
+        type: 'POST',
+        data: { tourBookingId: bookingId, status: newStatus },
+        success: function (response) {
+        if (response.success) {
+        selectElement.data('current', newStatus);
+        applyStyle(selectElement);
+        calculateStats();
+
+        Swal.fire({
+        icon: 'success',
+        title: 'Đã cập nhật trạng thái!',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 1000
+        });
+        } else {
+        selectElement.val(oldStatus);
+        applyStyle(selectElement);
+        Swal.fire('Hệ thống từ chối', response.message, 'warning');
+        }
+        },
+        error: function () {
+        selectElement.val(oldStatus);
+        applyStyle(selectElement);
+        Swal.fire('Lỗi kết nối', 'Không thể đồng bộ dữ liệu trạng thái.', 'error');
+        }
+        });
+        });
+
+        // 4. Tìm kiếm hành khách nhanh bằng JS (Bộ lọc Realtime không reload trang)
+        $('#search-passenger').on('keyup', function() {
+        var value = $(this).val().toLowerCase();
+        $("#passenger-table  .passenger-row").filter(function() {
+        $(this).toggle($(this).find('.target-search').text().toLowerCase().indexOf(value) > -1)
+        });
+        });
+
+        // 5. Thao tác nhanh hàng loạt: Check-In toàn bộ những người đang ở trạng thái chờ
+        $('#btn-checkin-all').click(function() {
+        var pendingSelectors = $('.status-selector').filter(function() {
+        return $(this).val() === 'Confirmed';
+        });
+
+        if(pendingSelectors.length === 0) {
+        Swal.fire('Thông báo', 'Không còn hành khách nào ở trạng thái chờ đến.', 'info');
+        return;
+        }
+
+        Swal.fire({
+        title: 'Xác nhận có mặt hàng loạt?',
+        text: "Hệ thống sẽ chuyển tất cả hành khách đang chờ thành 'Đã có mặt'!",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Đúng, xác nhận tất cả!',
+        cancelButtonText: 'Hủy'
+        }).then((result) => {
+        if (result.isConfirmed) {
+        let totalAjax = pendingSelectors.length;
+        let successCount = 0;
+
+        pendingSelectors.each(function() {
+        var selectElement = $(this);
+        var bookingId = selectElement.data('id');
+
+        $.ajax({
+        url: '@Url.Action("UpdateStatus", "TourGuide")',
+        type: 'POST',
+        data: { tourBookingId: bookingId, status: 'CheckedIn' },
+        success: function (response) {
+        if (response.success) {
+        selectElement.val('CheckedIn').data('current', 'CheckedIn');
+        applyStyle(selectElement);
+        }
+        completeCheck();
+        },
+        error: function() {
+        completeCheck();
+        }
+        });
+        });
+
+        function completeCheck() {
+        successCount++;
+        if(successCount === totalAjax) {
+        calculateStats();
+        Swal.fire('Thành công!', 'Đã điểm danh toàn đoàn hoàn tất.', 'success');
+        }
+        }
+        }
+        });
+        });
+        });
+    </script>
+}

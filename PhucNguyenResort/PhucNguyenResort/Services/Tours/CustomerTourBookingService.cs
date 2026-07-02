@@ -67,6 +67,9 @@ namespace PhucNguyenResort.Services.Tours
             // Sorting
             tourCards = sortBy switch
             {
+                "rating_desc" => tourCards.OrderByDescending(t => t.AverageRating).ToList(),
+                "rating_asc" => tourCards.OrderBy(t => t.AverageRating).ToList(),
+                "schedules_desc" => tourCards.OrderByDescending(t => t.UpcomingScheduleCount).ToList(),
                 "price_asc" => tourCards.OrderBy(t => t.Price).ToList(),
                 "price_desc" => tourCards.OrderByDescending(t => t.Price).ToList(),
                 "name" => tourCards.OrderBy(t => t.TourName).ToList(),

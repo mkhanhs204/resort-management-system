@@ -55,9 +55,9 @@
                 </div>
                 <div class="col-md-6 mb-4">
                     <div class="form-group">
-                        <label asp-for="GuideId">Hướng dẫn viên</label>
+                        <label asp-for="GuideId">Hướng dẫn viên<span class="text-danger">*</span></label>
                         <select asp-for="GuideId" class="form-control" asp-items="ViewBag.Guides">
-                            <option value="">-- Chọn Hướng dẫn viên (Không bắt buộc) --</option>
+                            <option value="">-- Chọn Hướng dẫn viên --</option>
                         </select>
                         <span asp-validation-for="GuideId" class="text-danger small"></span>
                     </div>

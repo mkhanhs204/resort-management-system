@@ -24,7 +24,7 @@
     </style>
 }
 
-<main class="pt-24 pb-section-gap-lg bg-background">
+<main class="pt-8 pb-section-gap-lg bg-background">
 
     <!-- Results Header -->
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
@@ -36,7 +36,10 @@
             <input type="hidden" name="search" value="@Model.SearchKeyword" />
             <span class="font-label-lg text-label-lg whitespace-nowrap">Sắp xếp theo:</span>
             <select name="sortBy" onchange="this.form.submit()" class="bg-transparent border-none font-label-lg text-label-lg text-primary font-bold cursor-pointer outline-none focus:ring-0 py-1 pl-2 pr-8 m-0 w-auto appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DFA974%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem top 50%; background-size: 0.65rem auto;">
-                <option value="">Phổ biến nhất</option>
+                <option value="">Không sắp xếp</option>
+                @if(Model.SortBy == "rating_desc") { <option value="rating_desc" selected>Đánh giá: Từ cao đến thấp</option> } else { <option value="rating_desc">Đánh giá: Từ cao đến thấp</option> }
+                @if(Model.SortBy == "rating_asc") { <option value="rating_asc" selected>Đánh giá: Từ thấp đến cao</option> } else { <option value="rating_asc">Đánh giá: Từ thấp đến cao</option> }
+                @if(Model.SortBy == "schedules_desc") { <option value="schedules_desc" selected>Nhiều lịch trình nhất</option> } else { <option value="schedules_desc">Nhiều lịch trình nhất</option> }
                 @if(Model.SortBy == "price_asc") { <option value="price_asc" selected>Giá: Thấp đến Cao</option> } else { <option value="price_asc">Giá: Thấp đến Cao</option> }
                 @if(Model.SortBy == "price_desc") { <option value="price_desc" selected>Giá: Cao đến Thấp</option> } else { <option value="price_desc">Giá: Cao đến Thấp</option> }
             </select>
@@ -75,13 +78,13 @@
                                     <span>@(tour.DurationHours >= 24 ? $"{tour.DurationHours/24} ngày" : $"{tour.DurationHours} giờ")</span>
                                 </div>
                                 <div class="flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-outline">groups</span>
-                                    <span>Còn @tour.TotalAvailableSlots chỗ</span>
+                                    <span class="material-symbols-outlined text-outline">event_available</span>
+                                    <span>@tour.UpcomingScheduleCount lịch trình</span>
                                 </div>
                             </div>
                             <div class="pt-6 border-t border-outline-variant/20 flex justify-between items-center">
                                 <div>
-                                    <p class="text-label-sm text-on-surface-variant uppercase mb-1 tracking-tight">Giá từ</p>
+                                    <p class="text-label-sm text-on-surface-variant uppercase mb-1 tracking-tight">Giá mỗi người</p>
                                     <p class="text-headline-sm text-primary font-bold">@tour.Price.ToString("N0")đ</p>
                                 </div>
                                 <a asp-action="Details" asp-route-id="@tour.TourId" class="border border-secondary text-secondary px-5 py-2 rounded-lg font-label-lg text-label-lg hover:bg-secondary hover:text-white transition-all">Chi tiết</a>
