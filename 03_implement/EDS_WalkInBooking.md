@@ -62,15 +62,15 @@ Module này xử lý nghiệp vụ đặt phòng và nhận phòng trực tiếp
 
 ## 2. Ma trận Truy vết (Traceability Matrix)
 
-| Requirement ID | Loại (BR/ADR/US) | Mô tả yêu cầu                                                                                                     | Thành phần Code                                                                            | Compliance Target   | ADR liên quan |
-| -------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------- | -------------- |
-| UC49 (SRS)     | User Story        | Lễ tân quản lý và tạo đơn đặt phòng trực tiếp tại quầy                                                 | `ReceptionController.WalkInBooking()`, `IReceptionService.ProcessWalkInBookingAsync()`   | —                  | ADR-003        |
-| UC51 (SRS)     | User Story        | Lễ tân thực hiện nhận phòng (Check-in) cho khách                                                               | `ReceptionController.CheckIn()`, `IReceptionService.ProcessCheckInAsync()`               | Luật Cư trú 2020 | —             |
-| UC55 (SRS)     | User Story        | Lễ tân xử lý thanh toán trực tiếp tại quầy (Tiền mặt, quẹt thẻ POS)                                      | `IReceptionService.ProcessWalkInBookingAsync()` (thanh toán cọc/toàn bộ ngoại tuyến) | —                  | —             |
-| BR-WK-01       | Business Rule     | Tất cả Booking phải liên kết với 1 `UserId` (Customer). Hệ thống tự sinh tài khoản nếu là khách mới. | `IReceptionService.ProcessWalkInBookingAsync()` (tự tạo `User` record)                 | NĐ 356/2025        | ADR-003        |
-| BR-WK-02       | Business Rule     | Thanh toán tại quầy được tự xác nhận bằng Tiền mặt (Cash), POS, hoặc chuyển khoản (Bank Transfer).     | `Payment` table insertion with offline method                                              | —                  | —             |
-| BR-WK-03       | Business Rule     | Kiểm soát trùng phòng vật lý gán trực tiếp tại thời điểm đặt phòng.                                   | `IReceptionService.ProcessWalkInBookingAsync()` (Overlap Room Check)                       | —                  | ADR-002        |
-| BR-WK-04       | Business Rule     | Gán trực tiếp phòng vật lý (`RoomId`) thay vì chỉ chọn hạng phòng như đặt online.                     | `BookingDetail` table insertion with `RoomId` filled                                     | —                  | —             |
+| Requirement ID | Loại (BR/ADR/US) | Mô tả yêu cầu                                                                                                    | Thành phần Code                                                                            | Compliance Target   | ADR liên quan |
+| -------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------- | -------------- |
+| UC49 (SRS)     | User Story        | Lễ tân quản lý và tạo đơn đặt phòng trực tiếp tại quầy                                                | `ReceptionController.WalkInBooking()`, `IReceptionService.ProcessWalkInBookingAsync()`   | —                  | ADR-003        |
+| UC51 (SRS)     | User Story        | Lễ tân thực hiện nhận phòng (Check-in) cho khách                                                              | `ReceptionController.CheckIn()`, `IReceptionService.ProcessCheckInAsync()`               | Luật Cư trú 2020 | —             |
+| UC55 (SRS)     | User Story        | Lễ tân xử lý thanh toán trực tiếp tại quầy (Tiền mặt, quẹt thẻ POS)                                     | `IReceptionService.ProcessWalkInBookingAsync()` (thanh toán cọc/toàn bộ ngoại tuyến) | —                  | —             |
+| BR-WK-01       | Business Rule     | Tất cả Booking phải liên kết với 1`UserId` (Customer). Hệ thống tự sinh tài khoản nếu là khách mới. | `IReceptionService.ProcessWalkInBookingAsync()` (tự tạo `User` record)                 | NĐ 356/2025        | ADR-003        |
+| BR-WK-02       | Business Rule     | Thanh toán tại quầy được tự xác nhận bằng Tiền mặt (Cash), POS, hoặc chuyển khoản (Bank Transfer).    | `Payment` table insertion with offline method                                              | —                  | —             |
+| BR-WK-03       | Business Rule     | Kiểm soát trùng phòng vật lý gán trực tiếp tại thời điểm đặt phòng.                                  | `IReceptionService.ProcessWalkInBookingAsync()` (Overlap Room Check)                       | —                  | ADR-002        |
+| BR-WK-04       | Business Rule     | Gán trực tiếp phòng vật lý (`RoomId`) thay vì chỉ chọn hạng phòng như đặt online.                    | `BookingDetail` table insertion with `RoomId` filled                                     | —                  | —             |
 
 ---
 
@@ -92,11 +92,11 @@ Trong cơ sở dữ liệu của PhucNguyen Resort, bảng `Booking` có quan h�
 
 **Các phương án đã xem xét (Options Considered)**
 
-| Phương án | Mô tả                                                                                                                                                                                         | Ưu điểm                                                                                                                                                            | Nhược điểm                                                                                                                                                                                                                      |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A            | Dùng một tài khoản chung duy nhất (ví dụ:`WalkInGuestAccount` với `UserId = 9999`) cho tất cả khách vãng lai.                                                                   | Lễ tân không cần nhập thông tin khách hàng, tốc độ tạo booking cực nhanh.                                                                                | Vi phạm nghiêm trọng tính toàn vẹn dữ liệu; không thể gửi hóa đơn điện tử riêng cho khách; không thể lưu lịch sử quay lại của khách; vi phạm Nghị định 356/2025 về định danh chủ thể dữ liệu. |
-| B            | Bắt khách tạo tài khoản trước bằng email trên điện thoại rồi lễ tân mới tìm kiếm để đặt phòng.                                                                           | Giữ cấu trúc dữ liệu nguyên bản, không cần code xử lý tự sinh tài khoản.                                                                                | Gây trải nghiệm rất tệ cho khách hàng tại quầy. Lễ tân tốn thời gian giải thích.                                                                                                                                     |
-| C (Chọn)    | Lễ tân nhập nhanh thông tin tối thiểu (Họ tên, SĐT, Email). Hệ thống tự tìm kiếm, nếu chưa có sẽ tự sinh nhanh một User có Role `Customer` với mật khẩu ngẫu nhiên. | Bảo đảm tính toàn vẹn dữ liệu, lưu giữ được thông tin khách hàng cũ cho lần sau, hỗ trợ gửi hóa đơn/email xác nhận, tuân thủ pháp luật. | Cần thêm code logic tự động tạo tài khoản trong Service.                                                                                                                                                                    |
+| Phương án | Mô tả                                                                                                                                                                                        | Ưu điểm                                                                                                                                                            | Nhược điểm                                                                                                                                                                                                                      |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A            | Dùng một tài khoản chung duy nhất (ví dụ:`WalkInGuestAccount` với `UserId = 9999`) cho tất cả khách vãng lai.                                                                  | Lễ tân không cần nhập thông tin khách hàng, tốc độ tạo booking cực nhanh.                                                                                | Vi phạm nghiêm trọng tính toàn vẹn dữ liệu; không thể gửi hóa đơn điện tử riêng cho khách; không thể lưu lịch sử quay lại của khách; vi phạm Nghị định 356/2025 về định danh chủ thể dữ liệu. |
+| B            | Bắt khách tạo tài khoản trước bằng email trên điện thoại rồi lễ tân mới tìm kiếm để đặt phòng.                                                                          | Giữ cấu trúc dữ liệu nguyên bản, không cần code xử lý tự sinh tài khoản.                                                                                | Gây trải nghiệm rất tệ cho khách hàng tại quầy. Lễ tân tốn thời gian giải thích.                                                                                                                                     |
+| C (Chọn)    | Lễ tân nhập nhanh thông tin tối thiểu (Họ tên, SĐT, Email). Hệ thống tự tìm kiếm, nếu chưa có sẽ tự sinh nhanh một User có Role`Customer` với mật khẩu ngẫu nhiên. | Bảo đảm tính toàn vẹn dữ liệu, lưu giữ được thông tin khách hàng cũ cho lần sau, hỗ trợ gửi hóa đơn/email xác nhận, tuân thủ pháp luật. | Cần thêm code logic tự động tạo tài khoản trong Service.                                                                                                                                                                    |
 
 **Quyết định (Decision)**
 Chọn Phương án C. Hệ thống cho phép Lễ tân nhập Số điện thoại. Nếu SĐT đã tồn tại, tự động điền thông tin cũ. Nếu chưa tồn tại, yêu cầu nhập Họ tên và Email (nếu khách không có email, hệ thống tự động sinh email tạm thời dạng `[SĐT]@phucnguyenresort.temp`) và tiến hành tạo tài khoản ngầm.
@@ -236,7 +236,7 @@ namespace PhucNguyenResort.Services.Reception
         Task<PreCheckinViewModel?> PrepareCheckInViewModelAsync(int bookingId);
         Task<Booking?> GetBookingByIdAsync(int bookingId);
         Task<CheckInResult> ProcessCheckInAsync(PreCheckinViewModel model);
-      
+    
         /// <summary>
         /// Xử lý đặt phòng trực tiếp tại quầy. Tự động sinh User nếu cần, gán phòng vật lý trực tiếp,
         /// ghi nhận thanh toán ngoại tuyến và thực hiện Check-in ngay nếu InstantCheckIn = true.
@@ -403,10 +403,10 @@ WHERE b.BookingId = [Mã_Booking_Mới];
 
 ## 15. Bảng tổng hợp phân quyền (Authorization Matrix)
 
-| Endpoint                          | GUEST | CUSTOMER | RECEPTIONIST | ADMIN |
-| --------------------------------- | ----- | -------- | ------------ | ----- |
-| GET `/Reception/WalkInBooking`  | ❌    | ❌       | ✅           | ✅    |
-| POST `/Reception/WalkInBooking` | ❌    | ❌       | ✅           | ✅    |
+| Endpoint                         | GUEST | CUSTOMER | RECEPTIONIST | ADMIN |
+| -------------------------------- | ----- | -------- | ------------ | ----- |
+| GET`/Reception/WalkInBooking`  | ❌    | ❌       | ✅           | ✅    |
+| POST`/Reception/WalkInBooking` | ❌    | ❌       | ✅           | ✅    |
 
 *Chú thích:*
 

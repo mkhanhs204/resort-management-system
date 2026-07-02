@@ -133,7 +133,7 @@
                                 <div>
                                     <div class="text-label-sm text-primary font-bold mb-1 tracking-widest uppercase">PNR-@booking.BookingId.ToString("D5")</div>
                                     <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">@roomsDisplay</h3>
-                                    <div class="flex flex-wrap items-center gap-4 text-on-surface-variant text-label-lg">
+                                    <div class="flex flex-wrap items-center gap-4 text-on-surface-variant text-label-lg mt-2">
                                         <div class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-[18px]">calendar_today</span>
                                             <span>@booking.CheckInDate.ToString("dd/MM/yyyy") - @booking.CheckOutDate.ToString("dd/MM/yyyy")</span>
@@ -142,6 +142,15 @@
                                             <span class="material-symbols-outlined text-[18px]">person</span>
                                             <span>@booking.NumberOfAdults NL, @booking.NumberOfChildren TE</span>
                                         </div>
+                                        @if (booking.ActualCheckInTime.HasValue || booking.ActualCheckOutTime.HasValue)
+                                        {
+                                            <div class="flex items-center gap-1 text-primary text-label-sm font-bold border border-primary/20 bg-primary/5 px-2 py-0.5 rounded">
+                                                <span class="material-symbols-outlined text-[16px]">schedule</span>
+                                                <span>
+                                                    Thực tế: @(booking.ActualCheckInTime?.ToString("HH:mm dd/MM/yy") ?? "...") - @(booking.ActualCheckOutTime?.ToString("HH:mm dd/MM/yy") ?? "...")
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                                 <div class="text-right mt-4 md:mt-0">
@@ -160,13 +169,7 @@
                                         Pre-Checkin
                                     </a>
                                 }
-                                else if (booking.BookingStatus == BookingStatus.CheckedIn)
-                                {
-                                    <a href="#" class="px-6 py-2.5 rounded-lg bg-secondary text-on-primary font-label-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                                        <span class="material-symbols-outlined text-[20px]">room_service</span>
-                                        Yêu cầu dịch vụ
-                                    </a>
-                                }
+
                                 else if (booking.BookingStatus == BookingStatus.CheckedOut)
                                 {
                                     <a href="#" class="px-6 py-2.5 rounded-lg border border-primary text-primary font-label-lg hover:bg-primary/5 transition-all flex items-center justify-center gap-2">

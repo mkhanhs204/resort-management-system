@@ -37,7 +37,7 @@ namespace PhucNguyenResort.Controllers
             return View();
         }
 
-        public async Task<IActionResult> RoomDetails(int id)
+        public async Task<IActionResult> RoomDetails(int id, string? checkIn = null, string? checkOut = null)
         {
             var roomCategory = await _homeService.GetRoomDetailsAsync(id);
 
@@ -45,6 +45,9 @@ namespace PhucNguyenResort.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.CheckIn = checkIn;
+            ViewBag.CheckOut = checkOut;
 
             return View(roomCategory);
         }

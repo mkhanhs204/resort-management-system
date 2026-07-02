@@ -25,6 +25,9 @@ public class User
     public bool IsBlocked { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    public string? ResetPasswordToken { get; set; }
+    public DateTime? ResetPasswordTokenExpiry { get; set; }
+
     public Role? Role { get; set; }
     public UserProfile? UserProfile { get; set; }
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();

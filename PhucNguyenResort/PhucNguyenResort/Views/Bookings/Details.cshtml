@@ -18,8 +18,28 @@
         roomTotal += (detail.RoomCategory?.PricePerNight ?? 0) * totalNights;
     }
     
-    decimal tax = roomTotal * 0.1m;
-    decimal grandTotal = Model.TotalAmount ?? (roomTotal + tax);
+    var filteredTransactions = Model.GuestFolio?.FolioTransactions?.Where(t => 
+        t.Amount > 0 &&
+        t.TransactionType != PhucNguyenResort.Enums.FolioTransactionType.Payment &&
+        t.TransactionType != PhucNguyenResort.Enums.FolioTransactionType.Refund &&
+        t.TransactionType != PhucNguyenResort.Enums.FolioTransactionType.TourCharge &&
+        t.TransactionType != PhucNguyenResort.Enums.FolioTransactionType.FoodCharge &&
+        !(t.TransactionType == PhucNguyenResort.Enums.FolioTransactionType.RoomCharge && t.Amount == Model.TotalAmount)
+    ).ToList();
+
+    var validTours = Model.TourBookings?.Where(tb => tb.BookingStatus != PhucNguyenResort.Enums.TourBookingStatus.Cancelled).ToList();
+    var validFoodOrders = Model.FoodOrders?.Where(fo => fo.OrderStatus != PhucNguyenResort.Enums.FoodOrderStatus.Cancelled && (fo.IsChargedToRoom || !fo.IsPaidAtRestaurant)).ToList();
+
+    decimal grandTotal = roomTotal;
+    if (validTours != null) {
+        grandTotal += validTours.Sum(tb => tb.TotalAmount ?? ((tb.Schedule?.Tour?.Price ?? 0) * (tb.Participants ?? 0)));
+    }
+    if (validFoodOrders != null) {
+        grandTotal += validFoodOrders.Sum(fo => fo.TotalAmount ?? 0);
+    }
+    if (filteredTransactions != null) {
+        grandTotal += filteredTransactions.Sum(t => t.Amount ?? 0);
+    }
     
     string statusBadgeClass = "";
     string statusText = "";
@@ -84,51 +104,65 @@
                     <div class="flex gap-3">
                         @if (Model.BookingStatus == BookingStatus.CheckedOut)
                         {
-                            <button class="flex items-center gap-2 border border-secondary text-secondary px-4 py-2 rounded-lg font-label-lg hover:bg-secondary-container/30 transition-all shadow-sm">
+                            <a asp-action="ViewInvoice" asp-route-id="@Model.BookingId" class="flex items-center gap-2 border border-secondary text-secondary px-4 py-2 rounded-lg font-label-lg hover:bg-secondary-container/30 transition-all shadow-sm">
                                 <span class="material-symbols-outlined">download</span>
                                 Tải Hóa Đơn
-                            </button>
+                            </a>
                         }
                     </div>
                 </div>
             </section>
             
             <!-- Room Information -->
-            <section class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden luxury-shadow">
-                <img class="w-full h-80 object-cover" src="@imgUrl" alt="@categoryName" />
-                <div class="p-8">
-                    <h2 class="font-headline-sm text-headline-sm mb-4">@categoryName</h2>
-                    <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">
-                        @description
-                    </p>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                        <div class="flex items-center gap-3 text-on-surface-variant">
-                            <span class="material-symbols-outlined text-primary">king_bed</span>
-                            <span class="font-label-lg">Giường Cao Cấp</span>
+            <div class="space-y-6">
+                @foreach (var detailGroup in Model.BookingDetails.Where(bd => bd.RoomCategory != null).GroupBy(bd => bd.RoomCategoryId))
+                {
+                    var cat = detailGroup.First().RoomCategory;
+                    int count = detailGroup.Count();
+                    string groupCategoryName = cat.CategoryName;
+                    string groupImgUrl = cat.ImageUrl ?? "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+                    string groupDescription = cat.Description ?? "Trải nghiệm kỳ nghỉ tuyệt vời với không gian sang trọng và tiện nghi cao cấp.";
+
+                    <section class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden luxury-shadow">
+                        <img class="w-full h-80 object-cover" src="@groupImgUrl" alt="@groupCategoryName" />
+                        <div class="p-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <h2 class="font-headline-sm text-headline-sm">@groupCategoryName</h2>
+                                <span class="bg-primary/10 text-primary px-4 py-2 rounded-full font-bold whitespace-nowrap">@count Phòng</span>
+                            </div>
+                            <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">
+                                @groupDescription
+                            </p>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                <div class="flex items-center gap-3 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary">king_bed</span>
+                                    <span class="font-label-lg">Giường Cao Cấp</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary">waves</span>
+                                    <span class="font-label-lg">View Tuyệt Đẹp</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary">wifi</span>
+                                    <span class="font-label-lg">Wifi Tốc Độ Cao</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary">bathtub</span>
+                                    <span class="font-label-lg">Bồn Tắm Riêng</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary">coffee_maker</span>
+                                    <span class="font-label-lg">Mini Bar Miễn Phí</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary">nest_cam_indoor</span>
+                                    <span class="font-label-lg">Điều Khiển Thông Minh</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3 text-on-surface-variant">
-                            <span class="material-symbols-outlined text-primary">waves</span>
-                            <span class="font-label-lg">View Tuyệt Đẹp</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-on-surface-variant">
-                            <span class="material-symbols-outlined text-primary">wifi</span>
-                            <span class="font-label-lg">Wifi Tốc Độ Cao</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-on-surface-variant">
-                            <span class="material-symbols-outlined text-primary">bathtub</span>
-                            <span class="font-label-lg">Bồn Tắm Riêng</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-on-surface-variant">
-                            <span class="material-symbols-outlined text-primary">coffee_maker</span>
-                            <span class="font-label-lg">Mini Bar Miễn Phí</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-on-surface-variant">
-                            <span class="material-symbols-outlined text-primary">nest_cam_indoor</span>
-                            <span class="font-label-lg">Điều Khiển Thông Minh</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                    </section>
+                }
+            </div>
             
             <!-- Stay Details -->
             <section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20 luxury-shadow">
@@ -137,12 +171,26 @@
                     <div>
                         <p class="text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Nhận phòng</p>
                         <p class="font-headline-sm text-headline-sm text-on-surface">@Model.CheckInDate.ToString("dd MMM yyyy")</p>
-                        <p class="text-label-sm text-on-surface-variant mt-1">Từ 14:00</p>
+                        @if (Model.ActualCheckInTime.HasValue)
+                        {
+                            <p class="text-label-sm text-primary mt-1 font-bold">Thực tế: @Model.ActualCheckInTime.Value.ToString("HH:mm - dd/MM")</p>
+                        }
+                        else
+                        {
+                            <p class="text-label-sm text-on-surface-variant mt-1">Dự kiến: Từ 14:00</p>
+                        }
                     </div>
                     <div>
                         <p class="text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Trả phòng</p>
                         <p class="font-headline-sm text-headline-sm text-on-surface">@Model.CheckOutDate.ToString("dd MMM yyyy")</p>
-                        <p class="text-label-sm text-on-surface-variant mt-1">Trước 12:00</p>
+                        @if (Model.ActualCheckOutTime.HasValue)
+                        {
+                            <p class="text-label-sm text-primary mt-1 font-bold">Thực tế: @Model.ActualCheckOutTime.Value.ToString("HH:mm - dd/MM")</p>
+                        }
+                        else
+                        {
+                            <p class="text-label-sm text-on-surface-variant mt-1">Dự kiến: Trước 12:00</p>
+                        }
                     </div>
                     <div>
                         <p class="text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Khách</p>
@@ -159,28 +207,71 @@
             <section class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/20 luxury-shadow">
                 <h3 class="font-label-lg text-label-lg uppercase tracking-widest text-primary mb-6">Tóm Tắt Thanh Toán</h3>
                 <div class="space-y-4">
-                    <div class="flex justify-between text-body-md">
-                        <span class="text-on-surface-variant">@totalNights Đêm x @(firstDetail?.RoomCategory?.PricePerNight?.ToString("N0") ?? "0")</span>
-                        <span class="font-medium text-on-surface">@roomTotal.ToString("N0") VNĐ</span>
+                    <div class="space-y-2">
+                        @foreach (var detailGroup in Model.BookingDetails.Where(bd => bd.RoomCategory != null).GroupBy(bd => bd.RoomCategoryId))
+                        {
+                            var cat = detailGroup.First().RoomCategory;
+                            int count = detailGroup.Count();
+                            decimal price = cat.PricePerNight ?? 0;
+                            decimal total = price * count * totalNights;
+                            
+                            <div class="flex justify-between text-body-md">
+                                <span class="text-on-surface-variant">@count x @cat.CategoryName (@totalNights Đêm)</span>
+                                <span class="font-medium text-on-surface">@total.ToString("N0") VNĐ</span>
+                            </div>
+                        }
                     </div>
-                    <div class="flex justify-between text-body-md">
-                        <span class="text-on-surface-variant">Phí dịch vụ</span>
-                        <span class="font-medium text-primary">Miễn phí</span>
-                    </div>
-                    <div class="flex justify-between text-body-md">
-                        <span class="text-on-surface-variant">Thuế (10% VAT)</span>
-                        <span class="font-medium text-on-surface">@tax.ToString("N0") VNĐ</span>
-                    </div>
-                    
-                    @if (Model.TourBookings != null && Model.TourBookings.Any())
+
+                    @if (validTours != null && validTours.Any())
                     {
                         <div class="border-t border-outline-variant/10 pt-4 mt-2">
-                            <span class="font-label-sm text-on-surface-variant block mb-2">Dịch vụ bổ sung:</span>
-                            @foreach (var tb in Model.TourBookings)
+                            <p class="text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Dịch vụ Tour:</p>
+                            <div class="space-y-2">
+                                @foreach (var tb in validTours)
+                                {
+                                    <div class="flex justify-between text-body-md">
+                                        <span class="text-on-surface-variant">- @tb.Schedule?.Tour?.TourName</span>
+                                        <span class="font-medium text-on-surface">@(((tb.TotalAmount ?? ((tb.Schedule?.Tour?.Price ?? 0) * (tb.Participants ?? 0)))).ToString("N0")) VNĐ</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (validFoodOrders != null && validFoodOrders.Any())
+                    {
+                        <div class="border-t border-outline-variant/10 pt-4 mt-2">
+                            <p class="text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Ăn Uống (Ghi nợ phòng):</p>
+                            <div class="space-y-2">
+                                @foreach (var fo in validFoodOrders)
+                                {
+                                    <div class="flex justify-between text-body-md">
+                                        <span class="text-on-surface-variant">- Gọi món (Mã #@fo.FoodOrderId.ToString("D4"))</span>
+                                        <span class="font-medium text-on-surface">@((fo.TotalAmount ?? 0).ToString("N0")) VNĐ</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (filteredTransactions != null && filteredTransactions.Any())
+                    {
+                        <div class="border-t border-outline-variant/10 pt-4 mt-2">
+                            <span class="font-label-sm text-on-surface-variant block mb-2">Phụ phí phát sinh:</span>
+                            @foreach (var tran in filteredTransactions)
                             {
+                                string txnName = tran.TransactionType switch
+                                {
+                                    PhucNguyenResort.Enums.FolioTransactionType.RoomCharge => 
+                                        (tran.CreatedAt.Date <= Model.CheckInDate.Date) ? "Phụ thu nhận phòng sớm" : 
+                                        (tran.CreatedAt.Date >= Model.CheckOutDate.Date) ? "Phụ thu trả phòng trễ" : 
+                                        "Phụ thu tiền phòng",
+                                    PhucNguyenResort.Enums.FolioTransactionType.Adjustment => "Điều chỉnh hóa đơn",
+                                    _ => "Khác"
+                                };
                                 <div class="flex justify-between text-body-md">
-                                    <span class="text-on-surface-variant">- @tb.Schedule?.Tour?.TourName</span>
-                                    <span class="font-medium text-on-surface">@(((tb.Schedule?.Tour?.Price ?? 0) * (tb.Participants ?? 0)).ToString("N0")) VNĐ</span>
+                                    <span class="text-on-surface-variant">- @txnName</span>
+                                    <span class="font-medium text-on-surface">@((tran.Amount ?? 0).ToString("N0")) VNĐ</span>
                                 </div>
                             }
                         </div>
@@ -196,8 +287,21 @@
                     <p class="text-label-sm text-on-surface-variant mb-2">Trạng Thái Thanh Toán</p>
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-secondary">credit_score</span>
-                        <span class="font-body-md font-bold text-on-surface">Đã Thanh Toán Toàn Bộ</span>
+                        @if (Model.BookingStatus == BookingStatus.CheckedOut || (Model.DepositAmount > 0 && Model.DepositAmount >= grandTotal))
+                        {
+                            <span class="font-body-md font-bold text-on-surface">Đã Thanh Toán Toàn Bộ</span>
+                        }
+                        else
+                        {
+                            <span class="font-body-md font-bold text-on-surface">Đã Thanh Toán Cọc (@(Model.DepositAmount?.ToString("N0") ?? "0") VNĐ)</span>
+                        }
                     </div>
+                    @if (Model.BookingStatus != BookingStatus.CheckedOut && (Model.DepositAmount == null || Model.DepositAmount < grandTotal))
+                    {
+                        <div class="mt-2 text-label-sm text-error">
+                            Số tiền còn lại: @((grandTotal - (Model.DepositAmount ?? 0)).ToString("N0")) VNĐ (Thanh toán tại quầy)
+                        </div>
+                    }
                 </div>
             </section>
             
@@ -238,16 +342,24 @@
             
             <!-- Actions -->
             <div class="space-y-3">
-                <button onclick="alert('Đang kết nối bạn tới nhân viên hỗ trợ Concierge...');" class="w-full bg-on-surface text-surface py-4 rounded-xl font-label-lg hover:opacity-90 transition-all shadow-md">
-                    Yêu Cầu Hỗ Trợ
-                </button>
-                @if (Model.BookingStatus == BookingStatus.Reserved && Model.CheckInDate > DateTime.Today.AddDays(3))
+
+                @if (Model.BookingStatus == BookingStatus.Reserved)
                 {
-                    <a asp-action="Cancel" asp-route-id="@Model.BookingId" class="w-full border border-error text-error py-4 rounded-xl font-label-lg hover:bg-error-container hover:text-on-error-container transition-all flex items-center justify-center">
-                        Hủy Đơn Đặt Phòng
-                    </a>
-                    <p class="text-center text-label-sm text-on-surface-variant px-4 leading-relaxed">
-                        Miễn phí hủy phòng đến trước @(Model.CheckInDate.AddDays(-3).ToString("dd/MM/yyyy")). Áp dụng Điều khoản & Chính sách.
+                    bool isRefundable = (Model.CheckInDate - DateTime.Now).TotalHours > 48;
+                    <form asp-action="Cancel" asp-route-id="@Model.BookingId" method="post" onsubmit="return confirm('@(isRefundable ? "Bạn có chắc chắn muốn hủy đơn đặt phòng này? Bạn sẽ được hoàn lại tiền cọc." : "Bạn đang hủy phòng trong vòng 48h trước giờ nhận phòng. Theo chính sách, tiền cọc sẽ KHÔNG được hoàn lại. Bạn vẫn muốn tiếp tục hủy?")');">
+                        <button type="submit" class="w-full border border-error text-error py-4 rounded-xl font-label-lg hover:bg-error-container hover:text-on-error-container transition-all flex items-center justify-center">
+                            Hủy Đơn Đặt Phòng
+                        </button>
+                    </form>
+                    <p class="text-center text-label-sm text-on-surface-variant px-4 leading-relaxed mt-2">
+                        @if (isRefundable)
+                        {
+                            <text>Miễn phí hủy phòng đến trước @(Model.CheckInDate.AddHours(-48).ToString("dd/MM/yyyy HH:mm")). Áp dụng Điều khoản & Chính sách.</text>
+                        }
+                        else
+                        {
+                            <text><span class="text-error font-bold">Không hoàn cọc:</span> Hủy phòng trong vòng 48 giờ trước giờ nhận phòng sẽ không được hoàn cọc.</text>
+                        }
                     </p>
                 }
             </div>
