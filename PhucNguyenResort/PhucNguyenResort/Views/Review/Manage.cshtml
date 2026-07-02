@@ -1,0 +1,274 @@
+@model IEnumerable<PhucNguyenResort.ViewModels.Reviews.ReviewListVM>
+@{
+    ViewData["Title"] = "Quản Lý Đánh Giá Khách Hàng";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #805528; margin-bottom: 4px; }
+        .page-subtitle { font-family: 'Inter', sans-serif; color: #50453b; font-size: 16px; margin-bottom: 24px; }
+        
+        .luxury-card { background: #ffffff; border-radius: 16px; box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08); border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; margin-bottom: 24px; overflow: hidden; }
+        
+        /* Table Styling */
+        .table-luxury { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+        .table-luxury th { background-color: #fcf9f5; color: #805528; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 24px; border-bottom: 2px solid rgba(212, 195, 182, 0.3); text-align: left; }
+        .table-luxury td { padding: 16px 24px; border-bottom: 1px solid #f0ede9; color: #1c1c1a; font-size: 14px; vertical-align: middle; }
+        .table-luxury tbody tr:hover { background-color: #faf8f5; }
+        .table-luxury tbody tr:last-child td { border-bottom: none; }
+        
+        /* Badges */
+        .status-badge { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-badge.visible { background-color: #e2f5ea; color: #0b5c2d; }
+        .status-badge.hidden { background-color: #ffdad6; color: #ba1a1a; }
+        
+        .service-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background-color: #f6f3ef; color: #805528; margin-bottom: 4px; }
+        
+        /* Buttons */
+        .btn-luxury { background-color: #dfa974; color: #633d11; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 8px 16px; border: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; text-decoration: none; cursor: pointer; font-size: 13px; }
+        .btn-luxury:hover { background-color: #805528; color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2); }
+        .btn-outline-luxury { background-color: transparent; color: #805528; border: 1px solid #dfa974; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 8px 16px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; text-decoration: none; cursor: pointer; font-size: 13px; }
+        .btn-outline-luxury:hover { background-color: #f6f3ef; color: #633d11; text-decoration: none; }
+        
+        /* Filter Pills */
+        .filter-label { font-weight: 600; color: #50453b; margin-right: 12px; font-size: 14px; margin-bottom: 0; }
+        .filter-pill { display: inline-block; padding: 6px 16px; border-radius: 20px; border: 1px solid #e5e0d8; color: #805528; text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.2s; background-color: #ffffff; margin-right: 8px; margin-bottom: 8px; }
+        .filter-pill:hover { background-color: #fcf9f5; text-decoration: none; color: #805528; }
+        .filter-pill.active { background-color: #dfa974; color: #ffffff; border-color: #dfa974; font-weight: 600; }
+        
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 20px; vertical-align: middle; }
+        
+        /* Stars */
+        .star-rating { color: #f59e0b; font-variation-settings: 'FILL' 1; font-size: 18px; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">Đánh Giá Khách Hàng</h2>
+        <p class="page-subtitle">Quản lý và kiểm duyệt các đánh giá của khách hàng về dịch vụ</p>
+    </div>
+</div>
+
+<div class="luxury-card" style="padding: 20px 24px;">
+    <div class="d-flex align-items-center flex-wrap mb-3">
+        <label class="filter-label">Lọc theo số sao:</label>
+        <div>
+            <a href="@Url.Action("Manage", new { serviceType = ViewBag.CurrentServiceType })" class="filter-pill @(ViewBag.CurrentRating == null ? "active" : "")">Tất cả</a>
+            <a href="@Url.Action("Manage", new { rating = 5, serviceType = ViewBag.CurrentServiceType })" class="filter-pill @(ViewBag.CurrentRating == 5 ? "active" : "")">5 Sao</a>
+            <a href="@Url.Action("Manage", new { rating = 4, serviceType = ViewBag.CurrentServiceType })" class="filter-pill @(ViewBag.CurrentRating == 4 ? "active" : "")">4 Sao</a>
+            <a href="@Url.Action("Manage", new { rating = 3, serviceType = ViewBag.CurrentServiceType })" class="filter-pill @(ViewBag.CurrentRating == 3 ? "active" : "")">3 Sao</a>
+            <a href="@Url.Action("Manage", new { rating = 2, serviceType = ViewBag.CurrentServiceType })" class="filter-pill @(ViewBag.CurrentRating == 2 ? "active" : "")">2 Sao</a>
+            <a href="@Url.Action("Manage", new { rating = 1, serviceType = ViewBag.CurrentServiceType })" class="filter-pill @(ViewBag.CurrentRating == 1 ? "active" : "")">1 Sao</a>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center flex-wrap">
+        <label class="filter-label">Loại dịch vụ:</label>
+        <div>
+            <a href="@Url.Action("Manage", new { rating = ViewBag.CurrentRating })" class="filter-pill @(string.IsNullOrEmpty(ViewBag.CurrentServiceType) ? "active" : "")">Tất cả</a>
+            <a href="@Url.Action("Manage", new { rating = ViewBag.CurrentRating, serviceType = "Room" })" class="filter-pill @(ViewBag.CurrentServiceType == "Room" ? "active" : "")">Phòng nghỉ</a>
+            <a href="@Url.Action("Manage", new { rating = ViewBag.CurrentRating, serviceType = "Tour" })" class="filter-pill @(ViewBag.CurrentServiceType == "Tour" ? "active" : "")">Tour du lịch</a>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    var messageType = TempData["MessageType"]?.ToString() ?? "success";
+    var bgColor = messageType == "danger" ? "#ffdad6" : "#e2f5ea";
+    var textColor = messageType == "danger" ? "#ba1a1a" : "#0b5c2d";
+    var borderColor = messageType == "danger" ? "#f4c6c2" : "#c6e9d6";
+    var iconName = messageType == "danger" ? "visibility_off" : "check_circle";
+
+    <div class="alert alert-dismissible fade show mb-4" role="alert" style="background-color: @bgColor; color: @textColor; border: 1px solid @borderColor; border-radius: 8px; font-family: 'Inter', sans-serif;">
+        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 8px;">@iconName</span>
+        @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; font-size: 20px; float: right; color: @textColor; opacity: 0.5;">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-dismissible fade show mb-4" role="alert" style="background-color: #ffdad6; color: #ba1a1a; border: 1px solid #f4c6c2; border-radius: 8px; font-family: 'Inter', sans-serif;">
+        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 8px;">error</span>
+        @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; font-size: 20px; float: right; color: #ba1a1a; opacity: 0.5;">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="luxury-card">
+    <div class="table-responsive">
+        <table class="table-luxury" id="reviews-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Khách Hàng</th>
+                    <th>Dịch Vụ</th>
+                    <th>Đánh Giá</th>
+                    <th>Nội Dung</th>
+                    <th>Ngày Đăng</th>
+                    <th class="text-center">Trạng Thái</th>
+                    <th class="text-center">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="font-weight: 500; color: #a4b5ce;">#@item.ReviewId</td>
+                            <td style="font-weight: 600;">@item.UserName</td>
+                            <td>
+                                @if (item.ServiceType == "Room")
+                                {
+                                    <span class="service-badge"><span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">bed</span> Phòng nghỉ</span>
+                                }
+                                else
+                                {
+                                    <span class="service-badge"><span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">map</span> Tour du lịch</span>
+                                }
+                                <br/>
+                                <small style="color: #50453b; font-weight: 500;">@item.ServiceName</small>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span style="font-weight: 600; color: #805528; font-size: 15px;">@item.Rating</span>
+                                    <span class="material-symbols-outlined star-rating">star</span>
+                                </div>
+                            </td>
+                            <td style="max-width: 250px;">
+                                <div class="text-truncate" title="@item.Comment" style="color: #50453b; line-height: 1.5;">
+                                    @(string.IsNullOrEmpty(item.Comment) ? "Không có nội dung" : item.Comment)
+                                </div>
+                            </td>
+                            <td style="color: #50453b;">@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-center">
+                                @if (item.IsVisible)
+                                {
+                                    <span class="status-badge visible"><span class="material-symbols-outlined" style="font-size: 16px; margin-right: 4px;">visibility</span> Hiển thị</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge hidden"><span class="material-symbols-outlined" style="font-size: 16px; margin-right: 4px;">visibility_off</span> Đã ẩn</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <form asp-action="ToggleVisibility" method="post" style="display:inline;">
+                                    <input type="hidden" name="reviewId" value="@item.ReviewId" />
+                                    @if (item.IsVisible)
+                                    {
+                                        <button type="submit" class="btn-outline-luxury" style="color: #ba1a1a; border-color: #ba1a1a;" title="Ẩn đánh giá này">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">visibility_off</span> Ẩn
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn-luxury" title="Hiển thị đánh giá này">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span> Hiện
+                                        </button>
+                                    }
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #a4b5ce; padding: 48px;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 16px; display: block;">reviews</span>
+                            Chưa có đánh giá nào phù hợp với bộ lọc hiện tại.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div id="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; font-family: 'Inter', sans-serif; border-top: 1px solid #f0ede9;">
+        <div style="color: #50453b; font-size: 14px;">
+            Hiển thị <span id="page-info-start" style="font-weight: 600; color: #1c1c1a;">0</span> - <span id="page-info-end" style="font-weight: 600; color: #1c1c1a;">0</span> trong số <span id="page-info-total" style="font-weight: 600; color: #1c1c1a;">0</span> đánh giá
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button id="btn-prev-page" class="btn-outline-luxury" style="padding: 6px 12px; gap: 4px;" disabled>
+                <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span> Trước
+            </button>
+            <button id="btn-next-page" class="btn-outline-luxury" style="padding: 6px 12px; gap: 4px;" disabled>
+                Sau <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var currentPage = 1;
+            var pageSize = 10; // Giới hạn 10 đánh giá mỗi trang cho dễ nhìn
+
+            function applyPagination() {
+                var tbody = document.querySelector('#reviews-table tbody');
+                var tableRows = Array.from(tbody.querySelectorAll('tr'));
+                
+                // Exclude empty state row
+                var dataRows = tableRows.filter(row => row.cells.length > 1);
+                
+                var totalItems = dataRows.length;
+                if (totalItems === 0) return; // If no data, do nothing
+                
+                var totalPages = Math.ceil(totalItems / pageSize);
+                if (currentPage > totalPages) currentPage = totalPages || 1;
+
+                var startIndex = (currentPage - 1) * pageSize;
+                var endIndex = Math.min(startIndex + pageSize, totalItems);
+
+                dataRows.forEach(function(row, index) {
+                    if (index >= startIndex && index < endIndex) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                var infoStart = document.getElementById('page-info-start');
+                var infoEnd = document.getElementById('page-info-end');
+                var infoTotal = document.getElementById('page-info-total');
+                var btnPrev = document.getElementById('btn-prev-page');
+                var btnNext = document.getElementById('btn-next-page');
+
+                if (infoStart) infoStart.textContent = startIndex + 1;
+                if (infoEnd) infoEnd.textContent = endIndex;
+                if (infoTotal) infoTotal.textContent = totalItems;
+                
+                if (btnPrev) btnPrev.disabled = currentPage <= 1;
+                if (btnNext) btnNext.disabled = currentPage >= totalPages;
+            }
+
+            document.getElementById('btn-prev-page')?.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    applyPagination();
+                }
+            });
+
+            document.getElementById('btn-next-page')?.addEventListener('click', function() {
+                currentPage++;
+                applyPagination();
+            });
+
+            // Initial render
+            applyPagination();
+        });
+    </script>
+}

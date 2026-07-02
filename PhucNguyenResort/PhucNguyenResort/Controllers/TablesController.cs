@@ -57,8 +57,16 @@ public class TablesController : Controller
         {
             TableId = table.TableId,
             TableNumber = table.TableNumber,
+            TableName = table.TableName,
+            ImageUrl = table.ImageUrl,
+            Description = table.Description,
+            Area = table.Area,
+            TableType = table.TableType,
+            LocationNote = table.LocationNote,
             Capacity = table.Capacity,
-            Status = table.Status
+            Status = table.Status,
+            IsReservable = table.IsReservable,
+            DisplayOrder = table.DisplayOrder
         };
 
         return View(model);

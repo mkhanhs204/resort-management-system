@@ -1,0 +1,209 @@
+@model PhucNguyenResort.ViewModels.Bookings.InvoiceViewModel
+
+@{
+    ViewData["Title"] = "Hóa Đơn Thanh Toán";
+    bool isCustomer = User.IsInRole("Customer");
+    Layout = isCustomer ? "_Layout" : "_DashboardLayout";
+}
+
+<style>
+    .invoice-container {
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .invoice-header {
+        border-bottom: 2px solid #4e73df;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+    }
+    .invoice-title {
+        color: #4e73df;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    .table-invoice th {
+        background-color: #f8f9fc;
+        color: #5a5c69;
+        border-top: none;
+        border-bottom: 2px solid #e3e6f0;
+    }
+    .table-invoice td {
+        vertical-align: middle;
+    }
+    .invoice-total-row {
+        background-color: #f8f9fc;
+        font-weight: bold;
+    }
+    .company-details h4 {
+        color: #2e59d9;
+        font-weight: bold;
+    }
+    .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 8rem;
+        color: rgba(78, 115, 223, 0.05);
+        font-weight: bold;
+        z-index: 0;
+        pointer-events: none;
+    }
+    
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        .invoice-container, .invoice-container * {
+            visibility: visible;
+        }
+        .invoice-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            box-shadow: none;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4 position-relative" style="margin-top: @(isCustomer ? "50px" : "0"); margin-bottom: @(isCustomer ? "50px" : "0");">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print" style="max-width: 900px; margin: 0 auto;">
+        @if (isCustomer)
+        {
+            <a asp-controller="Bookings" asp-action="MyBookings" class="btn btn-outline-secondary rounded-pill px-4"><i class="fas fa-arrow-left mr-2"></i> Quay lại</a>
+        }
+        else
+        {
+            <a asp-controller="Reception" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4"><i class="fas fa-arrow-left mr-2"></i> Quay lại</a>
+        }
+        <button onclick="window.print()" class="btn btn-primary rounded-pill px-4 shadow"><i class="fas fa-print mr-2"></i> In Hóa Đơn (PDF)</button>
+    </div>
+
+    <div class="invoice-container position-relative">
+        <div class="watermark">PAID</div>
+        
+        <div class="invoice-header d-flex justify-content-between align-items-start position-relative" style="z-index: 1;">
+            <div class="company-details">
+                <h4 class="mb-1"><i class="fas fa-hotel mr-2"></i>PhucNguyen Resort</h4>
+                <p class="mb-0 text-muted">Khu du lịch sinh thái PhucNguyen</p>
+                <p class="mb-0 text-muted">123 Đường Tự Do, TP. Biển Xanh</p>
+                <p class="mb-0 text-muted">Phone: 0123 456 789 | Email: contact@phucnguyen.com</p>
+            </div>
+            <div class="text-right">
+                <h2 class="invoice-title">HÓA ĐƠN</h2>
+                <p class="mb-0"><strong>Số HĐ:</strong> @Model.InvoiceNumber</p>
+                <p class="mb-0"><strong>Ngày xuất:</strong> @Model.IssuedAt.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+
+        <div class="row mb-5 position-relative" style="z-index: 1;">
+            <div class="col-sm-6">
+                <h6 class="text-uppercase text-muted font-weight-bold mb-3">Thông Tin Khách Hàng:</h6>
+                <h5 class="font-weight-bold text-dark mb-1">@Model.GuestName</h5>
+                @if (!string.IsNullOrEmpty(Model.GuestPhone))
+                {
+                    <p class="mb-0 text-muted">Điện thoại: @Model.GuestPhone</p>
+                }
+                <p class="mb-0 text-muted">Mã Booking: #@Model.BookingId</p>
+            </div>
+            <div class="col-sm-6 text-sm-right">
+                <h6 class="text-uppercase text-muted font-weight-bold mb-3">Thông Tin Lưu Trú:</h6>
+                <p class="mb-1"><strong>Phòng:</strong> @Model.RoomNumbers</p>
+                <p class="mb-1"><strong>Nhận phòng:</strong> @(Model.ActualCheckInTime?.ToString("dd/MM/yyyy HH:mm") ?? Model.CheckInDate.ToString("dd/MM/yyyy"))</p>
+                <p class="mb-0"><strong>Trả phòng:</strong> @(Model.ActualCheckOutTime?.ToString("dd/MM/yyyy HH:mm") ?? Model.CheckOutDate.ToString("dd/MM/yyyy"))</p>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-5 position-relative" style="z-index: 1;">
+            <table class="table table-invoice text-dark">
+                <thead>
+                    <tr>
+                        <th width="20%">Thời gian</th>
+                        <th width="50%">Mô tả giao dịch</th>
+                        <th width="30%" class="text-right">Thành tiền (VNĐ)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Transactions != null && Model.Transactions.Any())
+                    {
+                        foreach (var txn in Model.Transactions.Where(t => t.Amount > 0))
+                        {
+                            <tr>
+                                <td>@txn.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                <td>@txn.TransactionTypeName</td>
+                                <td class="text-right">@txn.Amount?.ToString("N0")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Không có dữ liệu</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row position-relative" style="z-index: 1;">
+            <div class="col-lg-6 col-md-5">
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted font-weight-bold mb-2">Phương thức thanh toán:</h6>
+                    <p class="text-dark font-weight-bold"><i class="fas fa-check-circle text-success mr-1"></i> @Model.PaymentMethod</p>
+                </div>
+                <div class="text-muted small">
+                    <p class="mb-1">Cảm ơn Quý khách đã lựa chọn PhucNguyen Resort!</p>
+                    <p>Mọi thắc mắc về hóa đơn vui lòng liên hệ quầy Lễ tân.</p>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-7">
+                <table class="table table-borderless text-dark text-right">
+                    <tr>
+                        <td width="60%">Tổng tiền phòng:</td>
+                        <td width="40%">@Model.TotalRoomCharges.ToString("N0")</td>
+                    </tr>
+                    @if(Model.TotalFoodCharges > 0)
+                    {
+                    <tr>
+                        <td>Tổng tiền ăn uống:</td>
+                        <td>@Model.TotalFoodCharges.ToString("N0")</td>
+                    </tr>
+                    }
+                    @if(Model.TotalTourCharges > 0)
+                    {
+                    <tr>
+                        <td>Tổng tiền tour:</td>
+                        <td>@Model.TotalTourCharges.ToString("N0")</td>
+                    </tr>
+                    }
+                    <tr class="border-top">
+                        <td class="font-weight-bold">Tổng Chi Phí:</td>
+                        <td class="font-weight-bold">@Model.TotalAmount.ToString("N0")</td>
+                    </tr>
+                    <tr class="text-success">
+                        <td>Đã đặt cọc:</td>
+                        <td>- @Model.DepositAmount.ToString("N0")</td>
+                    </tr>
+                    <tr class="invoice-total-row border-top">
+                        <td class="h5 mb-0 text-danger font-weight-bold py-3">TỔNG ĐÃ THANH TOÁN:</td>
+                        <td class="h5 mb-0 text-danger font-weight-bold py-3">@Model.AmountPaid.ToString("N0") VNĐ</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5 pt-4 border-top text-muted small position-relative" style="z-index: 1;">
+            <p>Đây là hóa đơn điện tử được tạo tự động bởi hệ thống PhucNguyen Resort.</p>
+        </div>
+    </div>
+</div>

@@ -32,7 +32,7 @@ namespace PhucNguyenResort.Controllers
             var response = _vnPayService.ExecutePayment(Request.Query);
             if (!response.Success)
             {
-                // Optionally handle fail
+                var paymentDescription = $"Thanh toan dat phong #{response.OrderId}";
                 TempData["Error"] = "Thanh toán không thành công. Mã lỗi: " + response.VnPayResponseCode;
             }
             else
@@ -42,7 +42,8 @@ namespace PhucNguyenResort.Controllers
                 {
                     var booking = _context.Bookings
                         .Include(b => b.User)
-                        .Include(b => b.Room)
+                        .Include(b => b.BookingDetails)
+                            .ThenInclude(bd => bd.Room)
                         .Include(b => b.TourBookings)
                             .ThenInclude(tb => tb.Schedule)
                                 .ThenInclude(s => s.Tour)
@@ -73,18 +74,18 @@ namespace PhucNguyenResort.Controllers
                                     tourHtml = "<h3 style='color: #dfa974; margin-top: 30px;'>Vé Dịch Vụ Tour Đi Kèm</h3>";
                                     foreach (var tb in booking.TourBookings)
                                     {
-                                        var request = HttpContext.Request;
-                                        string baseUrl = $"{request.Scheme}://{request.Host}";
                                         string tourName = tb.Schedule?.Tour?.TourName ?? "Tour không xác định";
-                                        string qrData = $"{baseUrl}/Tours/CheckTicket?ticketId={tb.TourBookingId}";
-                                        string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={System.Net.WebUtility.UrlEncode(qrData)}";
-
+                                        string qrData = $"{Request.Scheme}://{Request.Host}/Tours/CheckTicket?ticketId={tb.TourBookingId}";
+                                        string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&amp;data={System.Net.WebUtility.UrlEncode(qrData)}";
+                                        
                                         tourHtml += $@"
                                             <div style='background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; text-align: center;'>
                                                 <h4 style='margin-top: 0;'>{tourName}</h4>
                                                 <p>Số người: <strong>{tb.Participants}</strong></p>
-                                                <img src='{qrUrl}' alt='QR Code' style='margin-top: 10px; border: 2px solid #dfa974; border-radius: 5px; padding: 5px;' />
-                                                <p style='font-size: 12px; color: #777;'>Mã vé: {tb.TourBookingId}</p>
+                                                <p style='font-size: 12px; color: #777; margin-bottom: 10px;'>Mã vé: {tb.TourBookingId}</p>
+                                                <div style='margin-top: 10px;'>
+                                                    <img src='{qrUrl}' alt='QR Code Vé Tour' style='width: 250px; height: 250px; display: inline-block;' />
+                                                </div>
                                             </div>";
                                     }
                                 }
@@ -92,9 +93,9 @@ namespace PhucNguyenResort.Controllers
                                 var htmlBody = System.IO.File.ReadAllText(templatePath);
                                 htmlBody = htmlBody.Replace("{{CustomerName}}", booking.User.FullName)
                                                    .Replace("{{BookingId}}", booking.BookingId.ToString())
-                                                   .Replace("{{RoomName}}", booking.Room?.RoomNumber ?? "N/A")
-                                                   .Replace("{{CheckInDate}}", booking.CheckInDate.ToString("dd/MM/yyyy"))
-                                                   .Replace("{{CheckOutDate}}", booking.CheckOutDate.ToString("dd/MM/yyyy"))
+                                                   .Replace("{{RoomName}}", booking.BookingDetails != null && booking.BookingDetails.Any(bd => bd.Room != null) ? string.Join(", ", booking.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : "Chưa xếp phòng")
+                                                   .Replace("{{CheckInDate}}", booking.CheckInDate.ToString("dd/MM/yyyy") + " 14:00")
+                                                   .Replace("{{CheckOutDate}}", booking.CheckOutDate.ToString("dd/MM/yyyy") + " 12:00")
                                                    .Replace("{{TotalAmount}}", (booking.TotalAmount ?? 0).ToString("N0"))
                                                    .Replace("{{DepositAmount}}", (booking.DepositAmount ?? 0).ToString("N0"))
                                                    .Replace("{{TourDetails}}", tourHtml);

@@ -1,6 +1,12 @@
+@using PhucNguyenResort.Enums
+@model IEnumerable<PhucNguyenResort.ViewModels.Kots.KotDetailViewModel>
 @{
     ViewData["Title"] = "Kitchen Staff Dashboard";
     Layout = "_DashboardLayout";
+
+    var pendingCount = Model?.Count(k => k.Status == KotStatus.Pending) ?? 0;
+    var cookingCount = Model?.Count(k => k.Status == KotStatus.Cooking) ?? 0;
+    var readyCount = Model?.Count(k => k.Status == KotStatus.Ready) ?? 0;
 }
 
 <div class="row mb-4">
@@ -19,92 +25,142 @@
     </div>
 </div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
 <!-- KPI Cards -->
 <div class="row mb-4">
     <div class="col-lg-4 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107;">
             <h4 style="color: #ffc107;"><i class="fa fa-clock-o"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Pending Orders</p>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@pendingCount</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Pending</p>
             <small class="text-muted">Waiting to start cooking</small>
         </div>
     </div>
     <div class="col-lg-4 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #fd7e14;">
             <h4 style="color: #fd7e14;"><i class="fa fa-fire"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Now Preparing</p>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@cookingCount</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Cooking</p>
             <small class="text-muted">Currently being cooked</small>
         </div>
     </div>
     <div class="col-lg-4 col-md-6 mb-3">
         <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
             <h4 style="color: #28a745;"><i class="fa fa-check-circle"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Ready to Serve</p>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@readyCount</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Ready</p>
             <small class="text-muted">Waiting for pickup</small>
         </div>
     </div>
 </div>
 
-<!-- Active KOT Cards (Placeholder) -->
+<!-- Active KOT Cards -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card-box" style="border-left: 5px solid #fd7e14;">
             <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
                 <i class="fa fa-list-alt mr-2" style="color: #fd7e14;"></i> Active Kitchen Order Tickets
             </h5>
+            
             <div class="row">
-                <!-- Placeholder KOT Cards -->
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm rounded" style="border-top: 3px solid #ffc107;">
-                        <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: #fff8e1; font-family: 'Cabin', sans-serif;">
-                            <strong>KOT #--</strong>
-                            <small class="text-muted"><i class="fa fa-clock-o mr-1"></i> --:--</small>
-                        </div>
-                        <div class="card-body p-3 text-center text-muted" style="font-family: 'Cabin', sans-serif;">
-                            <i class="fa fa-info-circle fa-2x mb-2 d-block"></i>
-                            <p class="mb-0" style="font-size: 13px;">KOT data will be loaded when backend is connected.</p>
-                        </div>
-                        <div class="card-footer p-2 text-center">
-                            <button class="btn btn-sm btn-outline-warning btn-block" disabled>
-                                <i class="fa fa-play mr-1"></i> Start Cooking
-                            </button>
-                        </div>
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="col-12 text-center text-muted p-4">
+                        <i class="fa fa-check-circle fa-3x mb-3 text-success"></i>
+                        <h5>No active orders!</h5>
+                        <p>Kitchen is all caught up.</p>
                     </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm rounded" style="border-top: 3px solid #fd7e14;">
-                        <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: #fff3e0; font-family: 'Cabin', sans-serif;">
-                            <strong>KOT #--</strong>
-                            <small class="text-muted"><i class="fa fa-clock-o mr-1"></i> --:--</small>
+                }
+                else
+                {
+                    foreach (var kot in Model.Where(k => k.Status != KotStatus.Completed))
+                    {
+                        var borderColor = kot.Status == KotStatus.Pending ? "#ffc107" :
+                                          kot.Status == KotStatus.Cooking ? "#fd7e14" : "#28a745";
+                        var headerBg = kot.Status == KotStatus.Pending ? "#fff8e1" :
+                                       kot.Status == KotStatus.Cooking ? "#fff3e0" : "#e8f5e9";
+                        var serviceLocation = kot.OrderType == FoodOrderType.TableService
+                            ? $"Table {(string.IsNullOrWhiteSpace(kot.TableNumber) ? "N/A" : kot.TableNumber)}{(string.IsNullOrWhiteSpace(kot.TableName) ? "" : $" - {kot.TableName}")}"
+                            : $"Room {(string.IsNullOrWhiteSpace(kot.RoomNumber) ? "N/A" : kot.RoomNumber)}";
+
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm rounded" style="border-top: 3px solid @borderColor;">
+                                <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: @headerBg; font-family: 'Cabin', sans-serif;">
+                                    <strong>KOT #@kot.KotId (Ord: #@kot.FoodOrderId) - @serviceLocation</strong>
+                                    <small class="text-muted" title="@kot.CreatedAt.ToString("HH:mm:ss")"><i class="fa fa-clock-o mr-1"></i> @kot.CreatedAt.ToString("HH:mm")</small>
+                                </div>
+                                <div class="card-body p-3" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                                    <ul class="list-unstyled mb-0">
+                                        @if(kot.Items != null && kot.Items.Any())
+                                        {
+                                            foreach(var item in kot.Items)
+                                            {
+                                                <li class="mb-2 border-bottom pb-1">
+                                                    <strong>@item.Quantity x @item.MenuItemName</strong>
+                                                    @if(!string.IsNullOrEmpty(item.Notes))
+                                                    {
+                                                        <br /><small class="text-danger"><i class="fa fa-exclamation-triangle mr-1"></i>Note: @item.Notes</small>
+                                                    }
+                                                </li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <li class="text-muted">No items found.</li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="card-footer p-2 text-center bg-white border-top-0">
+                                    @if (kot.Status == KotStatus.Pending)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="UpdateKotStatus" method="post" style="display:inline;">
+                                            <input type="hidden" name="kotId" value="@kot.KotId" />
+                                            <input type="hidden" name="newStatus" value="Cooking" />
+                                            <button type="submit" class="btn btn-sm btn-outline-warning btn-block font-weight-bold">
+                                                <i class="fa fa-play mr-1"></i> Start Cooking
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (kot.Status == KotStatus.Cooking)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="UpdateKotStatus" method="post" style="display:inline;">
+                                            <input type="hidden" name="kotId" value="@kot.KotId" />
+                                            <input type="hidden" name="newStatus" value="Ready" />
+                                            <button type="submit" class="btn btn-sm btn-success btn-block font-weight-bold">
+                                                <i class="fa fa-check mr-1"></i> Mark Ready to Serve
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (kot.Status == KotStatus.Ready)
+                                    {
+                                        <span class="badge badge-success py-2 px-3 w-100" style="font-size: 14px;">
+                                            <i class="fa fa-bell mr-1"></i> Awaiting Pickup by F&B
+                                        </span>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body p-3 text-center text-muted" style="font-family: 'Cabin', sans-serif;">
-                            <i class="fa fa-fire fa-2x mb-2 d-block" style="color: #fd7e14;"></i>
-                            <p class="mb-0" style="font-size: 13px;">Currently being prepared...</p>
-                        </div>
-                        <div class="card-footer p-2 text-center">
-                            <button class="btn btn-sm btn-success btn-block" disabled>
-                                <i class="fa fa-check mr-1"></i> Mark Ready to Serve
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm rounded" style="border-top: 3px solid #28a745;">
-                        <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: #e8f5e9; font-family: 'Cabin', sans-serif;">
-                            <strong>KOT #--</strong>
-                            <small class="text-muted"><i class="fa fa-clock-o mr-1"></i> --:--</small>
-                        </div>
-                        <div class="card-body p-3 text-center" style="font-family: 'Cabin', sans-serif; color: #28a745;">
-                            <i class="fa fa-check-circle fa-2x mb-2 d-block"></i>
-                            <p class="mb-0 font-weight-bold" style="font-size: 13px;">Ready to Serve!</p>
-                        </div>
-                        <div class="card-footer p-2 text-center">
-                            <span class="badge badge-success py-2 px-3">Awaiting Pickup</span>
-                        </div>
-                    </div>
-                </div>
+                    }
+                }
             </div>
         </div>
     </div>

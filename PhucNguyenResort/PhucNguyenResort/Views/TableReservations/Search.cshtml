@@ -1,0 +1,233 @@
+@using PhucNguyenResort.Enums
+@model PhucNguyenResort.ViewModels.TableReservations.TableReservationSearchViewModel
+
+@{
+    ViewData["Title"] = "Reserve a Table";
+    var dateValue = Model.ReservationDate?.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd");
+    var timeValue = Model.ReservationTime?.ToString(@"hh\:mm") ?? "18:00";
+}
+
+<div class="tr-page">
+    <div class="tr-container">
+        <div class="tr-header">
+            <div>
+                <span class="tr-eyebrow">Restaurant Reservation</span>
+                <h1>Reserve a Table</h1>
+                <p>Choose a dining time and party size to find available tables.</p>
+            </div>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <a asp-action="MyReservations" class="tr-btn tr-btn-outline">
+                    <i class="fa fa-list"></i> My Reservations
+                </a>
+            }
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="tr-alert tr-alert-success">
+                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="tr-alert tr-alert-danger">
+                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <form asp-action="Search" method="post" class="tr-search-panel">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="tr-form-grid">
+                <div class="tr-field">
+                    <label asp-for="ReservationDate">Date</label>
+                    <input asp-for="ReservationDate" type="date" value="@dateValue" class="tr-input" />
+                    <span asp-validation-for="ReservationDate" class="text-danger"></span>
+                </div>
+
+                <div class="tr-field">
+                    <label asp-for="ReservationTime">Time</label>
+                    <input asp-for="ReservationTime" type="time" value="@timeValue" class="tr-input" />
+                    <span asp-validation-for="ReservationTime" class="text-danger"></span>
+                </div>
+
+                <div class="tr-field">
+                    <label asp-for="PartySize">Guests</label>
+                    <input asp-for="PartySize" type="number" min="1" max="50" class="tr-input" />
+                    <span asp-validation-for="PartySize" class="text-danger"></span>
+                </div>
+
+                <div class="tr-field tr-field-action">
+                    <button type="submit" class="tr-btn tr-btn-primary">
+                        <i class="fa fa-search"></i> Find Tables
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="tr-section-title">
+            <h2>Restaurant Tables</h2>
+            <span>@Model.Tables.Count dining option(s)</span>
+        </div>
+
+        @if (Model.Tables.Any())
+        {
+            <div class="tr-table-grid">
+                @foreach (var table in Model.Tables)
+                {
+                    var statusClass = table.Status switch
+                    {
+                        DiningTableStatus.Available => "available",
+                        DiningTableStatus.Occupied => "occupied",
+                        DiningTableStatus.Reserved => "reserved",
+                        _ => "pending"
+                    };
+
+                    <div class="tr-table-card tr-table-card-media">
+                        <div class="tr-table-image">
+                            @if (!string.IsNullOrWhiteSpace(table.ImageUrl))
+                            {
+                                <img src="@table.ImageUrl" alt="@table.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="tr-image-fallback" style="display:none;">
+                                    <i class="fa fa-cutlery"></i>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="tr-image-fallback">
+                                    <i class="fa fa-cutlery"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="tr-card-top">
+                            <div>
+                                <div class="tr-table-number">@table.TableName</div>
+                                <div class="tr-table-muted">Table @table.TableNumber</div>
+                            </div>
+                            <span class="tr-status @statusClass">@table.Status</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(table.Description))
+                        {
+                            <p class="tr-table-description">@table.Description</p>
+                        }
+                        <div class="tr-table-meta">
+                            <span><i class="fa fa-users"></i> Up to @table.Capacity guests</span>
+                            @if (!string.IsNullOrWhiteSpace(table.Area))
+                            {
+                                <span><i class="fa fa-map-marker"></i> @table.Area</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(table.TableType))
+                            {
+                                <span><i class="fa fa-tag"></i> @table.TableType</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(table.LocationNote))
+                            {
+                                <span><i class="fa fa-location-arrow"></i> @table.LocationNote</span>
+                            }
+                        </div>
+                        <div class="tr-card-bottom">
+                            <span>Search by date and time to check availability</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="tr-empty">
+                <i class="fa fa-table"></i>
+                <h3>No Tables Available</h3>
+                <p>Restaurant tables will appear here after staff creates them.</p>
+            </div>
+        }
+
+        @if (Model.AvailableTables.Any())
+        {
+            <div class="tr-section-title">
+                <h2>Available Tables</h2>
+                <span>@Model.AvailableTables.Count table(s) found</span>
+            </div>
+
+            <div class="tr-table-grid">
+                @foreach (var table in Model.AvailableTables)
+                {
+                    <div class="tr-table-card tr-table-card-media">
+                        <div class="tr-table-image">
+                            @if (!string.IsNullOrWhiteSpace(table.ImageUrl))
+                            {
+                                <img src="@table.ImageUrl" alt="@table.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="tr-image-fallback" style="display:none;">
+                                    <i class="fa fa-cutlery"></i>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="tr-image-fallback">
+                                    <i class="fa fa-cutlery"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="tr-card-top">
+                            <div>
+                                <div class="tr-table-number">@table.TableName</div>
+                                <div class="tr-table-muted">Table @table.TableNumber</div>
+                            </div>
+                            <span class="tr-status available">Available</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(table.Description))
+                        {
+                            <p class="tr-table-description">@table.Description</p>
+                        }
+                        <div class="tr-table-meta">
+                            <span><i class="fa fa-users"></i> Up to @table.Capacity guests</span>
+                            @if (!string.IsNullOrWhiteSpace(table.Area))
+                            {
+                                <span><i class="fa fa-map-marker"></i> @table.Area</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(table.TableType))
+                            {
+                                <span><i class="fa fa-tag"></i> @table.TableType</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(table.LocationNote))
+                            {
+                                <span><i class="fa fa-location-arrow"></i> @table.LocationNote</span>
+                            }
+                            <span><i class="fa fa-calendar"></i> @table.ReservationDate.ToString("MMM dd, yyyy")</span>
+                            <span><i class="fa fa-clock-o"></i> @table.ReservationTime.ToString(@"hh\:mm")</span>
+                        </div>
+                        <div class="tr-card-bottom">
+                            <span>@table.DurationMinutes minutes</span>
+                            <a asp-action="Create"
+                               asp-route-tableId="@table.TableId"
+                               asp-route-reservationDate="@table.ReservationDate.ToString("yyyy-MM-dd")"
+                               asp-route-reservationTime="@table.ReservationTime.ToString(@"hh\:mm")"
+                               asp-route-partySize="@Model.PartySize"
+                               asp-route-durationMinutes="@table.DurationMinutes"
+                               class="tr-btn tr-btn-primary tr-btn-sm">
+                                Reserve <i class="fa fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (Context.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="tr-empty">
+                <i class="fa fa-calendar-times-o"></i>
+                <h3>No Available Tables</h3>
+                <p>Try a different time, date, or party size.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/table-reservations.css" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

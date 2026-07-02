@@ -1,0 +1,182 @@
+@model PhucNguyenResort.ViewModels.Tours.TourListVM
+@{
+    ViewData["Title"] = "Kết quả Tìm kiếm Tour - Phúc Nguyên Resort";
+}
+
+@section Styles {
+    <style>
+        .luxury-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.06);
+        }
+        .luxury-shadow-lg {
+            box-shadow: 0 32px 50px rgba(30, 41, 59, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+}
+
+<main class="pt-8 pb-section-gap-lg bg-background">
+
+    <!-- Results Header -->
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg mb-2 text-on-surface">Hành Trình Trải Nghiệm</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Tìm thấy <span class="font-bold text-primary">@Model.TotalCount tours</span> phù hợp với yêu cầu của bạn</p>
+        </div>
+        <form asp-action="Index" method="get" class="flex items-center gap-4 text-on-surface-variant">
+            <input type="hidden" name="search" value="@Model.SearchKeyword" />
+            <span class="font-label-lg text-label-lg whitespace-nowrap">Sắp xếp theo:</span>
+            <select name="sortBy" onchange="this.form.submit()" class="bg-transparent border-none font-label-lg text-label-lg text-primary font-bold cursor-pointer outline-none focus:ring-0 py-1 pl-2 pr-8 m-0 w-auto appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DFA974%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem top 50%; background-size: 0.65rem auto;">
+                <option value="">Không sắp xếp</option>
+                @if(Model.SortBy == "rating_desc") { <option value="rating_desc" selected>Đánh giá: Từ cao đến thấp</option> } else { <option value="rating_desc">Đánh giá: Từ cao đến thấp</option> }
+                @if(Model.SortBy == "rating_asc") { <option value="rating_asc" selected>Đánh giá: Từ thấp đến cao</option> } else { <option value="rating_asc">Đánh giá: Từ thấp đến cao</option> }
+                @if(Model.SortBy == "schedules_desc") { <option value="schedules_desc" selected>Nhiều lịch trình nhất</option> } else { <option value="schedules_desc">Nhiều lịch trình nhất</option> }
+                @if(Model.SortBy == "price_asc") { <option value="price_asc" selected>Giá: Thấp đến Cao</option> } else { <option value="price_asc">Giá: Thấp đến Cao</option> }
+                @if(Model.SortBy == "price_desc") { <option value="price_desc" selected>Giá: Cao đến Thấp</option> } else { <option value="price_desc">Giá: Cao đến Thấp</option> }
+            </select>
+        </form>
+    </div>
+
+    <!-- Tour Grid -->
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+            @if (Model.Tours != null && Model.Tours.Any())
+            {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+                @foreach (var tour in Model.Tours)
+                {
+                    string imageUrl = string.IsNullOrEmpty(tour.ImageUrl) ? "https://lh3.googleusercontent.com/aida-public/AB6AXuCpOUrgaZ5m78kovL_1L4FziWaSnLV-irC-x3K4XC7Fap715wN0VT65CdQPr00XoISe6-wE-HiaxWNVoptQ1uXNpfuPabNvzI3WnJfjqY4sa8XR9ldHMpUCEYCcXpnxJ3oaseLKxjV9gUv6p_roKXMoQgHJzP5YD5NfPaX0MxRJwIYMwIkPPIBNVmJ8w_3jb88qOMYeSq4bxkNfgzn5rOwLwZojg20gVNvAm8tWKVDFB_JAKbPkoM34DJoQLY8dW8LPhsLBC2RtlpCb" : tour.ImageUrl;
+
+                    <article class="tour-card bg-surface-container-lowest rounded-xl overflow-hidden luxury-shadow border border-outline/5 flex flex-col group hover:-translate-y-1 transition-transform duration-300">
+                        <div class="relative h-64 overflow-hidden">
+                            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="@imageUrl" alt="@tour.TourName" />
+                            @if (!string.IsNullOrEmpty(tour.Location))
+                            {
+                                <div class="absolute top-4 left-4 bg-primary-container/90 backdrop-blur-md text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm uppercase">@tour.Location</div>
+                            }
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
+                                <span class="material-symbols-outlined text-primary fill-icon text-[16px]">star</span>
+                                <span class="font-bold text-label-sm text-on-surface">@(tour.AverageRating > 0 ? tour.AverageRating.ToString("F1") : "4.9")</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="font-headline-sm text-headline-sm mb-4 leading-tight group-hover:text-primary transition-colors text-on-surface line-clamp-2">@tour.TourName</h3>
+                            
+                            <p class="text-on-surface-variant text-body-md line-clamp-2 mb-4">@tour.Description</p>
+
+                            <div class="flex items-center gap-gutter mb-6 text-on-surface-variant font-body-md mt-auto">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-outline">schedule</span>
+                                    <span>@(tour.DurationHours >= 24 ? $"{tour.DurationHours/24} ngày" : $"{tour.DurationHours} giờ")</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-outline">event_available</span>
+                                    <span>@tour.UpcomingScheduleCount lịch trình</span>
+                                </div>
+                            </div>
+                            <div class="pt-6 border-t border-outline-variant/20 flex justify-between items-center">
+                                <div>
+                                    <p class="text-label-sm text-on-surface-variant uppercase mb-1 tracking-tight">Giá mỗi người</p>
+                                    <p class="text-headline-sm text-primary font-bold">@tour.Price.ToString("N0")đ</p>
+                                </div>
+                                <a asp-action="Details" asp-route-id="@tour.TourId" class="border border-secondary text-secondary px-5 py-2 rounded-lg font-label-lg text-label-lg hover:bg-secondary hover:text-white transition-all">Chi tiết</a>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="mt-8 flex justify-center">
+                    <ul class="flex items-center gap-2">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li>
+                                <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage - 1 })" aria-label="Previous" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+
+                        @{
+                            int startPage = Math.Max(1, Model.CurrentPage - 2);
+                            int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+                            if (startPage > 1)
+                            {
+                                <li>
+                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = 1 })" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">1</a>
+                                </li>
+                                if (startPage > 2)
+                                {
+                                    <li><span class="flex items-center justify-center w-10 h-10 text-on-surface-variant">...</span></li>
+                                }
+                            }
+
+                            for (int i = startPage; i <= endPage; i++)
+                            {
+                                <li>
+                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = i })" class="flex items-center justify-center w-10 h-10 rounded-lg @(i == Model.CurrentPage ? "bg-primary text-on-primary font-bold shadow-md" : "border border-outline-variant/30 text-primary hover:bg-primary/10") transition-colors">@i</a>
+                                </li>
+                            }
+
+                            if (endPage < Model.TotalPages)
+                            {
+                                if (endPage < Model.TotalPages - 1)
+                                {
+                                    <li><span class="flex items-center justify-center w-10 h-10 text-on-surface-variant">...</span></li>
+                                }
+                                <li>
+                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.TotalPages })" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">@Model.TotalPages</a>
+                                </li>
+                            }
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li>
+                                <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage + 1 })" aria-label="Next" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="tour-empty">
+                <i class="fa fa-compass"></i>
+                <h4>Không tìm thấy tour nào</h4>
+                <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
+            </div>
+        }
+
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        // Hover effect for tour cards
+        const cards = document.querySelectorAll('.tour-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('luxury-shadow-lg');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('luxury-shadow-lg');
+            });
+        });
+    </script>
+}

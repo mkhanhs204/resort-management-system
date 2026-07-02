@@ -1,0 +1,114 @@
+@model PhucNguyenResort.Models.TourSchedule
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Lịch Trình";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #805528; margin-bottom: 4px; }
+        .page-subtitle { font-family: 'Inter', sans-serif; color: #50453b; font-size: 16px; }
+        .luxury-card { background: #ffffff; border-radius: 16px; box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08); border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; padding: 32px; margin-bottom: 30px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; }
+        .form-control { background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 10px 16px; height: auto; font-size: 14px; color: #1c1c1a; transition: all 0.2s; box-shadow: none; }
+        .form-control:focus { background-color: #ffffff; border-color: #dfa974; box-shadow: 0 0 0 4px rgba(223, 169, 116, 0.1); }
+        .form-group label { color: #1c1c1a; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .btn-luxury { background-color: #dfa974; color: #633d11; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 10px 24px; border: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; }
+        .btn-luxury:hover { background-color: #805528; color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2); text-decoration: none; }
+        .btn-secondary-luxury { background-color: #f0ede9; color: #50453b; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 10px 24px; border: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; }
+        .btn-secondary-luxury:hover { background-color: #e5e2de; color: #1c1c1a; text-decoration: none; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">Chỉnh Sửa Lịch Trình</h2>
+        <p class="page-subtitle">Cập nhật thông tin phân công của lịch trình.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-secondary-luxury">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<div class="luxury-card">
+    <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px;">
+        Thông Tin Lịch Trình #@Model.ScheduleId
+    </div>
+    <div>
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;" role="alert"></div>
+            <input type="hidden" asp-for="ScheduleId" />
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label asp-for="TourId">Tên Tour <span class="text-danger">*</span></label>
+                        <select asp-for="TourId" class="form-control" asp-items="ViewBag.Tours">
+                            <option value="">-- Chọn Tour --</option>
+                        </select>
+                        <span asp-validation-for="TourId" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label asp-for="GuideId">Hướng dẫn viên</label>
+                        <select asp-for="GuideId" class="form-control" asp-items="ViewBag.Guides">
+                            <option value="">-- Chọn Hướng dẫn viên (Không bắt buộc) --</option>
+                        </select>
+                        <span asp-validation-for="GuideId" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="form-group">
+                        <label asp-for="TourDate">Ngày khởi hành <span class="text-danger">*</span></label>
+                        <input asp-for="TourDate" class="form-control" type="date" />
+                        <span asp-validation-for="TourDate" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="form-group">
+                        <label asp-for="StartTime">Giờ khởi hành <span class="text-danger">*</span></label>
+                        <select asp-for="StartTime" class="form-control">
+                            <option value="">-- Chọn giờ --</option>
+                            @for (int h = 5; h <= 20; h++)
+                            {
+                                <option value="@h.ToString("D2"):00">@h.ToString("D2"):00</option>
+                                <option value="@h.ToString("D2"):30">@h.ToString("D2"):30</option>
+                            }
+                        </select>
+                        <span asp-validation-for="StartTime" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="form-group">
+                        <label asp-for="AvailableSlots">Số chỗ trống <span class="text-danger">*</span></label>
+                        <input asp-for="AvailableSlots" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="AvailableSlots" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="border-color: #e5e2de; margin: 32px 0;" />
+            <div style="display: flex; gap: 16px;">
+                <button type="submit" class="btn-luxury">
+                    <span class="material-symbols-outlined">save</span> Lưu Thay Đổi
+                </button>
+                <a asp-action="Index" class="btn-secondary-luxury">
+                    Hủy bỏ
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

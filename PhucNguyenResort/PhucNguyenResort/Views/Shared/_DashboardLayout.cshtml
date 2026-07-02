@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Dashboard</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
 
-    <!-- Css Styles from template to maintain consistent UI components -->
     <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/elegant-icons.css" type="text/css">
@@ -17,18 +16,18 @@
     <link rel="stylesheet" href="~/css/nice-select.css" type="text/css">
     <link rel="stylesheet" href="~/css/style.css" type="text/css">
     
-    <!-- Dashboard specific styles -->
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" type="text/css">
+    
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
 
     <div id="wrapper">
-        <!-- Sidebar -->
         <nav id="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header" style="text-align: center; padding: 20px 10px;">
                 <a href="/" style="text-decoration: none; display: block;">
-                    <h3>PhucNguyen</h3>
-                    <span style="color: #aaa; font-size: 13px; display: block; margin-top: 3px; font-weight: normal; letter-spacing: 0.5px;">Resort Management</span>
+                    <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; color: #dfa974; margin-bottom: 0;">Phúc Nguyên</h3>
+                    <span style="color: #bcc7de; font-size: 13px; display: block; margin-top: 4px; font-family: 'Inter', sans-serif; letter-spacing: 0.5px;">Resort Management</span>
                 </a>
             </div>
 
@@ -37,7 +36,6 @@
                     <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
                 </li>
                 
-                <!-- Admin & Business Manager Section -->
                 @if (User.IsInRole("System Admin") || User.IsInRole("Business Manager"))
                 {
                     <li>
@@ -63,8 +61,8 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
                             <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
                         </li>
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reviews" ? "active" : "")">
-                            <a href="#"><i class="fa fa-star"></i> Customer Reviews</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Review" ? "active" : "")">
+                            <a asp-controller="Review" asp-action="Manage"><i class="fa fa-star"></i> Customer Reviews</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Refunds" ? "active" : "")">
                             <a asp-controller="Refunds" asp-action="Index"><i class="fa fa-money"></i> Refunds</a>
@@ -74,7 +72,6 @@
 
                 @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager") || User.IsInRole("Housekeeping Staff"))
                 {
-                    <!-- Room Management -->
                     <li>
                         <p>ROOMS</p>
                     </li>
@@ -106,7 +103,6 @@
 
                 @if (User.IsInRole("Maintenance Staff"))
                 {
-                    <!-- Maintenance Section -->
                     <li>
                         <p>MAINTENANCE</p>
                     </li>
@@ -117,7 +113,6 @@
 
                 @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
                 {
-                    <!-- F&B and Kitchen Section -->
                     <li>
                         <p>FOOD & BEVERAGE</p>
                     </li>
@@ -132,11 +127,14 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tables" ? "active" : "")">
                             <a asp-controller="Tables" asp-action="Index"><i class="fa fa-table"></i> Manage Tables</a>
                         </li>
+                        <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "TableReservations" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="TableReservations"><i class="fa fa-calendar-check-o"></i> Table Reservations</a>
+                        </li>
                     }
                     @if (User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
-                            <a href="#"><i class="fa fa-cutlery"></i> Orders</a>
+                        <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "FoodOrders" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="FoodOrders"><i class="fa fa-cutlery"></i> Orders</a>
                         </li>
                     }
                     @if (User.IsInRole("Kitchen Staff"))
@@ -147,41 +145,50 @@
                     }
                 }
 
-                @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide"))
+                @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
                 {
-                    <!-- Services & Tours -->
                     <li>
                         <p>SERVICES & TOURS</p>
                     </li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
-                        <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
-                    </li>
+                    
+                    @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
+                            <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "TourGuide" ? "active" : "")">
+                            <a asp-controller="TourGuide" asp-action="Index"><i class="fa fa-clock-o"></i> Lịch Trình Của Tôi</a>
+                        </li>
+                    }
                 }
             </ul>
         </nav>
 
-        <!-- Page Content -->
         <div id="content">
             
             <!-- Top Navbar -->
-            <nav class="dashboard-nav">
-                <div class="nav-left">
-                    <button type="button" id="sidebarCollapse" class="btn btn-outline-dark d-md-none">
+            <nav class="dashboard-nav" style="border-bottom: 1px solid rgba(212, 195, 182, 0.3); background-color: #ffffff; padding: 12px 24px;">
+                <div class="nav-left" style="display: flex; align-items: center;">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-dark d-md-none" style="border-color: #dfa974; color: #dfa974;">
                         <i class="fa fa-bars"></i>
                     </button>
-                    <span class="ml-3" style="font-family: 'Lora', serif; font-size: 20px; font-weight: bold;">Dashboard</span>
+                    <span class="ml-3" style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #805528; letter-spacing: 0.5px;">Dashboard</span>
                 </div>
-                <div class="nav-right">
-                    <div class="user-profile dropdown">
-                        <img src="~/img/blog/blog-1.jpg" alt="User">
-                        <span>@(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Staff Member") <i class="fa fa-angle-down"></i></span>
+                <div class="nav-right" style="display: flex; align-items: center; gap: 12px; font-family: 'Inter', sans-serif;">
+                    <div class="user-profile" style="display: flex; align-items: center;">
+                        <img src="~/img/blog/blog-1.jpg" alt="User" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid #dfa974; margin-right: 8px; object-fit: cover;">
+                        <span style="font-weight: 600; color: #1c1c1a; font-size: 14px;">@(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Staff Member")</span>
                     </div>
-                    <a href="/" class="btn btn-sm btn-outline-secondary" title="View Website"><i class="fa fa-globe"></i></a>
-                    <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-danger" title="Logout"><i class="fa fa-sign-out"></i></a>
+                    <div style="width: 1px; height: 24px; background-color: #e5e2de; margin: 0 4px;"></div>
+                    <a href="/" class="btn btn-sm" style="background-color: #fcf9f5; color: #805528; border: 1px solid #dfa974; border-radius: 8px; padding: 6px 12px; transition: all 0.2s;" title="View Website" onmouseover="this.style.backgroundColor='#dfa974'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#fcf9f5'; this.style.color='#805528';"><i class="fa fa-globe"></i></a>
+                    <a asp-controller="Account" asp-action="Logout" class="btn btn-sm" style="background-color: #ffdad6; color: #ba1a1a; border: 1px solid #ffdad6; border-radius: 8px; padding: 6px 12px; transition: all 0.2s;" title="Logout" onmouseover="this.style.backgroundColor='#ba1a1a'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#ffdad6'; this.style.color='#ba1a1a';"><i class="fa fa-sign-out"></i></a>
                 </div>
             </nav>
 
-            <!-- Main Body -->
             <div class="main-body">
                 @RenderBody()
             </div>
@@ -189,7 +196,6 @@
         </div>
     </div>
 
-    <!-- Js Plugins -->
     <script src="~/js/jquery-3.3.1.min.js"></script>
     <script src="~/js/bootstrap.min.js"></script>
     <script src="~/js/jquery.nice-select.min.js"></script>

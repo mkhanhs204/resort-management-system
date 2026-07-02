@@ -17,7 +17,8 @@ public class DiningTableService : IDiningTableService
     public async Task<IEnumerable<DiningTable>> GetAllAsync()
     {
         return await _context.DiningTables
-            .OrderBy(t => t.TableNumber)
+            .OrderBy(t => t.DisplayOrder)
+            .ThenBy(t => t.TableNumber)
             .ToListAsync();
     }
 
@@ -31,8 +32,16 @@ public class DiningTableService : IDiningTableService
         var table = new DiningTable
         {
             TableNumber = model.TableNumber,
+            TableName = NormalizeDisplayName(model.TableName, model.TableNumber),
+            ImageUrl = NormalizeNullableText(model.ImageUrl),
+            Description = NormalizeNullableText(model.Description),
+            Area = NormalizeNullableText(model.Area),
+            TableType = NormalizeNullableText(model.TableType),
+            LocationNote = NormalizeNullableText(model.LocationNote),
             Capacity = model.Capacity,
-            Status = model.Status
+            Status = model.Status,
+            IsReservable = model.IsReservable,
+            DisplayOrder = model.DisplayOrder
         };
 
         _context.DiningTables.Add(table);
@@ -47,8 +56,16 @@ public class DiningTableService : IDiningTableService
         if (table == null) return false;
 
         table.TableNumber = model.TableNumber;
+        table.TableName = NormalizeDisplayName(model.TableName, model.TableNumber);
+        table.ImageUrl = NormalizeNullableText(model.ImageUrl);
+        table.Description = NormalizeNullableText(model.Description);
+        table.Area = NormalizeNullableText(model.Area);
+        table.TableType = NormalizeNullableText(model.TableType);
+        table.LocationNote = NormalizeNullableText(model.LocationNote);
         table.Capacity = model.Capacity;
         table.Status = model.Status;
+        table.IsReservable = model.IsReservable;
+        table.DisplayOrder = model.DisplayOrder;
 
         _context.DiningTables.Update(table);
         await _context.SaveChangesAsync();
@@ -86,5 +103,23 @@ public class DiningTableService : IDiningTableService
         }
 
         return await query.AnyAsync();
+    }
+
+    private static string NormalizeDisplayName(string? tableName, string? tableNumber)
+    {
+        if (!string.IsNullOrWhiteSpace(tableName))
+        {
+            return tableName.Trim();
+        }
+
+        return string.IsNullOrWhiteSpace(tableNumber)
+            ? "Dining Table"
+            : $"Table {tableNumber.Trim()}";
+    }
+
+    private static string? NormalizeNullableText(string? value)
+    {
+        var trimmedValue = value?.Trim();
+        return string.IsNullOrWhiteSpace(trimmedValue) ? null : trimmedValue;
     }
 }

@@ -32,6 +32,7 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật.
 | ---------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-06-16 | Cuong               | Khởi tạo tài liệu — TDD cho logic Check-in                                                                                                                                     |
 | 2026-06-16 | Cuong               | Chỉnh sửa toàn bộ (v1.1): Đồng bộ cấu trúc chuẩn với EDS và TDD của Room Availability, cập nhật đầy đủ Test Cases, Tracker, Data Requirements và Rollback plan. |
+| 2026-06-19 | Cuong               | Cập nhật phiên bản v1.2: Bổ sung 3 test cases mới (REC-TC-004/005/006) để kiểm thử bộ lọc phòng khả dụng, validation gán phòng, và cập nhật REC-TC-001 theo cấu trúc RoomAssignments mới. |
 
 ---
 
@@ -103,9 +104,12 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic c
 
 | Condition ID | Test Condition                                                                         | Coverage Item                            | Test Cases     |
 | ------------ | -------------------------------------------------------------------------------------- | ---------------------------------------- | -------------- |
-| TC-COND-001  | Check-in thành công với trạng thái Reserved, lưu đủ Guest, đổi đúng Status | `ReceptionService.ProcessCheckInAsync` | `REC-TC-001` |
+| TC-COND-001  | Check-in thành công với trạng thái Reserved, lưu đủ Guest, gán phòng vật lý và đổi đúng Status | `ReceptionService.ProcessCheckInAsync` | `REC-TC-001` |
 | TC-COND-002  | Check-in với trạng thái không hợp lệ (Cancelled) → trả về False + Message     | `ReceptionService.ProcessCheckInAsync` | `REC-TC-002` |
 | TC-COND-003  | ID Đặt phòng không tồn tại → trả về False + Message                           | `ReceptionService.ProcessCheckInAsync` | `REC-TC-003` |
+| TC-COND-004  | Lọc phòng khả dụng chính xác loại phòng, loại trừ bảo trì hoặc đã gán trùng lịch lưu trú | `ReceptionService.GetAvailableRoomsForCategoryAsync` | `REC-TC-004` |
+| TC-COND-005  | Check-in thất bại do thiếu gán phòng vật lý                                   | `ReceptionService.ProcessCheckInAsync` | `REC-TC-005` |
+| TC-COND-006  | Check-in thất bại do danh sách gán phòng trống                                 | `ReceptionService.ProcessCheckInAsync` | `REC-TC-006` |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 
@@ -119,9 +123,11 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic c
 
 | Fixture ID | Type    | Value / Logic                                  | Mục đích                   |
 | ---------- | ------- | ---------------------------------------------- | ----------------------------- |
-| FX-001     | Mock DB | RoomId=101 (Available), BookingId=1 (Reserved) | Happy path — Valid check-in  |
+| FX-001     | Mock DB | RoomId=101 (Available), BookingId=1 (Reserved), BookingDetailId=1 | Happy path — Valid check-in  |
 | FX-002     | Mock DB | BookingId=2 (Cancelled)                        | Test Invalid status rejection |
 | FX-003     | Mock DB | Trống (BookingId=999)                         | Test Not Found rejection      |
+| FX-004     | Mock DB | Các phòng category=1 (101-Available, 102-Maint, 103-Overlapping, 104-Non-overlap) | Test Room Availability query  |
+| FX-005     | Mock DB | BookingId=3 (Reserved), BookingDetailId=301 (SelectedRoomId=null) | Test Missing assignment error |
 
 ## 4. Test Case Specification
 
@@ -137,7 +143,7 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic c
 
 - DB có `Booking` với ID=1 trạng thái `Reserved`.
 - DB có `Room` với ID=101 tồn tại trạng thái `Available`.
-- Dữ liệu Request model truyền lên hợp lệ chứa ít nhất 1 `BookingGuestDto`.
+- Dữ liệu Request model truyền lên hợp lệ chứa ít nhất 1 `BookingGuestDto` và gán phòng vật lý hợp lệ `SelectedRoomId=101`.
 - Fixture: FX-001
 
 **Test Steps**:
@@ -227,13 +233,95 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic c
 
 ---
 
+### REC-TC-004 — Lọc phòng khả dụng chính xác loại phòng và tính trạng thái vận hành
+
+**Severity**: HIGH
+**Feature Under Test**: `ReceptionService.GetAvailableRoomsForCategoryAsync()`
+**Test File**: `PhucNguyenResort.Tests/Services/ReceptionServiceTests.cs`
+**TDD Phase**: 🟢 GREEN
+**Condition Ref**: TC-COND-004
+
+**Preconditions**:
+- DB có các phòng cùng category=1, trong đó:
+  - Phòng 101: `Available` (trống hoàn toàn).
+  - Phòng 102: `Maintenance` (bảo trì).
+  - Phòng 103: `Available` nhưng bị gán bởi một booking khác có ngày lưu trú trùng.
+  - Phòng 104: `Available` nhưng được gán bởi một booking khác có ngày lưu trú không trùng.
+  - Phòng 201: Khác category=2.
+- Fixture: FX-004
+
+**Test Steps**:
+1. Arrange: Cấu hình DB và gán dữ liệu như Preconditions.
+2. Act: Gọi `GetAvailableRoomsForCategoryAsync(categoryId: 1, checkIn, checkOut)`.
+3. Assert: Kiểm tra số lượng và danh sách phòng trả về.
+
+**Expected Result (PASS)**:
+- Chỉ trả về danh sách chứa 2 phòng là 101 và 104.
+- Không chứa phòng 102 (đang bảo trì), 103 (bị trùng ngày) và 201 (khác loại).
+
+**Current Status**: 🟢 Passing
+
+---
+
+### REC-TC-005 — Check-in thất bại do thiếu thông tin gán phòng vật lý
+
+**Severity**: HIGH
+**Feature Under Test**: `ReceptionService.ProcessCheckInAsync()`
+**Test File**: `PhucNguyenResort.Tests/Services/ReceptionServiceTests.cs`
+**TDD Phase**: 🟢 GREEN
+**Condition Ref**: TC-COND-005
+
+**Preconditions**:
+- DB có booking ở trạng thái `Reserved`.
+- Người dùng truyền request model lên chứa chi tiết đặt phòng nhưng có `SelectedRoomId = null`.
+- Fixture: FX-005
+
+**Test Steps**:
+1. Arrange: Cấu hình DB chứa booking cần check-in.
+2. Act: Gọi `ProcessCheckInAsync` với model có `SelectedRoomId = null`.
+3. Assert: Kiểm tra kết quả trả về.
+
+**Expected Result (PASS)**:
+- Hàm trả về `Success = false` và `ErrorMessage = "Vui lòng gán phòng vật lý cho tất cả các chi tiết đặt phòng."`
+
+**Current Status**: 🟢 Passing
+
+---
+
+### REC-TC-006 — Check-in thất bại do danh sách gán phòng rỗng
+
+**Severity**: HIGH
+**Feature Under Test**: `ReceptionService.ProcessCheckInAsync()`
+**Test File**: `PhucNguyenResort.Tests/Services/ReceptionServiceTests.cs`
+**TDD Phase**: 🟢 GREEN
+**Condition Ref**: TC-COND-006
+
+**Preconditions**:
+- DB có booking ở trạng thái `Reserved`.
+- Request model truyền lên có `RoomAssignments = empty`.
+
+**Test Steps**:
+1. Arrange: Cấu hình DB chứa booking.
+2. Act: Gọi `ProcessCheckInAsync` với danh sách gán phòng trống.
+3. Assert: Kiểm tra kết quả trả về.
+
+**Expected Result (PASS)**:
+- Hàm trả về `Success = false` và `ErrorMessage = "Danh sách gán phòng trống."`
+
+**Current Status**: 🟢 Passing
+
+---
+
 ## 5. Red-Green-Refactor Tracker
 
 | TC ID          | Test File                    | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note                                              |
 | -------------- | ---------------------------- | ---------------- | ----------------- | ------------------------------------------------------------- |
-| `REC-TC-001` | `ReceptionServiceTests.cs` | `[x]`          | `[x]`           | Sửa Service để cập nhật `RoomStatus` sang `Occupied` |
+| `REC-TC-001` | `ReceptionServiceTests.cs` | `[x]`          | `[x]`           | Cập nhật test data để truyền danh sách `RoomAssignments` |
 | `REC-TC-002` | `ReceptionServiceTests.cs` | `[x]`          | `[x]`           | —                                                            |
 | `REC-TC-003` | `ReceptionServiceTests.cs` | `[x]`          | `[x]`           | —                                                            |
+| `REC-TC-004` | `ReceptionServiceTests.cs` | `[x]`          | `[x]`           | Kiểm tra gộp các điều kiện lọc trong GetAvailableRooms      |
+| `REC-TC-005` | `ReceptionServiceTests.cs` | `[x]`          | `[x]`           | Báo lỗi trực quan khi thiếu phòng vật lý                       |
+| `REC-TC-006` | `ReceptionServiceTests.cs` | `[x]`          | `[x]`           | Chặn request thiếu toàn bộ danh sách gán phòng                |
 
 ## 6. Entry / Exit Criteria
 
@@ -246,10 +334,10 @@ Phạm vi của TDD spec này bao gồm các component liên quan đến logic c
 
 **Exit Criteria (Điều kiện kết thúc — DoD)**
 
-- [X] TDD spec được bổ sung chi tiết bằng với chuẩn `TDD_CheckRoomAvailability.md`.
-- [X] `dotnet test` — tất cả unit tests xanh (REC-TC-001 → TC-003).
-- [X] Môi trường lock file được xử lý (Báo người dùng restart server).
-- [ ] Code review completed.
+- [X] TDD spec được bổ sung chi tiết các test cases `REC-TC-001` -> `REC-TC-006`.
+- [X] `dotnet test` — tất cả unit tests xanh (129/129 tests pass).
+- [X] Môi trường lock file được xử lý.
+- [X] Code review completed.
 
 **Suspension Criteria (Điều kiện tạm dừng)**
 

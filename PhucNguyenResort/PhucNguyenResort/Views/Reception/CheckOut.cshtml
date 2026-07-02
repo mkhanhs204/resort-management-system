@@ -1,0 +1,254 @@
+@model PhucNguyenResort.ViewModels.Bookings.CheckOutViewModel
+@using PhucNguyenResort.Enums
+
+@{
+    ViewData["Title"] = "Thủ Tục Check-out";
+    Layout = "_DashboardLayout";
+}
+
+<style>
+    .bg-gradient-primary { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); }
+    .bg-primary-light { background-color: rgba(78, 115, 223, 0.1); }
+    .bg-light-danger { background-color: rgba(231, 74, 59, 0.1); }
+    .w-20px { width: 25px; display: inline-block; }
+    .table-hover tbody tr:hover { background-color: rgba(0,0,0,.03); }
+    .icon-circle { height: 3rem; width: 3rem; border-radius: 100%; display: flex; align-items: center; justify-content: center; }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 page-title text-gray-800"><i class="fas fa-sign-out-alt text-primary mr-2"></i> @ViewData["Title"]</h1>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill shadow-sm px-4"><i class="fa fa-arrow-left"></i> Quay Lại</a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger border-left-danger shadow-sm rounded">
+            <div asp-validation-summary="All" class="text-danger mb-0"></div>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Thông tin tổng quan bên trái -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow border-0 h-100 rounded-lg">
+                <div class="card-header bg-gradient-primary text-white text-center py-3">
+                    <h5 class="font-weight-bold mb-0"><i class="fas fa-info-circle mr-2"></i> Thông Tin Đặt Phòng</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="icon-circle bg-primary-light text-primary mr-3">
+                            <i class="fas fa-user fa-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 text-muted small text-uppercase font-weight-bold">Khách hàng</h6>
+                            <h5 class="mb-0 font-weight-bold text-dark mt-1">@Model.GuestName</h5>
+                        </div>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="fas fa-hashtag text-secondary mr-3 w-20px text-center"></i>
+                            <div>
+                                <span class="text-muted d-block small">Mã Booking</span>
+                                <span class="font-weight-bold text-dark">#@Model.BookingId</span>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="fas fa-door-open text-secondary mr-3 w-20px text-center"></i>
+                            <div>
+                                <span class="text-muted d-block small">Phòng</span>
+                                <span class="font-weight-bold text-dark">@Model.RoomNumbers</span>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="fas fa-calendar-check text-secondary mr-3 w-20px text-center"></i>
+                            <div>
+                                <span class="text-muted d-block small">Ngày nhận phòng</span>
+                                <span class="font-weight-bold text-dark">@Model.CheckInDate.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="fas fa-calendar-times text-secondary mr-3 w-20px text-center"></i>
+                            <div>
+                                <span class="text-muted d-block small">Ngày trả phòng dự kiến</span>
+                                <span class="font-weight-bold text-dark">@Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="fas fa-clock text-success mr-3 w-20px text-center"></i>
+                            <div>
+                                <span class="text-muted d-block small">Thời gian thực nhận</span>
+                                <span class="font-weight-bold text-success">@(Model.ActualCheckInTime?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</span>
+                            </div>
+                        </li>
+                        <li class="mb-0 d-flex align-items-center p-3 bg-light-danger rounded">
+                            <i class="fas fa-history text-danger mr-3 w-20px text-center"></i>
+                            <div>
+                                <span class="text-danger d-block small font-weight-bold text-uppercase">Thời gian trả phòng</span>
+                                <span class="font-weight-bold text-danger">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chi tiết hóa đơn bên phải -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow border-0 h-100 rounded-lg">
+                <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom">
+                    <h5 class="m-0 font-weight-bold text-dark"><i class="fas fa-file-invoice-dollar text-primary mr-2"></i> Chi Tiết Hóa Đơn</h5>
+                    <span class="badge badge-primary px-3 py-2 badge-pill" style="font-size: 0.9rem;">Folio #@Model.FolioId</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive mb-4 rounded border">
+                        <table class="table table-hover table-borderless align-middle mb-0" width="100%" cellspacing="0">
+                            <thead class="bg-light text-muted">
+                                <tr>
+                                    <th class="py-3 px-4 border-bottom">Thời gian</th>
+                                    <th class="py-3 border-bottom">Loại giao dịch</th>
+                                    <th class="text-right py-3 px-4 border-bottom">Số tiền (VNĐ)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Transactions != null && Model.Transactions.Any())
+                                {
+                                    foreach (var txn in Model.Transactions)
+                                    {
+                                        <tr class="border-bottom">
+                                            <td class="px-4 text-muted">@txn.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (txn.TransactionTypeName.Contains("phòng")) {
+                                                        <i class="fas fa-bed text-info mr-2"></i>
+                                                    } else if (txn.TransactionTypeName.Contains("ăn")) {
+                                                        <i class="fas fa-utensils text-warning mr-2"></i>
+                                                    } else if (txn.TransactionTypeName.Contains("tour")) {
+                                                        <i class="fas fa-map-marked-alt text-success mr-2"></i>
+                                                    } else {
+                                                        <i class="fas fa-receipt text-secondary mr-2"></i>
+                                                    }
+                                                    <span>@txn.TransactionTypeName</span>
+                                                </div>
+                                                @if(txn.TransactionTypeName == "Phụ thu trả phòng muộn")
+                                                {
+                                                    <span class="badge badge-danger ml-4 mt-1"><i class="fas fa-fire mr-1"></i>Mới</span>
+                                                }
+                                            </td>
+                                            <td class="text-right font-weight-bold px-4">@txn.Amount?.ToString("N0")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-5">
+                                            <div class="mb-2"><i class="fas fa-box-open fa-3x text-gray-300"></i></div>
+                                            Không có giao dịch nào được ghi nhận.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tổng kết chi phí -->
+                    <div class="row px-3 mt-4">
+                        <div class="col-md-7 offset-md-5">
+                            <div class="bg-light rounded p-4 border border-left-primary">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted"><i class="fas fa-bed text-gray-400 mr-2"></i>Tiền phòng:</span>
+                                    <strong class="text-dark">@Model.TotalRoomCharges.ToString("N0")</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted"><i class="fas fa-utensils text-gray-400 mr-2"></i>Tiền ăn uống:</span>
+                                    <strong class="text-dark">@Model.TotalFoodCharges.ToString("N0")</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted"><i class="fas fa-map-marked-alt text-gray-400 mr-2"></i>Tiền tour:</span>
+                                    <strong class="text-dark">@Model.TotalTourCharges.ToString("N0")</strong>
+                                </div>
+                                @if (Model.LateCheckOutSurcharge > 0)
+                                {
+                                    <div class="d-flex justify-content-between mb-2 text-danger">
+                                        <span><i class="fas fa-clock mr-2"></i>Phụ thu trả muộn:</span>
+                                        <strong>@Model.LateCheckOutSurcharge.ToString("N0")</strong>
+                                    </div>
+                                }
+                                <div class="border-top my-3 border-secondary" style="border-top-style: dashed !important;"></div>
+                                <div class="d-flex justify-content-between mb-2 font-weight-bold h5">
+                                    <span class="text-dark">Tổng cộng:</span>
+                                    <span class="text-primary">@Model.TotalAmount.ToString("N0") VNĐ</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2 text-success">
+                                    <span><i class="fas fa-money-bill-wave mr-2"></i>Đã đặt cọc:</span>
+                                    <span>- @Model.DepositAmount.ToString("N0") VNĐ</span>
+                                </div>
+                                <div class="border-top my-3 border-secondary" style="border-top-style: dashed !important;"></div>
+                                <div class="d-flex justify-content-between mb-0 align-items-center">
+                                    <span class="font-weight-bold text-dark h5 mb-0 text-uppercase">Cần Thanh Toán:</span>
+                                    <span class="text-danger font-weight-bold" style="font-size: 1.5rem;">@Model.BalanceDue.ToString("N0") VNĐ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Thanh Toán -->
+                    <form asp-action="CheckOut" method="post" id="checkoutForm" class="mt-4">
+                        <input type="hidden" asp-for="BookingId" />
+                        <input type="hidden" asp-for="FolioId" />
+                        <input type="hidden" asp-for="TotalAmount" />
+                        <input type="hidden" asp-for="DepositAmount" />
+                        <input type="hidden" asp-for="BalanceDue" />
+                        <input type="hidden" asp-for="LateCheckOutSurcharge" />
+
+                        <div class="bg-white p-4 rounded border shadow-sm" style="border-left: 4px solid #e74a3b !important;">
+                            <h6 class="font-weight-bold mb-3 text-danger"><i class="fas fa-credit-card mr-2"></i> THÔNG TIN THANH TOÁN</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="SelectedPaymentMethod" class="font-weight-bold text-dark small text-uppercase">Phương thức thanh toán <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light"><i class="fas fa-wallet text-gray-500"></i></span>
+                                            </div>
+                                            <select asp-for="SelectedPaymentMethod" class="form-control" required>
+                                                <option value="">-- Chọn phương thức --</option>
+                                                @foreach (PaymentMethod method in Enum.GetValues(typeof(PaymentMethod)))
+                                                {
+                                                    <option value="@method">@method.ToString()</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <span asp-validation-for="SelectedPaymentMethod" class="text-danger small mt-1 d-block"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="PaymentNote" class="font-weight-bold text-dark small text-uppercase">Ghi chú <span class="text-muted font-weight-normal text-lowercase">(Mã GD nếu có)</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light"><i class="fas fa-comment-dots text-gray-500"></i></span>
+                                            </div>
+                                            <input asp-for="PaymentNote" class="form-control" placeholder="VD: Tiền mặt hoặc Mã Momo" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right mt-4 pt-3 border-top">
+                                <button type="submit" class="btn btn-danger btn-lg rounded-pill shadow px-5" onclick="return confirm('Xác nhận hoàn tất thanh toán và trả phòng? Thao tác này không thể hoàn tác.');">
+                                    <i class="fas fa-check-circle mr-2"></i> Hoàn Tất Check-out & Xuất Hóa Đơn
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

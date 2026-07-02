@@ -1,0 +1,370 @@
+@using PhucNguyenResort.Enums
+@model PhucNguyenResort.ViewModels.Tours.BookTourVM
+@{
+    ViewData["Title"] = "Đặt Tour - Phúc Nguyên Resort";
+}
+
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .luxury-shadow {
+            box-shadow: 0 24px 40px -12px rgba(30, 41, 59, 0.06);
+        }
+        .input-inset {
+            background-color: #FDFAF6;
+            transition: border-color 0.3s ease;
+        }
+        .input-inset:focus {
+            outline: none;
+            border-color: #dfa974 !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dfa974;
+            border-radius: 10px;
+        }
+    </style>
+}
+
+<main class="pt-8 pb-section-gap-lg max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop bg-background">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-on-surface-variant mb-stack-lg font-label-sm uppercase tracking-widest">
+        <a class="hover:text-primary transition-colors" asp-action="Index">Tour</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <a class="hover:text-primary transition-colors" asp-action="Details" asp-route-id="@Model.ScheduleId">Chi tiết</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="text-primary font-semibold">Đặt Tour</span>
+    </nav>
+    <h1 class="font-headline-lg text-headline-lg mb-section-gap-md text-on-surface">Hoàn tất đặt tour của bạn</h1>
+
+    <form asp-action="Book" method="post" id="bookingForm" class="grid grid-cols-12 gap-gutter items-start">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ScheduleId" />
+        <input type="hidden" asp-for="PaymentMethod" id="paymentMethodInput" value="VNPay" />
+        
+        <!-- Re-bind display properties so they don't get lost on postback validation failure -->
+        <input type="hidden" asp-for="TourName" />
+        <input type="hidden" asp-for="TourImage" />
+        <input type="hidden" asp-for="Location" />
+        <input type="hidden" asp-for="DurationHours" />
+        <input type="hidden" asp-for="PricePerPerson" id="basePrice" />
+        <input type="hidden" asp-for="TourDate" />
+        <input type="hidden" asp-for="StartTime" />
+        <input type="hidden" asp-for="AvailableSlots" />
+
+        <!-- Main Column (Left) -->
+        <div class="col-span-12 lg:col-span-8 space-y-stack-lg">
+            
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="bg-error-container text-on-error-container p-4 rounded-xl border border-error/20">
+                    <div asp-validation-summary="All" class="text-sm"></div>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="bg-error-container text-on-error-container p-4 rounded-xl border border-error/20">
+                    <p class="text-sm">@TempData["Error"]</p>
+                </div>
+            }
+
+            <!-- Section 'Thông Tin Tour' -->
+            <section class="bg-surface luxury-shadow border border-outline-variant/30 rounded-xl overflow-hidden">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/3 h-48 md:h-auto overflow-hidden">
+                        @{
+                            string imageUrl = string.IsNullOrEmpty(Model.TourImage) ? "https://lh3.googleusercontent.com/aida-public/AB6AXuDOWO0K1VjD5p-vN3BP_PlnVMDqB2_ikZ3F0ujXAF5q6BSqzBQauXCbSow_7-a8_QVTQZGqX5iYNe2deBGBN6c2DhHjCP61I7UXIvWZfLSZFGAxsKXdmqap7gUxiJUjirsZOeXsdIB1jewl4gl-uK_6Kc2WC72SB9nAiXOvq6WqfIvgF_4kAsUmS6wdBD475MhfwYfyioHf_rSiq6aJsGdsGjehrbpEWR59fGZloIfKOp0bjSWb8XZ4yNbjstdSyT7kFlAgj0zEYVSc" : Model.TourImage;
+                        }
+                        <img class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" src="@imageUrl" alt="@Model.TourName" />
+                    </div>
+                    <div class="md:w-2/3 p-stack-lg flex flex-col justify-between">
+                        <div>
+                            <div class="flex flex-col sm:flex-row justify-between items-start mb-2 gap-2">
+                                <h2 class="font-headline-sm text-headline-sm text-on-surface">@Model.TourName</h2>
+                                <div class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-[12px] font-semibold flex items-center gap-1 animate-pulse whitespace-nowrap">
+                                    <span class="material-symbols-outlined text-[16px]">priority_high</span>
+                                    Chỉ còn @Model.AvailableSlots chỗ trống
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-y-4 gap-x-2 mt-4 text-on-surface-variant font-body-md">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">calendar_today</span>
+                                    <span>@Model.TourDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">schedule</span>
+                                    <span>@(Model.StartTime.HasValue ? Model.StartTime.Value.ToString(@"hh\:mm") : "08:00 AM")</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.Location))
+                                {
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">location_on</span>
+                                        <span>@Model.Location</span>
+                                    </div>
+                                }
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">padding</span>
+                                    <span>@(Model.DurationHours >= 24 ? $"{Model.DurationHours/24} ngày" : $"{Model.DurationHours} giờ")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 'Số Người Tham Gia' -->
+            <section class="bg-surface luxury-shadow border border-outline-variant/30 rounded-xl p-stack-lg">
+                <h3 class="font-headline-sm text-headline-sm mb-stack-md flex items-center gap-2 text-on-surface">
+                    <span class="material-symbols-outlined text-primary">groups</span>
+                    Số người tham gia
+                </h3>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-stack-md">
+                    <div class="relative w-full sm:w-48">
+                        <input asp-for="Participants" id="participants" type="number" min="1" max="@Model.AvailableSlots" onchange="updateTotal()" class="w-full input-inset border border-outline-variant rounded-lg px-4 py-3 font-body-md focus:ring-1 focus:ring-primary-container" />
+                        <span class="absolute right-8 top-1/2 -translate-y-1/2 text-on-surface-variant text-[14px]">khách</span>
+                    </div>
+                    <p class="text-on-surface-variant font-label-sm italic">Tối đa @Model.AvailableSlots người dựa trên số chỗ còn trống.</p>
+                </div>
+                <span asp-validation-for="Participants" class="text-error text-sm mt-1 block"></span>
+            </section>
+
+            <!-- Section 'Khai Báo Tạm Trú' -->
+            <section class="bg-surface luxury-shadow border border-outline-variant/30 rounded-xl p-stack-lg">
+                <h3 class="font-headline-sm text-headline-sm mb-stack-lg flex items-center gap-2 text-on-surface">
+                    <span class="material-symbols-outlined text-primary">person_add</span>
+                    Thông tin khách lưu trú chính
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+                    <div class="flex flex-col gap-2">
+                        <label asp-for="PrimaryGuestName" class="font-label-lg text-on-surface"></label>
+                        <input asp-for="PrimaryGuestName" class="input-inset border border-outline-variant rounded-lg px-4 py-3" placeholder="Nguyễn Văn A" />
+                        <span asp-validation-for="PrimaryGuestName" class="text-error text-sm"></span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label asp-for="PrimaryGuestDateOfBirth" class="font-label-lg text-on-surface"></label>
+                        <input asp-for="PrimaryGuestDateOfBirth" type="date" class="input-inset border border-outline-variant rounded-lg px-4 py-3" />
+                        <span asp-validation-for="PrimaryGuestDateOfBirth" class="text-error text-sm"></span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label asp-for="PrimaryGuestGender" class="font-label-lg text-on-surface"></label>
+                        <select asp-for="PrimaryGuestGender" class="input-inset border border-outline-variant rounded-lg px-4 py-3 appearance-none cursor-pointer" asp-items="Html.GetEnumSelectList<GenderType>()">
+                            <option value="">-- Chọn giới tính --</option>
+                        </select>
+                        <span asp-validation-for="PrimaryGuestGender" class="text-error text-sm"></span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label asp-for="PrimaryGuestPassportNumber" class="font-label-lg text-on-surface"></label>
+                        <input asp-for="PrimaryGuestPassportNumber" class="input-inset border border-outline-variant rounded-lg px-4 py-3" placeholder="Nhập số giấy tờ" />
+                        <span asp-validation-for="PrimaryGuestPassportNumber" class="text-error text-sm"></span>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 flex flex-col gap-2">
+                        <label asp-for="PrimaryGuestNationality" class="font-label-lg text-on-surface"></label>
+                        <input asp-for="PrimaryGuestNationality" class="input-inset border border-outline-variant rounded-lg px-4 py-3" value="Việt Nam" />
+                        <span asp-validation-for="PrimaryGuestNationality" class="text-error text-sm"></span>
+                    </div>
+                </div>
+                <div class="mt-stack-lg flex items-start gap-3 p-4 bg-surface-container-low rounded-lg">
+                    <input asp-for="PdpdConsentChecked" class="mt-1 rounded border-outline text-primary focus:ring-primary h-5 w-5 cursor-pointer" />
+                    <div class="flex flex-col">
+                        <label asp-for="PdpdConsentChecked" class="text-on-surface-variant font-body-md leading-relaxed select-none cursor-pointer">
+                            Tôi đồng ý cung cấp thông tin cá nhân cho mục đích khai báo tạm trú và tuân thủ các chính sách bảo mật dữ liệu (PDPD) của Resort. Mọi thông tin sẽ được bảo mật tuyệt đối.
+                        </label>
+                        <span asp-validation-for="PdpdConsentChecked" class="text-error text-sm mt-1"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 'Phương Thức Thanh Toán' -->
+            <section class="bg-surface luxury-shadow border border-outline-variant/30 rounded-xl p-stack-lg">
+                <h3 class="font-headline-sm text-headline-sm mb-stack-lg flex items-center gap-2 text-on-surface">
+                    <span class="material-symbols-outlined text-primary">payments</span>
+                    Phương thức thanh toán
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md" id="payment-options">
+                    
+                    @{
+                        string vnpayClass = Model.PaymentMethod == "VNPay" ? "border-2 border-primary-container bg-surface-container-lowest" : "border border-outline-variant";
+                        string roomClass = Model.PaymentMethod == "ChargeToRoom" ? "border-2 border-primary-container bg-surface-container-lowest" : "border border-outline-variant";
+                    }
+
+                    <div class="@vnpayClass p-stack-md rounded-xl cursor-pointer transition-all hover:bg-surface-container-low relative" id="opt-vnpay" onclick="selectPayment('VNPay')">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                <span class="material-symbols-outlined text-blue-600 text-[32px]">account_balance_wallet</span>
+                            </div>
+                            <div>
+                                <p class="font-label-lg text-on-surface">Thanh toán qua VNPay</p>
+                                <p class="text-[12px] text-on-surface-variant">Ví điện tử, Thẻ ATM, QR Code</p>
+                            </div>
+                        </div>
+                        @if(Model.PaymentMethod == "VNPay")
+                        {
+                            <div id="vnpay-check" class="absolute top-2 right-2 text-primary">
+                                <span class="material-symbols-outlined">check_circle</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="@roomClass p-stack-md rounded-xl cursor-pointer transition-all hover:border-primary-container hover:bg-surface-container-low relative" id="opt-room" onclick="selectPayment('ChargeToRoom')">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                <span class="material-symbols-outlined text-primary text-[32px]">key</span>
+                            </div>
+                            <div>
+                                <p class="font-label-lg text-on-surface">Ghi nợ vào phòng</p>
+                                <p class="text-[12px] text-on-surface-variant">Charge to Room</p>
+                            </div>
+                        </div>
+                        @if(Model.PaymentMethod == "ChargeToRoom")
+                        {
+                            <div id="room-check" class="absolute top-2 right-2 text-primary">
+                                <span class="material-symbols-outlined">check_circle</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <span asp-validation-for="PaymentMethod" class="text-error text-sm mt-2 block"></span>
+
+                <!-- Room Selector (Hidden by default) -->
+                <div class="mt-stack-md @(Model.PaymentMethod == "ChargeToRoom" ? "" : "hidden") transition-all" id="room-selection-container">
+                    <div class="flex flex-col gap-2 bg-surface-container-low p-4 rounded-xl border border-outline-variant/30">
+                        <label asp-for="RoomBookingId" class="font-label-lg text-on-surface">Chọn phòng đang lưu trú của bạn</label>
+                        @if (Model.AvailableRoomBookings != null && Model.AvailableRoomBookings.Any())
+                        {
+                            <select asp-for="RoomBookingId" class="input-inset border border-outline-variant rounded-lg px-4 py-3 appearance-none cursor-pointer bg-white">
+                                <option value="">-- Vui lòng chọn một phòng --</option>
+                                @foreach (var room in Model.AvailableRoomBookings)
+                                {
+                                    <option value="@room.BookingId">@room.DisplayText</option>
+                                }
+                            </select>
+                            <p class="text-label-sm text-on-surface-variant mt-1">Chi phí tour sẽ được ghi nợ trực tiếp vào hóa đơn phòng này và thanh toán lúc Check-out.</p>
+                        }
+                        else
+                        {
+                            <select asp-for="RoomBookingId" class="input-inset border border-outline-variant rounded-lg px-4 py-3 appearance-none bg-surface-variant text-on-surface-variant cursor-not-allowed" disabled>
+                                <option value="">Bạn không có phòng nào đang lưu trú (Checked-in) tại Resort</option>
+                            </select>
+                            <p class="text-error text-sm mt-1">Tính năng Ghi nợ vào phòng chỉ dành cho khách đang lưu trú thực tế tại Resort.</p>
+                        }
+                        <span asp-validation-for="RoomBookingId" class="text-error text-sm mt-1"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Sidebar Column (Right) -->
+        <div class="col-span-12 lg:col-span-4 lg:sticky lg:top-32 space-y-stack-md mt-6 lg:mt-0">
+            <div class="bg-surface-container-lowest border border-primary/20 rounded-2xl p-stack-lg luxury-shadow">
+                <h3 class="font-headline-sm text-headline-sm mb-6 border-b border-outline-variant pb-4 text-on-surface">Tóm tắt đơn hàng</h3>
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between items-center text-on-surface-variant">
+                        <span class="font-body-md">Giá tour mỗi khách</span>
+                        <span class="font-label-lg text-on-surface">@Model.PricePerPerson.ToString("N0") VNĐ</span>
+                    </div>
+                    <div class="flex justify-between items-center text-on-surface-variant">
+                        <span class="font-body-md">Số lượng khách</span>
+                        <span class="font-label-lg text-on-surface" id="summary-count">@Model.Participants khách</span>
+                    </div>
+                </div>
+                <div class="border-t border-dashed border-outline-variant pt-6 mb-8">
+                    <div class="flex flex-col items-end">
+                        <span class="font-headline-sm text-headline-sm text-on-surface mb-2 self-start">Tổng cộng</span>
+                        <div class="text-right">
+                            <span class="font-headline-md text-headline-md text-primary-container leading-none" id="grand-total">@Model.TotalAmount.ToString("N0")</span>
+                            <span class="text-primary-container font-label-lg ml-1">VNĐ</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-primary-container text-on-primary-container py-4 rounded-xl font-label-lg flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-lg active:scale-95 group">
+                    Xác Nhận Đặt Tour
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </button>
+                <div class="mt-6 flex justify-center">
+                    <a asp-action="Index" class="text-on-surface-variant font-body-md hover:text-primary underline underline-offset-4 flex items-center gap-1 transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">keyboard_backspace</span>
+                        Quay lại danh sách tour
+                    </a>
+                </div>
+            </div>
+            <div class="bg-surface p-stack-md rounded-xl border border-outline-variant/30 flex items-center gap-3">
+                <div class="p-2 bg-primary/10 rounded-full text-primary shrink-0">
+                    <span class="material-symbols-outlined">verified_user</span>
+                </div>
+                <p class="text-[12px] text-on-surface-variant leading-tight">Giao dịch của bạn được bảo mật bởi hệ thống quản lý chuẩn quốc tế của Phúc Nguyên Resort.</p>
+            </div>
+        </div>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const PRICE_PER_PERSON = parseFloat(document.getElementById('basePrice').value.replace(/,/g, ''));
+
+        function updateTotal() {
+            const countInput = document.getElementById('participants');
+            let count = parseInt(countInput.value) || 1;
+            const max = parseInt(countInput.max) || 1;
+            
+            if(count > max) {
+                count = max;
+                countInput.value = max;
+            } else if (count < 1) {
+                count = 1;
+                countInput.value = 1;
+            }
+
+            const grandTotal = count * PRICE_PER_PERSON;
+
+            document.getElementById('summary-count').innerText = `${count} khách`;
+            document.getElementById('grand-total').innerText = grandTotal.toLocaleString('vi-VN');
+        }
+
+        function selectPayment(type) {
+            document.getElementById('paymentMethodInput').value = type;
+            const vnpayOpt = document.getElementById('opt-vnpay');
+            const roomOpt = document.getElementById('opt-room');
+            const roomContainer = document.getElementById('room-selection-container');
+
+            if (type === 'VNPay') {
+                vnpayOpt.className = 'border-2 border-primary-container bg-surface-container-lowest p-stack-md rounded-xl cursor-pointer transition-all hover:bg-surface-container-low relative';
+                if (!document.getElementById('vnpay-check')) {
+                    vnpayOpt.innerHTML += '<div id="vnpay-check" class="absolute top-2 right-2 text-primary"><span class="material-symbols-outlined">check_circle</span></div>';
+                }
+                
+                roomOpt.className = 'border border-outline-variant p-stack-md rounded-xl cursor-pointer transition-all hover:border-primary-container hover:bg-surface-container-low relative';
+                const check = document.getElementById('room-check');
+                if (check) check.remove();
+                
+                roomContainer.classList.add('hidden');
+            } else {
+                roomOpt.className = 'border-2 border-primary-container bg-surface-container-lowest p-stack-md rounded-xl cursor-pointer transition-all hover:bg-surface-container-low relative';
+                if (!document.getElementById('room-check')) {
+                    roomOpt.innerHTML += '<div id="room-check" class="absolute top-2 right-2 text-primary"><span class="material-symbols-outlined">check_circle</span></div>';
+                }
+                
+                vnpayOpt.className = 'border border-outline-variant p-stack-md rounded-xl cursor-pointer transition-all hover:border-primary-container hover:bg-surface-container-low relative';
+                const check = document.getElementById('vnpay-check');
+                if (check) check.remove();
+                
+                roomContainer.classList.remove('hidden');
+            }
+        }
+        
+        // Initialize state on load
+        document.addEventListener("DOMContentLoaded", function() {
+            updateTotal();
+            selectPayment(document.getElementById('paymentMethodInput').value);
+        });
+    </script>
+}

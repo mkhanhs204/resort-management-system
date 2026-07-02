@@ -1,0 +1,1261 @@
+/* ================================================================
+   Room Service — Light Luxury Premium UI Styles (Matched with main site)
+   ================================================================ */
+
+/* -- CSS Variables -------------------------------------------- */
+:root {
+    --rs-primary: #dfa974;
+    --rs-primary-dark: #c58f58;
+    --rs-dark: #1e293b;
+    --rs-dark-light: #f8fafc;
+    --rs-gray: #64748b;
+    --rs-gray-light: #cbd5e1;
+    --rs-bg: #f8fafc;
+    --rs-bg-card: #ffffff;
+    --rs-border: #e2e8f0;
+    --rs-text: #1e293b;
+    --rs-text-muted: #64748b;
+    --rs-success: #28a745;
+    --rs-warning: #ffc107;
+    --rs-danger: #dc3545;
+    --rs-info: #17a2b8;
+    --rs-radius: 20px;
+    --rs-radius-sm: 12px;
+    --rs-shadow: 0 15px 35px rgba(0,0,0,0.05);
+    --rs-shadow-hover: 0 25px 50px rgba(0,0,0,0.1);
+    --rs-transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --rs-font-heading: 'Lora', serif;
+    --rs-font-body: 'Cabin', sans-serif;
+}
+
+/* -- Page Base ------------------------------------------------ */
+.rs-page {
+    background: var(--rs-bg);
+    min-height: 100vh;
+    color: var(--rs-text);
+    font-family: var(--rs-font-body);
+    padding-bottom: 100px;
+}
+
+.rs-page a {
+    color: var(--rs-primary);
+    text-decoration: none;
+}
+
+.rs-page a:hover {
+    color: var(--rs-primary-dark);
+}
+
+/* -- Booking Info Bar ----------------------------------------- */
+.rs-booking-bar {
+    background: var(--rs-bg-card);
+    border: 1px solid var(--rs-border);
+    border-radius: var(--rs-radius-sm);
+    padding: 15px 25px;
+    margin-top: 30px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.rs-booking-bar .booking-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.rs-booking-bar .booking-info .room-badge {
+    background: #f1f5f9;
+    color: var(--rs-dark);
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+    border: 1px solid var(--rs-border);
+}
+
+.rs-booking-bar .booking-info .booking-id {
+    color: var(--rs-text-muted);
+}
+
+.rs-booking-bar .booking-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* -- Hero Section --------------------------------------------- */
+.rs-hero {
+    position: relative;
+    padding: 80px 0 60px;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--rs-radius);
+    margin: 30px 0;
+    overflow: hidden;
+    background-image: url('/img/room/room-b2.jpg');
+    box-shadow: var(--rs-shadow);
+}
+
+.rs-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
+    z-index: 1;
+}
+
+.rs-hero h1, .rs-hero p {
+    position: relative;
+    z-index: 2;
+}
+
+.rs-hero h1 {
+    font-family: var(--rs-font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.rs-hero h1 span {
+    color: var(--rs-primary);
+}
+
+.rs-hero p {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    max-width: 600px;
+    margin: 0 auto;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* -- Message/Alert Bars --------------------------------------- */
+.rs-alert {
+    border-radius: var(--rs-radius-sm);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border: 1px solid;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--rs-bg-card);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.rs-alert-info {
+    border-left: 4px solid var(--rs-info);
+    color: var(--rs-dark);
+}
+
+.rs-alert-success {
+    border-left: 4px solid var(--rs-success);
+    color: var(--rs-dark);
+}
+
+.rs-alert-warning {
+    border-left: 4px solid var(--rs-warning);
+    color: var(--rs-dark);
+}
+
+.rs-alert-danger {
+    border-left: 4px solid var(--rs-danger);
+    color: var(--rs-dark);
+}
+
+/* -- Category Cards Grid -------------------------------------- */
+.rs-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 991px) {
+    .rs-categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575px) {
+    .rs-categories-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rs-category-card {
+    position: relative;
+    border-radius: var(--rs-radius);
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    cursor: pointer;
+    transition: var(--rs-transition);
+    box-shadow: var(--rs-shadow);
+    text-decoration: none !important;
+    display: block;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.rs-category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--rs-shadow-hover);
+}
+
+.rs-category-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.rs-category-card:hover img {
+    transform: scale(1.08);
+}
+
+.rs-category-card .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0.1) 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 25px;
+}
+
+.rs-category-card .card-overlay h3 {
+    font-family: var(--rs-font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.rs-category-card .card-overlay .item-count {
+    font-size: 14px;
+    color: var(--rs-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rs-category-card .no-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #cbd5e1;
+}
+
+/* -- Buttons -------------------------------------------------- */
+.rs-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 28px;
+    border-radius: var(--rs-radius-sm);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+    height: 50px;
+}
+
+.rs-btn-primary {
+    background-color: var(--rs-primary);
+    color: #fff !important;
+    box-shadow: 0 10px 20px rgba(223, 169, 116, 0.3);
+}
+
+.rs-btn-primary:hover {
+    background-color: var(--rs-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(223, 169, 116, 0.4);
+    color: #fff !important;
+}
+
+.rs-btn-outline {
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: var(--rs-text-muted) !important;
+}
+
+.rs-btn-outline:hover {
+    background-color: #e2e8f0;
+    color: var(--rs-dark) !important;
+    border-color: #cbd5e1;
+}
+
+.rs-btn-danger {
+    background-color: transparent;
+    border: 2px solid var(--rs-danger);
+    color: var(--rs-danger) !important;
+}
+
+.rs-btn-danger:hover {
+    background-color: var(--rs-danger);
+    color: #fff !important;
+    box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+}
+
+.rs-btn-sm {
+    padding: 8px 18px;
+    font-size: 13px;
+    height: auto;
+}
+
+/* -- View Full Menu Button ------------------------------------ */
+.rs-view-full-menu {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* -- Bottom Nav Bar (Categories page) ------------------------- */
+.rs-bottom-nav {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 20px 0;
+    border-top: 1px solid var(--rs-border);
+}
+
+.rs-bottom-nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--rs-text-muted);
+    font-weight: 600;
+    font-size: 15px;
+    transition: var(--rs-transition);
+}
+
+.rs-bottom-nav a:hover {
+    color: var(--rs-primary);
+}
+
+/* ================================================================
+   MENU ITEMS PAGE (RoomService / OrderMenu)
+   ================================================================ */
+
+/* -- Back Navigation ------------------------------------------ */
+.rs-back-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--rs-border);
+}
+
+.rs-back-nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--rs-text-muted);
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--rs-transition);
+}
+
+.rs-back-nav a:hover {
+    color: var(--rs-primary);
+}
+
+/* -- Search Bar ----------------------------------------------- */
+.rs-search-bar {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.rs-search-bar input {
+    width: 100%;
+    padding: 14px 20px 14px 48px;
+    background: #f1f5f9;
+    border: 1px solid var(--rs-border);
+    border-radius: var(--rs-radius-sm);
+    color: var(--rs-text);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+    height: 54px;
+}
+
+.rs-search-bar input:focus {
+    background: #ffffff;
+    border-color: var(--rs-primary);
+    box-shadow: 0 0 0 3px rgba(223,169,116,0.2);
+}
+
+.rs-search-bar input::placeholder {
+    color: #94a3b8;
+}
+
+.rs-search-bar .search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+/* -- Category Tabs -------------------------------------------- */
+.rs-category-tabs {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    margin-bottom: 30px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.rs-category-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.rs-category-tab {
+    white-space: nowrap;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--rs-border);
+    background: #ffffff;
+    color: var(--rs-text-muted);
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.rs-category-tab:hover {
+    background: #f8fafc;
+    color: var(--rs-dark);
+}
+
+.rs-category-tab.active {
+    background: var(--rs-primary);
+    color: #fff;
+    border-color: var(--rs-primary);
+    box-shadow: 0 4px 15px rgba(223,169,116,0.3);
+}
+
+/* -- Room Selector -------------------------------------------- */
+.rs-room-selector {
+    background: #ffffff;
+    border: 1px solid var(--rs-border);
+    border-radius: var(--rs-radius-sm);
+    padding: 20px 25px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.rs-room-selector label {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--rs-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.rs-room-selector select {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 16px;
+    background: #f1f5f9;
+    border: 1px solid var(--rs-border);
+    border-radius: var(--rs-radius-sm);
+    color: var(--rs-text);
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.rs-room-selector select:focus {
+    background: #ffffff;
+    border-color: var(--rs-primary);
+    box-shadow: 0 0 0 3px rgba(223,169,116,0.2);
+}
+
+.rs-room-info {
+    font-size: 16px;
+    color: var(--rs-dark);
+    font-weight: 700;
+}
+
+/* -- Menu Items Grid ------------------------------------------ */
+.rs-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 991px) {
+    .rs-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575px) {
+    .rs-menu-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* -- Menu Section Title --------------------------------------- */
+.rs-section-title {
+    font-family: var(--rs-font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--rs-text);
+    margin: 40px 0 20px;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.rs-section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--rs-primary);
+    border-radius: 3px;
+}
+
+.rs-section-title:first-of-type {
+    margin-top: 0;
+}
+
+/* -- Menu Item Card ------------------------------------------- */
+.rs-menu-card {
+    background: var(--rs-bg-card);
+    border: 1px solid rgba(0,0,0,0.02);
+    border-radius: var(--rs-radius);
+    overflow: hidden;
+    transition: var(--rs-transition);
+    box-shadow: var(--rs-shadow);
+}
+
+.rs-menu-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--rs-shadow-hover);
+}
+
+.rs-menu-card.has-quantity {
+    border-color: var(--rs-primary);
+    box-shadow: 0 0 0 1px var(--rs-primary), var(--rs-shadow-hover);
+}
+
+.rs-menu-card .card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #f1f5f9;
+}
+
+.rs-menu-card .no-image {
+    width: 100%;
+    height: 200px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e1;
+    font-size: 15px;
+}
+
+.rs-menu-card .card-body {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.rs-menu-card .item-name {
+    font-family: var(--rs-font-heading);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--rs-text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.rs-menu-card .item-category {
+    font-size: 13px;
+    color: var(--rs-text-muted);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.rs-menu-card .item-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--rs-primary);
+    margin-bottom: 20px;
+}
+
+/* -- Quantity Selector ---------------------------------------- */
+.rs-qty-selector {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--rs-border);
+    border-radius: 30px;
+    overflow: hidden;
+    width: fit-content;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    margin-top: auto;
+}
+
+.rs-qty-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: var(--rs-text-muted);
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.rs-qty-btn:hover {
+    color: var(--rs-primary);
+    background: #f8fafc;
+}
+
+.rs-qty-value {
+    width: 44px;
+    height: 40px;
+    border: none;
+    background: transparent !important;
+    color: var(--rs-text);
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    -moz-appearance: textfield;
+}
+
+.rs-qty-value::-webkit-outer-spin-button,
+.rs-qty-value::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* -- Sticky Cart Bar ------------------------------------------ */
+.rs-cart-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--rs-border);
+    padding: 15px 0;
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.rs-cart-bar.visible {
+    transform: translateY(0);
+}
+
+.rs-cart-bar .cart-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.rs-cart-bar .cart-info {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.rs-cart-bar .cart-count {
+    font-size: 16px;
+    color: var(--rs-text-muted);
+    font-weight: 500;
+}
+
+.rs-cart-bar .cart-count strong {
+    color: var(--rs-dark);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.rs-cart-bar .cart-subtotal {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--rs-primary);
+}
+
+/* ================================================================
+   ORDER DETAILS / TRACKING PAGE
+   ================================================================ */
+
+/* -- Order Header --------------------------------------------- */
+.rs-order-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.rs-order-header h1 {
+    font-family: var(--rs-font-heading);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--rs-text);
+    margin-bottom: 8px;
+}
+
+.rs-order-header .order-time {
+    font-size: 15px;
+    color: var(--rs-text-muted);
+    font-weight: 500;
+}
+
+/* -- Status Timeline ------------------------------------------ */
+.rs-timeline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    padding: 0 40px;
+    margin: 50px 0;
+}
+
+.rs-timeline::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 60px;
+    right: 60px;
+    height: 4px;
+    background: var(--rs-border);
+    z-index: 1;
+    border-radius: 2px;
+}
+
+.rs-timeline .timeline-fill {
+    position: absolute;
+    top: 25px;
+    left: 60px;
+    height: 4px;
+    background: var(--rs-primary);
+    z-index: 2;
+    transition: width 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border-radius: 2px;
+}
+
+.rs-timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 3;
+    flex: 1;
+}
+
+.rs-timeline-step .step-circle {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 4px solid var(--rs-border);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+    transition: all 0.4s ease;
+}
+
+.rs-timeline-step.completed .step-circle {
+    border-color: var(--rs-primary);
+    background: var(--rs-primary);
+    color: #fff;
+}
+
+.rs-timeline-step.active .step-circle {
+    border-color: var(--rs-primary);
+    background: #fff;
+    color: var(--rs-primary);
+    box-shadow: 0 0 0 8px rgba(223, 169, 116, 0.15);
+    animation: pulse-ring 2s infinite;
+}
+
+.rs-timeline-step.cancelled .step-circle {
+    border-color: var(--rs-danger);
+    background: var(--rs-danger);
+    color: #fff;
+}
+
+@keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(223, 169, 116, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(223, 169, 116, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(223, 169, 116, 0); }
+}
+
+.rs-timeline-step .step-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--rs-text-muted);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rs-timeline-step.completed .step-label,
+.rs-timeline-step.active .step-label {
+    color: var(--rs-dark);
+}
+
+.rs-timeline-step .step-time {
+    font-size: 13px;
+    color: var(--rs-text-muted);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* -- Status Message Card -------------------------------------- */
+.rs-status-message {
+    background: #ffffff;
+    border: 1px solid var(--rs-border);
+    border-radius: var(--rs-radius);
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 40px;
+    box-shadow: var(--rs-shadow);
+}
+
+.rs-status-message .status-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.rs-status-message .status-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--rs-text);
+}
+
+/* -- Order Items Card ----------------------------------------- */
+.rs-order-card {
+    background: #ffffff;
+    border: 1px solid var(--rs-border);
+    border-radius: var(--rs-radius);
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: var(--rs-shadow);
+}
+
+.rs-order-card .card-header {
+    background: #f8fafc;
+    padding: 20px 25px;
+    font-family: var(--rs-font-heading);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--rs-dark);
+    border-bottom: 1px solid var(--rs-border);
+}
+
+.rs-order-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.rs-order-item:last-child {
+    border-bottom: none;
+}
+
+.rs-order-item .item-details {
+    flex: 1;
+}
+
+.rs-order-item .item-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--rs-text);
+    margin-bottom: 4px;
+}
+
+.rs-order-item .item-qty {
+    font-size: 14px;
+    color: var(--rs-text-muted);
+    font-weight: 500;
+}
+
+.rs-order-item .item-price {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--rs-dark);
+    white-space: nowrap;
+}
+
+.rs-order-total {
+    padding: 20px 25px;
+    background: #f8fafc;
+    border-top: 1px solid var(--rs-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rs-order-total .total-label {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--rs-text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rs-order-total .total-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--rs-primary);
+}
+
+/* -- Action Buttons Row --------------------------------------- */
+.rs-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+/* ================================================================
+   MY ORDERS PAGE
+   ================================================================ */
+
+/* -- Page Header ---------------------------------------------- */
+.rs-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 40px 0 30px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.rs-page-header h1 {
+    font-family: var(--rs-font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--rs-text);
+    margin: 0;
+}
+
+/* -- Filter Tabs ---------------------------------------------- */
+.rs-filter-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.rs-filter-tab {
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--rs-border);
+    background: #ffffff;
+    color: var(--rs-text-muted);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.rs-filter-tab:hover {
+    background: #f8fafc;
+    color: var(--rs-dark);
+}
+
+.rs-filter-tab.active {
+    background: var(--rs-primary);
+    color: #fff;
+    border-color: var(--rs-primary);
+    box-shadow: 0 4px 15px rgba(223, 169, 116, 0.3);
+}
+
+/* -- Order History Card --------------------------------------- */
+.rs-history-card {
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.02);
+    border-radius: var(--rs-radius);
+    padding: 25px 30px;
+    margin-bottom: 20px;
+    transition: var(--rs-transition);
+    box-shadow: var(--rs-shadow);
+}
+
+.rs-history-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--rs-shadow-hover);
+}
+
+.rs-history-card .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.rs-history-card .order-id {
+    font-family: var(--rs-font-heading);
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--rs-dark);
+}
+
+.rs-status-badge {
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rs-status-badge.pending {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.rs-status-badge.cooking {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+
+.rs-status-badge.delivered {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.rs-status-badge.cancelled {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.rs-history-card .card-meta {
+    font-size: 14px;
+    color: var(--rs-text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-weight: 500;
+}
+
+.rs-history-card .card-meta i {
+    color: var(--rs-primary);
+}
+
+.rs-history-card .card-items {
+    font-size: 15px;
+    color: var(--rs-dark);
+    margin-bottom: 20px;
+    line-height: 1.6;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: var(--rs-radius-sm);
+    border: 1px solid #f1f5f9;
+}
+
+.rs-history-card .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--rs-border);
+}
+
+.rs-history-card .order-total {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--rs-primary);
+}
+
+/* -- Mini Progress Bar ---------------------------------------- */
+.rs-mini-progress {
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 3px;
+    margin: 12px 0 20px;
+    overflow: hidden;
+}
+
+.rs-mini-progress .progress-fill {
+    height: 100%;
+    background: var(--rs-primary);
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* -- Empty State ---------------------------------------------- */
+.rs-empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--rs-text-muted);
+    background: #ffffff;
+    border-radius: var(--rs-radius);
+    box-shadow: var(--rs-shadow);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.rs-empty-state .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    color: #cbd5e1;
+}
+
+.rs-empty-state h3 {
+    font-family: var(--rs-font-heading);
+    font-size: 1.8rem;
+    color: var(--rs-dark);
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.rs-empty-state p {
+    font-size: 16px;
+    max-width: 500px;
+    margin: 0 auto 30px;
+    line-height: 1.6;
+}
+
+/* -- Confirmation Modal --------------------------------------- */
+.rs-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.rs-modal-backdrop.show {
+    display: flex;
+}
+
+.rs-modal {
+    background: #ffffff;
+    border: none;
+    border-radius: var(--rs-radius);
+    padding: 40px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+}
+
+.rs-modal h3 {
+    font-family: var(--rs-font-heading);
+    font-size: 1.8rem;
+    color: var(--rs-dark);
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+.rs-modal p {
+    color: var(--rs-text-muted);
+    font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.rs-modal .modal-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+/* -- Utility -------------------------------------------------- */
+.rs-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+@media (max-width: 767px) {
+    .rs-hero h1 {
+        font-size: 2.2rem;
+    }
+    .rs-timeline {
+        padding: 0 15px;
+    }
+    .rs-timeline::before,
+    .rs-timeline .timeline-fill {
+        left: 35px;
+        right: 35px;
+    }
+    .rs-timeline-step .step-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    .rs-timeline-step .step-label {
+        font-size: 11px;
+    }
+    .rs-order-total {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

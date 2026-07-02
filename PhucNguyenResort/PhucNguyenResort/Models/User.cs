@@ -22,7 +22,11 @@ public class User
 
     public int RoleId { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsBlocked { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    public string? ResetPasswordToken { get; set; }
+    public DateTime? ResetPasswordTokenExpiry { get; set; }
 
     public Role? Role { get; set; }
     public UserProfile? UserProfile { get; set; }
@@ -32,4 +36,5 @@ public class User
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public ICollection<TourBooking> TourBookings { get; set; } = new List<TourBooking>();
+
 }

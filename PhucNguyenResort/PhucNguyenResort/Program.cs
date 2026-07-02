@@ -1,14 +1,22 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.FoodOrders;
-using PhucNguyenResort.Services.Housekeeping;
 using PhucNguyenResort.Services.MenuCategories;
 using PhucNguyenResort.Services.RestaurantMenus;
+using PhucNguyenResort.Services.TableFoodOrders;
+using PhucNguyenResort.Services.TableReservations;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // MVC
-builder.Services.AddControllersWithViews();
+var mvcBuilder = builder.Services.AddControllersWithViews();
+if (builder.Environment.IsDevelopment())
+{
+    mvcBuilder.AddRazorRuntimeCompilation();
+}
 
 // Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -20,28 +28,64 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "PhucNguyenResort.Auth";
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<ResortDbContext>();
+                var userIdString = context.Principal?.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (int.TryParse(userIdString, out int userId))
+                {
+                    var isBlocked = await dbContext.Users
+                        .Where(u => u.UserId == userId)
+                        .Select(u => u.IsBlocked)
+                        .FirstOrDefaultAsync();
+
+                    if (isBlocked)
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    }
+                }
+            }
+        };
+    })
+    .AddCookie("ExternalCookie")
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.SignInScheme = "ExternalCookie";
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
     });
 
 builder.Services.AddAuthorization();
 
-// Services
+// ==========================================
+// 2. KẾT NỐI DATABASE (DbContext)
+// ==========================================
+builder.Services.AddDbContext<ResortDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+// ==========================================
+// 3. ĐĂNG KÝ CÁC ĐỐI TƯỢNG SERVICES (Dependency Injection)
+// ==========================================
 builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
+builder.Services.AddScoped<ITableReservationService, TableReservationService>();
+builder.Services.AddScoped<ITableFoodOrderService, TableFoodOrderService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Kots.IKotService, PhucNguyenResort.Services.Kots.KotService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Tables.IDiningTableService, PhucNguyenResort.Services.Tables.DiningTableService>();
-
-// DbContext
-builder.Services.AddDbContext<ResortDbContext>(options =>
-{
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-// Services
 builder.Services.AddScoped<PhucNguyenResort.Services.Rooms.IRoomService, PhucNguyenResort.Services.Rooms.RoomService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.RoomCategories.IRoomCategoryService, PhucNguyenResort.Services.RoomCategories.RoomCategoryService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Users.IUserService, PhucNguyenResort.Services.Users.UserService>();
-builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourService, PhucNguyenResort.Services.Tours.TourService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourCatalogService, PhucNguyenResort.Services.Tours.TourCatalogService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourScheduleService, PhucNguyenResort.Services.Tours.TourScheduleService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ITourBookingService, PhucNguyenResort.Services.Tours.TourBookingService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Tours.ICustomerTourBookingService, PhucNguyenResort.Services.Tours.CustomerTourBookingService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Home.IHomeService, PhucNguyenResort.Services.Home.HomeService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingService, PhucNguyenResort.Services.Bookings.BookingService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Bookings.IBookingGuestService, PhucNguyenResort.Services.Bookings.BookingGuestService>();
@@ -49,20 +93,31 @@ builder.Services.AddScoped<PhucNguyenResort.Services.Reception.IReceptionService
 builder.Services.AddScoped<PhucNguyenResort.Services.Payments.IVnPayService, PhucNguyenResort.Services.Payments.VnPayService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Refunds.IRefundService, PhucNguyenResort.Services.Refunds.RefundService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Email.IEmailSender, PhucNguyenResort.Services.Email.EmailSender>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Reviews.IReviewService, PhucNguyenResort.Services.Reviews.ReviewService>();
+builder.Services.AddHttpClient<PhucNguyenResort.Services.Gemini.IGeminiService, PhucNguyenResort.Services.Gemini.GeminiService>();
 builder.Services.AddDataProtection();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PdpdDataPurgeJob>();
-builder.Services.AddScoped<IHousekeepingService, HousekeepingService>();
+builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourBookingCleanupJob>();
+builder.Services.AddHostedService<PhucNguyenResort.Services.Email.OtpCleanupJob>();
+builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PendingBookingCleanupJob>();
+
+// Service tự động cập nhật đồng bộ trạng thái Tour theo thời gian thực vừa thêm
+builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourStatusWorker>();
+
 var app = builder.Build();
 
-// Auto Migration
+// ==========================================
+// 5. AUTO MIGRATION (Tự động cập nhật cấu trúc DB)
+// ==========================================
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider
-        .GetRequiredService<ResortDbContext>();
-
+    var dbContext = scope.ServiceProvider.GetRequiredService<ResortDbContext>();
     dbContext.Database.Migrate();
 }
 
+// ==========================================
+// 6. CẤU HÌNH HTTP REQUEST PIPELINE (MIDDLEWARES)
+// ==========================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

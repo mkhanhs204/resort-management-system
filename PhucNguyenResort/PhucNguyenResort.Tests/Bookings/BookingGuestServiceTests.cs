@@ -52,15 +52,16 @@ namespace PhucNguyenResort.Tests.Bookings
             {
                 context.RoomCategories.Add(new RoomCategory { CategoryId = 1, CategoryName = "Deluxe", MaxAdults = 2, MaxChildren = 1 });
                 context.Rooms.Add(new Room { RoomId = 1, CategoryId = 1 });
-                context.Bookings.Add(new Booking
+                var booking = new Booking
                 {
                     BookingId = 15,
-                    RoomId = 1,
                     UserId = 1,
                     NumberOfAdults = 2,
                     NumberOfChildren = 1,
                     BookingStatus = BookingStatus.Reserved
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 15 });
+                context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
             }
 
@@ -105,15 +106,16 @@ namespace PhucNguyenResort.Tests.Bookings
             {
                 context.RoomCategories.Add(new RoomCategory { CategoryId = 1, CategoryName = "Deluxe", MaxAdults = 2, MaxChildren = 1 });
                 context.Rooms.Add(new Room { RoomId = 1, CategoryId = 1 });
-                context.Bookings.Add(new Booking
+                var booking = new Booking
                 {
                     BookingId = 16,
-                    RoomId = 1,
                     UserId = 1,
                     NumberOfAdults = 2,
                     NumberOfChildren = 1,
                     BookingStatus = BookingStatus.Reserved
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 16 });
+                context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
             }
 
@@ -149,15 +151,16 @@ namespace PhucNguyenResort.Tests.Bookings
             {
                 context.RoomCategories.Add(new RoomCategory { CategoryId = 1, CategoryName = "Single", MaxAdults = 1, MaxChildren = 0 });
                 context.Rooms.Add(new Room { RoomId = 1, CategoryId = 1 });
-                context.Bookings.Add(new Booking
+                var booking = new Booking
                 {
                     BookingId = 16,
-                    RoomId = 1,
                     UserId = 1,
                     NumberOfAdults = 1,
                     NumberOfChildren = 0,
                     BookingStatus = BookingStatus.Reserved
-                });
+                };
+                booking.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 16 });
+                context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
             }
 
@@ -237,15 +240,16 @@ namespace PhucNguyenResort.Tests.Bookings
             using (var context = new ResortDbContext(options))
             {
                 // Old booking (checked out 8 days ago)
-                context.Bookings.Add(new Booking
+                var booking17 = new Booking
                 {
                     BookingId = 17,
-                    RoomId = 1,
                     UserId = 1,
                     CheckInDate = DateTime.Today.AddDays(-10),
                     CheckOutDate = DateTime.Today.AddDays(-8),
                     BookingStatus = BookingStatus.CheckedOut
-                });
+                };
+                booking17.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 17 });
+                context.Bookings.Add(booking17);
 
                 context.BookingGuests.Add(new BookingGuest
                 {
@@ -259,15 +263,16 @@ namespace PhucNguyenResort.Tests.Bookings
                 });
 
                 // Recent booking (checked out 3 days ago)
-                context.Bookings.Add(new Booking
+                var booking18 = new Booking
                 {
                     BookingId = 18,
-                    RoomId = 1,
                     UserId = 2,
                     CheckInDate = DateTime.Today.AddDays(-5),
                     CheckOutDate = DateTime.Today.AddDays(-3),
                     BookingStatus = BookingStatus.CheckedOut
-                });
+                };
+                booking18.BookingDetails.Add(new BookingDetail { RoomCategoryId = 1, BookingId = 18 });
+                context.Bookings.Add(booking18);
 
                 context.BookingGuests.Add(new BookingGuest
                 {

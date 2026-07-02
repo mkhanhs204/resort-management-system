@@ -12,10 +12,12 @@ public class ResortDbContext : DbContext
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<EmailOtp> EmailOtps => Set<EmailOtp>();
     public DbSet<RoomCategory> RoomCategories => Set<RoomCategory>();
     public DbSet<RoomCategoryImage> RoomCategoryImages => Set<RoomCategoryImage>();
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Booking> Bookings => Set<Booking>();
+    public DbSet<BookingDetail> BookingDetails => Set<BookingDetail>();
     public DbSet<BookingGuest> BookingGuests => Set<BookingGuest>();
     public DbSet<MenuCategory> MenuCategories => Set<MenuCategory>();
     public DbSet<MenuItem> MenuItems => Set<MenuItem>();

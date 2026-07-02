@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
-using PhucNguyenResort.Helpers;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Users;
 using PhucNguyenResort.ViewModels.Staff;
@@ -10,7 +9,7 @@ using PhucNguyenResort.Helpers;
 using Microsoft.AspNetCore.Authorization;
 namespace PhucNguyenResort.Controllers
 {
-    [Authorize(Roles = "System Admin,Business Manager")]
+    [Authorize(Roles = "System Admin")]
     public class StaffAccountsController : Controller
     {
         private readonly IUserService _userService;
@@ -25,13 +24,13 @@ namespace PhucNguyenResort.Controllers
         // GET: StaffAccounts
         public async Task<IActionResult> Index()
         {
-            var staff = await _userService.GetAllStaffAsync();
-            return View(staff);
+            var users = await _userService.GetAllUsersAsync();
+            return View(users);
         }
 
         private async Task PopulateRolesDropDownList(object? selectedRole = null)
         {
-            var rolesQuery = _context.Roles.Where(r => r.RoleId != 3).OrderBy(r => r.RoleName);
+            var rolesQuery = _context.Roles.OrderBy(r => r.RoleName);
             ViewBag.RoleId = new SelectList(await rolesQuery.AsNoTracking().ToListAsync(), "RoleId", "RoleName", selectedRole);
         }
 
@@ -70,6 +69,7 @@ namespace PhucNguyenResort.Controllers
                 user.PasswordHash = PasswordHelper.HashPassword(user, model.Password);
 
                 await _userService.AddStaffAsync(user);
+                TempData["SuccessMessage"] = "Tạo tài khoản mới thành công!";
                 return RedirectToAction(nameof(Index));
             }
             await PopulateRolesDropDownList(model.RoleId);
@@ -84,7 +84,7 @@ namespace PhucNguyenResort.Controllers
                 return NotFound();
             }
 
-            var user = await _userService.GetStaffByIdAsync(id.Value);
+            var user = await _userService.GetUserByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -123,7 +123,7 @@ namespace PhucNguyenResort.Controllers
                     return View(model);
                 }
 
-                var userToUpdate = await _userService.GetStaffByIdAsync(id);
+                var userToUpdate = await _userService.GetUserByIdAsync(id);
                 if (userToUpdate == null)
                 {
                     return NotFound();
@@ -140,6 +140,7 @@ namespace PhucNguyenResort.Controllers
                 }
 
                 await _userService.UpdateStaffAsync(userToUpdate);
+                TempData["SuccessMessage"] = "Cập nhật thông tin tài khoản thành công!";
                 return RedirectToAction(nameof(Index));
             }
             await PopulateRolesDropDownList(model.RoleId);
@@ -151,13 +152,38 @@ namespace PhucNguyenResort.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
         {
-            var user = await _userService.GetStaffByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            await _userService.ToggleStaffStatusAsync(id);
+            await _userService.ToggleUserStatusAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: StaffAccounts/ToggleBlockStatus/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleBlockStatus(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            await _userService.ToggleUserBlockStatusAsync(id);
+            if (user.IsBlocked)
+            {
+                TempData["SuccessMessage"] = "Khóa tài khoản thành công!";
+                TempData["MessageType"] = "danger";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Mở khóa tài khoản thành công!";
+                TempData["MessageType"] = "success";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

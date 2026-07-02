@@ -23,32 +23,44 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Rooms
-        public async Task<IActionResult> Index(string searchString, RoomStatus? statusFilter, int? categoryId)
+        public async Task<IActionResult> Index(string searchString, RoomStatus? statusFilter, int? categoryId, int page = 1)
         {
+            int pageSize = 10;
             var rooms = await _roomService.GetAllRoomsAsync();
+            var query = rooms.AsEnumerable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                rooms = rooms.Where(r => (r.RoomNumber != null && r.RoomNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase)) || 
+                query = query.Where(r => (r.RoomNumber != null && r.RoomNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase)) || 
                                          r.FloorNumber.ToString() == searchString);
             }
 
             if (statusFilter.HasValue)
             {
-                rooms = rooms.Where(r => r.Status == statusFilter.Value);
+                query = query.Where(r => r.Status == statusFilter.Value);
             }
 
             if (categoryId.HasValue)
             {
-                rooms = rooms.Where(r => r.CategoryId == categoryId.Value);
+                query = query.Where(r => r.CategoryId == categoryId.Value);
             }
+
+            var totalItems = query.Count();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            page = page < 1 ? 1 : page;
+            page = page > totalPages && totalPages > 0 ? totalPages : page;
+
+            var pagedRooms = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             var categories = await _roomCategoryService.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "CategoryId", "CategoryName", categoryId);
             ViewBag.SearchString = searchString;
             ViewBag.StatusFilter = statusFilter;
+            ViewBag.CurrentCategory = categoryId;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
-            return View(rooms);
+            return View(pagedRooms);
         }
 
         // GET: Rooms/Details/5

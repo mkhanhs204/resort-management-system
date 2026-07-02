@@ -1,94 +1,229 @@
+@using PhucNguyenResort.Enums
+@model PhucNguyenResort.ViewModels.TableReservations.FnBTableReservationDashboardViewModel
 @{
-    ViewData["Title"] = "Business Manager Dashboard";
+    ViewData["Title"] = "Bảng Điều Khiển Quản Lý Kinh Doanh";
     Layout = "_DashboardLayout";
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-bar-chart mr-2" style="color: #28a745;"></i> Business Manager
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Revenue analytics, occupancy rates, and resort operations overview.</p>
-            </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #805528; margin-bottom: 4px; }
+        .page-subtitle { font-family: 'Inter', sans-serif; color: #50453b; font-size: 16px; margin-bottom: 32px; }
+        
+        /* KPI Cards */
+        .kpi-card { background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 12px 24px -8px rgba(30, 41, 59, 0.05); border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; height: 100%; display: flex; align-items: center; transition: all 0.3s ease; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 20px 32px -8px rgba(30, 41, 59, 0.1); }
+        .kpi-icon-wrapper { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0; }
+        .kpi-icon-wrapper.primary { background-color: #f6f3ef; color: #805528; }
+        .kpi-icon-wrapper.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .kpi-icon-wrapper.warning { background-color: #fff8e6; color: #946c00; }
+        .kpi-icon-wrapper.info { background-color: #d3e4fe; color: #0b1c30; }
+        .kpi-details h3 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px; }
+        .kpi-details p { color: #50453b; font-size: 14px; font-weight: 500; margin-bottom: 0; }
+        
+        /* Section styling */
+        .section-header { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #805528; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .action-card { background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 12px 24px -8px rgba(30, 41, 59, 0.05); border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; height: 100%; }
+        
+        /* List Group */
+        .luxury-list .list-group-item { border: none; border-bottom: 1px solid rgba(212, 195, 182, 0.3); padding: 16px 8px; background-color: transparent; font-weight: 500; color: #1c1c1a; transition: all 0.2s; }
+        .luxury-list .list-group-item:hover { background-color: #fcf9f5; border-radius: 8px; padding-left: 16px; color: #805528; }
+        .luxury-list .list-group-item:last-child { border-bottom: none; }
+        
+        /* Table */
+        .table-luxury { background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; margin-bottom: 16px; }
+        .table-luxury table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+        .table-luxury th { background-color: #fcf9f5; color: #805528; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 16px; border-bottom: 2px solid rgba(212, 195, 182, 0.3); text-align: left; }
+        .table-luxury td { padding: 16px; border-bottom: 1px solid #f0ede9; color: #1c1c1a; font-size: 14px; vertical-align: middle; }
+        .table-luxury tbody tr:hover { background-color: #faf8f5; }
+        .table-luxury tbody tr:last-child td { border-bottom: none; }
+        
+        .status-badge { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-badge.confirmed { background-color: #e2f5ea; color: #0b5c2d; }
+        .status-badge.pending { background-color: #fff8e6; color: #946c00; }
+        .status-badge.seated { background-color: #d3e4fe; color: #0b1c30; }
+        .status-badge.completed { background-color: #f0ede9; color: #50453b; }
+        .status-badge.noshow { background-color: #e3e3e3; color: #1c1c1a; }
+        .status-badge.cancelled { background-color: #ffdad6; color: #ba1a1a; }
+        
+        .btn-outline-luxury { background-color: transparent; color: #805528; border: 1.5px solid #dfa974; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 6px 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; font-size: 14px; }
+        .btn-outline-luxury:hover { background-color: #f6f3ef; color: #633d11; text-decoration: none; }
+        
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 24px; vertical-align: middle; }
+    </style>
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="page-title">Quản Lý Kinh Doanh</h2>
+        <p class="page-subtitle">Giám sát hoạt động khu nghỉ dưỡng và cấu hình kinh doanh</p>
+    </div>
+    <div class="page-subtitle" style="margin-bottom: 8px;">
+        <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">calendar_today</span>
+        @DateTime.Now.ToString("dd MMMM, yyyy")
     </div>
 </div>
 
 <!-- KPI Cards -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
-            <h4 style="color: #28a745;"><i class="fa fa-money"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Total Revenue</p>
+<div class="row mb-5">
+    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper primary">
+                <span class="material-symbols-outlined">bed</span>
+            </div>
+            <div class="kpi-details">
+                <h3>@ViewBag.TotalRoomCategories</h3>
+                <p>Loại Phòng Cung Cấp</p>
+            </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #007bff;">
-            <h4 style="color: #007bff;"><i class="fa fa-percent"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--%</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Occupancy Rate</p>
+    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper success">
+                <span class="material-symbols-outlined">map</span>
+            </div>
+            <div class="kpi-details">
+                <h3>@ViewBag.TotalTours</h3>
+                <p>Gói Tour / Trải Nghiệm</p>
+            </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107;">
-            <h4 style="color: #ffc107;"><i class="fa fa-star"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">-- / 5.0</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Average Guest Rating</p>
+    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper warning">
+                <span class="material-symbols-outlined">payments</span>
+            </div>
+            <div class="kpi-details">
+                <h3>@ViewBag.PendingRefunds</h3>
+                <p>Yêu Cầu Hoàn Tiền Chờ Duyệt</p>
+            </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #17a2b8;">
-            <h4 style="color: #17a2b8;"><i class="fa fa-comments"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">--</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Total Reviews</p>
+    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper info">
+                <span class="material-symbols-outlined">restaurant</span>
+            </div>
+            <div class="kpi-details">
+                <h3>@(Model.PendingReservationsToday + Model.ConfirmedReservationsToday)</h3>
+                <p>Lượt Đặt Bàn Hôm Nay</p>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <!-- Quick Management Links -->
-    <div class="col-lg-6 mb-4">
-        <div class="card-box h-100" style="border-left: 5px solid #28a745;">
-            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
-                <i class="fa fa-link mr-2" style="color: #dfa974;"></i> Quick Management Links
+<div class="row mb-4">
+    <div class="col-lg-5 mb-4 mb-lg-0">
+        <div class="action-card">
+            <h5 class="section-header">
+                <span class="material-symbols-outlined">link</span> Đường Dẫn Nhanh
             </h5>
-            <div class="list-group" style="font-family: 'Cabin', sans-serif;">
-                <a asp-controller="RoomCategories" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span><i class="fa fa-bed mr-2 text-primary"></i> Room Categories & Pricing</span>
-                    <span class="badge badge-primary badge-pill"><i class="fa fa-chevron-right"></i></span>
+            <div class="list-group luxury-list mt-4">
+                <a asp-controller="RoomCategories" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><span class="material-symbols-outlined mr-3" style="color: #dfa974;">bed</span> Loại Phòng & Giá</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
                 </a>
-                <a asp-controller="RestaurantMenus" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span><i class="fa fa-cutlery mr-2 text-success"></i> F&B Menu Items</span>
-                    <span class="badge badge-success badge-pill"><i class="fa fa-chevron-right"></i></span>
+                <a asp-controller="RestaurantMenus" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><span class="material-symbols-outlined mr-3" style="color: #0b5c2d;">restaurant_menu</span> Thực Đơn F&B</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
                 </a>
-                <a asp-controller="Tours" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span><i class="fa fa-map-marker mr-2 text-warning"></i> Tour Packages</span>
-                    <span class="badge badge-warning badge-pill"><i class="fa fa-chevron-right"></i></span>
+                <a asp-controller="Tables" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><span class="material-symbols-outlined mr-3" style="color: #0b1c30;">table_bar</span> Quản Lý Bàn</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
                 </a>
-                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span><i class="fa fa-file-pdf-o mr-2 text-danger"></i> Export Reports (PDF/Excel)</span>
-                    <span class="badge badge-danger badge-pill"><i class="fa fa-chevron-right"></i></span>
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><span class="material-symbols-outlined mr-3" style="color: #946c00;">book_online</span> Đặt Bàn</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
+                </a>
+                <a asp-controller="Tours" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><span class="material-symbols-outlined mr-3" style="color: #ba1a1a;">map</span> Gói Tour & Trải Nghiệm</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
+                </a>
+                <a asp-controller="Refunds" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><span class="material-symbols-outlined mr-3" style="color: #50453b;">payments</span> Yêu Cầu Hoàn Tiền</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Recent Customer Reviews (Placeholder) -->
-    <div class="col-lg-6 mb-4">
-        <div class="card-box h-100" style="border-left: 5px solid #ffc107;">
-            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
-                <i class="fa fa-star mr-2" style="color: #ffc107;"></i> Recent Customer Reviews
-            </h5>
-            <div class="text-center text-muted py-5" style="font-family: 'Cabin', sans-serif;">
-                <i class="fa fa-info-circle fa-2x mb-3 d-block"></i>
-                <p>Review data will be loaded when backend is connected.</p>
+    <div class="col-lg-7">
+        <div class="action-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="section-header mb-0">
+                    <span class="material-symbols-outlined">event_note</span> Lịch Đặt Bàn Hôm Nay
+                </h5>
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn-outline-luxury">
+                    Xem tất cả
+                </a>
             </div>
+            
+            <div class="table-luxury">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã Bàn</th>
+                            <th>Khách Hàng</th>
+                            <th>Bàn</th>
+                            <th>Giờ</th>
+                            <th>Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TodayReservations == null || !Model.TodayReservations.Any())
+                        {
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #a4b5ce; padding: 32px;">
+                                    Không có lượt đặt bàn nào trong hôm nay.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var reservation in Model.TodayReservations.Take(6))
+                            {
+                                <tr>
+                                    <td style="font-weight: 600;">@reservation.ReservationCode</td>
+                                    <td>@reservation.CustomerName</td>
+                                    <td>Bàn @reservation.TableNumber</td>
+                                    <td style="font-weight: 500;">@reservation.ReservationTime.ToString(@"hh\:mm")</td>
+                                    <td>
+                                        @if (reservation.Status == TableReservationStatus.Pending)
+                                        {
+                                            <span class="status-badge pending">Pending</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Confirmed)
+                                        {
+                                            <span class="status-badge confirmed">Confirmed</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Seated)
+                                        {
+                                            <span class="status-badge seated">Seated</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Completed)
+                                        {
+                                            <span class="status-badge completed">Completed</span>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.NoShow)
+                                        {
+                                            <span class="status-badge noshow">No Show</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge cancelled">Cancelled</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <p style="color: #a4b5ce; font-size: 13px; font-style: italic; margin-top: 16px;">
+                * Quản lý Kinh doanh chỉ giám sát các đơn đặt bàn ở đây. Cập nhật trạng thái được xử lý bởi nhân viên F&B.
+            </p>
         </div>
     </div>
 </div>

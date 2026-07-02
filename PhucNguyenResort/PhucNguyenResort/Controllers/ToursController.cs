@@ -13,10 +13,10 @@ namespace PhucNguyenResort.Controllers
     /// </summary>
     public class ToursController : Controller
     {
-        private readonly ITourService _tourService;
+        private readonly ITourCatalogService _tourService;
         private readonly ResortDbContext _context;
 
-        public ToursController(ITourService tourService, ResortDbContext context)
+        public ToursController(ITourCatalogService tourService, ResortDbContext context)
         {
             _tourService = tourService;
             _context = context;
@@ -47,7 +47,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: Tours/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
@@ -71,7 +71,7 @@ namespace PhucNguyenResort.Controllers
                 };
 
                 await _tourService.AddTourAsync(tour);
-                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been created successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Tạo tour \"{tour.TourName}\" thành công.";
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -133,7 +133,7 @@ namespace PhucNguyenResort.Controllers
                 tour.ImageUrl      = model.ImageUrl;
 
                 await _tourService.UpdateTourAsync(tour);
-                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tour.TourName}\" has been updated successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Cập nhật tour \"{tour.TourName}\" thành công.";
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -174,12 +174,12 @@ namespace PhucNguyenResort.Controllers
 
                 string tourName = tour.TourName ?? $"Tour #{id}";
                 await _tourService.DeleteTourAsync(id);
-                if (TempData != null) TempData["SuccessMessage"] = $"Tour \"{tourName}\" has been deleted successfully.";
+                if (TempData != null) TempData["SuccessMessage"] = $"Xóa tour \"{tourName}\" thành công.";
             }
             catch (InvalidOperationException ex) when (ex.Message.StartsWith("TOUR-003"))
             {
                 // BR-TOUR-005: Tour has active TourSchedules — refuse delete
-                if (TempData != null) TempData["ErrorMessage"] = "Cannot delete this tour because it has active schedules (TourSchedules). Please remove all schedules first.";
+                if (TempData != null) TempData["ErrorMessage"] = "Không thể xóa tour này vì đang có lịch trình (TourSchedules) hoạt động. Vui lòng xóa hết lịch trình trước.";
             }
 
             return RedirectToAction(nameof(Index));

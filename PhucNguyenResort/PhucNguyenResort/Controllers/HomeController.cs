@@ -4,6 +4,7 @@ using System.Diagnostics;
 using PhucNguyenResort.Services.Home;
 using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.Models;
+using PhucNguyenResort.Services.Reviews;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -11,19 +12,22 @@ namespace PhucNguyenResort.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHomeService _homeService;
-        private readonly ITourService _tourService;
+        private readonly ITourCatalogService _tourService;
+        private readonly IReviewService _reviewService;
 
-        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourService tourService)
+        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourCatalogService tourService, IReviewService reviewService)
         {
             _logger = logger;
             _homeService = homeService;
             _tourService = tourService;
+            _reviewService = reviewService;
         }
 
         public async Task<IActionResult> Index()
         {
             var roomCategories = await _homeService.GetRoomCategoriesForHomeAsync();
-            ViewBag.Tours = await _tourService.GetAllToursAsync();
+            ViewBag.Tours = await _tourService.GetActiveToursForHomeAsync();
+            ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();
             return View(roomCategories);
         }
 
@@ -37,7 +41,7 @@ namespace PhucNguyenResort.Controllers
             return View();
         }
 
-        public async Task<IActionResult> RoomDetails(int id)
+        public async Task<IActionResult> RoomDetails(int id, string? checkIn = null, string? checkOut = null)
         {
             var roomCategory = await _homeService.GetRoomDetailsAsync(id);
 
@@ -46,11 +50,14 @@ namespace PhucNguyenResort.Controllers
                 return NotFound();
             }
 
+            ViewBag.CheckIn = checkIn;
+            ViewBag.CheckOut = checkOut;
+
             return View(roomCategory);
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int adultsCount = 2, int childrenCount = 0, int roomCount = 1)
+        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int adultsCount = 2, int childrenCount = 0, int roomCount = 1, int? preselectId = null, int? preselectQty = null)
         {
             bool isFiltered = !string.IsNullOrEmpty(checkIn) && !string.IsNullOrEmpty(checkOut);
             IEnumerable<RoomCategory> availableCategories;
@@ -100,6 +107,8 @@ namespace PhucNguyenResort.Controllers
             ViewBag.ChildrenCount = childrenCount;
             ViewBag.RoomCount = roomCount;
             ViewBag.IsFiltered = true;
+            ViewBag.PreselectId = preselectId;
+            ViewBag.PreselectQty = preselectQty;
 
             return View(availableCategories);
         }

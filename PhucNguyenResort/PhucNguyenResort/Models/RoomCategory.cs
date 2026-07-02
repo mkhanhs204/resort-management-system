@@ -25,6 +25,9 @@ public class RoomCategory
     [StringLength(255)]
     public string? ImageUrl { get; set; }
 
+    [NotMapped]
+    public int AvailableRoomsCount { get; set; }
+
     public ICollection<Room> Rooms { get; set; } = new List<Room>();
     public ICollection<RoomCategoryImage> Images { get; set; } = new List<RoomCategoryImage>();
 }

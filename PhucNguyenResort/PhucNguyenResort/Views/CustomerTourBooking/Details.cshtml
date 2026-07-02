@@ -1,0 +1,438 @@
+@model PhucNguyenResort.ViewModels.Tours.TourDetailVM
+@{
+    ViewData["Title"] = "Chi Tiết Tour | Phúc Nguyên Resort";
+    string imageUrl = string.IsNullOrEmpty(Model.ImageUrl) ? "https://lh3.googleusercontent.com/aida-public/AB6AXuCM9OErZMl-5BqJTmZKC5cF27v4NpOrlYot62zaWRmB2uF9gZJZJ76juU0YrC-roJA-z1a4xKW0KVcbhUW9AtMhjH7TyyHce4wAvBeI0-XIXpdiNY4MGiiesNrjzCmCswoxpU08i3Mu2Sa7u_Iy3niC8eA7cKkO1mHVPrHLFq-nUSwirX7dCC7OhZLT-6vrYK9lQp0e-wSwt0YdlOvxLhN7jhceuFNaUgo-ywtjx2QUlHaFhPoSg_N1s2t_2MYKnsIXRQAqWT3Gwps4" : Model.ImageUrl;
+}
+
+@section Styles {
+    <style>
+        .luxury-shadow {
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.06);
+        }
+        .hero-overlay {
+            background: linear-gradient(to top, rgba(28, 28, 26, 0.8) 0%, rgba(28, 28, 26, 0) 60%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+}
+
+<main class="pt-0 bg-background">
+    <!-- Hero Section -->
+    <section class="relative h-screen w-full overflow-hidden">
+        <div class="absolute inset-0 w-full h-full bg-cover bg-center" style="background-image: url('@imageUrl')"></div>
+        <div class="absolute inset-0 hero-overlay flex flex-col justify-end pb-section-gap-md px-margin-mobile md:px-margin-desktop">
+            <div class="max-w-container-max mx-auto w-full">
+                <span class="bg-primary-container text-on-primary-container px-4 py-1 rounded-full text-label-sm font-label-lg uppercase tracking-widest mb-4 inline-block">Trải Nghiệm Độc Bản</span>
+                <h1 class="font-display-lg text-display-lg text-white mb-4">@Model.TourName</h1>
+                <div class="flex flex-wrap gap-stack-lg text-white/90">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined">schedule</span>
+                        <span class="font-label-lg">@(Model.DurationHours >= 24 ? $"{Model.DurationHours/24} Ngày" : $"{Model.DurationHours} Giờ")</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Location))
+                    {
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined">location_on</span>
+                            <span class="font-label-lg">@Model.Location</span>
+                        </div>
+                    }
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined">groups</span>
+                        <span class="font-label-lg">Tổng còn @Model.UpcomingSchedules.Where(s => !s.IsFull).Sum(s => s.AvailableSlots) chỗ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap-md grid grid-cols-12 gap-gutter relative">
+        
+        <!-- Left Column: Content -->
+        <div class="col-span-12 md:col-span-8 space-y-section-gap-md">
+            <!-- Overview -->
+            <article>
+                <h2 class="font-headline-lg text-headline-lg mb-stack-lg text-primary">Tổng Quan Chuyến Đi</h2>
+                <div class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-stack-md whitespace-pre-wrap">@Model.Description</div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-gutter pt-stack-lg mt-8 border-t border-outline/10">
+                    <div class="flex flex-col gap-2 p-stack-md bg-surface-container rounded-xl border border-outline/10 text-center items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-3xl mb-2" data-weight="fill">restaurant</span>
+                        <span class="font-label-lg text-on-surface">Ẩm thực cao cấp</span>
+                    </div>
+                    <div class="flex flex-col gap-2 p-stack-md bg-surface-container rounded-xl border border-outline/10 text-center items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-3xl mb-2" data-weight="fill">directions_boat</span>
+                        <span class="font-label-lg text-on-surface">Di chuyển riêng</span>
+                    </div>
+                    <div class="flex flex-col gap-2 p-stack-md bg-surface-container rounded-xl border border-outline/10 text-center items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-3xl mb-2" data-weight="fill">photo_camera</span>
+                        <span class="font-label-lg text-on-surface">Chụp ảnh chuyên nghiệp</span>
+                    </div>
+                </div>
+
+                <!-- Images Gallery -->
+                <div class="mt-12">
+                    <h3 class="font-headline-sm text-headline-sm text-primary mb-4">Hình Ảnh Trải Nghiệm</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="col-span-2 row-span-2 rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
+                            <img src="@imageUrl" alt="@Model.TourName" class="w-full h-full object-cover aspect-video group-hover:scale-105 transition-transform duration-500" />
+                            <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
+                                <span class="text-white bg-black/50 p-3 rounded-full flex items-center justify-center"><span class="material-symbols-outlined">zoom_in</span></span>
+                            </div>
+                        </div>
+                        <div class="rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
+                            <img src="https://images.unsplash.com/photo-1542314831-c6a420325142?auto=format&fit=crop&q=80&w=600" alt="Trải nghiệm 1" class="w-full h-full object-cover aspect-square group-hover:scale-105 transition-transform duration-500" />
+                            <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
+                                <span class="text-white bg-black/50 p-2 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-sm">zoom_in</span></span>
+                            </div>
+                        </div>
+                        <div class="rounded-xl overflow-hidden shadow-sm relative group cursor-pointer gallery-img">
+                            <img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&q=80&w=600" alt="Trải nghiệm 2" class="w-full h-full object-cover aspect-square group-hover:scale-105 transition-transform duration-500" />
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span class="text-white font-label-lg flex items-center gap-2"><span class="material-symbols-outlined">zoom_in</span> Xem thêm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Weather -->
+                <div class="mt-12 border-t border-outline/10 pt-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+                        <!-- Google Maps -->
+                        <div>
+                            <h3 class="font-headline-sm text-headline-sm text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined">location_on</span> Vị Trí
+                            </h3>
+                            <div class="rounded-xl overflow-hidden shadow-sm border border-outline/10 h-[280px]">
+                                <iframe 
+                                    src="https://maps.google.com/maps?q=Hòa Lạc, Thạch Thất, Hà Nội&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+                                    width="100%" 
+                                    height="100%" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                            </div>
+                        </div>
+
+                        <!-- Weather Forecast -->
+                        <div>
+                            <h3 class="font-headline-sm text-headline-sm text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined">routine</span> Thời Tiết Dự Kiến
+                            </h3>
+                            <div class="rounded-xl shadow-sm border border-outline/10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 h-[280px] flex flex-col justify-between">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-headline-md text-slate-800">Hòa Lạc</h4>
+                                        <p class="text-slate-600 font-label-lg">Hôm nay</p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-5xl text-yellow-500" style="font-variation-settings: 'FILL' 1;">light_mode</span>
+                                </div>
+                                <div class="flex items-end gap-4 mt-2">
+                                    <span class="text-display-md font-bold text-slate-800">28°C</span>
+                                    <div class="text-slate-600 font-body-sm pb-1">
+                                        <p>Nắng đẹp</p>
+                                        <p>Độ ẩm: 65% • Gió: 12km/h</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-blue-200/50 text-center">
+                                    <div>
+                                        <p class="text-label-sm text-slate-500">Ngày mai</p>
+                                        <span class="material-symbols-outlined text-yellow-500 my-1">partly_cloudy_day</span>
+                                        <p class="font-label-lg text-slate-700">30°</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-label-sm text-slate-500">Ngày 3</p>
+                                        <span class="material-symbols-outlined text-yellow-500 my-1">light_mode</span>
+                                        <p class="font-label-lg text-slate-700">31°</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-label-sm text-slate-500">Ngày 4</p>
+                                        <span class="material-symbols-outlined text-slate-400 my-1">cloud</span>
+                                        <p class="font-label-lg text-slate-700">27°</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Inclusion -->
+            <article>
+                <h2 class="font-headline-lg text-headline-lg mb-stack-lg text-primary">Dịch Vụ Bao Gồm</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">check_circle</span>
+                        <span class="text-on-surface-variant">Tất cả các bữa ăn tiêu chuẩn</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">check_circle</span>
+                        <span class="text-on-surface-variant">Hướng dẫn viên chuyên nghiệp</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">check_circle</span>
+                        <span class="text-on-surface-variant">Bảo hiểm du lịch trọn gói</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">check_circle</span>
+                        <span class="text-on-surface-variant">Nước uống và tiện ích miễn phí</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- Right Column: Sticky Widget -->
+        <aside class="col-span-12 md:col-span-4">
+            <div class="sticky top-28 bg-surface-container-lowest border border-outline/10 p-stack-lg rounded-2xl luxury-shadow mt-12 md:mt-0">
+                <div class="mb-stack-lg">
+                    <span class="text-label-sm text-on-surface-variant uppercase tracking-widest">Giá mỗi khách</span>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <span class="font-display-lg text-headline-lg text-primary font-bold">@Model.Price.ToString("N0")</span>
+                        <span class="font-label-lg text-on-surface">VNĐ</span>
+                    </div>
+                </div>
+                
+                @if (TempData["Error"] != null)
+                {
+                    <div class="bg-error-container text-on-error-container p-4 rounded-lg mb-4 text-sm font-medium">
+                        @TempData["Error"]
+                    </div>
+                }
+
+                <form asp-controller="CustomerTourBooking" asp-action="Book" method="get" class="space-y-stack-md">
+                    <div>
+                        <label class="font-label-lg text-on-surface block mb-2">Lịch khởi hành</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">calendar_month</span>
+                            <select name="id" required class="w-full pl-10 py-3 bg-surface-container border border-outline/15 rounded-lg focus:outline-none focus:border-primary-container transition-all cursor-pointer">
+                                @if (Model.UpcomingSchedules != null && Model.UpcomingSchedules.Any())
+                                {
+                                    <option value="">-- Chọn lịch trình --</option>
+                                    foreach (var sch in Model.UpcomingSchedules)
+                                    {
+                                        if (sch.IsFull)
+                                        {
+                                            <option value="@sch.ScheduleId" disabled>@sch.TourDate.ToString("dd/MM/yyyy") (Hết chỗ)</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@sch.ScheduleId">@sch.TourDate.ToString("dd/MM/yyyy") (Còn @sch.AvailableSlots chỗ)</option>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>Chưa có lịch khởi hành</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+
+                    @if (Model.UpcomingSchedules != null && Model.UpcomingSchedules.Any(s => !s.IsFull))
+                    {
+                        <button type="submit" class="w-full bg-primary-container text-on-primary-container font-headline-sm py-4 rounded-xl hover:brightness-105 active:scale-95 transition-all shadow-lg shadow-primary-container/20 mt-4 font-bold">
+                            Đặt Tour Ngay
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" disabled class="w-full bg-surface-variant text-on-surface-variant font-headline-sm py-4 rounded-xl mt-4 cursor-not-allowed">
+                            Chưa có lịch mở bán hoặc đã hết chỗ
+                        </button>
+                    }
+                </form>
+                <p class="text-center text-label-sm text-on-surface-variant mt-4">
+                    <span class="material-symbols-outlined text-[14px] align-text-top mr-1">verified_user</span>
+                    Xác nhận tức thì qua email
+                </p>
+            </div>
+        </aside>
+    </section>
+
+    <!-- Reviews Section (Static Mockup) -->
+    <section class="bg-surface-container-low py-section-gap-lg border-t border-outline/10">
+        <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-section-gap-md gap-4">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Đánh Giá Từ Khách Hàng</h2>
+                    <div class="flex items-center gap-2">
+                        <div class="flex text-primary">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                        <span class="font-label-lg text-on-surface">@(Model.AverageRating > 0 ? Model.AverageRating.ToString("F1") : "4.9")/5 dựa trên @(Model.ReviewCount > 0 ? Model.ReviewCount : 124) lượt đánh giá</span>
+                    </div>
+                </div>
+            </div>
+            
+            @if (Model.Reviews != null && Model.Reviews.Any())
+            {
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+                    @foreach (var review in Model.Reviews.Take(3))
+                    {
+                        var avatarColors = new[] { "bg-primary-container", "bg-tertiary-container", "bg-secondary-container", "bg-error-container" };
+                        var colorClass = avatarColors[review.ReviewId % avatarColors.Length];
+                        var initial = !string.IsNullOrEmpty(review.UserName) ? review.UserName.Substring(0, 1).ToUpper() : "U";
+
+                        <div class="bg-surface p-stack-lg rounded-2xl luxury-shadow border border-outline/5">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-full overflow-hidden @colorClass flex items-center justify-center font-bold text-on-surface text-lg">
+                                    @initial
+                                </div>
+                                <div>
+                                    <h4 class="font-label-lg text-on-surface">@review.UserName</h4>
+                                    <p class="text-label-sm text-on-surface-variant">Tháng @review.CreatedAt.Month, @review.CreatedAt.Year</p>
+                                </div>
+                                <div class="ml-auto flex text-primary items-center">
+                                    <span class="font-bold mr-1">@review.Rating</span>
+                                    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                </div>
+                            </div>
+                            <p class="font-body-md text-on-surface-variant italic line-clamp-4">"@review.Comment"</p>
+                        </div>
+                    }
+                </div>
+                @if (Model.ReviewCount > 3)
+                {
+                    <div class="mt-8 text-center">
+                        <a asp-controller="Review" asp-action="PublicList" asp-route-tourId="@Model.TourId" class="inline-flex items-center justify-center px-6 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all font-label-lg">
+                            Xem tất cả @Model.ReviewCount đánh giá
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+                    <!-- Static Fallback when no reviews exist -->
+                    <div class="bg-surface p-stack-lg rounded-2xl luxury-shadow border border-outline/5">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-primary-container"></div>
+                            <div>
+                                <h4 class="font-label-lg text-on-surface">Minh Anh Lê</h4>
+                                <p class="text-label-sm text-on-surface-variant">Tháng 10, 2023</p>
+                            </div>
+                        </div>
+                        <p class="font-body-md text-on-surface-variant italic">"Một chuyến đi tuyệt vời vượt xa sự mong đợi. Dịch vụ chăm sóc khách hàng của Phúc Nguyên thật sự tinh tế."</p>
+                    </div>
+                    <div class="bg-surface p-stack-lg rounded-2xl luxury-shadow border border-outline/5">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-tertiary-container"></div>
+                            <div>
+                                <h4 class="font-label-lg text-on-surface">James Wilson</h4>
+                                <p class="text-label-sm text-on-surface-variant">Tháng 11, 2023</p>
+                            </div>
+                        </div>
+                        <p class="font-body-md text-on-surface-variant italic">"Perfect organization from start to finish. The cave tour was magical and the sunrise was the highlight."</p>
+                    </div>
+                    <div class="bg-surface p-stack-lg rounded-2xl luxury-shadow border border-outline/5">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-secondary-container"></div>
+                            <div>
+                                <h4 class="font-label-lg text-on-surface">Thanh & Hoài</h4>
+                                <p class="text-label-sm text-on-surface-variant">Tháng 12, 2023</p>
+                            </div>
+                        </div>
+                        <p class="font-body-md text-on-surface-variant italic">"Chúng mình đã có kỷ niệm ngày cưới thật trọn vẹn. Cảm ơn team đã chuẩn bị chu đáo."</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 hidden bg-black/90 items-center justify-center">
+        <button id="lightbox-close" class="absolute top-6 right-6 text-white hover:text-gray-300 transition-colors">
+            <span class="material-symbols-outlined text-4xl">close</span>
+        </button>
+        <button id="lightbox-prev" class="absolute left-6 text-white hover:text-gray-300 transition-colors">
+            <span class="material-symbols-outlined text-4xl">chevron_left</span>
+        </button>
+        <div class="max-w-5xl max-h-[80vh] w-full mx-4 flex justify-center relative">
+            <img id="lightbox-img" src="" alt="Gallery Image" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+        </div>
+        <button id="lightbox-next" class="absolute right-6 text-white hover:text-gray-300 transition-colors">
+            <span class="material-symbols-outlined text-4xl">chevron_right</span>
+        </button>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Lightbox functionality
+            const lightbox = document.getElementById('lightbox-modal');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const btnClose = document.getElementById('lightbox-close');
+            const btnPrev = document.getElementById('lightbox-prev');
+            const btnNext = document.getElementById('lightbox-next');
+            const galleryImages = document.querySelectorAll('.gallery-img');
+            
+            let currentIndex = 0;
+            // High-res variants for demo purposes if needed, otherwise fallback to img src
+            const imagesSrc = Array.from(galleryImages).map(el => {
+                const img = el.querySelector('img');
+                return img ? img.src.replace('&w=600', '&w=1200') : ''; 
+            });
+
+            function openLightbox(index) {
+                currentIndex = index;
+                lightboxImg.src = imagesSrc[currentIndex];
+                lightbox.classList.remove('hidden');
+                lightbox.classList.add('flex');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            }
+
+            function closeLightbox() {
+                lightbox.classList.add('hidden');
+                lightbox.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+
+            function showNext() {
+                currentIndex = (currentIndex + 1) % imagesSrc.length;
+                lightboxImg.src = imagesSrc[currentIndex];
+            }
+
+            function showPrev() {
+                currentIndex = (currentIndex - 1 + imagesSrc.length) % imagesSrc.length;
+                lightboxImg.src = imagesSrc[currentIndex];
+            }
+
+            galleryImages.forEach((item, index) => {
+                item.addEventListener('click', () => openLightbox(index));
+            });
+
+            btnClose.addEventListener('click', closeLightbox);
+            btnNext.addEventListener('click', showNext);
+            btnPrev.addEventListener('click', showPrev);
+
+            // Close on background click
+            lightbox.addEventListener('click', function (e) {
+                if (e.target === lightbox || e.target.parentElement === lightbox) {
+                    closeLightbox();
+                }
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function (e) {
+                if (!lightbox.classList.contains('hidden')) {
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowRight') showNext();
+                    if (e.key === 'ArrowLeft') showPrev();
+                }
+            });
+        });
+    </script>
+}

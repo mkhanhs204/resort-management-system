@@ -1,0 +1,238 @@
+@model PhucNguyenResort.ViewModels.Auth.VerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Xác minh tài khoản | Phúc Nguyên Resort";
+}
+
+@section Styles {
+    <style>
+        .luxury-blur-bg {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.06);
+        }
+        .input-focus-gold:focus {
+            border-color: #dfa974;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(223, 169, 116, 0.2);
+        }
+        .otp-box {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+}
+
+<div class="flex items-center justify-center relative py-section-gap-md overflow-hidden min-h-[85vh]">
+    <!-- Background Imagery -->
+    <div class="absolute inset-0 z-0">
+        <div class="w-full h-full bg-cover bg-center opacity-40 scale-105 transform transition-transform duration-[10s] login-bg-image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAuYBt8CIxzN8hqDekIfwBi1dMK536pQGApkEKzWXvsIILQtM0GLC98QJUJMtSjO0MIJ-X9egJaLWVpS52dnEhUSKtWb5m66IW5ySz2sG9D_F_oev5S-t1qD0Yi9zdfst42M9-GkuwjxfjQ3jTcnRqOHFdKXo3i0dhbtJ2Lfid-EyR5jK_N8cEeCWVgCBgXCarYwM65JbRx9vYm_fVedFp3QCaNqiy-A62TLp7t6WKQvyI8MX6jaGK-ff9rjxF5LXLIF4y8RhCQv0GL')">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
+    </div>
+
+    <!-- OTP Card Container -->
+    <div class="relative z-10 w-full max-w-[500px] px-margin-mobile md:px-0">
+        <div class="bg-surface-container-lowest border border-outline/10 rounded-xl custom-shadow p-8 md:p-12 luxury-blur-bg">
+            <div class="text-center mb-8">
+                <span class="material-symbols-outlined text-[48px] text-primary mb-4">verified_user</span>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Xác minh tài khoản</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">Chúng tôi đã gửi mã xác thực gồm 6 chữ số đến email của bạn:</p>
+                <p class="font-label-lg text-on-surface mt-1">@Model.Email</p>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="bg-error/10 text-error p-4 rounded-xl border border-error/30 mb-6 text-center text-sm">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <div id="ajax-message" class="hidden p-4 rounded-xl border mb-6 text-center text-sm"></div>
+
+            <form asp-action="VerifyOtp" method="post" id="otp-form" class="flex flex-col gap-6">
+                <div asp-validation-summary="ModelOnly" class="text-error text-sm text-center"></div>
+                
+                <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="OtpCode" id="hiddenOtpCode" />
+
+                <div class="flex justify-between items-center gap-2 sm:gap-4">
+                    <input type="text" class="w-12 h-14 sm:w-14 sm:h-16 text-center text-[24px] font-bold rounded-lg border border-outline/20 bg-surface-container-low text-on-surface input-focus-gold otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                    <input type="text" class="w-12 h-14 sm:w-14 sm:h-16 text-center text-[24px] font-bold rounded-lg border border-outline/20 bg-surface-container-low text-on-surface input-focus-gold otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                    <input type="text" class="w-12 h-14 sm:w-14 sm:h-16 text-center text-[24px] font-bold rounded-lg border border-outline/20 bg-surface-container-low text-on-surface input-focus-gold otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                    <input type="text" class="w-12 h-14 sm:w-14 sm:h-16 text-center text-[24px] font-bold rounded-lg border border-outline/20 bg-surface-container-low text-on-surface input-focus-gold otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                    <input type="text" class="w-12 h-14 sm:w-14 sm:h-16 text-center text-[24px] font-bold rounded-lg border border-outline/20 bg-surface-container-low text-on-surface input-focus-gold otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                    <input type="text" class="w-12 h-14 sm:w-14 sm:h-16 text-center text-[24px] font-bold rounded-lg border border-outline/20 bg-surface-container-low text-on-surface input-focus-gold otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                </div>
+
+                <div class="text-center -mt-2">
+                    <span asp-validation-for="OtpCode" class="text-error text-sm"></span>
+                </div>
+
+                <button type="submit" class="w-full h-14 bg-primary-container text-on-primary-container rounded-lg font-label-lg text-[16px] shadow-sm hover:opacity-90 active:scale-[0.98] transition-all">
+                    Xác Minh Ngay
+                </button>
+            </form>
+
+            <div class="text-center mt-6 font-body-md text-on-surface-variant">
+                Chưa nhận được mã? 
+                <span id="resend-timer-wrapper">Gửi lại mã sau <span class="font-bold text-primary" id="countdown-timer">60</span>s</span>
+                <a id="resend-btn" class="hidden text-primary font-semibold hover:underline cursor-pointer">Gửi lại mã ngay</a>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <p class="font-body-md text-on-surface-variant">
+                    Quay lại 
+                    <a asp-action="Register" class="text-primary font-semibold hover:underline transition-all">Đăng ký</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Background animation
+            document.addEventListener('mousemove', (e) => {
+                const bg = document.querySelector('.login-bg-image');
+                if (bg) {
+                    const x = (e.clientX / window.innerWidth) - 0.5;
+                    const y = (e.clientY / window.innerHeight) - 0.5;
+                    bg.style.transform = `scale(1.05) translate(${x * 20}px, ${y * 20}px)`;
+                }
+            });
+
+            const boxes = document.querySelectorAll(".otp-box");
+            const hiddenInput = document.getElementById("hiddenOtpCode");
+            const form = document.getElementById("otp-form");
+            const resendBtn = document.getElementById("resend-btn");
+            const timerWrapper = document.getElementById("resend-timer-wrapper");
+            const timerSpan = document.getElementById("countdown-timer");
+            const ajaxMessage = document.getElementById("ajax-message");
+            
+            let timeLeft = 60;
+            let timerId = null;
+
+            function startTimer() {
+                timeLeft = 60;
+                resendBtn.classList.add("hidden");
+                timerWrapper.classList.remove("hidden");
+                timerSpan.textContent = timeLeft;
+                
+                if (timerId) clearInterval(timerId);
+                
+                timerId = setInterval(function () {
+                    timeLeft--;
+                    timerSpan.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerId);
+                        timerWrapper.classList.add("hidden");
+                        resendBtn.classList.remove("hidden");
+                    }
+                }, 1000);
+            }
+
+            // Start timer on load
+            startTimer();
+
+            // Set focus to the first box
+            if(boxes[0]) boxes[0].focus();
+
+            boxes.forEach((box, index) => {
+                box.addEventListener("input", function (e) {
+                    // Only allow numbers
+                    this.value = this.value.replace(/[^0-9]/g, "");
+
+                    if (this.value.length === 1 && index < boxes.length - 1) {
+                        boxes[index + 1].focus();
+                    }
+                    updateHiddenInput();
+                });
+
+                box.addEventListener("keydown", function (e) {
+                    if (e.key === "Backspace") {
+                        if (this.value.length === 0 && index > 0) {
+                            boxes[index - 1].focus();
+                            boxes[index - 1].value = "";
+                        } else {
+                            this.value = "";
+                        }
+                        updateHiddenInput();
+                        e.preventDefault();
+                    }
+                });
+
+                box.addEventListener("paste", function (e) {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData("text").trim();
+                    if (/^[0-9]{6}$/.test(text)) {
+                        for (let i = 0; i < boxes.length; i++) {
+                            boxes[i].value = text[i];
+                        }
+                        boxes[boxes.length - 1].focus();
+                        updateHiddenInput();
+                    }
+                });
+            });
+
+            function updateHiddenInput() {
+                let code = "";
+                boxes.forEach(box => {
+                    code += box.value;
+                });
+                hiddenInput.value = code;
+            }
+
+            form.addEventListener("submit", function (e) {
+                updateHiddenInput();
+                if (hiddenInput.value.length !== 6) {
+                    e.preventDefault();
+                    alert("Vui lòng nhập đủ 6 chữ số xác thực.");
+                }
+            });
+
+            resendBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                
+                ajaxMessage.classList.add("hidden");
+                ajaxMessage.classList.remove("bg-primary-container/20", "text-on-primary-container", "border-primary-container/30", "bg-error/10", "text-error", "border-error/30");
+
+                const email = document.querySelector('input[name="Email"]').value;
+
+                fetch('/Account/ResendOtp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        ajaxMessage.textContent = data.message;
+                        ajaxMessage.classList.remove("hidden");
+                        ajaxMessage.classList.add("bg-primary-container/20", "text-on-primary-container", "border-primary-container/30");
+                        startTimer();
+                    } else {
+                        ajaxMessage.textContent = data.message;
+                        ajaxMessage.classList.remove("hidden");
+                        ajaxMessage.classList.add("bg-error/10", "text-error", "border-error/30");
+                    }
+                })
+                .catch(error => {
+                    ajaxMessage.textContent = "Có lỗi xảy ra khi gửi lại mã. Vui lòng thử lại.";
+                    ajaxMessage.classList.remove("hidden");
+                    ajaxMessage.classList.add("bg-error/10", "text-error", "border-error/30");
+                });
+            });
+        });
+    </script>
+}

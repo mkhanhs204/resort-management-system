@@ -8,6 +8,10 @@
 <div class="container-fluid refund-container py-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
+        @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
+        {
+            <a asp-action="WalkInBooking" class="btn btn-primary shadow-sm"><i class="fa fa-plus"></i> Đặt Phòng Tại Quầy</a>
+        }
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -94,7 +98,10 @@
                             <th>Check-out</th>
                             <th>Cọc / Tổng</th>
                             <th>Trạng Thái</th>
-                            <th class="pr-4 text-end">Thao Tác</th>
+                            @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
+                            {
+                                <th class="pr-4 text-end">Thao Tác</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -107,8 +114,8 @@
                                     <span class="small text-muted">@item.User?.Email</span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-light border p-2">@item.Room?.RoomNumber</span><br />
-                                    <span class="small text-muted">@item.Room?.Category?.CategoryName</span>
+                                    <span class="badge badge-light border p-2">@(item.BookingDetails != null && item.BookingDetails.Any(bd => bd.Room != null) ? string.Join(", ", item.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : "Chưa xếp phòng")</span><br />
+                                    <span class="small text-muted">@(item.BookingDetails != null ? string.Join(", ", item.BookingDetails.GroupBy(bd => bd.RoomCategory?.CategoryName).Select(g => $"{g.Count()}x {g.Key}")) : "")</span>
                                 </td>
                                 <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
                                 <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>
@@ -121,6 +128,7 @@
                                         var badgeClass = item.BookingStatus switch
                                         {
                                             PhucNguyenResort.Enums.BookingStatus.Reserved => "badge-pastel-warning",
+                                            PhucNguyenResort.Enums.BookingStatus.Arrived => "badge-pastel-info",
                                             PhucNguyenResort.Enums.BookingStatus.CheckedIn => "badge-pastel-success",
                                             PhucNguyenResort.Enums.BookingStatus.CheckedOut => "badge-pastel-secondary",
                                             PhucNguyenResort.Enums.BookingStatus.Cancelled => "badge-pastel-danger",
@@ -139,23 +147,38 @@
                                     }
                                     <span class="badge @badgeClass">@statusText</span>
                                 </td>
-                                <td class="pr-4 text-end">
-                                    <div class="d-flex justify-content-end flex-wrap" style="gap: 5px;">
-                                        @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.PendingPayment)
-                                        {
-                                            <a asp-action="CheckIn" asp-route-id="@item.BookingId" class="btn btn-sm btn-success">Check-in</a>
-                                        }
-                                        
-                                        <a asp-action="ExportManifest" asp-route-id="@item.BookingId" class="btn btn-sm btn-outline-info">Báo Cáo Tạm Trú</a>
-
-                                        @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
-                                        {
-                                            <form asp-controller="Bookings" asp-action="Cancel" asp-route-id="@item.BookingId" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận hủy booking này?');">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hủy</button>
-                                            </form>
-                                        }
-                                    </div>
-                                </td>
+                                @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
+                                {
+                                    <td class="pr-4 text-end">
+                                        <div class="d-flex justify-content-end flex-wrap" style="gap: 5px;">
+                                            @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.PendingPayment || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived)
+                                            {
+                                                <a asp-action="CheckIn" asp-route-id="@item.BookingId" class="btn btn-sm btn-success">
+                                                    @(item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived ? "Giao phòng" : "Check-in")
+                                                </a>
+                                            }
+                                            @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedIn)
+                                            {
+                                                <a asp-action="CheckOut" asp-route-id="@item.BookingId" class="btn btn-sm btn-danger">Check-out</a>
+                                                <a asp-action="ExportManifest" asp-route-id="@item.BookingId" target="_blank" class="btn btn-sm btn-outline-info">Báo Cáo Tạm Trú</a>
+                                            }
+                                            else if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedOut)
+                                            {
+                                                <a asp-action="PrintInvoice" asp-route-id="@item.BookingId" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-print"></i> In Hóa Đơn</a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="ExportManifest" asp-route-id="@item.BookingId" target="_blank" class="btn btn-sm btn-outline-info">Báo Cáo Tạm Trú</a>
+                                            }
+                                            @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
+                                            {
+                                                <form asp-controller="Bookings" asp-action="Cancel" asp-route-id="@item.BookingId" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận hủy booking này?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Hủy</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                }
                             </tr>
                         }
                     </tbody>
