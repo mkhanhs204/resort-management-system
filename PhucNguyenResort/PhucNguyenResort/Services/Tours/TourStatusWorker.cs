@@ -33,15 +33,30 @@ namespace PhucNguyenResort.Services.Tours
                     {
                         var context = scope.ServiceProvider.GetRequiredService<ResortDbContext>();
 
-                        // Chạy lệnh SQL cập nhật trạng thái tự động
-                        // Loại bỏ stoppingToken tại đây để tránh ném ngoại lệ TaskCanceledException khi DB chưa phản hồi kịp lúc shutdown
+                        // --- HÀNH ĐỘNG 1: CẬP NHẬT TRẠNG THÁI TOURBOOKINGS (CHI TIẾT KHÁCH HÀNG) ---
+                        // Nghiệp vụ: Nếu Tour đã hết giờ, tự động chuyển các khách ở trạng thái 'CheckedIn' sang 'Completed'
+                        // Điều kiện: Đến giờ kết thúc (EndTime) của ngày hôm nay, hoặc ngày vận hành đã trôi qua (TourDate < Hôm nay)
+                        await context.Database.ExecuteSqlRawAsync(@"
+                            UPDATE TourBookings
+                            SET BookingStatus = 'Completed'
+                            FROM TourBookings b
+                            INNER JOIN TourSchedules s ON b.TourScheduleId = s.TourScheduleId
+                            WHERE b.BookingStatus = 'CheckedIn'
+                            AND (
+                                s.TourDate < CAST(GETDATE() AS DATE) 
+                                OR (s.TourDate = CAST(GETDATE() AS DATE) AND s.EndTime <= CAST(GETDATE() AS TIME))
+                            )
+                        ");
+
+                        // --- HÀNH ĐỘNG 2: CẬP NHẬT TRẠNG THÁI TOURSCHEULES (LỊCH TRÌNH VẬN HÀNH TỔNG) ---
+                        // Giữ nguyên logic ban đầu của bạn nhưng đồng bộ mốc EndTime chuẩn xác
                         await context.Database.ExecuteSqlRawAsync(@"
                             UPDATE TourSchedules
                             SET Status = 'Completed'
                             WHERE Status != 'Completed' AND Status != 'Cancelled'
                             AND (
                                 TourDate < CAST(GETDATE() AS DATE) 
-                                OR (TourDate = CAST(GETDATE() AS DATE) AND DATEADD(minute, 180, StartTime) <= CAST(GETDATE() AS TIME))
+                                OR (TourDate = CAST(GETDATE() AS DATE) AND EndTime <= CAST(GETDATE() AS TIME))
                             )
                         ");
                     }
@@ -53,8 +68,8 @@ namespace PhucNguyenResort.Services.Tours
 
                 try
                 {
-                    // Chờ 2 phút trước khi quét lại, bọc trong try-catch để bắt gọn sự kiện app tắt (Shutdown/Cancellation)
-                    await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
+                    // Chờ 1 phút quét lại hệ thống 1 lần để đảm bảo độ chính xác theo thời gian thực
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
                 catch (TaskCanceledException)
                 {
