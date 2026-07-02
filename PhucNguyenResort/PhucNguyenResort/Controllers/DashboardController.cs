@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data; // Nhận diện ResortDbContext
 using PhucNguyenResort.Enums; // Nhận diện trạng thái TourBookingStatus
 using PhucNguyenResort.Models;
+using PhucNguyenResort.Services.TableReservations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace PhucNguyenResort.Web.Controllers
