@@ -67,11 +67,11 @@ Test data dùng classification `SYNTHETIC`. Không dùng PII thật của ngư�
 
 Bắt buộc điền trước khi viết test. Liệt kê các điểm sai lệch giữa tài liệu SRS, thiết kế và thực tế codebase để chuẩn bị kịch bản kiểm thử khớp.
 
-| #  | Spec gốc (sai / thiếu)                                                       | Thực tế (schema / policy)                                                                                    | Fix áp dụng trong test                                                                                                                       |
-| -- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| L1 | Chưa mô tả cụ thể trường Giới tính (Gender) cho khai báo tạm trú.  | Cần enum `GenderType` (Male = 0, Female = 1, Other = 2) tương thích với biểu mẫu Công an.            | Test sẽ xác thực giá trị `Gender` thuộc tập enum trên.                                                                               |
-| L2 | Cho phép nhập CCCD mà không ràng buộc sự đồng ý bảo mật dữ liệu. | Vi phạm Nghị định 356/2025/NĐ-CP về xử lý dữ liệu cá nhân nhạy cảm nếu không có consent.      | Ném lỗi ngoại lệ `REG-001` nếu `PdpdConsentChecked` là `false` khi lưu CCCD.                                                      |
-| L3 | Thiếu cơ chế tự động xóa dữ liệu (Right to Deletion) sau chuyến đi. | Dữ liệu CCCD/Ngày sinh không được lưu trữ vô thời hạn. Phải tự động xóa (Purge) sau checkout. | Viết test cho scheduler kiểm tra các booking có `CheckOutDate < Now - 7 ngày` sẽ bị xóa cột `PassportNumber` và `DateOfBirth`. |
+| #  | Spec gốc (sai / thiếu)                                                       | Thực tế (schema / policy)                                                                                    | Fix áp dụng trong test                                                                                                                      |
+| -- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| L1 | Chưa mô tả cụ thể trường Giới tính (Gender) cho khai báo tạm trú.  | Cần enum`GenderType` (Male = 0, Female = 1, Other = 2) tương thích với biểu mẫu Công an.             | Test sẽ xác thực giá trị`Gender` thuộc tập enum trên.                                                                               |
+| L2 | Cho phép nhập CCCD mà không ràng buộc sự đồng ý bảo mật dữ liệu. | Vi phạm Nghị định 356/2025/NĐ-CP về xử lý dữ liệu cá nhân nhạy cảm nếu không có consent.      | Ném lỗi ngoại lệ`REG-001` nếu `PdpdConsentChecked` là `false` khi lưu CCCD.                                                      |
+| L3 | Thiếu cơ chế tự động xóa dữ liệu (Right to Deletion) sau chuyến đi. | Dữ liệu CCCD/Ngày sinh không được lưu trữ vô thời hạn. Phải tự động xóa (Purge) sau checkout. | Viết test cho scheduler kiểm tra các booking có`CheckOutDate < Now - 7 ngày` sẽ bị xóa cột `PassportNumber` và `DateOfBirth`. |
 
 ---
 
@@ -101,13 +101,13 @@ Bắt buộc điền trước khi viết test. Liệt kê các điểm sai lệc
 
 ### TDS-03 — Test Conditions and Coverage Items
 
-| Condition ID | Test Condition                                                                                        | Coverage Item                       | Test Cases     |
-| ------------ | ----------------------------------------------------------------------------------------------------- | ----------------------------------- | -------------- |
-| TC-COND-001  | Lưu danh sách khách đi cùng thành công khi có PDPD consent                                    | `SaveBookingGuestsAsync`          | `REG-TC-001` |
-| TC-COND-002  | Trả về lỗi `REG-001` khi lưu danh sách khách chứa số CCCD nhưng không tích chọn consent | `SaveBookingGuestsAsync`          | `REG-TC-002` |
-| TC-COND-003  | Trả về lỗi `REG-002` khi số lượng khách khai báo vượt quá sức chứa booking             | `SaveBookingGuestsAsync`          | `REG-TC-003` |
-| TC-COND-004  | Giải mã số CCCD/Passport thành công cho Lễ tân sử dụng check-in                              | `GetBookingGuestsForCheckInAsync` | `REG-TC-004` |
-| TC-COND-005  | Tự động xóa (Purge) số CCCD và Ngày sinh của các booking đã checkout > 7 ngày             | `PurgeExpiredPiiDataAsync`        | `REG-TC-005` |
+| Condition ID | Test Condition                                                                                       | Coverage Item                       | Test Cases     |
+| ------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------- | -------------- |
+| TC-COND-001  | Lưu danh sách khách đi cùng thành công khi có PDPD consent                                   | `SaveBookingGuestsAsync`          | `REG-TC-001` |
+| TC-COND-002  | Trả về lỗi`REG-001` khi lưu danh sách khách chứa số CCCD nhưng không tích chọn consent | `SaveBookingGuestsAsync`          | `REG-TC-002` |
+| TC-COND-003  | Trả về lỗi`REG-002` khi số lượng khách khai báo vượt quá sức chứa booking             | `SaveBookingGuestsAsync`          | `REG-TC-003` |
+| TC-COND-004  | Giải mã số CCCD/Passport thành công cho Lễ tân sử dụng check-in                             | `GetBookingGuestsForCheckInAsync` | `REG-TC-004` |
+| TC-COND-005  | Tự động xóa (Purge) số CCCD và Ngày sinh của các booking đã checkout > 7 ngày            | `PurgeExpiredPiiDataAsync`        | `REG-TC-005` |
 
 ### TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 
@@ -130,7 +130,7 @@ Bắt buộc điền trước khi viết test. Liệt kê các điểm sai lệc
 
 **Severity**: CRITICAL
 **Feature Under Test**: `BookingGuestService.SaveBookingGuestsAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-001
 
 **Preconditions**:
@@ -159,7 +159,7 @@ Bắt buộc điền trước khi viết test. Liệt kê các điểm sai lệc
 
 **Severity**: CRITICAL
 **Feature Under Test**: `BookingGuestService.SaveBookingGuestsAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-002
 
 **Preconditions**:
@@ -183,7 +183,7 @@ Bắt buộc điền trước khi viết test. Liệt kê các điểm sai lệc
 
 **Severity**: HIGH
 **Feature Under Test**: `BookingGuestService.SaveBookingGuestsAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-003
 
 **Preconditions**:
@@ -207,7 +207,7 @@ Bắt buộc điền trước khi viết test. Liệt kê các điểm sai lệc
 
 **Severity**: HIGH
 **Feature Under Test**: `BookingGuestService.GetBookingGuestsForCheckInAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-004
 
 **Preconditions**:
@@ -229,7 +229,7 @@ Bắt buộc điền trước khi viết test. Liệt kê các điểm sai lệc
 
 **Severity**: CRITICAL
 **Feature Under Test**: `BookingGuestService.PurgeExpiredPiiDataAsync()`
-**TDD Phase**: 🔴 RED
+**TDD Phase**: 🟢
 **Condition Ref**: TC-COND-005
 
 **Preconditions**:
