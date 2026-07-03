@@ -45,13 +45,13 @@ namespace PhucNguyenResort.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TourBooking booking)
+        public async Task<IActionResult> Create(TourBooking model)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _bookingService.AddBookingAsync(booking);
+                    await _bookingService.AddBookingAsync(model);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (System.Exception ex)
@@ -59,9 +59,9 @@ namespace PhucNguyenResort.Controllers
                     ModelState.AddModelError("", ex.Message);
                 }
             }
-            ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId", booking.ScheduleId);
-            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", booking.UserId);
-            return View(booking);
+            ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId", model.ScheduleId);
+            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", model.UserId);
+            return View(model);
         }
 
         public async Task<IActionResult> Edit(int? id)
@@ -78,18 +78,18 @@ namespace PhucNguyenResort.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, TourBooking booking)
+        public async Task<IActionResult> Edit(int id, TourBooking model)
         {
-            if (id != booking.TourBookingId) return NotFound();
+            if (id != model.TourBookingId) return NotFound();
 
             if (ModelState.IsValid)
             {
-                await _bookingService.UpdateBookingAsync(booking);
+                await _bookingService.UpdateBookingAsync(model);
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId", booking.ScheduleId);
-            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", booking.UserId);
-            return View(booking);
+            ViewBag.Schedules = new SelectList(await _scheduleService.GetAllSchedulesAsync(), "ScheduleId", "ScheduleId", model.ScheduleId);
+            ViewBag.Users = new SelectList(await _userService.GetAllUsersAsync(), "UserId", "FullName", model.UserId);
+            return View(model);
         }
 
         public async Task<IActionResult> Delete(int? id)

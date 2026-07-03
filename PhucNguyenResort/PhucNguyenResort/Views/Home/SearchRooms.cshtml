@@ -6,9 +6,9 @@
 
 <div>
     <!-- Hero Banner -->
-    <section class="relative h-[300px] flex flex-col justify-center items-center text-center px-margin-mobile overflow-hidden">
+    <section class="relative h-[600px] flex flex-col justify-center items-center text-center px-margin-mobile overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <div class="w-full h-full bg-cover bg-center transition-transform duration-1000 hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDF_GSeazGYHkWMyoO3oze92q_KXMuVgiXVWHZ53XkNeOS4YVbQJEWyReDqkTZ09bJamHlqSGs8kUextTFsksmBZH-I19BGp9eZPiZcNKBMP-kv3eZklURWraINff0SV7P_QyvU099aA8uFCVwzvH76EUZF-lljWNSv_jwVBj6Plk5XyyCjXkw2vNomtsYzVlSbOBVLJRgDPJ5PD0kxTBMRg5ZrVZ3dory4vBuSNbqv7LpTpWNu4ZuefJMqS8bOsugXrx_NAWMKX70z')">
+            <div class="w-full h-full bg-cover bg-center transition-transform duration-1000 hover:scale-105" style="background-image: url('https://nhaxinhdesign.com/wp-content/uploads/2023/02/noi-that-re-sort-10.jpg')">
             </div>
             <div class="absolute inset-0 bg-on-surface/40"></div>
         </div>
@@ -132,10 +132,27 @@
                             <div class="md:w-3/5 p-6 flex flex-col">
                                 <div class="flex justify-between items-start mb-2">
                                     <h3 class="font-headline-sm text-headline-sm text-on-surface">@room.CategoryName</h3>
-                                    <div class="flex items-center text-primary-container">
-                                        <span class="material-symbols-outlined fill" style="font-variation-settings: 'FILL' 1;">star</span>
-                                        <span class="ml-1 font-label-lg text-label-lg font-bold">4.9</span>
-                                    </div>
+                                    @{
+                                        var reviews = ViewBag.Reviews as IEnumerable<PhucNguyenResort.ViewModels.Reviews.ReviewListVM>;
+                                        if (reviews != null)
+                                        {
+                                            var roomReviews = reviews.Where(r => r.ServiceType == "Room" && r.ServiceName == room.CategoryName);
+                                            if (roomReviews.Any())
+                                            {
+                                                var avgRating = roomReviews.Average(r => r.Rating) ?? 0.0;
+                                                <div class="flex items-center text-primary-container">
+                                                    <span class="material-symbols-outlined fill text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                                    <span class="ml-1 font-label-lg text-label-lg font-bold">@avgRating.ToString("F1")</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="flex items-center text-on-surface-variant">
+                                                    <span class="text-[13px] italic whitespace-nowrap">Chưa có đánh giá</span>
+                                                </div>
+                                            }
+                                        }
+                                    }
                                 </div>
                                 <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4">
                                     @(string.IsNullOrEmpty(room.Description) ? "Trải nghiệm tầm nhìn vô cực ra đại dương từ ban công riêng. Nội thất hiện đại kết hợp hoàn hảo giữa gỗ tự nhiên và đá cẩm thạch." : room.Description)

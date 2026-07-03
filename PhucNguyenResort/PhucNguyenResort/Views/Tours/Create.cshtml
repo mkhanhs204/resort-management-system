@@ -58,6 +58,20 @@
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
         }
+        input[type="file"].form-control::file-selector-button {
+            padding: 10px 16px;
+            margin: -10px -16px;
+            margin-right: 16px;
+            background-color: #e5e2de;
+            border: none;
+            color: #50453b;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        input[type="file"].form-control:hover::file-selector-button {
+            background-color: #d4c3b6;
+        }
         .form-group label {
             color: #1c1c1a;
             font-size: 14px;
@@ -140,7 +154,7 @@
         Thông Tin Tour
     </div>
     <div>
-        <form asp-action="Create" id="create-tour-form">
+        <form asp-action="Create" id="create-tour-form" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;" role="alert"></div>
 
             <div class="row">
@@ -224,13 +238,18 @@
                         </div>
                     </div>
 
-                    <!-- Image URL -->
+                    <!-- Image Upload -->
                     <div class="form-group mb-4">
-                        <label asp-for="ImageUrl">URL Hình Ảnh</label>
-                        <input asp-for="ImageUrl" class="form-control" id="input-image-url"
-                               placeholder="/images/tours/halong.jpg" maxlength="255"
-                               oninput="previewImage(this.value)" />
-                        <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                        <label asp-for="ImageUpload">Ảnh Đại Diện Chính <span class="text-danger">*</span></label>
+                        <input asp-for="ImageUpload" type="file" class="form-control" accept="image/*" onchange="previewImageFile(this)" />
+                        <span asp-validation-for="ImageUpload" class="text-danger small"></span>
+                        <input type="hidden" asp-for="ImageUrl" id="input-image-url" />
+                    </div>
+
+                    <!-- Gallery Images -->
+                    <div class="form-group mb-4">
+                        <label asp-for="GalleryImages">Album Hình Ảnh (Nhiều ảnh)</label>
+                        <input asp-for="GalleryImages" type="file" multiple class="form-control" accept="image/*" />
                     </div>
 
                 </div>
@@ -276,6 +295,22 @@
                     img.classList.add('d-none');
                     placeholder.classList.remove('d-none');
                 };
+            } else {
+                img.classList.add('d-none');
+                placeholder.classList.remove('d-none');
+            }
+        }
+        function previewImageFile(input) {
+            var img = document.getElementById('preview-img');
+            var placeholder = document.getElementById('preview-placeholder');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                    img.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
             } else {
                 img.classList.add('d-none');
                 placeholder.classList.remove('d-none');

@@ -2,15 +2,22 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
     
+    bool hasBanner = (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase)) ||
+                     (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("SearchRooms", StringComparison.OrdinalIgnoreCase)) ||
+                     (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("AboutUs", StringComparison.OrdinalIgnoreCase)) ||
+                     (currentController.Equals("CustomerTourBooking", StringComparison.OrdinalIgnoreCase)) ||
+                     (currentController.Equals("Review", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("PublicList", StringComparison.OrdinalIgnoreCase));
+
     string IsActive(string controller, string action = "")
     {
         bool isControllerMatch = string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
-        if (string.IsNullOrEmpty(action))
+        bool isActionMatch = string.IsNullOrEmpty(action) || string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+
+        if (isControllerMatch && isActionMatch)
         {
-            return isControllerMatch ? "flex items-center text-primary border-b-2 border-primary font-semibold pt-1.5 pb-1 whitespace-nowrap" : "flex items-center text-on-secondary-container hover:text-primary transition-colors duration-300 border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap";
+            return "flex items-center text-primary border-b-2 border-primary font-semibold pt-1.5 pb-1 whitespace-nowrap nav-item active-item";
         }
-        bool isActionMatch = string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
-        return isControllerMatch && isActionMatch ? "flex items-center text-primary border-b-2 border-primary font-semibold pt-1.5 pb-1 whitespace-nowrap" : "flex items-center text-on-secondary-container hover:text-primary transition-colors duration-300 border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap";
+        return "flex items-center text-on-secondary-container hover:text-primary transition-colors duration-300 border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap nav-item";
     }
 }
 <!DOCTYPE html>
@@ -152,14 +159,46 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #dfa974; }
+        
+        .header-transparent {
+            background-color: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .header-transparent .nav-item {
+            color: #ffffff !important;
+        }
+        .header-transparent .nav-item:hover {
+            color: #ffffff !important;
+            opacity: 0.8;
+        }
+        .header-transparent .nav-item.active-item {
+            color: #ffffff !important;
+            border-bottom-color: #ffffff !important;
+        }
+        .header-transparent .brand-text {
+            color: #ffffff !important;
+        }
+        .header-transparent .brand-text:hover {
+            opacity: 0.8;
+        }
+        .header-transparent #mobile-menu-btn {
+            color: #ffffff !important;
+        }
+        .header-transparent .btn-book-now {
+            background-color: #ffffff !important;
+            color: #805528 !important; /* primary color */
+        }
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="bg-background text-on-surface font-body-md overflow-x-hidden">
     <!-- TopNavBar -->
-    <header class="sticky top-0 w-full z-50 bg-surface backdrop-blur-md border-b border-outline-variant/10 shadow-sm transition-all duration-300" id="main-header">
+    <header class="@(hasBanner ? "fixed top-0 w-full z-50 bg-surface backdrop-blur-md border-b border-outline-variant/10 shadow-sm transition-all duration-300 text-white header-transparent" : "sticky top-0 w-full z-50 bg-surface backdrop-blur-md border-b border-outline-variant/10 shadow-sm transition-all duration-300 text-on-surface")" id="main-header" data-has-banner="@hasBanner.ToString().ToLower()">
         <nav class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto transition-all duration-300 gap-8" id="main-nav">
-            <a asp-controller="Home" asp-action="Index" class="font-headline-md text-headline-md font-bold text-on-surface hover:text-primary transition-colors whitespace-nowrap mr-8">Phúc Nguyên Resort</a>
+            <a asp-controller="Home" asp-action="Index" class="font-headline-md text-headline-md font-bold text-on-surface hover:text-primary transition-colors whitespace-nowrap mr-8 brand-text">Phúc Nguyên Resort</a>
             
             <!-- Desktop Nav -->
             <ul class="hidden xl:flex items-center space-x-4 flex-1 justify-center">
@@ -169,7 +208,7 @@
                 
                 @{
                     bool isServiceActive = currentController.Equals("FoodOrders", StringComparison.OrdinalIgnoreCase) || currentController.Equals("TableReservations", StringComparison.OrdinalIgnoreCase);
-                    string serviceActiveStr = isServiceActive ? "flex items-center text-primary border-b-2 border-primary font-semibold pt-1.5 pb-1 whitespace-nowrap" : "flex items-center text-on-secondary-container hover:text-primary transition-colors duration-300 border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap";
+                    string serviceActiveStr = isServiceActive ? "flex items-center text-primary border-b-2 border-primary font-semibold pt-1.5 pb-1 whitespace-nowrap nav-item active-item" : "flex items-center text-on-secondary-container hover:text-primary transition-colors duration-300 border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap nav-item";
                 }
                 <li class="relative group cursor-pointer">
                     <a class="@serviceActiveStr font-label-lg text-label-lg">
@@ -196,7 +235,7 @@
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
                     <div class="relative group cursor-pointer">
-                        <div class="text-on-secondary-container hover:text-primary transition-colors duration-300 font-label-lg text-label-lg flex items-center border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap">
+                        <div class="text-on-secondary-container hover:text-primary transition-colors duration-300 font-label-lg text-label-lg flex items-center border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap nav-item">
                             @User.Identity.Name <span class="material-symbols-outlined ml-1">expand_more</span>
                         </div>
                         <div class="absolute right-0 mt-2 w-56 bg-surface rounded-xl shadow-ambient border border-outline-variant/20 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-300 z-50">
@@ -215,7 +254,7 @@
                     <a class="@IsActive("Account", "Login") font-label-lg text-label-lg" asp-controller="Account" asp-action="Login">Đăng Nhập</a>
                 }
                 
-                <a asp-controller="Home" asp-action="SearchRooms" class="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-label-lg text-label-lg shadow-ambient hover:scale-105 transition-all duration-300 whitespace-nowrap">
+                <a asp-controller="Home" asp-action="SearchRooms" class="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-label-lg text-label-lg shadow-ambient hover:scale-105 transition-all duration-300 whitespace-nowrap btn-book-now">
                     Đặt Ngay
                 </a>
             </div>
@@ -374,12 +413,24 @@
             window.addEventListener('scroll', () => {
                 const header = document.getElementById('main-header');
                 const nav = document.getElementById('main-nav');
+                const hasBanner = header.getAttribute('data-has-banner') === 'true';
+
                 if (window.scrollY > 50) {
-                    header.classList.add('bg-surface/95');
+                    if (hasBanner) {
+                        header.classList.remove('text-white', 'header-transparent');
+                        header.classList.add('text-on-surface');
+                    } else {
+                        header.classList.add('bg-surface/95');
+                    }
                     nav.classList.remove('h-20');
                     nav.classList.add('h-16');
                 } else {
-                    header.classList.remove('bg-surface/95');
+                    if (hasBanner) {
+                        header.classList.add('text-white', 'header-transparent');
+                        header.classList.remove('text-on-surface');
+                    } else {
+                        header.classList.remove('bg-surface/95');
+                    }
                     nav.classList.add('h-20');
                     nav.classList.remove('h-16');
                 }
