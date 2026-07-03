@@ -37,7 +37,7 @@ namespace PhucNguyenResort.Services.Reception
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(b => 
+                query = query.Where(b =>
                     b.BookingId.ToString() == searchString ||
                     (b.User != null && b.User.FullName != null && b.User.FullName.Contains(searchString)) ||
                     (b.User != null && b.User.Email != null && b.User.Email.Contains(searchString)) ||
@@ -53,11 +53,9 @@ namespace PhucNguyenResort.Services.Reception
             if (dateFilter.HasValue)
             {
                 var targetDate = dateFilter.Value.Date;
-                // Lọc những booking có CheckInDate HOẶC CheckOutDate nằm trong ngày được chọn
                 query = query.Where(b => b.CheckInDate.Date == targetDate || b.CheckOutDate.Date == targetDate);
             }
 
-            // Sắp xếp: Giảm dần theo mã Booking (Booking mới tạo lên đầu)
             return await query
                 .OrderByDescending(b => b.BookingId)
                 .ToListAsync();
@@ -437,7 +435,7 @@ namespace PhucNguyenResort.Services.Reception
             var guestList = guests.ToList();
 
             var csv = new System.Text.StringBuilder();
-            csv.AppendLine("\uFEFF"); // BOM for Excel
+            csv.AppendLine("\uFEFF");
             csv.AppendLine("STT,Họ và Tên,Ngày Sinh,Giới Tính,Số CCCD/Hộ Chiếu,Quốc Tịch,Vai Trò,Thời Gian Tạm Trú");
 
             int index = 1;
@@ -448,8 +446,8 @@ namespace PhucNguyenResort.Services.Reception
                 var role = guest.IsPrimaryBooker ? "Người đặt chính" : "Khách đi cùng";
                 var durationStr = $"{booking.CheckInDate:dd/MM/yyyy} - {booking.CheckOutDate:dd/MM/yyyy}";
 
-                var nameEscaped = $"\"{guest.FullName.Replace("\"", "\"\"")}\"";
-                var nationalityEscaped = $"\"{guest.Nationality.Replace("\"", "\"\"")}\"";
+                var nameEscaped = $"\"{guest.FullName?.Replace("\"", "\"\"")}\"";
+                var nationalityEscaped = $"\"{guest.Nationality?.Replace("\"", "\"\"")}\"";
 
                 csv.AppendLine($"{index},{nameEscaped},{dobStr},{genderStr},{guest.PassportNumber},{nationalityEscaped},{role},{durationStr}");
                 index++;
@@ -457,7 +455,7 @@ namespace PhucNguyenResort.Services.Reception
 
             var fileBytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
             var fileName = $"BaoCaoTamTru_Booking_{booking.BookingId}.csv";
-            
+
             return (fileBytes, fileName, string.Empty);
         }
 
