@@ -4,6 +4,8 @@ using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.ViewModels.Tours;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -15,11 +17,13 @@ namespace PhucNguyenResort.Controllers
     {
         private readonly ITourCatalogService _tourService;
         private readonly ResortDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ToursController(ITourCatalogService tourService, ResortDbContext context)
+        public ToursController(ITourCatalogService tourService, ResortDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _tourService = tourService;
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Tours
@@ -66,9 +70,51 @@ namespace PhucNguyenResort.Controllers
                     Price         = model.Price,
                     MaxCapacity   = model.MaxCapacity,
                     DurationHours = model.DurationHours,
-                    Location      = model.Location,
-                    ImageUrl      = model.ImageUrl
+                    Location      = model.Location
                 };
+
+                // Process Main Image
+                if (model.ImageUpload != null && model.ImageUpload.Length > 0)
+                {
+                    string imagesFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "tours");
+                    Directory.CreateDirectory(imagesFolder);
+                    string fileName = Guid.NewGuid().ToString() + "_" + model.ImageUpload.FileName;
+                    string filePath = Path.Combine(imagesFolder, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.ImageUpload.CopyToAsync(stream);
+                    }
+                    tour.ImageUrl = "/images/tours/" + fileName;
+                }
+                else
+                {
+                    tour.ImageUrl = model.ImageUrl;
+                }
+
+                // Process Gallery Images
+                if (model.GalleryImages != null && model.GalleryImages.Count > 0)
+                {
+                    string galleryFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "tours", "gallery");
+                    Directory.CreateDirectory(galleryFolder);
+
+                    foreach (var file in model.GalleryImages)
+                    {
+                        if (file.Length > 0)
+                        {
+                            string galleryFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                            string galleryFilePath = Path.Combine(galleryFolder, galleryFileName);
+                            using (var stream = new FileStream(galleryFilePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+
+                            tour.Images.Add(new TourImage
+                            {
+                                ImageUrl = "/images/tours/gallery/" + galleryFileName
+                            });
+                        }
+                    }
+                }
 
                 await _tourService.AddTourAsync(tour);
                 if (TempData != null) TempData["SuccessMessage"] = $"Tạo tour \"{tour.TourName}\" thành công.";
@@ -100,7 +146,12 @@ namespace PhucNguyenResort.Controllers
                 MaxCapacity   = tour.MaxCapacity ?? 0,
                 DurationHours = tour.DurationHours ?? 0,
                 Location      = tour.Location,
-                ImageUrl      = tour.ImageUrl
+                ImageUrl      = tour.ImageUrl,
+                ExistingGalleryImages = tour.Images.Select(i => new TourImageVM
+                {
+                    ImageId = i.ImageId,
+                    ImageUrl = i.ImageUrl
+                }).ToList()
             };
 
             return View(model);
@@ -130,13 +181,91 @@ namespace PhucNguyenResort.Controllers
                 tour.MaxCapacity   = model.MaxCapacity;
                 tour.DurationHours = model.DurationHours;
                 tour.Location      = model.Location;
-                tour.ImageUrl      = model.ImageUrl;
+
+                // Process Main Image
+                if (model.ImageUpload != null && model.ImageUpload.Length > 0)
+                {
+                    string imagesFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "tours");
+                    Directory.CreateDirectory(imagesFolder);
+                    string fileName = Guid.NewGuid().ToString() + "_" + model.ImageUpload.FileName;
+                    string filePath = Path.Combine(imagesFolder, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.ImageUpload.CopyToAsync(stream);
+                    }
+                    tour.ImageUrl = "/images/tours/" + fileName;
+                }
+                else if (!string.IsNullOrEmpty(model.ImageUrl))
+                {
+                    tour.ImageUrl = model.ImageUrl;
+                }
+
+                // Process Gallery Images
+                if (model.NewGalleryImages != null && model.NewGalleryImages.Count > 0)
+                {
+                    string galleryFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "tours", "gallery");
+                    Directory.CreateDirectory(galleryFolder);
+
+                    foreach (var file in model.NewGalleryImages)
+                    {
+                        if (file.Length > 0)
+                        {
+                            string galleryFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                            string galleryFilePath = Path.Combine(galleryFolder, galleryFileName);
+                            using (var stream = new FileStream(galleryFilePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+
+                            tour.Images.Add(new TourImage
+                            {
+                                ImageUrl = "/images/tours/gallery/" + galleryFileName
+                            });
+                        }
+                    }
+                }
 
                 await _tourService.UpdateTourAsync(tour);
                 if (TempData != null) TempData["SuccessMessage"] = $"Cập nhật tour \"{tour.TourName}\" thành công.";
                 return RedirectToAction(nameof(Index));
             }
+            
+            // Reload existing images on validation failure
+            var reloadTour = await _tourService.GetTourByIdAsync(id);
+            if (reloadTour != null)
+            {
+                model.ExistingGalleryImages = reloadTour.Images.Select(i => new TourImageVM
+                {
+                    ImageId = i.ImageId,
+                    ImageUrl = i.ImageUrl
+                }).ToList();
+            }
             return View(model);
+        }
+
+        // POST: Tours/DeleteGalleryImage/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteGalleryImage(int id)
+        {
+            var image = await _tourService.GetGalleryImageByIdAsync(id);
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            var tourId = image.TourId;
+
+            // Delete physical file
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, image.ImageUrl.TrimStart('/'));
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            await _tourService.DeleteGalleryImageAsync(id);
+
+            return RedirectToAction(nameof(Edit), new { id = tourId });
         }
 
         // GET: Tours/Delete/5

@@ -52,6 +52,7 @@ namespace PhucNguyenResort.Controllers
 
             ViewBag.CheckIn = checkIn;
             ViewBag.CheckOut = checkOut;
+            ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync(categoryId: id);
 
             return View(roomCategory);
         }
@@ -72,6 +73,7 @@ namespace PhucNguyenResort.Controllers
                 ViewBag.ChildrenCount = childrenCount;
                 ViewBag.RoomCount = roomCount;
                 ViewBag.IsFiltered = false;
+                ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();
 
                 return View(availableCategories);
             }
@@ -109,6 +111,7 @@ namespace PhucNguyenResort.Controllers
             ViewBag.IsFiltered = true;
             ViewBag.PreselectId = preselectId;
             ViewBag.PreselectQty = preselectQty;
+            ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();
 
             return View(availableCategories);
         }

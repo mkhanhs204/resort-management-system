@@ -37,6 +37,7 @@ namespace PhucNguyenResort.Services.Tours
         {
             return await _context.Tours
                 .Include(t => t.TourSchedules)
+                .Include(t => t.Images)
                 .FirstOrDefaultAsync(t => t.TourId == tourId);
         }
 
@@ -83,6 +84,21 @@ namespace PhucNguyenResort.Services.Tours
                 .Where(u => u.IsActive && u.RoleId == 7)
                 .OrderBy(u => u.FullName)
                 .ToListAsync();
+        }
+
+        public async Task<TourImage?> GetGalleryImageByIdAsync(int imageId)
+        {
+            return await _context.TourImages.FindAsync(imageId);
+        }
+
+        public async Task DeleteGalleryImageAsync(int imageId)
+        {
+            var image = await _context.TourImages.FindAsync(imageId);
+            if (image != null)
+            {
+                _context.TourImages.Remove(image);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

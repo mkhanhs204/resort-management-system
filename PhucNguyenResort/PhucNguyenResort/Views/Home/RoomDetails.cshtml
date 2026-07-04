@@ -52,14 +52,33 @@
                 </nav>
                 <h1 class="font-headline-lg text-headline-lg text-on-secondary-fixed mb-2">@Model.CategoryName</h1>
                 <div class="flex items-center gap-4 text-primary">
-                    <div class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                        <span class="ml-2 font-label-lg text-on-surface-variant">4.9 / 5 (120 Đánh giá)</span>
-                    </div>
+                    @{
+                        var heroReviews = ViewBag.Reviews as IEnumerable<PhucNguyenResort.ViewModels.Reviews.ReviewListVM>;
+                    }
+                    @if (heroReviews != null && heroReviews.Any())
+                    {
+                        var heroAvg = heroReviews.Average(r => r.Rating) ?? 0.0;
+                        <div class="flex items-center gap-1">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Round(heroAvg))
+                                {
+                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                                }
+                                else
+                                {
+                                    <span class="material-symbols-outlined text-sm">star</span>
+                                }
+                            }
+                            <span class="ml-2 font-label-lg text-on-surface-variant">@heroAvg.ToString("0.0") / 5 (@heroReviews.Count() Đánh giá)</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="flex items-center gap-1">
+                            <span class="font-label-lg text-on-surface-variant italic px-1">Chưa có đánh giá</span>
+                        </div>
+                    }
                 </div>
             </header>
 
@@ -133,6 +152,72 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Reviews Section -->
+            @if (ViewBag.Reviews != null && ((IEnumerable<PhucNguyenResort.ViewModels.Reviews.ReviewListVM>)ViewBag.Reviews).Any())
+            {
+                var reviews = (IEnumerable<PhucNguyenResort.ViewModels.Reviews.ReviewListVM>)ViewBag.Reviews;
+                var avgRating = reviews.Average(r => r.Rating) ?? 0.0;
+                <div class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/20 mt-8">
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-6">Đánh Giá Từ Khách Hàng</h3>
+                    <div class="flex items-center gap-4 mb-6 pb-6 border-b border-outline-variant/20">
+                        <div class="text-4xl font-bold text-primary">@avgRating.ToString("0.0")</div>
+                        <div>
+                            <div class="flex text-primary">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Round(avgRating))
+                                    {
+                                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="material-symbols-outlined">star</span>
+                                    }
+                                }
+                            </div>
+                            <div class="text-on-surface-variant font-label-md">Dựa trên @reviews.Count() đánh giá</div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        @foreach (var review in reviews)
+                        {
+                            <div class="border-b border-outline-variant/10 pb-6 last:border-0 last:pb-0">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-label-lg text-on-surface">@review.UserName</h4>
+                                        <div class="text-on-surface-variant text-body-sm">@review.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                    </div>
+                                    <div class="flex text-primary text-sm">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= (review.Rating ?? 0))
+                                            {
+                                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="material-symbols-outlined text-[16px]">star</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(review.Comment))
+                                {
+                                    <p class="text-body-md text-on-surface-variant">@review.Comment</p>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/20 mt-8">
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-6">Đánh Giá Từ Khách Hàng</h3>
+                    <p class="text-on-surface-variant font-label-md italic">Chưa có đánh giá nào cho phòng này.</p>
+                </div>
+            }
         </div>
 
         <!-- Sticky Booking Widget (Right Column) -->

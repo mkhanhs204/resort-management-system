@@ -10,7 +10,7 @@
             box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.06);
         }
         .hero-overlay {
-            background: linear-gradient(to top, rgba(28, 28, 26, 0.8) 0%, rgba(28, 28, 26, 0) 60%);
+            background: rgba(28, 28, 26, 0.5);
         }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
@@ -26,11 +26,11 @@
     <!-- Hero Section -->
     <section class="relative h-screen w-full overflow-hidden">
         <div class="absolute inset-0 w-full h-full bg-cover bg-center" style="background-image: url('@imageUrl')"></div>
-        <div class="absolute inset-0 hero-overlay flex flex-col justify-end pb-section-gap-md px-margin-mobile md:px-margin-desktop">
-            <div class="max-w-container-max mx-auto w-full">
-                <span class="bg-primary-container text-on-primary-container px-4 py-1 rounded-full text-label-sm font-label-lg uppercase tracking-widest mb-4 inline-block">Trải Nghiệm Độc Bản</span>
+        <div class="absolute inset-0 hero-overlay flex flex-col justify-center items-center px-margin-mobile md:px-margin-desktop text-center">
+            <div class="max-w-container-max mx-auto w-full flex flex-col items-center">
+                <span class="bg-primary-container text-on-primary-container px-4 py-1 rounded-full text-label-sm font-label-lg uppercase tracking-widest mb-4 inline-block">TINH HOA KHÁM PHÁ</span>
                 <h1 class="font-display-lg text-display-lg text-white mb-4">@Model.TourName</h1>
-                <div class="flex flex-wrap gap-stack-lg text-white/90">
+                <div class="flex flex-wrap justify-center gap-stack-lg text-white/90">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined">schedule</span>
                         <span class="font-label-lg">@(Model.DurationHours >= 24 ? $"{Model.DurationHours/24} Ngày" : $"{Model.DurationHours} Giờ")</span>
@@ -79,26 +79,87 @@
                 <!-- Images Gallery -->
                 <div class="mt-12">
                     <h3 class="font-headline-sm text-headline-sm text-primary mb-4">Hình Ảnh Trải Nghiệm</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <div class="col-span-2 row-span-2 rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
-                            <img src="@imageUrl" alt="@Model.TourName" class="w-full h-full object-cover aspect-video group-hover:scale-105 transition-transform duration-500" />
-                            <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
-                                <span class="text-white bg-black/50 p-3 rounded-full flex items-center justify-center"><span class="material-symbols-outlined">zoom_in</span></span>
+                    @{
+                        var allImages = new List<string> { imageUrl };
+                        if (Model.GalleryImages != null && Model.GalleryImages.Any())
+                        {
+                            allImages.AddRange(Model.GalleryImages);
+                        }
+                    }
+                    
+                    @if(allImages.Count == 1)
+                    {
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
+                                <img src="@allImages[0]" alt="@Model.TourName" class="w-full h-[400px] object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
+                                    <span class="text-white bg-black/50 p-3 rounded-full flex items-center justify-center"><span class="material-symbols-outlined">zoom_in</span></span>
+                                </div>
                             </div>
                         </div>
-                        <div class="rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
-                            <img src="https://images.unsplash.com/photo-1542314831-c6a420325142?auto=format&fit=crop&q=80&w=600" alt="Trải nghiệm 1" class="w-full h-full object-cover aspect-square group-hover:scale-105 transition-transform duration-500" />
-                            <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
-                                <span class="text-white bg-black/50 p-2 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-sm">zoom_in</span></span>
-                            </div>
+                    }
+                    else if(allImages.Count == 2)
+                    {
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach(var img in allImages)
+                            {
+                                <div class="rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
+                                    <img src="@img" alt="@Model.TourName" class="w-full h-[400px] object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
+                                        <span class="text-white bg-black/50 p-3 rounded-full flex items-center justify-center"><span class="material-symbols-outlined">zoom_in</span></span>
+                                    </div>
+                                </div>
+                            }
                         </div>
-                        <div class="rounded-xl overflow-hidden shadow-sm relative group cursor-pointer gallery-img">
-                            <img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&q=80&w=600" alt="Trải nghiệm 2" class="w-full h-full object-cover aspect-square group-hover:scale-105 transition-transform duration-500" />
-                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <span class="text-white font-label-lg flex items-center gap-2"><span class="material-symbols-outlined">zoom_in</span> Xem thêm</span>
+                    }
+                    else
+                    {
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="col-span-2 row-span-2 rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
+                                <img src="@allImages[0]" alt="@Model.TourName" class="w-full h-[416px] object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
+                                    <span class="text-white bg-black/50 p-3 rounded-full flex items-center justify-center"><span class="material-symbols-outlined">zoom_in</span></span>
+                                </div>
                             </div>
+                            <div class="rounded-xl overflow-hidden shadow-sm gallery-img cursor-pointer relative group">
+                                <img src="@allImages[1]" alt="Trải nghiệm" class="w-full h-[200px] object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
+                                    <span class="text-white bg-black/50 p-2 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-sm">zoom_in</span></span>
+                                </div>
+                            </div>
+                            @if(allImages.Count > 2)
+                            {
+                                <div class="rounded-xl overflow-hidden shadow-sm relative group cursor-pointer gallery-img">
+                                    <img src="@allImages[2]" alt="Trải nghiệm" class="w-full h-[200px] object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    @if(allImages.Count > 3)
+                                    {
+                                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-100 group-hover:bg-black/60 transition-colors">
+                                            <span class="text-white font-label-lg flex items-center gap-2"><span class="material-symbols-outlined">zoom_in</span> +@(allImages.Count - 3) Xem thêm</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="absolute inset-0 bg-black/0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-black/20 transition-all">
+                                            <span class="text-white bg-black/50 p-2 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-sm">zoom_in</span></span>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         </div>
-                    </div>
+                    }
+
+                    <!-- Hidden images for lightbox -->
+                    @if(allImages.Count > 3)
+                    {
+                        <div class="hidden">
+                            @for(int i = 3; i < allImages.Count; i++)
+                            {
+                                <div class="gallery-img">
+                                    <img src="@allImages[i]" />
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <!-- Location & Weather -->
@@ -264,16 +325,25 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-section-gap-md gap-4">
                 <div>
                     <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Đánh Giá Từ Khách Hàng</h2>
-                    <div class="flex items-center gap-2">
-                        <div class="flex text-primary">
-                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                    @if (Model.ReviewCount > 0)
+                    {
+                        <div class="flex items-center gap-2">
+                            <div class="flex text-primary">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Round(Model.AverageRating))
+                                    {
+                                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="material-symbols-outlined">star</span>
+                                    }
+                                }
+                            </div>
+                            <span class="font-label-lg text-on-surface">@Model.AverageRating.ToString("F1")/5 dựa trên @Model.ReviewCount lượt đánh giá</span>
                         </div>
-                        <span class="font-label-lg text-on-surface">@(Model.AverageRating > 0 ? Model.AverageRating.ToString("F1") : "4.9")/5 dựa trên @(Model.ReviewCount > 0 ? Model.ReviewCount : 124) lượt đánh giá</span>
-                    </div>
+                    }
                 </div>
             </div>
             
@@ -315,38 +385,8 @@
             }
             else
             {
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-                    <!-- Static Fallback when no reviews exist -->
-                    <div class="bg-surface p-stack-lg rounded-2xl luxury-shadow border border-outline/5">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="w-12 h-12 rounded-full overflow-hidden bg-primary-container"></div>
-                            <div>
-                                <h4 class="font-label-lg text-on-surface">Minh Anh Lê</h4>
-                                <p class="text-label-sm text-on-surface-variant">Tháng 10, 2023</p>
-                            </div>
-                        </div>
-                        <p class="font-body-md text-on-surface-variant italic">"Một chuyến đi tuyệt vời vượt xa sự mong đợi. Dịch vụ chăm sóc khách hàng của Phúc Nguyên thật sự tinh tế."</p>
-                    </div>
-                    <div class="bg-surface p-stack-lg rounded-2xl luxury-shadow border border-outline/5">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="w-12 h-12 rounded-full overflow-hidden bg-tertiary-container"></div>
-                            <div>
-                                <h4 class="font-label-lg text-on-surface">James Wilson</h4>
-                                <p class="text-label-sm text-on-surface-variant">Tháng 11, 2023</p>
-                            </div>
-                        </div>
-                        <p class="font-body-md text-on-surface-variant italic">"Perfect organization from start to finish. The cave tour was magical and the sunrise was the highlight."</p>
-                    </div>
-                    <div class="bg-surface p-stack-lg rounded-2xl luxury-shadow border border-outline/5">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="w-12 h-12 rounded-full overflow-hidden bg-secondary-container"></div>
-                            <div>
-                                <h4 class="font-label-lg text-on-surface">Thanh & Hoài</h4>
-                                <p class="text-label-sm text-on-surface-variant">Tháng 12, 2023</p>
-                            </div>
-                        </div>
-                        <p class="font-body-md text-on-surface-variant italic">"Chúng mình đã có kỷ niệm ngày cưới thật trọn vẹn. Cảm ơn team đã chuẩn bị chu đáo."</p>
-                    </div>
+                <div class="bg-surface p-stack-lg rounded-2xl text-center border border-outline/5">
+                    <p class="text-on-surface-variant font-label-lg italic">Chưa có đánh giá nào cho tour này.</p>
                 </div>
             }
         </div>

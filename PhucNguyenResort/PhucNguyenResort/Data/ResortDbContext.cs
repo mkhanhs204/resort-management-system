@@ -27,6 +27,7 @@ public class ResortDbContext : DbContext
     public DbSet<FoodOrderItem> FoodOrderItems => Set<FoodOrderItem>();
     public DbSet<Kot> KOT => Set<Kot>();
     public DbSet<Tour> Tours => Set<Tour>();
+    public DbSet<TourImage> TourImages => Set<TourImage>();
     public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
     public DbSet<TourBooking> TourBookings => Set<TourBooking>();
     public DbSet<Review> Reviews => Set<Review>();

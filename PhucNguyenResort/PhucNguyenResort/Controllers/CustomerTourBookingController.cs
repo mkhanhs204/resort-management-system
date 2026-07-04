@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Services.Payments;
 using PhucNguyenResort.Services.Tours;
-using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.ViewModels.Payments;
 using PhucNguyenResort.ViewModels.Tours;
 using System.Security.Claims;
@@ -38,9 +37,9 @@ namespace PhucNguyenResort.Controllers
         /// GET: /CustomerTourBooking — Browse all available tours.
         /// Accessible by Guest + Customer.
         /// </summary>
-        public async Task<IActionResult> Index(string? search, string? sortBy, int page = 1)
+        public async Task<IActionResult> Index(string? search, DateTime? tourDate, string? sortBy, int page = 1)
         {
-            var model = await _tourBookingService.GetTourListAsync(search, sortBy, page, 9);
+            var model = await _tourBookingService.GetTourListAsync(search, tourDate, sortBy, page, 9);
             return View(model);
         }
 
@@ -102,6 +101,16 @@ namespace PhucNguyenResort.Controllers
         {
             var userId = await GetCurrentUserIdAsync();
             if (userId == null) return RedirectToAction("Logout", "Account");
+
+            if (model.PrimaryGuestDateOfBirth.HasValue)
+            {
+                var age = DateTime.Today.Year - model.PrimaryGuestDateOfBirth.Value.Year;
+                if (model.PrimaryGuestDateOfBirth.Value.Date > DateTime.Today.AddYears(-age)) age--;
+                if (age < 18)
+                {
+                    ModelState.AddModelError(nameof(model.PrimaryGuestDateOfBirth), "Người đại diện tour phải từ 18 tuổi trở lên để thực hiện đặt tour.");
+                }
+            }
 
             if (!ModelState.IsValid)
             {

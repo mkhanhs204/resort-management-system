@@ -120,7 +120,7 @@ public class ReviewService : IReviewService
         });
     }
 
-    public async Task<IEnumerable<ReviewListVM>> GetPublicReviewsAsync(int? tourId = null)
+    public async Task<IEnumerable<ReviewListVM>> GetPublicReviewsAsync(int? tourId = null, int? categoryId = null)
     {
         var query = _context.Reviews
             .Include(r => r.User)
@@ -133,6 +133,11 @@ public class ReviewService : IReviewService
         if (tourId.HasValue)
         {
             query = query.Where(r => r.TourId == tourId.Value);
+        }
+
+        if (categoryId.HasValue)
+        {
+            query = query.Where(r => r.Booking != null && r.Booking.BookingDetails.Any(bd => bd.RoomCategoryId == categoryId.Value));
         }
 
         var reviews = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
