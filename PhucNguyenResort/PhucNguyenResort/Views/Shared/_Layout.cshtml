@@ -5,7 +5,7 @@
     bool hasBanner = (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase)) ||
                      (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("SearchRooms", StringComparison.OrdinalIgnoreCase)) ||
                      (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("AboutUs", StringComparison.OrdinalIgnoreCase)) ||
-                     (currentController.Equals("CustomerTourBooking", StringComparison.OrdinalIgnoreCase)) ||
+                     (currentController.Equals("CustomerTourBooking", StringComparison.OrdinalIgnoreCase) && (currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) || currentAction.Equals("Details", StringComparison.OrdinalIgnoreCase))) ||
                      (currentController.Equals("Review", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("PublicList", StringComparison.OrdinalIgnoreCase));
 
     string IsActive(string controller, string action = "")
