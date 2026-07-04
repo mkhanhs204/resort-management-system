@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PhucNguyenResort.Services.Users;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhucNguyenResort.Controllers
 {
+    [Authorize(Roles = "Business Manager")]
     public class TourSchedulesController : Controller
     {
         private readonly ITourScheduleService _scheduleService;

@@ -110,6 +110,36 @@
                 </div>
             }
         </div>
+
+        <!-- Pagination Controls -->
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="flex justify-center mt-12 gap-2">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating, serviceType = ViewBag.CurrentServiceType, page = ViewBag.CurrentPage - 1 })" 
+                       class="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface luxury-shadow">
+                        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                    </a>
+                }
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating, serviceType = ViewBag.CurrentServiceType, page = i })" 
+                       class="w-10 h-10 rounded-xl flex items-center justify-center font-label-lg transition-all @(ViewBag.CurrentPage == i ? "bg-primary text-on-primary shadow-md scale-110" : "bg-surface-container hover:bg-surface-container-high text-on-surface luxury-shadow")">
+                        @i
+                    </a>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("PublicList", new { rating = ViewBag.CurrentRating, serviceType = ViewBag.CurrentServiceType, page = ViewBag.CurrentPage + 1 })" 
+                       class="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface luxury-shadow">
+                        <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                    </a>
+                }
+            </div>
+        }
     }
     else
     {

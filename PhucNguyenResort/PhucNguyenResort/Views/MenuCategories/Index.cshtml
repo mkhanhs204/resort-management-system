@@ -1,64 +1,301 @@
 @model IReadOnlyList<PhucNguyenResort.ViewModels.MenuCategories.MenuCategoryListViewModel>
 
 @{
-    ViewData["Title"] = "Menu Categories";
+    ViewData["Title"] = "Quản Lý Danh Mục Thực Đơn";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container-fluid refund-container py-4">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
-        <a asp-action="Create" class="btn btn-premium-action btn-primary shadow-sm">
-            <i class="fa fa-plus-circle"></i> Add category
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef; /* surface-container-low */
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5; /* surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974; /* primary-container */
+            color: #633d11; /* on-primary-container */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury.outline {
+            background-color: transparent;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+        }
+        .btn-luxury.outline:hover {
+            background-color: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            box-shadow: none;
+        }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+            transition: all 0.2s;
+            background: transparent;
+            margin: 0 2px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .action-btn.large {
+            width: auto;
+            padding: 0 12px;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .action-btn:hover {
+            background: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            text-decoration: none;
+        }
+        .action-btn.delete:hover {
+            background: #ffdad6;
+            color: #ba1a1a;
+            border-color: #ba1a1a;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .luxury-badge.blue {
+            background-color: #d3e4fe;
+            color: #0b1c30;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        
+        /* Alert Styling */
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+    </style>
+}
+
+<div class="header-container mt-4">
+    <div>
+        <h2 class="page-title">
+            @ViewData["Title"]
+        </h2>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+        </div>
+        <a asp-action="Create" class="btn-luxury" style="padding: 8px 16px; font-size: 14px;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">add</span> Tạo Mới
         </a>
     </div>
+</div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="luxury-alert success alert-dismissible fade show" role="alert" id="alert-success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer; opacity: 0.5;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
 
-    <div class="card premium-card mb-4">
-        <div class="premium-card-header d-flex align-items-center">
-            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;">
-                <i class="fa fa-list"></i>
-            </div>
-            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Menu Categories List</h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table premium-table mb-0" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th class="pl-4">Name</th>
-                            <th class="text-end">Menu items</th>
-                            <th class="pr-4 text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var category in Model)
-                        {
-                            <tr>
-                                <td class="pl-4 fw-bold">@category.CategoryName</td>
-                                <td class="text-end"><span class="badge badge-light border p-2">@category.MenuItemCount</span></td>
-                                <td class="pr-4 text-end">
-                                    <a asp-action="Edit" asp-route-id="@category.CategoryId" class="btn-action-icon edit" title="Edit"><i class="fa fa-pencil"></i></a>
-                                    <a asp-action="Details" asp-route-id="@category.CategoryId" class="btn-action-icon view" title="Details"><i class="fa fa-eye"></i></a>
-                                    <a asp-action="Delete" asp-route-id="@category.CategoryId" class="btn-action-icon delete" title="Delete"><i class="fa fa-trash"></i></a>
-                                </td>
-                            </tr>
-                        }
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-4">No menu categories found.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Danh Mục Thực Đơn</span>
+            <span class="luxury-badge blue">@(Model?.Count() ?? 0)</span>
         </div>
     </div>
+    
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="categories-table">
+            <thead>
+                <tr>
+                    <th>Tên Danh Mục</th>
+                    <th style="text-align: center;">Số Lượng Món</th>
+                    <th style="text-align: center;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var category in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background-color: #f0ede9; display: flex; align-items: center; justify-content: center; color: #827569;">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">restaurant_menu</span>
+                                    </div>
+                                    <strong style="color: #1c1c1a; font-weight: 600; font-size: 16px;">@category.CategoryName</strong>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="luxury-badge" style="background-color: transparent;">
+                                    @category.MenuItemCount
+                                </span>
+                            </td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <div style="display: flex; justify-content: center; gap: 4px;">
+                                    <a asp-action="Details" asp-route-id="@category.CategoryId" class="action-btn" title="Xem chi tiết">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@category.CategoryId" class="action-btn" title="Sửa">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@category.CategoryId" class="action-btn delete" title="Xóa">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">restaurant</span>
+                                <div>Không có danh mục nào.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alerts = document.querySelectorAll('#alert-success');
+            alerts.forEach(function (el) {
+                if (el) {
+                    el.style.transition = "opacity 0.5s ease";
+                    el.style.opacity = "0";
+                    setTimeout(() => el.remove(), 500);
+                }
+            });
+        }, 4000);
+        
+        // Handle dismiss buttons
+        document.querySelectorAll('.luxury-alert .btn-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var alert = this.closest('.luxury-alert');
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            });
+        });
+    </script>
+}

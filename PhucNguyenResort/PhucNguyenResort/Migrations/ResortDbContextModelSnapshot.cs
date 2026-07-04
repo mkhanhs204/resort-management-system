@@ -3793,7 +3793,7 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             ReviewId = 1,
-                            Comment = "Sample review 01 for resort service scenario.",
+                            Comment = "Tour khám phá đảo rất thú vị. Hướng dẫn viên nhiệt tình, tuy nhiên xe đón xuất phát trễ khoảng 10 phút. Tổng thể vẫn rất đáng trải nghiệm.",
                             CreatedAt = new DateTime(2026, 6, 16, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 4,
@@ -3805,7 +3805,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 2,
                             BookingId = 2,
-                            Comment = "Sample review 02 for resort service scenario.",
+                            Comment = "Trải nghiệm lưu trú tuyệt vời! Phòng ốc chuẩn 5 sao, view hướng biển cực đẹp. Bữa tối tại nhà hàng rất ngon, nhân viên phục vụ tại bàn chu đáo.",
                             CreatedAt = new DateTime(2026, 6, 17, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
@@ -3814,10 +3814,10 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             ReviewId = 3,
-                            Comment = "Sample review 03 for resort service scenario.",
+                            Comment = "Chuyến đi lặn ngắm san hô thật sự ấn tượng. Dịch vụ cano riêng rất êm, có chuẩn bị sẵn khăn tắm, đồ ăn nhẹ và nước uống vô cùng cẩn thận.",
                             CreatedAt = new DateTime(2026, 6, 18, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 1,
+                            Rating = 5,
                             TourBookingId = 3,
                             TourId = 3,
                             UserId = 3
@@ -3826,19 +3826,19 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 4,
                             BookingId = 4,
-                            Comment = "Sample review 04 for resort service scenario.",
+                            Comment = "Dịch vụ phòng (Room service) cực kỳ nhanh chóng. Tôi gọi bữa sáng mang lên phòng và mọi thứ đều nóng hổi, trình bày đẹp mắt như ăn ở nhà hàng.",
                             CreatedAt = new DateTime(2026, 6, 19, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 2,
+                            Rating = 5,
                             UserId = 4
                         },
                         new
                         {
                             ReviewId = 5,
-                            Comment = "Sample review 05 for resort service scenario.",
+                            Comment = "Lịch trình tour thám hiểm rừng quốc gia sắp xếp hợp lý, không bị mệt. Cảnh quan đẹp tuyệt vời và các bạn guide rất am hiểu kiến thức bản địa.",
                             CreatedAt = new DateTime(2026, 6, 20, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = false,
-                            Rating = 3,
+                            Rating = 5,
                             TourBookingId = 5,
                             TourId = 5,
                             UserId = 5
@@ -3847,7 +3847,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 6,
                             BookingId = 6,
-                            Comment = "Sample review 06 for resort service scenario.",
+                            Comment = "Đồ ăn tại nhà hàng buffet phong phú, tôm hùm tươi ngon. Tuy nhiên hồ bơi chung hơi đông vào buổi chiều. Nhân viên hỗ trợ lấy khăn rất nhiệt tình.",
                             CreatedAt = new DateTime(2026, 6, 21, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 4,
@@ -3856,7 +3856,7 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             ReviewId = 7,
-                            Comment = "Sample review 07 for resort service scenario.",
+                            Comment = "Trải nghiệm tour du thuyền ngắm hoàng hôn ngoài sức tưởng tượng. Rượu vang và hải sản phục vụ trên tàu đều là loại hảo hạng, sang trọng.",
                             CreatedAt = new DateTime(2026, 6, 22, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
@@ -3868,19 +3868,19 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 8,
                             BookingId = 8,
-                            Comment = "Sample review 08 for resort service scenario.",
+                            Comment = "Đúng chuẩn resort 5 sao! Không gian yên tĩnh, thiết kế đẳng cấp. Tôi rất thích bữa tối lãng mạn được setup riêng tư ngay trên bãi biển.",
                             CreatedAt = new DateTime(2026, 6, 23, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 1,
+                            Rating = 5,
                             UserId = 8
                         },
                         new
                         {
                             ReviewId = 9,
-                            Comment = "Sample review 09 for resort service scenario.",
+                            Comment = "Xe limousine đưa đón đi tour đời mới rất êm ái. Lịch trình tham quan linh hoạt theo sức khỏe của gia đình tôi, một dịch vụ rất đáng tiền.",
                             CreatedAt = new DateTime(2026, 6, 24, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 2,
+                            Rating = 5,
                             TourBookingId = 9,
                             TourId = 9,
                             UserId = 9
@@ -3889,16 +3889,16 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 10,
                             BookingId = 10,
-                            Comment = "Sample review 10 for resort service scenario.",
+                            Comment = "Mọi thứ đều hoàn hảo từ lúc check-in đến check-out. Giường ngủ cực kỳ êm ái. Gọi cocktail phục vụ tại hồ bơi riêng rất nhanh.",
                             CreatedAt = new DateTime(2026, 6, 25, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 3,
+                            Rating = 5,
                             UserId = 10
                         },
                         new
                         {
                             ReviewId = 11,
-                            Comment = "Sample review 11 for resort service scenario.",
+                            Comment = "Tour đạp xe quanh bản làng không khí rất trong lành. Đồ ăn trưa set menu ngon nhưng hơi ít lựa chọn cho người ăn thuần chay.",
                             CreatedAt = new DateTime(2026, 6, 26, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 4,
@@ -3910,7 +3910,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 12,
                             BookingId = 12,
-                            Comment = "Sample review 12 for resort service scenario.",
+                            Comment = "Gia đình tôi đã có kỳ nghỉ trọn vẹn. Gọi món ăn phục vụ tận phòng lúc 1 giờ sáng nhưng chất lượng steak và pasta vẫn cực kỳ xuất sắc.",
                             CreatedAt = new DateTime(2026, 6, 27, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
@@ -3919,10 +3919,10 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             ReviewId = 13,
-                            Comment = "Sample review 13 for resort service scenario.",
+                            Comment = "Chuyến đi chèo kayak rất an toàn và chuyên nghiệp. Các trang thiết bị bảo hộ, áo phao của resort đều còn rất mới và chất lượng cao.",
                             CreatedAt = new DateTime(2026, 6, 28, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 1,
+                            Rating = 5,
                             TourBookingId = 13,
                             TourId = 13,
                             UserId = 13
@@ -3931,19 +3931,19 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 14,
                             BookingId = 14,
-                            Comment = "Sample review 14 for resort service scenario.",
+                            Comment = "Nhà hàng fine-dining mang đến hương vị bùng nổ. Các bạn phục vụ bàn cực kỳ tinh tế, luôn để ý rót thêm rượu và giải thích rõ từng món.",
                             CreatedAt = new DateTime(2026, 6, 29, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 2,
+                            Rating = 5,
                             UserId = 14
                         },
                         new
                         {
                             ReviewId = 15,
-                            Comment = "Sample review 15 for resort service scenario.",
+                            Comment = "Tour câu mực đêm rất vui, tuy nhiên hôm đó sóng hơi lớn nên tôi bị say sóng chút xíu. Bù lại nhân viên pha trà gừng chăm sóc rất ân cần.",
                             CreatedAt = new DateTime(2026, 6, 30, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 3,
+                            Rating = 4,
                             TourBookingId = 15,
                             TourId = 15,
                             UserId = 15
@@ -3952,7 +3952,7 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 16,
                             BookingId = 16,
-                            Comment = "Sample review 16 for resort service scenario.",
+                            Comment = "Phòng rộng, sạch sẽ, bồn tắm nằm siêu to. Hệ thống điện smart-home trong phòng đôi lúc hơi khó điều khiển. Dịch vụ dọn phòng chu đáo.",
                             CreatedAt = new DateTime(2026, 7, 1, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = false,
                             Rating = 4,
@@ -3961,7 +3961,7 @@ namespace PhucNguyenResort.Web.Migrations
                         new
                         {
                             ReviewId = 17,
-                            Comment = "Sample review 17 for resort service scenario.",
+                            Comment = "Tour đi tham quan vườn quốc gia và suối thác vô cùng tuyệt diệu. Bữa trưa picnic do resort chuẩn bị mang theo thực sự xuất sắc và đầy đặn.",
                             CreatedAt = new DateTime(2026, 7, 2, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
@@ -3973,19 +3973,19 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 18,
                             BookingId = 18,
-                            Comment = "Sample review 18 for resort service scenario.",
+                            Comment = "Thích nhất là dịch vụ khay bữa sáng nổi (floating breakfast) ở hồ bơi riêng trong villa. Góc nào trong phòng cũng chụp được ảnh sống ảo.",
                             CreatedAt = new DateTime(2026, 7, 3, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 1,
+                            Rating = 5,
                             UserId = 18
                         },
                         new
                         {
                             ReviewId = 19,
-                            Comment = "Sample review 19 for resort service scenario.",
+                            Comment = "Chương trình tour tham quan làng nghề địa phương khá hay và nhiều thông tin. Mong resort cân đối cho thêm khoảng 30 phút để tự do mua sắm.",
                             CreatedAt = new DateTime(2026, 7, 4, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 2,
+                            Rating = 4,
                             TourBookingId = 19,
                             TourId = 19,
                             UserId = 19
@@ -3994,10 +3994,10 @@ namespace PhucNguyenResort.Web.Migrations
                         {
                             ReviewId = 20,
                             BookingId = 20,
-                            Comment = "Sample review 20 for resort service scenario.",
+                            Comment = "Chất lượng ẩm thực, tiện ích spa và dịch vụ phòng thật sự vượt cả kỳ vọng. Thái độ nhân viên chuẩn 5 sao. Chắc chắn sẽ quay lại vào năm sau!",
                             CreatedAt = new DateTime(2026, 7, 5, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
-                            Rating = 3,
+                            Rating = 5,
                             UserId = 20
                         });
                 });

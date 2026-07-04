@@ -1,78 +1,262 @@
 @model PhucNguyenResort.ViewModels.RoomCategories.RoomCategoryCreateVM
 
 @{
-    ViewData["Title"] = "Create Room Category";
+    ViewData["Title"] = "Thêm Hạng Phòng Mới";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">@ViewData["Title"]</h4>
-                    <a asp-action="Index" class="btn btn-sm btn-light text-primary">Back to List</a>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="CategoryName" class="form-label fw-bold"></label>
-                            <input asp-for="CategoryName" class="form-control" />
-                            <span asp-validation-for="CategoryName" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label fw-bold"></label>
-                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="MaxAdults" class="form-label fw-bold"></label>
-                                <input asp-for="MaxAdults" class="form-control" type="number" />
-                                <span asp-validation-for="MaxAdults" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="MaxChildren" class="form-label fw-bold"></label>
-                                <input asp-for="MaxChildren" class="form-control" type="number" />
-                                <span asp-validation-for="MaxChildren" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PricePerNight" class="form-label fw-bold"></label>
-                                <div class="input-group">
-                                    <input asp-for="PricePerNight" class="form-control" type="number" step="0.01" />
-                                    <span class="input-group-text">VND</span>
-                                </div>
-                                <span asp-validation-for="PricePerNight" class="text-danger"></span>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label asp-for="ImageUpload" class="form-label fw-bold"></label>
-                            <input asp-for="ImageUpload" class="form-control" type="file" accept="image/*" />
-                            <span asp-validation-for="ImageUpload" class="text-danger"></span>
-                            <div class="form-text">Choose an image from your device. It will be saved automatically.</div>
-                        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .form-control, .form-select {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #1c1c1a;
+            transition: all 0.2s;
+            box-shadow: none;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff;
+            border-color: #dfa974;
+            box-shadow: 0 0 0 4px rgba(223, 169, 116, 0.1);
+        }
+        .input-group-text {
+            background-color: #e5e2de;
+            border: none;
+            color: #50453b;
+            font-weight: 600;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        input[type="file"].form-control::file-selector-button {
+            padding: 10px 16px;
+            margin: -10px -16px;
+            margin-right: 16px;
+            background-color: #e5e2de;
+            border: none;
+            color: #50453b;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        input[type="file"].form-control:hover::file-selector-button {
+            background-color: #d4c3b6;
+        }
+        .form-group label, .form-label {
+            color: #1c1c1a;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-secondary-luxury {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary-luxury:hover {
+            background-color: #e5e2de;
+            color: #1c1c1a;
+            text-decoration: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .image-preview-box {
+            border: 2px dashed #d4c3b6;
+            border-radius: 12px;
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fcf9f5;
+            transition: all 0.3s;
+        }
+    </style>
+}
 
-                        <div class="mb-4">
-                            <label asp-for="GalleryUploads" class="form-label fw-bold"></label>
-                            <input asp-for="GalleryUploads" class="form-control" type="file" accept="image/*" multiple />
-                            <span asp-validation-for="GalleryUploads" class="text-danger"></span>
-                            <div class="form-text">Select multiple images for the room's gallery.</div>
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Thêm Hạng Phòng Mới
+        </h2>
+        <p class="page-subtitle">Thêm một hạng phòng mới vào hệ thống. Các trường có dấu <span class="text-danger">*</span> là bắt buộc.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-secondary-luxury">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<div class="luxury-card">
+    <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px;">
+        Thông Tin Hạng Phòng
+    </div>
+    <form asp-action="Create" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;" role="alert"></div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="mb-4">
+                    <label asp-for="CategoryName" class="form-label fw-bold">Tên Hạng Phòng <span class="text-danger">*</span></label>
+                    <input asp-for="CategoryName" class="form-control" placeholder="VD: Deluxe Ocean View" />
+                    <span asp-validation-for="CategoryName" class="text-danger small"></span>
+                </div>
+                
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label fw-bold">Mô tả</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Mô tả các tiện ích nổi bật của hạng phòng..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="MaxAdults" class="form-label fw-bold">Số NL tối đa <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input asp-for="MaxAdults" class="form-control" type="number" placeholder="1-10" />
+                            <span class="input-group-text">người</span>
                         </div>
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-primary px-4">Create</button>
+                        <span asp-validation-for="MaxAdults" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="MaxChildren" class="form-label fw-bold">Số TE tối đa <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input asp-for="MaxChildren" class="form-control" type="number" placeholder="0-10" />
+                            <span class="input-group-text">người</span>
                         </div>
-                    </form>
+                        <span asp-validation-for="MaxChildren" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="PricePerNight" class="form-label fw-bold">Giá 1 đêm <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input asp-for="PricePerNight" class="form-control" type="number" step="0.01" placeholder="0" />
+                            <span class="input-group-text">₫</span>
+                        </div>
+                        <span asp-validation-for="PricePerNight" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ImageUpload" class="form-label fw-bold">Ảnh Đại Diện <span class="text-danger">*</span></label>
+                    <input asp-for="ImageUpload" class="form-control" type="file" accept="image/*" onchange="previewImageFile(this)" />
+                    <span asp-validation-for="ImageUpload" class="text-danger small"></span>
+                    <div class="form-text mt-2" style="font-size: 13px; color: #807366;">Chọn ảnh từ thiết bị của bạn. Ảnh sẽ được tự động lưu.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="GalleryUploads" class="form-label fw-bold">Album Hình Ảnh</label>
+                    <input asp-for="GalleryUploads" class="form-control" type="file" accept="image/*" multiple />
+                    <span asp-validation-for="GalleryUploads" class="text-danger small"></span>
+                    <div class="form-text mt-2" style="font-size: 13px; color: #807366;">Bạn có thể chọn nhiều ảnh để làm album (gallery) cho phòng.</div>
+                </div>
+            </div>
+
+            <!-- Live Image Preview -->
+            <div class="col-md-4">
+                <label style="color: #1c1c1a; font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">Xem trước hình ảnh</label>
+                <div id="image-preview-container" class="image-preview-box">
+                    <div id="preview-placeholder" style="text-align: center; color: #a4b5ce;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 8px; color: #d4c3b6;">image</span><br/>
+                        <small style="color: #807366;">Chưa có ảnh</small>
+                    </div>
+                    <img id="preview-img" src="" alt="Preview" class="img-fluid rounded d-none"
+                         style="max-height:240px;object-fit:cover; border-radius: 8px;" />
                 </div>
             </div>
         </div>
-    </div>
+        
+        <hr style="border-color: #e5e2de; margin: 32px 0;" />
+        <div style="display: flex; gap: 16px;">
+            <button type="submit" class="btn-luxury">
+                <span class="material-symbols-outlined">save</span> Tạo Hạng Phòng
+            </button>
+            <a asp-action="Index" class="btn-secondary-luxury">
+                Hủy bỏ
+            </a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImageFile(input) {
+            var img = document.getElementById('preview-img');
+            var placeholder = document.getElementById('preview-placeholder');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                    img.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                img.classList.add('d-none');
+                placeholder.classList.remove('d-none');
+            }
+        }
+    </script>
 }

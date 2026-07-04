@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -13,6 +14,7 @@ namespace PhucNguyenResort.Controllers
     /// ToursController — Manage Tour Catalog (UC04 subset).
     /// All POST actions protected by [ValidateAntiForgeryToken] (OWASP CSRF).
     /// </summary>
+    [Authorize(Roles = "Business Manager")]
     public class ToursController : Controller
     {
         private readonly ITourCatalogService _tourService;
