@@ -158,6 +158,13 @@
                         </li>
                     }
 
+                    @if (User.IsInRole("Business Manager"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "TourSchedules" ? "active" : "")">
+                            <a asp-controller="TourSchedules" asp-action="Index"><i class="fa fa-calendar"></i> Tour Schedules</a>
+                        </li>
+                    }
+
                     @if (User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "TourGuide" ? "active" : "")">
