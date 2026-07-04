@@ -37,7 +37,7 @@ namespace PhucNguyenResort.Services.Payments
             
             // SỬA LỖI TRÙNG MÃ: Thêm Ticks vào OrderId để đảm bảo vnp_TxnRef luôn là duy nhất mỗi lần click thanh toán
             vnpay.AddRequestData("vnp_TxnRef", $"{model.OrderId}_{tick}");
-            vnpay.AddRequestData("vnp_ExpireDate", model.CreatedDate.AddMinutes(1).ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_ExpireDate", model.CreatedDate.AddMinutes(2).ToString("yyyyMMddHHmmss"));
 
             var paymentUrl = vnpay.CreateRequestUrl(_config["VNPay:BaseUrl"]!, _config["VNPay:HashSecret"]!);
             return paymentUrl;

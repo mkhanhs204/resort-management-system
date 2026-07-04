@@ -107,7 +107,7 @@
 
 <div class="luxury-card">
     <div class="table-responsive">
-        <table class="table-luxury">
+        <table class="table-luxury" id="reviews-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -194,4 +194,81 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Controls -->
+    <div id="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; font-family: 'Inter', sans-serif; border-top: 1px solid #f0ede9;">
+        <div style="color: #50453b; font-size: 14px;">
+            Hiển thị <span id="page-info-start" style="font-weight: 600; color: #1c1c1a;">0</span> - <span id="page-info-end" style="font-weight: 600; color: #1c1c1a;">0</span> trong số <span id="page-info-total" style="font-weight: 600; color: #1c1c1a;">0</span> đánh giá
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button id="btn-prev-page" class="btn-outline-luxury" style="padding: 6px 12px; gap: 4px;" disabled>
+                <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span> Trước
+            </button>
+            <button id="btn-next-page" class="btn-outline-luxury" style="padding: 6px 12px; gap: 4px;" disabled>
+                Sau <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+            </button>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var currentPage = 1;
+            var pageSize = 10; // Giới hạn 10 đánh giá mỗi trang cho dễ nhìn
+
+            function applyPagination() {
+                var tbody = document.querySelector('#reviews-table tbody');
+                var tableRows = Array.from(tbody.querySelectorAll('tr'));
+                
+                // Exclude empty state row
+                var dataRows = tableRows.filter(row => row.cells.length > 1);
+                
+                var totalItems = dataRows.length;
+                if (totalItems === 0) return; // If no data, do nothing
+                
+                var totalPages = Math.ceil(totalItems / pageSize);
+                if (currentPage > totalPages) currentPage = totalPages || 1;
+
+                var startIndex = (currentPage - 1) * pageSize;
+                var endIndex = Math.min(startIndex + pageSize, totalItems);
+
+                dataRows.forEach(function(row, index) {
+                    if (index >= startIndex && index < endIndex) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                var infoStart = document.getElementById('page-info-start');
+                var infoEnd = document.getElementById('page-info-end');
+                var infoTotal = document.getElementById('page-info-total');
+                var btnPrev = document.getElementById('btn-prev-page');
+                var btnNext = document.getElementById('btn-next-page');
+
+                if (infoStart) infoStart.textContent = startIndex + 1;
+                if (infoEnd) infoEnd.textContent = endIndex;
+                if (infoTotal) infoTotal.textContent = totalItems;
+                
+                if (btnPrev) btnPrev.disabled = currentPage <= 1;
+                if (btnNext) btnNext.disabled = currentPage >= totalPages;
+            }
+
+            document.getElementById('btn-prev-page')?.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    applyPagination();
+                }
+            });
+
+            document.getElementById('btn-next-page')?.addEventListener('click', function() {
+                currentPage++;
+                applyPagination();
+            });
+
+            // Initial render
+            applyPagination();
+        });
+    </script>
+}

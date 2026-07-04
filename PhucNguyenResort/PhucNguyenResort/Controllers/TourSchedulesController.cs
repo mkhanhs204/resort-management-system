@@ -54,6 +54,15 @@ namespace PhucNguyenResort.Controllers
                 ModelState.AddModelError("TourDate", "Ngày khởi hành không được nằm trong quá khứ.");
             }
 
+            if (schedule.TourId > 0)
+            {
+                var tour = await _tourService.GetTourByIdAsync(schedule.TourId);
+                if (tour != null && schedule.AvailableSlots > tour.MaxCapacity)
+                {
+                    ModelState.AddModelError("AvailableSlots", $"Số chỗ trống không được vượt quá số lượng tối đa của tour ({tour.MaxCapacity} chỗ).");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 await _scheduleService.AddScheduleAsync(schedule);
@@ -90,9 +99,27 @@ namespace PhucNguyenResort.Controllers
                 ModelState.AddModelError("TourDate", "Ngày khởi hành không được nằm trong quá khứ.");
             }
 
+            if (schedule.TourId > 0)
+            {
+                var tour = await _tourService.GetTourByIdAsync(schedule.TourId);
+                if (tour != null && schedule.AvailableSlots > tour.MaxCapacity)
+                {
+                    ModelState.AddModelError("AvailableSlots", $"Số chỗ trống không được vượt quá số lượng tối đa của tour ({tour.MaxCapacity} chỗ).");
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                await _scheduleService.UpdateScheduleAsync(schedule);
+                var existingSchedule = await _scheduleService.GetScheduleByIdAsync(id);
+                if (existingSchedule == null) return NotFound();
+
+                existingSchedule.TourId = schedule.TourId;
+                existingSchedule.TourDate = schedule.TourDate;
+                existingSchedule.StartTime = schedule.StartTime;
+                existingSchedule.AvailableSlots = schedule.AvailableSlots;
+                existingSchedule.GuideId = schedule.GuideId;
+
+                await _scheduleService.UpdateScheduleAsync(existingSchedule);
                 TempData["SuccessMessage"] = "Cập nhật lịch trình tour thành công!";
                 return RedirectToAction(nameof(Index));
             }

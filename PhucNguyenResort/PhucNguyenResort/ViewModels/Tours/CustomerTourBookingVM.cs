@@ -32,6 +32,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public List<TourCardVM> Tours { get; set; } = new();
         public string? SearchKeyword { get; set; }
         public string? SortBy { get; set; } // "price_asc", "price_desc", "name", "duration"
+        public DateTime? TourDate { get; set; }
         public int TotalCount { get; set; }
 
         // Pagination
@@ -66,6 +67,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public int DurationHours { get; set; }
         public string? Location { get; set; }
         public string? ImageUrl { get; set; }
+        public List<string> GalleryImages { get; set; } = new();
         public List<ScheduleDisplayVM> UpcomingSchedules { get; set; } = new();
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }

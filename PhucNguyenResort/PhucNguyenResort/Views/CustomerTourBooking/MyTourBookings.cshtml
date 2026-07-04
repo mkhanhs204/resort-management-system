@@ -1,11 +1,18 @@
 @using PhucNguyenResort.Enums
+@using System.Security.Claims
 @model List<PhucNguyenResort.ViewModels.Tours.MyTourBookingItemVM>
 @{
     ViewData["Title"] = "Lịch Sử Đặt Tour";
+    var fullName = User.FindFirstValue(ClaimTypes.Name) ?? "Khách Hàng";
+    var email = User.FindFirstValue(ClaimTypes.Email) ?? "";
+    var initials = string.IsNullOrEmpty(fullName) ? "U" : fullName.Substring(0, 1).ToUpper();
 }
 
 @section Styles {
     <style>
+        .custom-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.06);
+        }
         .luxury-shadow {
             box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.06);
         }
@@ -21,44 +28,89 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+        .active-link {
+            border-left: 3px solid #805528;
+            font-weight: 700;
+            color: #805528 !important;
+            background-color: #f6f3ef;
+        }
+        .luxury-card {
+            background-color: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.04);
+        }
+        .transition-soft {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 }
 
-<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap-md bg-background">
-    <!-- Title & Breadcrumb -->
-    <div class="mb-stack-lg text-center md:text-left">
-        <nav class="flex items-center justify-center md:justify-start space-x-2 text-on-surface-variant mb-4 font-label-sm text-label-sm uppercase tracking-widest">
-            <a class="hover:text-primary" asp-controller="Home" asp-action="Index">Trang chủ</a>
-            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span class="text-primary">Lịch sử đặt tour</span>
-        </nav>
-        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Lịch Sử Đặt Tour</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto md:mx-0">Xem lại những hành trình tuyệt vời bạn đã trải nghiệm và chuẩn bị cho những chuyến đi sắp tới.</p>
-    </div>
+<div class="pt-8 pb-section-gap-lg max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop min-h-screen bg-background">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+        
+        <!-- Sidebar (4 columns) -->
+        <aside class="md:col-span-4 space-y-stack-md">
+            <div class="luxury-card rounded-xl p-8 text-center flex flex-col items-center">
+                <div class="relative group cursor-pointer mb-6">
+                    <div class="w-32 h-32 rounded-full bg-primary-container text-white flex items-center justify-center text-4xl font-headline-lg shadow-lg">
+                        @initials
+                    </div>
+                </div>
+                <h2 class="font-headline-sm text-headline-sm text-primary mb-1">@fullName</h2>
+                <p class="font-body-md text-on-surface-variant opacity-70 mb-8">@email</p>
 
-    <!-- Filter / Tabs -->
-    <div class="flex flex-wrap gap-4 mb-stack-lg border-b border-outline-variant/20 pb-4">
-        <button class="font-label-lg text-label-lg text-primary border-b-2 border-primary pb-4">Tất cả</button>
-        <button class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary transition-colors pb-4 hidden">Sắp diễn ra</button>
-        <button class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary transition-colors pb-4 hidden">Đã hoàn thành</button>
-        <button class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary transition-colors pb-4 hidden">Đã hủy</button>
-    </div>
+                <nav class="w-full space-y-2 text-left">
+                    <a asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="font-label-lg text-label-lg">Hồ Sơ Cá Nhân</span>
+                    </a>
+                    <a asp-controller="Bookings" asp-action="MyBookings" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">history</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Phòng</span>
+                    </a>
+                    <a asp-controller="CustomerTourBooking" asp-action="MyTourBookings" class="flex items-center gap-3 p-4 rounded-lg text-primary font-bold active-link transition-soft">
+                        <span class="material-symbols-outlined">tour</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Tour</span>
+                    </a>
+                    <a asp-controller="TableReservations" asp-action="MyReservations" class="flex items-center gap-3 p-4 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-soft">
+                        <span class="material-symbols-outlined">restaurant</span>
+                        <span class="font-label-lg text-label-lg">Lịch Sử Đặt Bàn</span>
+                    </a>
+                    <hr class="border-outline/10 my-4" />
+                    <a asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 p-4 rounded-lg text-error hover:bg-error-container/20 transition-soft">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="font-label-lg text-label-lg">Đăng Xuất</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="bg-primary-container text-on-primary-container p-4 rounded-xl mb-6">
-            @TempData["Success"]
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="bg-error-container text-on-error-container p-4 rounded-xl mb-6">
-            @TempData["Error"]
-        </div>
-    }
+        <!-- Main Content (8 columns) -->
+        <div class="md:col-span-8 space-y-gutter">
 
-    <!-- Tour History List -->
-    <div class="space-y-6">
+            @if (TempData["Success"] != null)
+            {
+                <div class="bg-primary-container/20 text-on-primary-container p-4 rounded-xl border border-primary-container/30 text-center text-sm mb-6">
+                    <span class="material-symbols-outlined align-middle mr-2 text-primary">check_circle</span>
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="bg-error-container/20 text-error p-4 rounded-xl border border-error-container/30 text-center text-sm mb-6">
+                    <span class="material-symbols-outlined align-middle mr-2">error</span>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="luxury-card rounded-xl p-8 mb-gutter">
+                <div class="mb-8 border-b border-outline-variant/20 pb-4">
+                    <h1 class="font-headline-md text-headline-md text-primary mb-2">Lịch Sử Đặt Tour</h1>
+                    <p class="font-body-md text-on-surface-variant">Xem lại những hành trình tuyệt vời bạn đã trải nghiệm và chuẩn bị cho những chuyến đi sắp tới.</p>
+                </div>
+
+                <!-- Tour History List -->
+                <div class="space-y-6">
         @if (Model != null && Model.Any())
         {
             foreach (var item in Model)
@@ -122,7 +174,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-end items-center gap-3 border-t border-outline-variant/10 pt-4 mt-2">
+                        <div class="flex flex-wrap justify-end items-center gap-3 border-t border-outline-variant/10 pt-4 mt-2">
                             @if (isCancelled)
                             {
                                 <button class="px-6 py-1.5 border border-outline text-outline rounded-lg font-label-md cursor-not-allowed">Đã hủy</button>
@@ -136,7 +188,7 @@
                                 @if (isPending)
                                 {
                                     int elapsedSeconds = (int)(DateTime.Now - item.CreatedAt).TotalSeconds;
-                                    <div class="text-sm text-error font-medium flex items-center gap-1 mr-2">
+                                    <div class="text-sm text-error font-medium flex items-center gap-1 mr-2 whitespace-nowrap">
                                         <span class="material-symbols-outlined text-[16px]">schedule</span>
                                         <span class="payment-timer" data-elapsed="@elapsedSeconds">Đang tính...</span>
                                     </div>
@@ -144,11 +196,7 @@
 
                                 if (item.CanCancel)
                                 {
-                                    <form asp-action="CancelTourBooking" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy tour này không?');">
-                                        <input type="hidden" name="id" value="@item.TourBookingId" />
-                                        <input type="hidden" name="reason" value="Khách hàng tự hủy qua web" />
-                                        <button type="submit" class="px-5 py-1.5 border border-secondary text-secondary rounded-lg font-label-md hover:bg-secondary/5 transition-all">Hủy đặt chỗ</button>
-                                    </form>
+                                    <button type="button" class="px-5 py-1.5 border border-secondary text-secondary rounded-lg font-label-md hover:bg-secondary/5 transition-all" onclick="openCancelModal(@item.TourBookingId)">Hủy đặt chỗ</button>
                                 }
                                 else
                                 {
@@ -177,17 +225,64 @@
         }
     </div>
 
-    @if (Model != null && Model.Count > 10)
-    {
-        <!-- Pagination Container -->
-        <div id="pagination-container" class="mt-section-gap-md flex justify-center items-center space-x-2">
-            <!-- JS will populate buttons here -->
-        </div>
-    }
-</main>
+                </div> <!-- End Tour History List space-y-6 -->
+                
+                @if (Model != null && Model.Count > 10)
+                {
+                    <!-- Pagination Container -->
+                    <div id="pagination-container" class="mt-8 flex justify-center items-center space-x-2 border-t border-outline-variant/10 pt-6">
+                        <!-- JS will populate buttons here -->
+                    </div>
+                }
+            </div> <!-- End luxury-card -->
+        </div> <!-- End Main Content -->
+    </div> <!-- End Grid -->
+</div> <!-- End Main wrapper -->
+
+<!-- Cancel Tour Modal -->
+<div id="cancel-modal" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center backdrop-blur-sm">
+    <div class="bg-surface-container-lowest rounded-xl shadow-2xl max-w-md w-full p-6 m-4 relative border border-outline-variant/30 transform transition-all">
+        <h4 class="font-headline-sm text-error mb-4">Xác nhận hủy tour</h4>
+        <form asp-action="CancelTourBooking" method="post">
+            <input type="hidden" id="cancel-booking-id" name="id" value="" />
+            
+            <div class="mb-4">
+                <label class="block text-label-sm font-bold text-on-surface mb-2">Lý do hủy tour (Tùy chọn)</label>
+                <textarea name="reason" class="w-full p-3 rounded-lg border border-outline-variant focus:border-error focus:ring focus:ring-error/20 bg-surface-container-lowest" rows="3" placeholder="Ví dụ: Thay đổi lịch trình..."></textarea>
+            </div>
+            
+            <div class="mb-4 p-3 bg-error-container/50 text-error rounded-lg text-sm">
+                <span class="font-bold">Lưu ý:</span> Hủy tour trong vòng 48h trước giờ khởi hành sẽ <span class="font-bold">KHÔNG</span> được hoàn cọc theo chính sách của resort.
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button type="button" onclick="closeCancelModal()" class="flex-1 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container font-label-lg transition-all">
+                    Đóng
+                </button>
+                <button type="submit" class="flex-1 py-2.5 rounded-lg bg-error text-white hover:opacity-90 font-label-lg transition-all">
+                    Xác Nhận Hủy
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+        // Cancel Modal logic
+        window.openCancelModal = function(id) {
+            document.getElementById('cancel-booking-id').value = id;
+            const modal = document.getElementById('cancel-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+        
+        window.closeCancelModal = function() {
+            const modal = document.getElementById('cancel-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             const itemsPerPage = 10;
             const items = document.querySelectorAll('.tour-item');
@@ -264,7 +359,7 @@
                         elapsed += 1;
                         timer.setAttribute('data-elapsed', elapsed);
                         
-                        const maxSeconds = 60; // 1 minute
+                        const maxSeconds = 120; // 2 minutes
                         const remaining = maxSeconds - elapsed;
                         
                         if (remaining <= 0) {
