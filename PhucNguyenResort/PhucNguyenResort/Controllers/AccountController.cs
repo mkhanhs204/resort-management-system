@@ -359,7 +359,7 @@ namespace PhucNguyenResort.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.Email), // Để User.Identity.Name hiển thị Email giống hình bạn chụp ban đầu
+                new Claim(ClaimTypes.Name, user.FullName), // Hiển thị FullName thay vì Email
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, roleName) // Nạp Role gốc từ DB
             };

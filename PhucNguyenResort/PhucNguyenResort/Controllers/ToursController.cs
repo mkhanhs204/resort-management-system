@@ -318,8 +318,19 @@ namespace PhucNguyenResort.Controllers
 
         // GET: Tours/CheckTicket?ticketId=123
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> CheckTicket(int ticketId)
         {
+            // Manual authorization: only Customer and Business Manager can access
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return Challenge();
+            }
+            if (!User.IsInRole("Customer") && !User.IsInRole("Business Manager"))
+            {
+                return Forbid();
+            }
+
             var ticket = await _context.TourBookings
                 .Include(tb => tb.User)
                 .Include(tb => tb.Schedule)

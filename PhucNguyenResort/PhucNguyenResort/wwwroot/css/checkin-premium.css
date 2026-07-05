@@ -12,6 +12,24 @@
     --accent-gradient: linear-gradient(135deg, #dfa974 0%, #b8962e 100%);
 }
 
+/* Prevent Bootstrap from breaking the Tailwind navbar */
+#main-header,
+#main-header * {
+    box-sizing: border-box;
+}
+
+#main-header .nav-item {
+    padding: inherit;
+    margin: inherit;
+}
+
+/* Ensure Bootstrap grid works within .checkin-container */
+.checkin-container *,
+.checkin-container *::before,
+.checkin-container *::after {
+    box-sizing: border-box;
+}
+
 .checkin-container {
     font-family: 'Inter', 'Cabin', sans-serif;
     color: var(--text-color);
