@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PhucNguyenResort.Services.Users;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhucNguyenResort.Controllers
 {
+    [Authorize(Roles = "Business Manager")]
     public class TourSchedulesController : Controller
     {
         private readonly ITourScheduleService _scheduleService;
@@ -37,11 +39,11 @@ namespace PhucNguyenResort.Controllers
             return View(schedule);
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? tourId)
         {
-            ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName");
+            ViewBag.Tours = new SelectList(await _tourService.GetAllToursAsync(), "TourId", "TourName", tourId);
             var allUsers = await _userService.GetAllUsersAsync();
-            ViewBag.Guides = new SelectList(allUsers.Where(u => u.Role?.RoleName == "Tour Guide"), "UserId", "FullName");
+            ViewBag.Guides = new SelectList(allUsers.Where(u => u.Role?.RoleName == "Tour Guide" || u.Role?.RoleName == "Hướng Dẫn Viên"), "UserId", "FullName");
             return View();
         }
 

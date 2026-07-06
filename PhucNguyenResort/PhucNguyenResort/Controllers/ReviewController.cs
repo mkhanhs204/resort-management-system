@@ -17,7 +17,7 @@ public class ReviewController : Controller
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> PublicList(int? tourId = null, int? rating = null, string? serviceType = null)
+    public async Task<IActionResult> PublicList(int? tourId = null, int? rating = null, string? serviceType = null, int page = 1)
     {
         var reviews = await _reviewService.GetPublicReviewsAsync(tourId);
         
@@ -33,7 +33,15 @@ public class ReviewController : Controller
 
         ViewBag.CurrentRating = rating;
         ViewBag.CurrentServiceType = serviceType;
-        return View(reviews);
+        
+        int pageSize = 6;
+        int totalItems = reviews.Count();
+        var pagedReviews = reviews.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+        return View(pagedReviews);
     }
 
     [Authorize(Roles = "Customer")]

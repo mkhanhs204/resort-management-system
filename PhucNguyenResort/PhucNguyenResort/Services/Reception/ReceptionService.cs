@@ -291,7 +291,7 @@ namespace PhucNguyenResort.Services.Reception
                         await _context.SaveChangesAsync();
                     }
 
-                    if (booking.RoomHandoverTime.Value.Date <= booking.CheckInDate.Date)
+                    if (booking.RoomHandoverTime.Value.Date == booking.CheckInDate.Date)
                     {
                         var handoverTime = booking.RoomHandoverTime.Value.TimeOfDay;
                         if (handoverTime < TimeSpan.FromHours(14))
@@ -856,7 +856,7 @@ namespace PhucNguyenResort.Services.Reception
                     TransactionId = 0,
                     TransactionTypeName = "Tiền phòng đặt trước",
                     Amount = baseRoomCharge,
-                    CreatedAt = booking.CreatedAt
+                    CreatedAt = DateTime.Now
                 });
             }
             model.Transactions = transactions;
@@ -925,7 +925,7 @@ namespace PhucNguyenResort.Services.Reception
                     FolioId = folio.FolioId,
                     TransactionType = FolioTransactionType.RoomCharge,
                     Amount = baseRoomCharge,
-                    CreatedAt = booking.CreatedAt
+                    CreatedAt = now
                 });
             }
 
@@ -1098,7 +1098,7 @@ namespace PhucNguyenResort.Services.Reception
                     TransactionId = 0,
                     TransactionTypeName = "Tiền phòng đặt trước",
                     Amount = baseRoomCharge,
-                    CreatedAt = booking.CreatedAt
+                    CreatedAt = DateTime.Now
                 });
             }
 

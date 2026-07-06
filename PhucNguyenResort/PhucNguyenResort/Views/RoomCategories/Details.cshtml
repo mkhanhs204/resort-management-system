@@ -1,81 +1,208 @@
 @model PhucNguyenResort.Models.RoomCategory
 
 @{
-    ViewData["Title"] = "Room Category Details";
+    ViewData["Title"] = "Chi Tiết Hạng Phòng";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">@Model.CategoryName</h4>
-            <div>
-                <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-primary">Edit</a>
-                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 mb-4 mb-md-0">
-                    @if (!string.IsNullOrEmpty(Model.ImageUrl) || (Model.Images != null && Model.Images.Any()))
-                    {
-                        var allImages = new List<string>();
-                        if (!string.IsNullOrEmpty(Model.ImageUrl)) allImages.Add(Model.ImageUrl);
-                        if (Model.Images != null) allImages.AddRange(Model.Images.Select(i => i.ImageUrl));
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-secondary-luxury {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary-luxury:hover {
+            background-color: #e5e2de;
+            color: #1c1c1a;
+            text-decoration: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .detail-row {
+            display: flex;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0ede9;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            width: 35%;
+            color: #50453b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .detail-value {
+            width: 65%;
+            color: #1c1c1a;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .carousel-inner {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+    </style>
+}
 
-                        if (allImages.Count == 1)
-                        {
-                            <img src="@allImages[0]" alt="@Model.CategoryName" class="img-fluid rounded shadow-sm w-100" style="max-height: 300px; object-fit: cover;" />
-                        }
-                        else
-                        {
-                            <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner rounded shadow-sm">
-                                    @for (int i = 0; i < allImages.Count; i++)
-                                    {
-                                        <div class="carousel-item @(i == 0 ? "active" : "")">
-                                            <img src="@allImages[i]" class="d-block w-100" alt="Gallery Image @i" style="height: 300px; object-fit: cover;">
-                                        </div>
-                                    }
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Chi Tiết Hạng Phòng
+        </h2>
+        <p class="page-subtitle">Thông tin chi tiết của @Model.CategoryName.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-secondary-luxury">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<div class="luxury-card">
+    <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px;">
+        @Model.CategoryName
+    </div>
+    
+    <div class="row">
+        <div class="col-md-5 mb-4 mb-md-0">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl) || (Model.Images != null && Model.Images.Any()))
+            {
+                var allImages = new List<string>();
+                if (!string.IsNullOrEmpty(Model.ImageUrl)) allImages.Add(Model.ImageUrl);
+                if (Model.Images != null) allImages.AddRange(Model.Images.Select(i => i.ImageUrl));
+
+                if (allImages.Count == 1)
+                {
+                    <img src="@allImages[0]" alt="@Model.CategoryName" class="img-fluid rounded w-100" style="max-height: 350px; object-fit: cover; border-radius: 12px;" />
+                }
+                else
+                {
+                    <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @for (int i = 0; i < allImages.Count; i++)
+                            {
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@allImages[i]" class="d-block w-100" alt="Gallery Image @i" style="height: 350px; object-fit: cover;">
                                 </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded h-100" style="min-height: 300px;">
-                            <h4>No Image Available</h4>
+                            }
                         </div>
-                    }
+                        <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                }
+            }
+            else
+            {
+                <div style="background-color: #f6f3ef; border: 2px dashed #d4c3b6; border-radius: 12px; height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6; margin-bottom: 8px;">image</span>
+                    <span style="color: #807366; font-weight: 500;">Chưa có hình ảnh</span>
                 </div>
-                <div class="col-md-8">
-                    <dl class="row">
-                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.CategoryName)</dt>
-                        <dd class="col-sm-9 fw-bold fs-5">@Html.DisplayFor(model => model.CategoryName)</dd>
+            }
+        </div>
+        
+        <div class="col-md-7">
+            <div class="detail-row">
+                <div class="detail-label">Tên Hạng Phòng</div>
+                <div class="detail-value fw-bold fs-5">@Html.DisplayFor(model => model.CategoryName)</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Sức Chứa</div>
+                <div class="detail-value">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #805528;">man</span> @Model.MaxAdults Người lớn &nbsp;
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #805528;">child_care</span> @Model.MaxChildren Trẻ em
+                </div>
+            </div>
 
-                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.MaxAdults)</dt>
-                        <dd class="col-sm-9">@Html.DisplayFor(model => model.MaxAdults) Người lớn</dd>
-                        
-                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.MaxChildren)</dt>
-                        <dd class="col-sm-9">@Html.DisplayFor(model => model.MaxChildren) Trẻ em</dd>
+            <div class="detail-row">
+                <div class="detail-label">Giá Mỗi Đêm</div>
+                <div class="detail-value" style="color: #2e7d32; font-weight: 700; font-size: 18px;">
+                    @Model.PricePerNight?.ToString("N0") ₫
+                </div>
+            </div>
 
-                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.PricePerNight)</dt>
-                        <dd class="col-sm-9 text-success fw-bold">@Model.PricePerNight?.ToString("N0") VND / Night</dd>
-
-                        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.Description)</dt>
-                        <dd class="col-sm-9 text-justify">
-                            @(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)
-                        </dd>
-                    </dl>
+            <div class="detail-row">
+                <div class="detail-label">Mô tả chi tiết</div>
+                <div class="detail-value text-justify" style="line-height: 1.6;">
+                    @(string.IsNullOrEmpty(Model.Description) ? "Chưa có mô tả." : Model.Description)
                 </div>
             </div>
         </div>
+    </div>
+    
+    <hr style="border-color: #e5e2de; margin: 32px 0;" />
+    <div style="display: flex; gap: 16px;">
+        <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn-luxury">
+            <span class="material-symbols-outlined">edit</span> Chỉnh Sửa
+        </a>
     </div>
 </div>

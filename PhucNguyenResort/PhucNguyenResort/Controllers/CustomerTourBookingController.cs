@@ -175,7 +175,7 @@ namespace PhucNguyenResort.Controllers
                 // Charge to Room — already confirmed in service
                 await SendTourConfirmationEmail(result.TourBookingId!.Value); // Gửi mail xác nhận
                 TempData["Success"] = "Đặt tour thành công! Chi phí đã được ghi nợ vào phòng.";
-                return RedirectToAction("BookingSuccess", new { id = result.TourBookingId });
+                return RedirectToAction(nameof(MyTourBookings));
             }
         }
 
@@ -257,7 +257,7 @@ namespace PhucNguyenResort.Controllers
                 await _tourBookingService.ConfirmPaymentAsync(tourBookingId, response.TransactionId);
                 await SendTourConfirmationEmail(tourBookingId); // Gửi mail xác nhận
                 TempData["Success"] = "Thanh toán tour thành công!";
-                return RedirectToAction("BookingSuccess", new { id = tourBookingId });
+                return RedirectToAction(nameof(MyTourBookings));
             }
 
             TempData["Error"] = "Không thể xác nhận thanh toán.";

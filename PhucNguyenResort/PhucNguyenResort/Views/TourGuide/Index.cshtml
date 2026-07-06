@@ -1,11 +1,9 @@
-﻿@model IEnumerable<dynamic>
+@model IEnumerable<dynamic>
 
 @{
     ViewData["Title"] = "Lịch Trình Vận Hành Của Tôi";
-    // Tích hợp trực tiếp vào hệ thống quản trị Dashboard, loại bỏ header thừa của Client
     Layout = "_DashboardLayout";
 
-    // Gom nhóm tính toán dữ liệu trực tiếp trên tầng C#
     var totalTasks = Model?.Count() ?? 0;
     var upcomingCount = 0;
     var ongoingCount = 0;
@@ -23,186 +21,294 @@
     }
 }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<style>
-    /* Custom CSS tạo độ sâu và bo góc chuẩn phong cách Resort sang trọng */
-    .custom-table-resort th {
-        border-bottom: none;
-        letter-spacing: 0.5px;
-        font-size: 11px;
-    }
-
-    .tour-row {
-        transition: all 0.2s ease-in-out;
-    }
-
-        .tour-row:hover {
-            background-color: rgba(248, 249, 250, 1) !important;
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528;
+            margin-bottom: 4px;
         }
-    /* Tạo Style riêng biệt cho Badge Trạng thái thực tế */
-    .badge-status-custom {
-        padding: 6px 12px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 700;
-        display: inline-block;
-    }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef;
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .action-btn {
+            background: transparent;
+            border: 1px solid #dfa974;
+            color: #805528;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .action-btn:hover {
+            background: #fcf9f5;
+            color: #633d11;
+            text-decoration: none;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .luxury-badge.blue {
+            background-color: #d3e4fe;
+            color: #0b1c30;
+        }
+        .luxury-badge.green {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-badge.red {
+            background-color: #ffdad6;
+            color: #ba1a1a;
+        }
+        .luxury-badge.yellow {
+            background-color: #fff8e6;
+            color: #946c00;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+    </style>
+}
 
-    .b-upcoming {
-        background-color: #fff3cd;
-        color: #856404;
-    }
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Schedules & Attendance
+        </h2>
+        <p class="page-subtitle mb-0">
+            Xem danh sách lịch trình tour được phân công, kiểm tra danh sách đoàn và tiến hành điểm danh
+        </p>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+    </div>
+</div>
 
-    .b-ongoing {
-        background-color: #d1e7dd;
-        color: #0f5132;
-    }
-
-    .b-completed {
-        background-color: #cfe2ff;
-        color: #084298;
-    }
-</style>
-
-<div class="container-fluid py-4">
-    <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px;">
-        <div class="card-body d-flex justify-content-between align-items-center p-4 flex-wrap gap-3">
-            <div>
-                <h3 class="font-weight-bold text-dark mb-1" style="font-family: 'Playfair Display', serif; font-size: 1.6rem;">
-                    <i class="fa-solid fa-map-location-dot text-info me-2"></i> Tour Guide — Schedules & Attendance
-                </h3>
-                <p class="text-muted small mb-0">Xem danh sách lịch trình tour được phân công, kiểm tra danh sách đoàn và tiến hành điểm danh.</p>
+<div class="row mb-4">
+    <div class="col-md-4 col-12 mb-3">
+        <div class="luxury-card" style="padding: 24px; margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #fff8e6; color: #946c00; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined fill" style="font-size: 24px;">schedule</span>
+                </div>
             </div>
-            <div>
-                <span class="badge bg-white text-dark border p-2 font-weight-bold fs-7 shadow-sm" style="border-radius: 8px;">
-                    <i class="fa-regular fa-calendar-days me-1 text-info"></i> @DateTime.Now.ToString("dd/MM/yyyy")
-                </span>
+            <div style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px;">@upcomingCount</div>
+            <div style="color: #827569; font-size: 13px; font-weight: 600; text-transform: uppercase;">Upcoming Tours</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-12 mb-3">
+        <div class="luxury-card" style="padding: 24px; margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #d3e4fe; color: #0b1c30; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined fill" style="font-size: 24px;">autorenew</span>
+                </div>
             </div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px;">@ongoingCount</div>
+            <div style="color: #827569; font-size: 13px; font-weight: 600; text-transform: uppercase;">Ongoing Tours</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-12 mb-3">
+        <div class="luxury-card" style="padding: 24px; margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #e2f5ea; color: #0b5c2d; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined fill" style="font-size: 24px;">check_circle</span>
+                </div>
+            </div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px;">@completedCount</div>
+            <div style="color: #827569; font-size: 13px; font-weight: 600; text-transform: uppercase;">Completed Tours</div>
+        </div>
+    </div>
+</div>
+
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h5 style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #805528; margin: 0;">
+            Lịch Trình Tour Phân Công
+        </h5>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <span class="luxury-badge" style="font-size: 13px; padding: 6px 16px;">Tổng cộng: @totalTasks</span>
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-md-4">
-            <div class="card text-center border-0 shadow-sm p-4 h-100" style="border-radius: 12px; border-top: 4px solid #ffc107 !important; transition: transform 0.2s;">
-                <div class="text-warning mb-2"><i class="fa-regular fa-calendar fs-3"></i></div>
-                <h6 class="text-muted text-uppercase font-weight-bold small mb-2">Upcoming Scheduled Tours</h6>
-                <h2 class="font-weight-bold text-dark my-1">@upcomingCount</h2>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="card text-center border-0 shadow-sm p-4 h-100" style="border-radius: 12px; border-top: 4px solid #198754 !important; transition: transform 0.2s;">
-                <div class="text-success mb-2"><i class="fa-solid fa-circle-play fa-spin fs-3"></i></div>
-                <h6 class="text-muted text-uppercase font-weight-bold small mb-2">Ongoing Tours</h6>
-                <h2 class="font-weight-bold text-dark my-1">@ongoingCount</h2>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="card text-center border-0 shadow-sm p-4 h-100" style="border-radius: 12px; border-top: 4px solid #0d6efd !important; transition: transform 0.2s;">
-                <div class="text-primary mb-2"><i class="fa-regular fa-circle-check fs-3"></i></div>
-                <h6 class="text-muted text-uppercase font-weight-bold small mb-2">Completed Tours</h6>
-                <h2 class="font-weight-bold text-dark my-1">@completedCount</h2>
-            </div>
-        </div>
-    </div>
+    <div style="overflow-x: auto;">
+        <table class="luxury-table">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Mã số</th>
+                    <th style="width: 250px;">Tên Tour</th>
+                    <th>Ngày khởi hành</th>
+                    <th>Thời gian</th>
+                    <th>Chỗ trống</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align: right;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        var currentStatus = ViewData[$"Status_{item.ScheduleId}"]?.ToString() ?? "Upcoming";
+                        var endTimeStr = ViewData[$"EndTime_{item.ScheduleId}"]?.ToString() ?? "N/A";
+                        var startHourStr = item.StartTime != null ? item.StartTime.ToString(@"hh\:mm") : "00:00";
 
-    <div class="card shadow-sm border-0" style="border-radius: 12px;">
-        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-            <h5 class="font-weight-bold text-dark mb-0">
-                <i class="fa-solid fa-list-check me-2 text-secondary"></i> Upcoming Tour Schedules
-            </h5>
-            <span class="badge bg-secondary px-3 py-2 small fw-bold" style="border-radius: 6px;">Tổng số tác vụ: @totalTasks</span>
-        </div>
-
-        <div class="card-body px-4 pb-4">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle custom-table-resort text-center">
-                    <thead class="table-light text-uppercase text-secondary font-weight-bold">
                         <tr>
-                            <th style="width: 10%;">Mã số</th>
-                            <th class="text-start" style="width: 25%;">Tour Name</th>
-                            <th style="width: 12%;">Date</th>
-                            <th style="width: 18%;">Start Time</th>
-                            <th style="width: 12%;">Slots Left</th>
-                            <th style="width: 13%;">Status</th>
-                            <th style="width: 10%;">Action</th>
+                            <td style="color: #827569; font-weight: 600;">#@item.ScheduleId.ToString("D2")</td>
+                            <td>
+                                <div style="font-weight: 600; color: #1c1c1a; font-size: 15px; margin-bottom: 4px;">@(item.Tour?.TourName ?? "N/A")</div>
+                                <div style="color: #827569; font-size: 12px; display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">schedule</span>
+                                    Thời lượng: @(item.Tour?.DurationHours != null ? $"{item.Tour.DurationHours} tiếng" : "4 tiếng")
+                                </div>
+                            </td>
+                            <td style="font-weight: 600;">@(item.TourDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px; background: #f6f3ef; padding: 4px 12px; border-radius: 8px; display: inline-flex; font-weight: 600; font-size: 13px;">
+                                    <span>@startHourStr</span>
+                                    <span class="material-symbols-outlined" style="font-size: 14px; color: #a4b5ce;">arrow_right_alt</span>
+                                    <span style="color: #0b1c30;">@endTimeStr</span>
+                                </div>
+                            </td>
+                            <td>
+                                @if (item.AvailableSlots > 0)
+                                {
+                                    <span class="luxury-badge blue" style="font-size: 11px;">Còn @item.AvailableSlots chỗ</span>
+                                }
+                                else
+                                {
+                                    <span class="luxury-badge red" style="font-size: 11px;">Đã hết chỗ</span>
+                                }
+                            </td>
+                            <td>
+                                @if (currentStatus == "Upcoming")
+                                {
+                                    <span class="luxury-badge yellow">Sắp diễn ra</span>
+                                }
+                                else if (currentStatus == "Ongoing")
+                                {
+                                    <span class="luxury-badge blue">Đang diễn ra</span>
+                                }
+                                else
+                                {
+                                    <span class="luxury-badge green">Đã hoàn thành</span>
+                                }
+                            </td>
+                            <td style="text-align: right;">
+                                <a asp-controller="TourGuide" asp-action="Participants" asp-route-scheduleId="@item.ScheduleId" class="action-btn">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">groups</span> Điểm danh
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            @foreach (var item in Model)
-                            {
-                                var currentStatus = ViewData[$"Status_{item.ScheduleId}"]?.ToString() ?? "Upcoming";
-                                var endTimeStr = ViewData[$"EndTime_{item.ScheduleId}"]?.ToString() ?? "N/A";
-                                var startHourStr = item.StartTime != null ? item.StartTime.ToString(@"hh\:mm") : "00:00";
-
-                                <tr class="tour-row" data-schedule-id="@item.ScheduleId">
-                                    <td class="text-secondary font-weight-bold">#@item.ScheduleId.ToString("D2")</td>
-                                    <td class="text-start">
-                                        <span class="font-weight-bold text-dark d-block" style="font-size: 15px;">@(item.Tour?.TourName ?? "N/A")</span>
-                                        <small class="text-muted">
-                                            <i class="fa-regular fa-clock me-1"></i>Thời lượng: @(item.Tour?.DurationHours != null ? $"{item.Tour.DurationHours} tiếng" : "4 tiếng")
-                                        </small>
-                                    </td>
-                                    <td class="text-dark font-weight-bold target-date">
-                                        @(item.TourDate?.ToString("dd/MM/yyyy") ?? "N/A")
-                                    </td>
-                                    <td>
-                                        <div class="time-badge-box text-dark fw-bold bg-light py-1 px-2 rounded d-inline-block">
-                                            <span class="start-time-text text-dark">@startHourStr</span>
-                                            <i class="fa-solid fa-arrow-right-long text-muted mx-2"></i>
-                                            <span class="text-info end-time-text">@endTimeStr</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        @if (item.AvailableSlots > 0)
-                                        {
-                                            <span class="badge p-2" style="font-size: 11px; background-color: rgba(8, 145, 178, 0.1); color: #0891b2; font-weight: 700; border-radius: 6px;">
-                                                Còn @item.AvailableSlots chỗ
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge p-2" style="font-size: 11px; background-color: rgba(239, 68, 68, 0.1); color: #ef4444; font-weight: 700; border-radius: 6px;">
-                                                Full slots
-                                            </span>
-                                        }
-                                    </td>
-                                    <td class="status-container">
-                                        @if (currentStatus == "Upcoming")
-                                        {
-                                            <span class="badge-status-custom b-upcoming" data-origin="Upcoming"><i class="fa-regular fa-clock me-1"></i> Sắp diễn ra</span>
-                                        }
-                                        else if (currentStatus == "Ongoing")
-                                        {
-                                            <span class="badge-status-custom b-ongoing" data-origin="Ongoing"><i class="fa-solid fa-arrows-rotate fa-spin me-1"></i> Đang diễn ra</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge-status-custom b-completed" data-origin="Completed"><i class="fa-regular fa-circle-check me-1"></i> Đã hoàn thành</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <a asp-controller="TourGuide" asp-action="Participants" asp-route-scheduleId="@item.ScheduleId" class="btn btn-sm btn-info text-white shadow-sm font-weight-bold px-3 py-1_5" style="border-radius: 6px; font-size: 12px;">
-                                            <i class="fa-solid fa-users me-1"></i> Guest List
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
-                                    <div class="mb-2 text-secondary opacity-50"><i class="fa-solid fa-folder-open fs-1"></i></div>
-                                    Hiện chưa có lịch trình vận hành tour nào được phân công cho bạn hôm nay.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">folder_open</span>
+                                <div>Hiện chưa có lịch trình vận hành tour nào được phân công cho bạn hôm nay.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>

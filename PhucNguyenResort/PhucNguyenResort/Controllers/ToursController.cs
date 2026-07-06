@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -13,6 +14,7 @@ namespace PhucNguyenResort.Controllers
     /// ToursController — Manage Tour Catalog (UC04 subset).
     /// All POST actions protected by [ValidateAntiForgeryToken] (OWASP CSRF).
     /// </summary>
+    [Authorize(Roles = "Business Manager")]
     public class ToursController : Controller
     {
         private readonly ITourCatalogService _tourService;
@@ -316,8 +318,19 @@ namespace PhucNguyenResort.Controllers
 
         // GET: Tours/CheckTicket?ticketId=123
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> CheckTicket(int ticketId)
         {
+            // Manual authorization: only Customer and Business Manager can access
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return Challenge();
+            }
+            if (!User.IsInRole("Customer") && !User.IsInRole("Business Manager"))
+            {
+                return Forbid();
+            }
+
             var ticket = await _context.TourBookings
                 .Include(tb => tb.User)
                 .Include(tb => tb.Schedule)
