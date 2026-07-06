@@ -32,7 +32,7 @@
             </div>
 
             <ul class="list-unstyled components">
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Action"]?.ToString() != "FinancialReport" && ViewContext.RouteData.Values["Action"]?.ToString() != "TableReservations" && ViewContext.RouteData.Values["Action"]?.ToString() != "FoodOrders" ? "active" : "")">
                     <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
                 </li>
                 
@@ -58,8 +58,8 @@
                     }
                     @if (User.IsInRole("Business Manager"))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
-                            <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
+                        <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "FinancialReport" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="FinancialReport"><i class="fa fa-bar-chart"></i> Business Reports</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Review" ? "active" : "")">
                             <a asp-controller="Review" asp-action="Manage"><i class="fa fa-star"></i> Customer Reviews</a>

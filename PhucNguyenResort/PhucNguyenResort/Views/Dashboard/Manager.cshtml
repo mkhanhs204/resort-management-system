@@ -1,5 +1,5 @@
 @using PhucNguyenResort.Enums
-@model PhucNguyenResort.ViewModels.TableReservations.FnBTableReservationDashboardViewModel
+@model PhucNguyenResort.ViewModels.Dashboard.ManagerDashboardViewModel
 @{
     ViewData["Title"] = "Bảng Điều Khiển Quản Lý Kinh Doanh";
     Layout = "_DashboardLayout";
@@ -20,6 +20,7 @@
         .kpi-icon-wrapper.success { background-color: #e2f5ea; color: #0b5c2d; }
         .kpi-icon-wrapper.warning { background-color: #fff8e6; color: #946c00; }
         .kpi-icon-wrapper.info { background-color: #d3e4fe; color: #0b1c30; }
+        .kpi-icon-wrapper.danger { background-color: #ffdad6; color: #ba1a1a; }
         .kpi-details h3 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px; }
         .kpi-details p { color: #50453b; font-size: 14px; font-weight: 500; margin-bottom: 0; }
         
@@ -50,69 +51,120 @@
         
         .btn-outline-luxury { background-color: transparent; color: #805528; border: 1.5px solid #dfa974; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 6px 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; font-size: 14px; }
         .btn-outline-luxury:hover { background-color: #f6f3ef; color: #633d11; text-decoration: none; }
+
+        .btn-primary-luxury { background-color: #805528; color: #ffffff; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 6px 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; font-size: 14px; border: none; }
+        .btn-primary-luxury:hover { background-color: #633d11; color: #ffffff; text-decoration: none; transform: translateY(-1px); }
         
         .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 24px; vertical-align: middle; }
+
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        .chart-container-pie { position: relative; height: 260px; width: 100%; display: flex; justify-content: center; }
     </style>
 }
 
 <div class="d-flex justify-content-between align-items-end mb-4">
     <div>
         <h2 class="page-title">Quản Lý Kinh Doanh</h2>
-        <p class="page-subtitle">Giám sát hoạt động khu nghỉ dưỡng và cấu hình kinh doanh</p>
+        <p class="page-subtitle">Giám sát hoạt động khu nghỉ dưỡng và hiệu quả tài chính</p>
     </div>
-    <div class="page-subtitle" style="margin-bottom: 8px;">
-        <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">calendar_today</span>
-        @DateTime.Now.ToString("dd MMMM, yyyy")
-    </div>
+    <form method="get" asp-action="Manager" class="d-flex align-items-center gap-2 mb-2">
+        <select name="month" class="form-select form-select-sm" style="border-radius: 8px; border: 1px solid #d4c3b6; color: #50453b; width: 110px;">
+            <option value="0" selected="@(Model.SelectedMonth == 0)">All-Time</option>
+            @for (int i = 1; i <= 12; i++)
+            {
+                if (Model.SelectedMonth == i) { <option value="@i" selected>Tháng @i</option> }
+                else { <option value="@i">Tháng @i</option> }
+            }
+        </select>
+        <select name="year" class="form-select form-select-sm" style="border-radius: 8px; border: 1px solid #d4c3b6; color: #50453b; width: 110px;">
+            <option value="0" selected="@(Model.SelectedYear == 0)">All-Time</option>
+            @for (int i = 2023; i <= DateTime.Now.Year + 1; i++)
+            {
+                if (Model.SelectedYear == i) { <option value="@i" selected>Năm @i</option> }
+                else { <option value="@i">Năm @i</option> }
+            }
+        </select>
+        <button type="submit" class="btn-primary-luxury" style="padding: 4px 12px;"><span class="material-symbols-outlined" style="font-size: 16px;">filter_list</span> Lọc</button>
+    </form>
 </div>
 
 <!-- KPI Cards -->
-<div class="row mb-5">
-    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
         <div class="kpi-card">
             <div class="kpi-icon-wrapper primary">
-                <span class="material-symbols-outlined">bed</span>
+                <span class="material-symbols-outlined">monitoring</span>
             </div>
             <div class="kpi-details">
-                <h3>@ViewBag.TotalRoomCategories</h3>
-                <p>Loại Phòng Cung Cấp</p>
+                <h3>@Model.Revenue.TotalRevenue.ToString("N0") ₫</h3>
+                <p>Tổng Doanh Thu</p>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper info">
+                <span class="material-symbols-outlined">bedroom_parent</span>
+            </div>
+            <div class="kpi-details">
+                <h3>@Model.Occupancy.OccupancyRatePercent.ToString("0.##")%</h3>
+                <p>Tỷ Lệ Lấp Đầy</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
         <div class="kpi-card">
             <div class="kpi-icon-wrapper success">
-                <span class="material-symbols-outlined">map</span>
+                <span class="material-symbols-outlined">restaurant</span>
             </div>
             <div class="kpi-details">
-                <h3>@ViewBag.TotalTours</h3>
-                <p>Gói Tour / Trải Nghiệm</p>
+                <h3>@(Model.TableReservationDashboard.PendingReservationsToday + Model.TableReservationDashboard.ConfirmedReservationsToday)</h3>
+                <p>Lượt Đặt Bàn Hôm Nay</p>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+    <div class="col-lg-3 col-md-6 mb-3">
         <div class="kpi-card">
             <div class="kpi-icon-wrapper warning">
                 <span class="material-symbols-outlined">payments</span>
             </div>
             <div class="kpi-details">
-                <h3>@ViewBag.PendingRefunds</h3>
+                <h3>@Model.PendingRefunds</h3>
                 <p>Yêu Cầu Hoàn Tiền Chờ Duyệt</p>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
-        <div class="kpi-card">
-            <div class="kpi-icon-wrapper info">
-                <span class="material-symbols-outlined">restaurant</span>
+</div>
+
+<!-- Financial Charts -->
+<div class="row mb-4">
+    <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="action-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="section-header mb-0">
+                    <span class="material-symbols-outlined">show_chart</span> Biểu Đồ Doanh Thu
+                </h5>
+                <a asp-controller="Dashboard" asp-action="FinancialReport" asp-route-month="@Model.SelectedMonth" asp-route-year="@Model.SelectedYear" class="btn-outline-luxury">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">analytics</span> Xem Chi Tiết
+                </a>
             </div>
-            <div class="kpi-details">
-                <h3>@(Model.PendingReservationsToday + Model.ConfirmedReservationsToday)</h3>
-                <p>Lượt Đặt Bàn Hôm Nay</p>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="action-card">
+            <h5 class="section-header mb-4">
+                <span class="material-symbols-outlined">pie_chart</span> Tỷ Trọng
+            </h5>
+            <div class="chart-container-pie">
+                <canvas id="revenuePieChart"></canvas>
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="row mb-4">
     <div class="col-lg-5 mb-4 mb-lg-0">
@@ -121,6 +173,10 @@
                 <span class="material-symbols-outlined">link</span> Đường Dẫn Nhanh
             </h5>
             <div class="list-group luxury-list mt-4">
+                <a asp-controller="Dashboard" asp-action="FinancialReport" class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #fcf9f5; border-radius: 8px;">
+                    <span><span class="material-symbols-outlined mr-3" style="color: #805528;">request_quote</span> Báo Cáo Tài Chính</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #805528;">chevron_right</span>
+                </a>
                 <a asp-controller="RoomCategories" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
                     <span><span class="material-symbols-outlined mr-3" style="color: #dfa974;">bed</span> Loại Phòng & Giá</span>
                     <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
@@ -129,20 +185,12 @@
                     <span><span class="material-symbols-outlined mr-3" style="color: #0b5c2d;">restaurant_menu</span> Thực Đơn F&B</span>
                     <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
                 </a>
-                <a asp-controller="Tables" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><span class="material-symbols-outlined mr-3" style="color: #0b1c30;">table_bar</span> Quản Lý Bàn</span>
-                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
-                </a>
                 <a asp-controller="Dashboard" asp-action="TableReservations" class="list-group-item d-flex justify-content-between align-items-center">
                     <span><span class="material-symbols-outlined mr-3" style="color: #946c00;">book_online</span> Đặt Bàn</span>
                     <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
                 </a>
                 <a asp-controller="Tours" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
                     <span><span class="material-symbols-outlined mr-3" style="color: #ba1a1a;">map</span> Gói Tour & Trải Nghiệm</span>
-                    <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
-                </a>
-                <a asp-controller="Refunds" asp-action="Index" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><span class="material-symbols-outlined mr-3" style="color: #50453b;">payments</span> Yêu Cầu Hoàn Tiền</span>
                     <span class="material-symbols-outlined" style="font-size: 20px; color: #a4b5ce;">chevron_right</span>
                 </a>
             </div>
@@ -172,7 +220,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.TodayReservations == null || !Model.TodayReservations.Any())
+                        @if (Model.TableReservationDashboard.TodayReservations == null || !Model.TableReservationDashboard.TodayReservations.Any())
                         {
                             <tr>
                                 <td colspan="5" style="text-align: center; color: #a4b5ce; padding: 32px;">
@@ -182,7 +230,7 @@
                         }
                         else
                         {
-                            @foreach (var reservation in Model.TodayReservations.Take(6))
+                            @foreach (var reservation in Model.TableReservationDashboard.TodayReservations.Take(6))
                             {
                                 <tr>
                                     <td style="font-weight: 600;">@reservation.ReservationCode</td>
@@ -227,3 +275,112 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Serialize data from Model
+            var isAllTime = @(Model.SelectedMonth == 0 ? "true" : "false");
+            var rawLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Revenue.DailyData.Select(d => Model.SelectedMonth == 0 ? d.Date.ToString("MM/yyyy") : d.Date.ToString("dd/MM"))));
+            var rawDataRoom = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Revenue.DailyData.Select(d => d.RoomRevenue)));
+            var rawDataFnB = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Revenue.DailyData.Select(d => d.FnBRevenue)));
+            var rawDataTour = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Revenue.DailyData.Select(d => d.TourRevenue)));
+            
+            // Common Chart configuration
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#50453b';
+
+            // 1. Line Chart for Revenue
+            var ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            var revenueChart = new Chart(ctxRevenue, {
+                type: 'bar',
+                data: {
+                    labels: rawLabels,
+                    datasets: [
+                        {
+                            label: 'Phòng',
+                            data: rawDataRoom,
+                            backgroundColor: '#805528',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'F&B',
+                            data: rawDataFnB,
+                            backgroundColor: '#dfa974',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Tour',
+                            data: rawDataTour,
+                            backgroundColor: '#0b5c2d',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, border: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Pie Chart for Breakdown
+            var ctxPie = document.getElementById('revenuePieChart').getContext('2d');
+            var pieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Phòng', 'F&B', 'Tour'],
+                    datasets: [{
+                        data: [@Model.Revenue.RoomRevenue, @Model.Revenue.FnBRevenue, @Model.Revenue.TourRevenue],
+                        backgroundColor: ['#805528', '#dfa974', '#0b5c2d'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) label += ': ';
+                                    let val = context.parsed;
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%';
+                                    
+                                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+                                    label += ' (' + percentage + ')';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
+}

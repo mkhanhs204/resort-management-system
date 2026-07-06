@@ -2642,6 +2642,38 @@ namespace PhucNguyenResort.Web.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PhucNguyenResort.Models.MaintenanceRequest", b =>
+                {
+                    b.Property<int>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RequestId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("MaintenanceRequests");
+                });
+
             modelBuilder.Entity("PhucNguyenResort.Models.MenuCategory", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -3736,6 +3768,9 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TourBookingId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("TourId")
                         .HasColumnType("int");
 
@@ -3745,6 +3780,8 @@ namespace PhucNguyenResort.Web.Migrations
                     b.HasKey("ReviewId");
 
                     b.HasIndex("BookingId");
+
+                    b.HasIndex("TourBookingId");
 
                     b.HasIndex("TourId");
 
@@ -3760,6 +3797,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 16, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 4,
+                            TourBookingId = 1,
                             TourId = 1,
                             UserId = 1
                         },
@@ -3780,6 +3818,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 18, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 1,
+                            TourBookingId = 3,
                             TourId = 3,
                             UserId = 3
                         },
@@ -3800,6 +3839,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 20, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = false,
                             Rating = 3,
+                            TourBookingId = 5,
                             TourId = 5,
                             UserId = 5
                         },
@@ -3820,6 +3860,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 22, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
+                            TourBookingId = 7,
                             TourId = 7,
                             UserId = 7
                         },
@@ -3840,6 +3881,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 24, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 2,
+                            TourBookingId = 9,
                             TourId = 9,
                             UserId = 9
                         },
@@ -3860,6 +3902,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 26, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 4,
+                            TourBookingId = 11,
                             TourId = 11,
                             UserId = 11
                         },
@@ -3880,6 +3923,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 28, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 1,
+                            TourBookingId = 13,
                             TourId = 13,
                             UserId = 13
                         },
@@ -3900,6 +3944,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 6, 30, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 3,
+                            TourBookingId = 15,
                             TourId = 15,
                             UserId = 15
                         },
@@ -3920,6 +3965,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 7, 2, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 5,
+                            TourBookingId = 17,
                             TourId = 17,
                             UserId = 17
                         },
@@ -3940,6 +3986,7 @@ namespace PhucNguyenResort.Web.Migrations
                             CreatedAt = new DateTime(2026, 7, 4, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             IsVisible = true,
                             Rating = 2,
+                            TourBookingId = 19,
                             TourId = 19,
                             UserId = 19
                         },
@@ -4327,7 +4374,7 @@ namespace PhucNguyenResort.Web.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("RoomCategoryImages", (string)null);
+                    b.ToTable("RoomCategoryImages");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.TableReservation", b =>
@@ -5408,6 +5455,29 @@ namespace PhucNguyenResort.Web.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PhucNguyenResort.Models.TourImage", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("TourId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ImageId");
+
+                    b.HasIndex("TourId");
+
+                    b.ToTable("TourImages");
+                });
+
             modelBuilder.Entity("PhucNguyenResort.Models.TourSchedule", b =>
                 {
                     b.Property<int>("ScheduleId")
@@ -6436,6 +6506,17 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Navigation("FoodOrder");
                 });
 
+            modelBuilder.Entity("PhucNguyenResort.Models.MaintenanceRequest", b =>
+                {
+                    b.HasOne("PhucNguyenResort.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("PhucNguyenResort.Models.MenuItem", b =>
                 {
                     b.HasOne("PhucNguyenResort.Models.MenuCategory", "Category")
@@ -6491,6 +6572,10 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("PhucNguyenResort.Models.TourBooking", "TourBooking")
+                        .WithMany()
+                        .HasForeignKey("TourBookingId");
+
                     b.HasOne("PhucNguyenResort.Models.Tour", "Tour")
                         .WithMany("Reviews")
                         .HasForeignKey("TourId")
@@ -6504,6 +6589,8 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Navigation("Booking");
 
                     b.Navigation("Tour");
+
+                    b.Navigation("TourBooking");
 
                     b.Navigation("User");
                 });
@@ -6586,6 +6673,17 @@ namespace PhucNguyenResort.Web.Migrations
                     b.Navigation("Schedule");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PhucNguyenResort.Models.TourImage", b =>
+                {
+                    b.HasOne("PhucNguyenResort.Models.Tour", "Tour")
+                        .WithMany("Images")
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.TourSchedule", b =>
@@ -6700,6 +6798,8 @@ namespace PhucNguyenResort.Web.Migrations
 
             modelBuilder.Entity("PhucNguyenResort.Models.Tour", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Reviews");
 
                     b.Navigation("TourSchedules");
