@@ -2,232 +2,359 @@
 @model PhucNguyenResort.ViewModels.TableReservations.TableReservationSearchViewModel
 
 @{
-    ViewData["Title"] = "Reserve a Table";
+    ViewData["Title"] = "Tìm Bàn Nhà Hàng";
     var dateValue = Model.ReservationDate?.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd");
     var timeValue = Model.ReservationTime?.ToString(@"hh\:mm") ?? "18:00";
 }
 
-<div class="tr-page">
-    <div class="tr-container">
-        <div class="tr-header">
-            <div>
-                <span class="tr-eyebrow">Restaurant Reservation</span>
-                <h1>Reserve a Table</h1>
-                <p>Choose a dining time and party size to find available tables.</p>
-            </div>
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <a asp-action="MyReservations" class="tr-btn tr-btn-outline">
-                    <i class="fa fa-list"></i> My Reservations
-                </a>
-            }
-        </div>
-
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="tr-alert tr-alert-success">
-                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
-            </div>
-        }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="tr-alert tr-alert-danger">
-                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
-            </div>
-        }
-
-        <form asp-action="Search" method="post" class="tr-search-panel">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="tr-form-grid">
-                <div class="tr-field">
-                    <label asp-for="ReservationDate">Date</label>
-                    <input asp-for="ReservationDate" type="date" value="@dateValue" class="tr-input" />
-                    <span asp-validation-for="ReservationDate" class="text-danger"></span>
-                </div>
-
-                <div class="tr-field">
-                    <label asp-for="ReservationTime">Time</label>
-                    <input asp-for="ReservationTime" type="time" value="@timeValue" class="tr-input" />
-                    <span asp-validation-for="ReservationTime" class="text-danger"></span>
-                </div>
-
-                <div class="tr-field">
-                    <label asp-for="PartySize">Guests</label>
-                    <input asp-for="PartySize" type="number" min="1" max="50" class="tr-input" />
-                    <span asp-validation-for="PartySize" class="text-danger"></span>
-                </div>
-
-                <div class="tr-field tr-field-action">
-                    <button type="submit" class="tr-btn tr-btn-primary">
-                        <i class="fa fa-search"></i> Find Tables
-                    </button>
-                </div>
-            </div>
-        </form>
-
-        <div class="tr-section-title">
-            <h2>Restaurant Tables</h2>
-            <span>@Model.Tables.Count dining option(s)</span>
-        </div>
-
-        @if (Model.Tables.Any())
-        {
-            <div class="tr-table-grid">
-                @foreach (var table in Model.Tables)
-                {
-                    var statusClass = table.Status switch
-                    {
-                        DiningTableStatus.Available => "available",
-                        DiningTableStatus.Occupied => "occupied",
-                        DiningTableStatus.Reserved => "reserved",
-                        _ => "pending"
-                    };
-
-                    <div class="tr-table-card tr-table-card-media">
-                        <div class="tr-table-image">
-                            @if (!string.IsNullOrWhiteSpace(table.ImageUrl))
-                            {
-                                <img src="@table.ImageUrl" alt="@table.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                <div class="tr-image-fallback" style="display:none;">
-                                    <i class="fa fa-cutlery"></i>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="tr-image-fallback">
-                                    <i class="fa fa-cutlery"></i>
-                                </div>
-                            }
-                        </div>
-                        <div class="tr-card-top">
-                            <div>
-                                <div class="tr-table-number">@table.TableName</div>
-                                <div class="tr-table-muted">Table @table.TableNumber</div>
-                            </div>
-                            <span class="tr-status @statusClass">@table.Status</span>
-                        </div>
-                        @if (!string.IsNullOrWhiteSpace(table.Description))
-                        {
-                            <p class="tr-table-description">@table.Description</p>
-                        }
-                        <div class="tr-table-meta">
-                            <span><i class="fa fa-users"></i> Up to @table.Capacity guests</span>
-                            @if (!string.IsNullOrWhiteSpace(table.Area))
-                            {
-                                <span><i class="fa fa-map-marker"></i> @table.Area</span>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(table.TableType))
-                            {
-                                <span><i class="fa fa-tag"></i> @table.TableType</span>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(table.LocationNote))
-                            {
-                                <span><i class="fa fa-location-arrow"></i> @table.LocationNote</span>
-                            }
-                        </div>
-                        <div class="tr-card-bottom">
-                            <span>Search by date and time to check availability</span>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="tr-empty">
-                <i class="fa fa-table"></i>
-                <h3>No Tables Available</h3>
-                <p>Restaurant tables will appear here after staff creates them.</p>
-            </div>
-        }
-
-        @if (Model.AvailableTables.Any())
-        {
-            <div class="tr-section-title">
-                <h2>Available Tables</h2>
-                <span>@Model.AvailableTables.Count table(s) found</span>
-            </div>
-
-            <div class="tr-table-grid">
-                @foreach (var table in Model.AvailableTables)
-                {
-                    <div class="tr-table-card tr-table-card-media">
-                        <div class="tr-table-image">
-                            @if (!string.IsNullOrWhiteSpace(table.ImageUrl))
-                            {
-                                <img src="@table.ImageUrl" alt="@table.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                <div class="tr-image-fallback" style="display:none;">
-                                    <i class="fa fa-cutlery"></i>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="tr-image-fallback">
-                                    <i class="fa fa-cutlery"></i>
-                                </div>
-                            }
-                        </div>
-                        <div class="tr-card-top">
-                            <div>
-                                <div class="tr-table-number">@table.TableName</div>
-                                <div class="tr-table-muted">Table @table.TableNumber</div>
-                            </div>
-                            <span class="tr-status available">Available</span>
-                        </div>
-                        @if (!string.IsNullOrWhiteSpace(table.Description))
-                        {
-                            <p class="tr-table-description">@table.Description</p>
-                        }
-                        <div class="tr-table-meta">
-                            <span><i class="fa fa-users"></i> Up to @table.Capacity guests</span>
-                            @if (!string.IsNullOrWhiteSpace(table.Area))
-                            {
-                                <span><i class="fa fa-map-marker"></i> @table.Area</span>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(table.TableType))
-                            {
-                                <span><i class="fa fa-tag"></i> @table.TableType</span>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(table.LocationNote))
-                            {
-                                <span><i class="fa fa-location-arrow"></i> @table.LocationNote</span>
-                            }
-                            <span><i class="fa fa-calendar"></i> @table.ReservationDate.ToString("MMM dd, yyyy")</span>
-                            <span><i class="fa fa-clock-o"></i> @table.ReservationTime.ToString(@"hh\:mm")</span>
-                        </div>
-                        <div class="tr-card-bottom">
-                            <span>@table.DurationMinutes minutes</span>
-                            <a asp-action="Create"
-                               asp-route-tableId="@table.TableId"
-                               asp-route-reservationDate="@table.ReservationDate.ToString("yyyy-MM-dd")"
-                               asp-route-reservationTime="@table.ReservationTime.ToString(@"hh\:mm")"
-                               asp-route-partySize="@Model.PartySize"
-                               asp-route-durationMinutes="@table.DurationMinutes"
-                               class="tr-btn tr-btn-primary tr-btn-sm">
-                                Reserve <i class="fa fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else if (Context.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
-        {
-            <div class="tr-empty">
-                <i class="fa fa-calendar-times-o"></i>
-                <h3>No Available Tables</h3>
-                <p>Try a different time, date, or party size.</p>
-            </div>
-        }
-    </div>
-</div>
-
 @section Styles {
-    <link rel="stylesheet" href="~/css/table-reservations.css" />
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .luxury-shadow {
+            box-shadow: 0 24px 48px -12px rgba(30, 41, 59, 0.08);
+        }
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(252, 249, 245, 1) 100%);
+        }
+        body {
+            background-color: #fcf9f5 !important; /* Ivory White */
+        }
+    </style>
 }
 
+<div class="-mt-[80px]"> <!-- Compensate for Layout navbar if any, to allow hero to hit top -->
+    <!-- Hero Section -->
+    <section class="relative h-[819px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="w-full h-full bg-cover bg-center transition-transform duration-[10000ms] scale-105 hover:scale-100" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC63g5M8INll2C0uwKmn91cqrQCdyCpc2I8-ylcgwbNrLskZOeGcBCblF3HtXpVs_z6V8FyRtsxtHkW5KWI9Y49P9-rOfl0ZvZjp3wX9umNar9w3DllQX6nCNjcx-YnWx_4mLz_5LHKP7ohuILfULWn5r-zKabWeYWUHQnmEDzxEMG0GJyJ33WrkgNF9Y_iDNDW1eobQ7_sPsmJS6LDfLLI2MKg1zNI6UX5637ankaE_i8yJ27MuRtnvzkIxsueSulIlMRnfRnobfOl')">
+            </div>
+            <div class="absolute inset-0 hero-gradient"></div>
+        </div>
+        <div class="relative z-10 text-center px-4 max-w-4xl">
+            <h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-stack-md leading-tight text-white">
+                Trải Nghiệm <br /> Ẩm Thực Tinh Hoa
+            </h1>
+            <p class="font-body-lg text-body-lg text-white/90 max-w-2xl mx-auto mb-stack-lg">
+                Đắm chìm trong không gian sang trọng, nơi hương vị bản địa gặp gỡ nghệ thuật ẩm thực quốc tế dưới bàn tay tài hoa của các đầu bếp hàng đầu.
+            </p>
+        </div>
+    </section>
+
+    <!-- Search Bar Section -->
+    <section class="relative z-20 -mt-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+        <div class="bg-surface-container-lowest luxury-shadow rounded-xl border border-outline-variant/20 p-stack-lg">
+            <form asp-action="Search" method="post" class="grid grid-cols-1 md:grid-cols-4 gap-gutter items-end">
+                <!-- Date -->
+                <div class="space-y-2">
+                    <label class="font-label-lg text-label-lg text-on-surface-variant flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">calendar_today</span>
+                        Chọn Ngày
+                    </label>
+                    <div class="relative">
+                        <input asp-for="ReservationDate" value="@dateValue" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container outline-none transition-all" type="date" required />
+                    </div>
+                </div>
+                <!-- Time -->
+                <div class="space-y-2">
+                    <label class="font-label-lg text-label-lg text-on-surface-variant flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">schedule</span>
+                        Giờ Đặt
+                    </label>
+                    <div class="relative">
+                        <select asp-for="ReservationTime" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container outline-none appearance-none">
+                            @{
+                                var times = new[] { "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00" };
+                                foreach (var t in times)
+                                {
+                                    if (t == timeValue)
+                                    {
+                                        <option value="@t" selected>@t</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@t">@t</option>
+                                    }
+                                }
+                            }
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+                <!-- Party Size -->
+                <div class="space-y-2">
+                    <label class="font-label-lg text-label-lg text-on-surface-variant flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">group</span>
+                        Số Khách
+                    </label>
+                    <div class="relative">
+                        <select asp-for="PartySize" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container outline-none appearance-none">
+                            <option value="2">2 Người</option>
+                            <option value="4">4 Người</option>
+                            <option value="6">6 Người</option>
+                            <option value="8">8 Người</option>
+                            <option value="10">10+ Người</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+                <!-- CTA -->
+                <div>
+                    <button type="submit" class="w-full bg-primary-container text-on-primary-container h-[50px] rounded-lg font-label-lg text-label-lg hover:bg-primary hover:text-white transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
+                        Tìm Bàn
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Available Tables Results -->
+    @if (Context.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+    {
+        <section class="py-section-gap-md px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto" id="results-section">
+            <div class="text-center mb-stack-lg">
+                <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Kết Quả Tìm Kiếm</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Tìm thấy @Model.AvailableTables.Count bàn trống phù hợp.</p>
+            </div>
+            
+            @if (Model.AvailableTables.Any())
+            {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="table-grid">
+                    @foreach (var table in Model.AvailableTables)
+                    {
+                        <div class="table-item bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden luxury-shadow group transition-all duration-300 hover:-translate-y-1">
+                            <div class="relative h-64 overflow-hidden">
+                                @if (!string.IsNullOrWhiteSpace(table.ImageUrl))
+                                {
+                                    <img src="@table.ImageUrl" alt="@table.TableName" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.onerror=null;this.src='https://placehold.co/400x300?text=No+Image'" />
+                                }
+                                else
+                                {
+                                    <div class="w-full h-full bg-surface-variant flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-6xl text-on-surface-variant/50">restaurant</span>
+                                    </div>
+                                }
+                                <div class="absolute top-4 right-4 bg-primary text-white px-4 py-1 rounded-full text-label-sm font-label-sm font-bold shadow-md uppercase tracking-widest">
+                                    Bàn @table.TableNumber
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">@table.TableName</h3>
+                                @if (!string.IsNullOrWhiteSpace(table.Description))
+                                {
+                                    <p class="text-body-md text-on-surface-variant line-clamp-2 mb-4">@table.Description</p>
+                                }
+                                
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="bg-surface-container px-3 py-1 rounded-md text-label-sm flex items-center gap-1 text-on-surface-variant">
+                                        <span class="material-symbols-outlined text-[16px]">group</span> Tối đa @table.Capacity
+                                    </span>
+                                    @if (!string.IsNullOrWhiteSpace(table.Area))
+                                    {
+                                        <span class="bg-surface-container px-3 py-1 rounded-md text-label-sm flex items-center gap-1 text-on-surface-variant">
+                                            <span class="material-symbols-outlined text-[16px]">map</span> @table.Area
+                                        </span>
+                                    }
+                                </div>
+                                
+                                <a asp-action="Create"
+                                   asp-route-tableId="@table.TableId"
+                                   asp-route-reservationDate="@table.ReservationDate.ToString("yyyy-MM-dd")"
+                                   asp-route-reservationTime="@table.ReservationTime.ToString(@"hh\:mm")"
+                                   asp-route-partySize="@Model.PartySize"
+                                   asp-route-durationMinutes="@table.DurationMinutes"
+                                   class="block w-full text-center border border-primary text-primary py-3 rounded-lg font-label-lg text-label-lg hover:bg-primary hover:text-white transition-all duration-300">
+                                    Đặt Bàn Này
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="flex justify-center items-center gap-2 mt-section-gap-md" id="pagination-controls">
+                </div>
+            }
+            else
+            {
+                <div class="bg-error-container/20 border border-error/20 rounded-xl p-8 text-center max-w-2xl mx-auto mt-stack-lg">
+                    <span class="material-symbols-outlined text-error text-4xl mb-2">sentiment_dissatisfied</span>
+                    <h3 class="font-headline-sm text-headline-sm text-error mb-2">Không Có Bàn Trống</h3>
+                    <p class="text-on-surface-variant">Rất tiếc, không có bàn nào phù hợp với yêu cầu của bạn. Vui lòng thử lại với thời gian hoặc số lượng khách khác.</p>
+                </div>
+            }
+        </section>
+    }
+
+    <!-- Restaurant Areas Section -->
+    <section class="py-section-gap-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+        <div class="text-center mb-section-gap-md">
+            <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-stack-sm">Khu Vực Nhà Hàng</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto">Mỗi không gian là một cảm xúc riêng biệt, được thiết kế để nâng tầm trải nghiệm của bạn.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <!-- Area 1: Indoor -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-xl h-[400px] mb-stack-md">
+                    <div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3cZB99JOVzBS86cOcqsBVGA-KvqX39sfV1KpDkV344fbld2JD7lolwJcN_v_CaVHdjTB3y6VTNYYDd4m83054HzYe_35x9jSOx8nkNFochIb-NuEtobPXRQvf-3eI70sLnN0OiiyJCxTWm4FYlzckTSMNPQ1MXjILdkfG6NAADorRGQf36ljRdM_kkkpgtUxIlCICRHuXHobdXvkBfjFegMDoko_HUj2ZJxeP4KHMQGvdJX1oAx2hD-R3srqHY0L-cPR41P_dExlP')">
+                    </div>
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div>
+                    <div class="absolute bottom-6 left-6">
+                        <span class="bg-surface-container-lowest/90 backdrop-blur-md px-4 py-1 rounded-full text-label-sm font-label-sm text-secondary uppercase tracking-widest">Trong Nhà</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Grand Salon</h3>
+                <p class="font-body-md text-on-surface-variant leading-relaxed">Không gian ấm cúng, sang trọng với hệ thống điều hòa và nhạc nhẹ, lý tưởng cho những bữa tối thân mật.</p>
+            </div>
+            <!-- Area 2: Outdoor Terrace -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-xl h-[400px] mb-stack-md">
+                    <div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtMCws0gHUtAtuYVmAmgyxp8h8aeQOby4yz7Z15SWQvlaJiQnEUrAONOKDqr2hiVfhaMAXDA_sKVDKWcddRzys-UfAg5RodOaOm4n7JVHIZO36xYzCitk3Ui2Y8GRn-w7mvwbYmJDZbgF0As18knzq0W3L5YJ3utJbhHf-r9XEWqKrA3sK9SFSd5ayUPLHEw583H4wdR92jM3ky-SlD7Yla2GrLhLZk-plHazZhvxIvbVO9jR9sklzZolVCVq_nrxPDAUSelMtpApx')">
+                    </div>
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div>
+                    <div class="absolute bottom-6 left-6">
+                        <span class="bg-surface-container-lowest/90 backdrop-blur-md px-4 py-1 rounded-full text-label-sm font-label-sm text-secondary uppercase tracking-widest">Ngoài Trời</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">The Terrace</h3>
+                <p class="font-body-md text-on-surface-variant leading-relaxed">Tận hưởng gió biển rì rào và bầu trời đầy sao tại hiên nhà hàng, mang lại cảm giác khoáng đạt, tự do.</p>
+            </div>
+            <!-- Area 3: Poolside -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-xl h-[400px] mb-stack-md">
+                    <div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBjDcq0DfvyNM7eID7c1n7YcWvZ258-KjGDrukbNIv1_F6yujZMmxRzksd70WEfDFJH0h-W7xxL0lTCqQrZNpnXynXsFK-1eZjhDpWIfOuBx259bzchF_px-J8g41Xfuh5jrVHlyn-rTPkUtBlcblQWvlj7X9YyLpK9-SPisYaPO98RqpOnELTUQaCUle0d8ZdUcJWkbFfuyZP6NhZm8DmMUVNkgXJxqBcu2QnFSZxaSYnX3z1nCjdqME1LwLQYgNl1frr5Ef6lk54k')">
+                    </div>
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div>
+                    <div class="absolute bottom-6 left-6">
+                        <span class="bg-surface-container-lowest/90 backdrop-blur-md px-4 py-1 rounded-full text-label-sm font-label-sm text-secondary uppercase tracking-widest">Cạnh Hồ Bơi</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Azure Lounge</h3>
+                <p class="font-body-md text-on-surface-variant leading-relaxed">Sự kết hợp hoàn hảo giữa làn nước mát lành và ánh sáng nghệ thuật, tạo nên không gian lãng mạn bậc nhất.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promotional Bento Section -->
+    <section class="bg-surface-container py-section-gap-lg">
+        <div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter h-auto md:h-[600px]">
+                <div class="md:col-span-7 bg-surface-container-lowest rounded-xl border border-outline-variant/10 overflow-hidden flex flex-col justify-center p-stack-lg relative">
+                    <div class="relative z-10">
+                        <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-stack-md leading-tight">Tiệc Tối <br /> Riêng Tư</h2>
+                        <p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-md">Chúng tôi cung cấp dịch vụ đặt tiệc riêng cho các dịp đặc biệt: sinh nhật, kỷ niệm hoặc tiếp đãi đối tác quan trọng.</p>
+                        <button class="border border-secondary text-secondary px-8 py-3 rounded-lg font-label-lg text-label-lg hover:bg-secondary hover:text-white transition-all duration-300">Tìm Hiểu Thêm</button>
+                    </div>
+                    <div class="absolute bottom-[-10%] right-[-5%] w-1/2 opacity-20 pointer-events-none">
+                        <span class="material-symbols-outlined text-[300px] text-primary-container">restaurant_menu</span>
+                    </div>
+                </div>
+                <div class="md:col-span-5 grid grid-rows-2 gap-gutter">
+                    <div class="bg-primary text-white rounded-xl p-stack-lg flex flex-col justify-center luxury-shadow">
+                        <h4 class="font-headline-sm text-headline-sm mb-2">Thực Đơn Mùa</h4>
+                        <p class="font-body-md opacity-80 mb-stack-md">Khám phá hương vị tươi mới nhất từ nguyên liệu thu hoạch theo mùa tại địa phương.</p>
+                        <a class="font-label-lg text-label-lg underline decoration-champagne-gold underline-offset-4 hover:opacity-100 opacity-80" href="#">Xem Thực Đơn</a>
+                    </div>
+                    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/10 overflow-hidden relative group">
+                        <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA9oNNucvKrN0zJHjo_HiU4Kcs1kxWW-R3_Dsioudfth1lCs6_QGJ7S_qFIN1cYv7pJw1weWWxbqXIXTy_qza1uX3Znol6E2sUXf1MNOcHwV3rpbIRBraNiPzztek5c1-3oM12aQkHRjWyUmJm9LsNjpyvw0FNkjx5Ob3R9XVDfQ-ZM_nkpg7Sxg0Z2wb0BQHpSY3GV0O9PBbK5N5i4PVr_j0bHz4hBcqHp9uRy78UCOoVtwEa8f5_eH5O-Kq-ZmMNW-BN5Ciu6riPe')">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                            <span class="text-white font-headline-sm text-headline-sm">Signature Drinks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pagination logic
+            const tableItems = document.querySelectorAll('.table-item');
+            if (tableItems.length === 0) {
+                scrollToResults();
+                return;
+            }
+
+            const itemsPerPage = 6; // Show 6 tables per page
+            let currentPage = 1;
+            const totalPages = Math.ceil(tableItems.length / itemsPerPage);
+
+            function showPage(page) {
+                currentPage = page;
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+
+                tableItems.forEach((item, index) => {
+                    if (index >= start && index < end) {
+                        item.style.display = 'block';
+                        // Add a small fade in animation
+                        item.style.opacity = '0';
+                        setTimeout(() => item.style.opacity = '1', 50);
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                renderPagination();
+                if(page > 1) {
+                    document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            function renderPagination() {
+                const controls = document.getElementById('pagination-controls');
+                if (!controls) return;
+                controls.innerHTML = '';
+
+                if (totalPages <= 1) return;
+
+                // Prev button
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = `w-10 h-10 rounded-full flex items-center justify-center transition-colors ${currentPage === 1 ? 'text-on-surface-variant/50 cursor-not-allowed bg-surface-container/50' : 'bg-surface-container hover:bg-primary hover:text-white'}`;
+                prevBtn.innerHTML = '<span class="material-symbols-outlined">chevron_left</span>';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.onclick = () => { if (currentPage > 1) showPage(currentPage - 1); };
+                controls.appendChild(prevBtn);
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.type = 'button';
+                    pageBtn.className = `w-10 h-10 rounded-full font-label-lg transition-colors ${currentPage === i ? 'bg-primary text-white shadow-md' : 'bg-surface-container hover:bg-surface-variant text-on-surface-variant'}`;
+                    pageBtn.innerText = i;
+                    pageBtn.onclick = () => showPage(i);
+                    controls.appendChild(pageBtn);
+                }
+
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = `w-10 h-10 rounded-full flex items-center justify-center transition-colors ${currentPage === totalPages ? 'text-on-surface-variant/50 cursor-not-allowed bg-surface-container/50' : 'bg-surface-container hover:bg-primary hover:text-white'}`;
+                nextBtn.innerHTML = '<span class="material-symbols-outlined">chevron_right</span>';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.onclick = () => { if (currentPage < totalPages) showPage(currentPage + 1); };
+                controls.appendChild(nextBtn);
+            }
+
+            showPage(1);
+            scrollToResults();
+            
+            function scrollToResults() {
+                // Scroll to results if there are any (POST request)
+                if (document.getElementById('results-section')) {
+                    // Small timeout to ensure rendering is complete
+                    setTimeout(() => {
+                        document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 300);
+                }
+            }
+        });
+    </script>
 }
