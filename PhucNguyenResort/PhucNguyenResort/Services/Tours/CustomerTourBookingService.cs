@@ -24,7 +24,7 @@ namespace PhucNguyenResort.Services.Tours
         }
 
         /// <inheritdoc/>
-        public async Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy, int page = 1, int pageSize = 9)
+        public async Task<TourListVM> GetTourListAsync(string? searchKeyword, DateTime? tourDate, string? sortBy, int page = 1, int pageSize = 9)
         {
             var query = _context.Tours
                 .Include(t => t.TourSchedules)
@@ -39,6 +39,12 @@ namespace PhucNguyenResort.Services.Tours
                     (t.TourName != null && t.TourName.ToLower().Contains(keyword)) ||
                     (t.Location != null && t.Location.ToLower().Contains(keyword)) ||
                     (t.Description != null && t.Description.ToLower().Contains(keyword)));
+            }
+
+            // Date filter
+            if (tourDate.HasValue)
+            {
+                query = query.Where(t => t.TourSchedules.Any(s => s.TourDate != null && s.TourDate.Value.Date == tourDate.Value.Date && (s.AvailableSlots ?? 0) > 0));
             }
 
             var tours = await query.ToListAsync();
@@ -67,6 +73,9 @@ namespace PhucNguyenResort.Services.Tours
             // Sorting
             tourCards = sortBy switch
             {
+                "rating_desc" => tourCards.OrderByDescending(t => t.AverageRating).ToList(),
+                "rating_asc" => tourCards.OrderBy(t => t.AverageRating).ToList(),
+                "schedules_desc" => tourCards.OrderByDescending(t => t.UpcomingScheduleCount).ToList(),
                 "price_asc" => tourCards.OrderBy(t => t.Price).ToList(),
                 "price_desc" => tourCards.OrderByDescending(t => t.Price).ToList(),
                 "name" => tourCards.OrderBy(t => t.TourName).ToList(),
@@ -81,6 +90,7 @@ namespace PhucNguyenResort.Services.Tours
             {
                 Tours = pagedTours,
                 SearchKeyword = searchKeyword,
+                TourDate = tourDate,
                 SortBy = sortBy,
                 TotalCount = totalCount,
                 CurrentPage = page,
@@ -94,6 +104,7 @@ namespace PhucNguyenResort.Services.Tours
             var tour = await _context.Tours
                 .Include(t => t.TourSchedules)
                     .ThenInclude(s => s.Guide)
+                .Include(t => t.Images)
                 .Include(t => t.Reviews)
                     .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(t => t.TourId == tourId);
@@ -110,6 +121,7 @@ namespace PhucNguyenResort.Services.Tours
                 DurationHours = tour.DurationHours ?? 0,
                 Location = tour.Location,
                 ImageUrl = tour.ImageUrl,
+                GalleryImages = tour.Images.Select(i => i.ImageUrl).ToList(),
                 AverageRating = tour.Reviews.Any() ? tour.Reviews.Average(r => r.Rating ?? 0) : 0,
                 ReviewCount = tour.Reviews.Count,
                 Reviews = tour.Reviews.Where(r => r.IsVisible).Select(r => new PhucNguyenResort.ViewModels.Reviews.ReviewListVM

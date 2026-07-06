@@ -4,6 +4,7 @@ using System.Diagnostics;
 using PhucNguyenResort.Services.Home;
 using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.Models;
+using PhucNguyenResort.Services.Reviews;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -12,18 +13,21 @@ namespace PhucNguyenResort.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IHomeService _homeService;
         private readonly ITourCatalogService _tourService;
+        private readonly IReviewService _reviewService;
 
-        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourCatalogService tourService)
+        public HomeController(ILogger<HomeController> logger, IHomeService homeService, ITourCatalogService tourService, IReviewService reviewService)
         {
             _logger = logger;
             _homeService = homeService;
             _tourService = tourService;
+            _reviewService = reviewService;
         }
 
         public async Task<IActionResult> Index()
         {
             var roomCategories = await _homeService.GetRoomCategoriesForHomeAsync();
             ViewBag.Tours = await _tourService.GetActiveToursForHomeAsync();
+            ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();
             return View(roomCategories);
         }
 
@@ -48,6 +52,7 @@ namespace PhucNguyenResort.Controllers
 
             ViewBag.CheckIn = checkIn;
             ViewBag.CheckOut = checkOut;
+            ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync(categoryId: id);
 
             return View(roomCategory);
         }
@@ -68,6 +73,7 @@ namespace PhucNguyenResort.Controllers
                 ViewBag.ChildrenCount = childrenCount;
                 ViewBag.RoomCount = roomCount;
                 ViewBag.IsFiltered = false;
+                ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();
 
                 return View(availableCategories);
             }
@@ -105,6 +111,7 @@ namespace PhucNguyenResort.Controllers
             ViewBag.IsFiltered = true;
             ViewBag.PreselectId = preselectId;
             ViewBag.PreselectQty = preselectQty;
+            ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();
 
             return View(availableCategories);
         }

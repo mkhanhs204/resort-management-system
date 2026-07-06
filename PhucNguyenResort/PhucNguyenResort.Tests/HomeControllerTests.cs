@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
+using PhucNguyenResort.Services.Reviews;
+
 namespace PhucNguyenResort.Tests
 {
     public class HomeControllerTests
@@ -17,6 +19,7 @@ namespace PhucNguyenResort.Tests
         private readonly Mock<ILogger<HomeController>> _mockLogger;
         private readonly Mock<IHomeService> _mockHomeService;
         private readonly Mock<ITourCatalogService> _mockTourService;
+        private readonly Mock<IReviewService> _mockReviewService;
         private readonly HomeController _controller;
 
         public HomeControllerTests()
@@ -24,7 +27,8 @@ namespace PhucNguyenResort.Tests
             _mockLogger = new Mock<ILogger<HomeController>>();
             _mockHomeService = new Mock<IHomeService>();
             _mockTourService = new Mock<ITourCatalogService>();
-            _controller = new HomeController(_mockLogger.Object, _mockHomeService.Object, _mockTourService.Object);
+            _mockReviewService = new Mock<IReviewService>();
+            _controller = new HomeController(_mockLogger.Object, _mockHomeService.Object, _mockTourService.Object, _mockReviewService.Object);
         }
 
         [Fact]

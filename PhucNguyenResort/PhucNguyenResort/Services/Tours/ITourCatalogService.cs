@@ -14,5 +14,7 @@ namespace PhucNguyenResort.Services.Tours
         Task<IEnumerable<Tour>> GetActiveToursForHomeAsync();
         bool TourExists(int tourId);
         Task<List<User>> GetAvailableManagersAsync();
+        Task<TourImage?> GetGalleryImageByIdAsync(int imageId);
+        Task DeleteGalleryImageAsync(int imageId);
     }
 }

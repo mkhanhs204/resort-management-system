@@ -58,6 +58,20 @@
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
         }
+        input[type="file"].form-control::file-selector-button {
+            padding: 10px 16px;
+            margin: -10px -16px;
+            margin-right: 16px;
+            background-color: #e5e2de;
+            border: none;
+            color: #50453b;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        input[type="file"].form-control:hover::file-selector-button {
+            background-color: #d4c3b6;
+        }
         .form-group label {
             color: #1c1c1a;
             font-size: 14px;
@@ -162,7 +176,7 @@
         </a>
     </div>
     <div>
-        <form asp-action="Edit" id="edit-tour-form">
+        <form asp-action="Edit" id="edit-tour-form" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;" role="alert"></div>
             <input type="hidden" asp-for="TourId" />
 
@@ -244,13 +258,41 @@
                         </div>
                     </div>
 
-                    <!-- Image URL -->
+                    <!-- Image Upload -->
                     <div class="form-group mb-4">
-                        <label asp-for="ImageUrl">URL Hình Ảnh</label>
-                        <input asp-for="ImageUrl" class="form-control" id="input-image-url" maxlength="255"
-                               oninput="previewImage(this.value)" />
-                        <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                        <label asp-for="ImageUpload">Ảnh Đại Diện Chính (Chọn tệp mới để thay đổi)</label>
+                        <input asp-for="ImageUpload" type="file" class="form-control" accept="image/*" onchange="previewImageFile(this)" />
+                        <span asp-validation-for="ImageUpload" class="text-danger small"></span>
+                        <input type="hidden" asp-for="ImageUrl" id="input-image-url" />
                     </div>
+
+                    <!-- New Gallery Images -->
+                    <div class="form-group mb-4">
+                        <label asp-for="NewGalleryImages">Thêm Album Hình Ảnh</label>
+                        <input asp-for="NewGalleryImages" type="file" multiple class="form-control" accept="image/*" />
+                    </div>
+
+                    <!-- Existing Gallery Images -->
+                    @if (Model.ExistingGalleryImages != null && Model.ExistingGalleryImages.Count > 0)
+                    {
+                        <div class="form-group mb-4">
+                            <label style="color: #1c1c1a; font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">Hình Ảnh Đã Tải Lên</label>
+                            <div class="d-flex flex-wrap" style="gap: 12px;">
+                                @foreach (var img in Model.ExistingGalleryImages)
+                                {
+                                    <div class="position-relative" style="width: 100px; height: 100px;">
+                                        <img src="@img.ImageUrl" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #e5e2de;" onerror="this.src='https://placehold.co/100x100?text=No+Image'" />
+                                        <button type="submit" asp-action="DeleteGalleryImage" asp-route-id="@img.ImageId"
+                                                class="btn btn-danger position-absolute"
+                                                style="top: 4px; right: 4px; border-radius: 50%; width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
+                                                onclick="return confirm('Bạn có chắc muốn xóa ảnh này?');">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
 
                 </div>
 
@@ -301,5 +343,37 @@
                 placeholder.classList.remove('d-none');
             }
         }
+        
+        function previewImageFile(input) {
+            var img = document.getElementById('preview-img');
+            var placeholder = document.getElementById('preview-placeholder');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                    img.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // If they cancel upload, we might want to revert to the old ImageUrl
+                // But for now, we can just leave the preview as is or hide it.
+                var oldUrl = document.getElementById('input-image-url').value;
+                if (oldUrl) {
+                    previewImage(oldUrl);
+                } else {
+                    img.classList.add('d-none');
+                    placeholder.classList.remove('d-none');
+                }
+            }
+        }
+
+        // Initialize preview on load
+        document.addEventListener('DOMContentLoaded', function() {
+            var oldUrl = document.getElementById('input-image-url').value;
+            if (oldUrl) {
+                previewImage(oldUrl);
+            }
+        });
     </script>
 }

@@ -24,19 +24,55 @@
     </style>
 }
 
-<main class="pt-24 pb-section-gap-lg bg-background">
+<main class="pt-0 pb-section-gap-lg bg-background">
+    <!-- Hero Section -->
+    <section class="relative h-[650px] min-h-[400px] w-full overflow-hidden mb-12">
+        <div class="absolute inset-0 w-full h-full bg-cover bg-center" style="background-image: url('https://nhaxinhdesign.com/wp-content/uploads/2023/02/noi-that-re-sort-7.jpg')"></div>
+        <div class="absolute inset-0 bg-black/40 flex flex-col justify-center items-center px-margin-mobile md:px-margin-desktop text-center">
+            <div class="max-w-container-max mx-auto w-full flex flex-col items-center mt-10">
+                <span class="bg-primary-container text-on-primary-container px-4 py-1 rounded-full text-label-sm font-label-lg uppercase tracking-widest mb-4 inline-block">Khám Phá Thế Giới</span>
+                <h1 class="font-display-lg text-display-lg text-white mb-4">Hành Trình Trải Nghiệm</h1>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filter Form -->
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-8">
+        <form asp-action="Index" method="get" class="bg-surface-container-lowest p-6 rounded-xl luxury-shadow flex flex-col md:flex-row gap-4 items-end border border-outline/5 relative -mt-24 z-10">
+            <div class="flex-grow w-full">
+                <label class="block text-label-sm text-on-surface-variant mb-2">Tên tour</label>
+                <input type="text" name="search" value="@Model.SearchKeyword" class="w-full px-4 py-2 rounded-lg border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-surface" placeholder="Tìm kiếm theo tên, địa điểm..." />
+            </div>
+            <div class="w-full md:w-48">
+                <label class="block text-label-sm text-on-surface-variant mb-2">Ngày đi</label>
+                <input type="date" name="tourDate" value="@Model.TourDate?.ToString("yyyy-MM-dd")" class="w-full px-4 py-2 rounded-lg border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-surface" />
+            </div>
+            <div class="w-full md:w-auto">
+                <input type="hidden" name="sortBy" value="@Model.SortBy" />
+                <button type="submit" class="w-full md:w-auto px-6 py-2 bg-primary text-on-primary font-label-lg text-label-lg rounded-lg hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg">Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
 
     <!-- Results Header -->
-    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-            <h1 class="font-headline-lg text-headline-lg mb-2 text-on-surface">Hành Trình Trải Nghiệm</h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant">Tìm thấy <span class="font-bold text-primary">@Model.TotalCount tours</span> phù hợp với yêu cầu của bạn</p>
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex items-center gap-2 bg-surface p-2 px-5 rounded-full border border-outline-variant/30 shadow-sm">
+            <span class="material-symbols-outlined text-primary text-xl">travel_explore</span>
+            <p class="font-body-lg text-body-lg text-on-surface">Tìm thấy <span class="font-bold text-primary text-xl mx-1">@Model.TotalCount</span> tour phù hợp</p>
         </div>
-        <form asp-action="Index" method="get" class="flex items-center gap-4 text-on-surface-variant">
+        <form asp-action="Index" method="get" class="flex items-center gap-2 text-on-surface-variant bg-surface p-2 px-5 rounded-full border border-outline-variant/30 shadow-sm transition-all hover:shadow-md">
             <input type="hidden" name="search" value="@Model.SearchKeyword" />
-            <span class="font-label-lg text-label-lg whitespace-nowrap">Sắp xếp theo:</span>
-            <select name="sortBy" onchange="this.form.submit()" class="bg-transparent border-none font-label-lg text-label-lg text-primary font-bold cursor-pointer outline-none focus:ring-0 py-1 pl-2 pr-8 m-0 w-auto appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DFA974%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem top 50%; background-size: 0.65rem auto;">
-                <option value="">Phổ biến nhất</option>
+            <input type="hidden" name="tourDate" value="@Model.TourDate?.ToString("yyyy-MM-dd")" />
+            
+            <span class="material-symbols-outlined text-on-surface-variant/70 text-[20px]">sort</span>
+            <span class="font-label-md text-label-md whitespace-nowrap text-on-surface-variant/70 hidden sm:inline-block">Sắp xếp theo:</span>
+            
+            <select name="sortBy" onchange="this.form.submit()" class="bg-transparent border-none font-label-md text-label-md text-primary font-bold cursor-pointer outline-none focus:ring-0 py-1 pl-1 pr-6 m-0 w-auto appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DFA974%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.25rem top 50%; background-size: 0.65rem auto;">
+                <option value="">Mặc định</option>
+                @if(Model.SortBy == "rating_desc") { <option value="rating_desc" selected>Sao: Cao đến thấp</option> } else { <option value="rating_desc">Sao: Cao đến thấp</option> }
+                @if(Model.SortBy == "rating_asc") { <option value="rating_asc" selected>Sao: Thấp đến cao</option> } else { <option value="rating_asc">Sao: Thấp đến cao</option> }
+                @if(Model.SortBy == "schedules_desc") { <option value="schedules_desc" selected>Lịch trình: Nhiều nhất</option> } else { <option value="schedules_desc">Lịch trình: Nhiều nhất</option> }
                 @if(Model.SortBy == "price_asc") { <option value="price_asc" selected>Giá: Thấp đến Cao</option> } else { <option value="price_asc">Giá: Thấp đến Cao</option> }
                 @if(Model.SortBy == "price_desc") { <option value="price_desc" selected>Giá: Cao đến Thấp</option> } else { <option value="price_desc">Giá: Cao đến Thấp</option> }
             </select>
@@ -60,8 +96,15 @@
                                 <div class="absolute top-4 left-4 bg-primary-container/90 backdrop-blur-md text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm uppercase">@tour.Location</div>
                             }
                             <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
-                                <span class="material-symbols-outlined text-primary fill-icon text-[16px]">star</span>
-                                <span class="font-bold text-label-sm text-on-surface">@(tour.AverageRating > 0 ? tour.AverageRating.ToString("F1") : "4.9")</span>
+                                @if (tour.AverageRating > 0)
+                                {
+                                    <span class="material-symbols-outlined text-primary fill-icon text-[16px]">star</span>
+                                    <span class="font-bold text-label-sm text-on-surface">@tour.AverageRating.ToString("F1")</span>
+                                }
+                                else
+                                {
+                                    <span class="font-bold text-label-sm text-on-surface whitespace-nowrap px-1">Chưa có đánh giá</span>
+                                }
                             </div>
                         </div>
                         <div class="p-6 flex flex-col flex-grow">
@@ -75,13 +118,13 @@
                                     <span>@(tour.DurationHours >= 24 ? $"{tour.DurationHours/24} ngày" : $"{tour.DurationHours} giờ")</span>
                                 </div>
                                 <div class="flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-outline">groups</span>
-                                    <span>Còn @tour.TotalAvailableSlots chỗ</span>
+                                    <span class="material-symbols-outlined text-outline">event_available</span>
+                                    <span>@tour.UpcomingScheduleCount lịch trình</span>
                                 </div>
                             </div>
                             <div class="pt-6 border-t border-outline-variant/20 flex justify-between items-center">
                                 <div>
-                                    <p class="text-label-sm text-on-surface-variant uppercase mb-1 tracking-tight">Giá từ</p>
+                                    <p class="text-label-sm text-on-surface-variant uppercase mb-1 tracking-tight">Giá mỗi người</p>
                                     <p class="text-headline-sm text-primary font-bold">@tour.Price.ToString("N0")đ</p>
                                 </div>
                                 <a asp-action="Details" asp-route-id="@tour.TourId" class="border border-secondary text-secondary px-5 py-2 rounded-lg font-label-lg text-label-lg hover:bg-secondary hover:text-white transition-all">Chi tiết</a>
@@ -99,7 +142,7 @@
                         @if (Model.CurrentPage > 1)
                         {
                             <li>
-                                <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage - 1 })" aria-label="Previous" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">
+                                <a href="@Url.Action("Index", new { search = Model.SearchKeyword, tourDate = Model.TourDate?.ToString("yyyy-MM-dd"), sortBy = Model.SortBy, page = Model.CurrentPage - 1 })" aria-label="Previous" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -112,7 +155,7 @@
                             if (startPage > 1)
                             {
                                 <li>
-                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = 1 })" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">1</a>
+                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, tourDate = Model.TourDate?.ToString("yyyy-MM-dd"), sortBy = Model.SortBy, page = 1 })" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">1</a>
                                 </li>
                                 if (startPage > 2)
                                 {
@@ -123,7 +166,7 @@
                             for (int i = startPage; i <= endPage; i++)
                             {
                                 <li>
-                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = i })" class="flex items-center justify-center w-10 h-10 rounded-lg @(i == Model.CurrentPage ? "bg-primary text-on-primary font-bold shadow-md" : "border border-outline-variant/30 text-primary hover:bg-primary/10") transition-colors">@i</a>
+                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, tourDate = Model.TourDate?.ToString("yyyy-MM-dd"), sortBy = Model.SortBy, page = i })" class="flex items-center justify-center w-10 h-10 rounded-lg @(i == Model.CurrentPage ? "bg-primary text-on-primary font-bold shadow-md" : "border border-outline-variant/30 text-primary hover:bg-primary/10") transition-colors">@i</a>
                                 </li>
                             }
 
@@ -134,7 +177,7 @@
                                     <li><span class="flex items-center justify-center w-10 h-10 text-on-surface-variant">...</span></li>
                                 }
                                 <li>
-                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.TotalPages })" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">@Model.TotalPages</a>
+                                    <a href="@Url.Action("Index", new { search = Model.SearchKeyword, tourDate = Model.TourDate?.ToString("yyyy-MM-dd"), sortBy = Model.SortBy, page = Model.TotalPages })" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">@Model.TotalPages</a>
                                 </li>
                             }
                         }
@@ -142,7 +185,7 @@
                         @if (Model.CurrentPage < Model.TotalPages)
                         {
                             <li>
-                                <a href="@Url.Action("Index", new { search = Model.SearchKeyword, sortBy = Model.SortBy, page = Model.CurrentPage + 1 })" aria-label="Next" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">
+                                <a href="@Url.Action("Index", new { search = Model.SearchKeyword, tourDate = Model.TourDate?.ToString("yyyy-MM-dd"), sortBy = Model.SortBy, page = Model.CurrentPage + 1 })" aria-label="Next" class="flex items-center justify-center w-10 h-10 rounded-lg border border-outline-variant/30 text-primary hover:bg-primary/10 transition-colors">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>

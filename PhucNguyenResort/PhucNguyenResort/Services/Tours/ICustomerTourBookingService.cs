@@ -13,7 +13,7 @@ namespace PhucNguyenResort.Services.Tours
         /// <summary>
         /// Get all active tours for customer browsing with optional search/sort.
         /// </summary>
-        Task<TourListVM> GetTourListAsync(string? searchKeyword, string? sortBy, int page = 1, int pageSize = 9);
+        Task<TourListVM> GetTourListAsync(string? searchKeyword, DateTime? tourDate, string? sortBy, int page = 1, int pageSize = 9);
 
         /// <summary>
         /// Get tour detail with upcoming schedules.

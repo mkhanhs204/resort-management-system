@@ -67,7 +67,12 @@
         <div class="row mb-5">
             <div class="col-md-6">
                 <label asp-for="Password" class="form-label">Mật khẩu ban đầu</label>
-                <input asp-for="Password" class="form-control" placeholder="Thiết lập mật khẩu..." type="password" />
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input asp-for="Password" class="form-control" style="padding-right: 40px;" placeholder="Thiết lập mật khẩu..." type="password" id="Password" />
+                    <button type="button" class="toggle-password text-muted" data-target="Password" style="position: absolute; right: 10px; border: none; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 10; cursor: pointer; outline: none;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                    </button>
+                </div>
                 <span asp-validation-for="Password" class="text-danger mt-1 d-block" style="font-size: 13px;"></span>
             </div>
             <div class="col-md-6 mt-4 mt-md-0">
@@ -89,4 +94,21 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const icon = this.querySelector('.material-symbols-outlined');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = 'visibility_off';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = 'visibility';
+                }
+            });
+        });
+    </script>
 }

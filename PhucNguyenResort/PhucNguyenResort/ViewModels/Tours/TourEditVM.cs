@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace PhucNguyenResort.ViewModels.Tours
 {
@@ -29,5 +31,16 @@ namespace PhucNguyenResort.ViewModels.Tours
 
         [StringLength(255)]
         public string? ImageUrl { get; set; }
+
+        public IFormFile? ImageUpload { get; set; }
+
+        public List<IFormFile>? NewGalleryImages { get; set; }
+        public List<TourImageVM> ExistingGalleryImages { get; set; } = new();
+    }
+
+    public class TourImageVM
+    {
+        public int ImageId { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
     }
 }
