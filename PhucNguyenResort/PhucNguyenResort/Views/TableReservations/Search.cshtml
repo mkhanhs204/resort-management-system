@@ -129,7 +129,7 @@
                             <div class="relative h-64 overflow-hidden">
                                 @if (!string.IsNullOrWhiteSpace(table.ImageUrl))
                                 {
-                                    <img src="@table.ImageUrl" alt="@table.TableName" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='/images/placeholder.jpg'" />
+                                    <img src="@table.ImageUrl" alt="@table.TableName" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.onerror=null;this.src='https://placehold.co/400x300?text=No+Image'" />
                                 }
                                 else
                                 {

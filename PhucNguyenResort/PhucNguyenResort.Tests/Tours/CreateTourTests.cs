@@ -16,7 +16,7 @@ namespace PhucNguyenResort.Tests.Tours
         public CreateTourTests()
         {
             _mockTourService = new Mock<ITourCatalogService>();
-            _controller = new ToursController(_mockTourService.Object, null!);
+            _controller = new ToursController(_mockTourService.Object, null!, null!);
         }
 
         [Fact]
