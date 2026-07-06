@@ -1,0 +1,183 @@
+@model PhucNguyenResort.ViewModels.Dashboard.FinancialReportViewModel
+@{
+    string titlePeriod = (Model.Month == 0 || Model.Year == 0) ? "Toàn Thời Gian" : $"Tháng {Model.Month}/{Model.Year}";
+    ViewData["Title"] = "Báo Cáo Tài Chính - " + titlePeriod;
+    Layout = "_DashboardLayout";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #805528; margin-bottom: 4px; }
+        .page-subtitle { font-family: 'Inter', sans-serif; color: #50453b; font-size: 16px; margin-bottom: 24px; }
+        
+        .top-bar-luxury { background: #ffffff; border-radius: 12px; padding: 16px 24px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.05); border: 1px solid rgba(212, 195, 182, 0.3); display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+        
+        /* Filter Form */
+        .filter-form { display: flex; align-items: center; gap: 12px; }
+        .filter-form select { font-family: 'Inter', sans-serif; padding: 8px 16px; border: 1px solid #d4c3b6; border-radius: 8px; color: #50453b; background-color: #fcf9f5; font-size: 14px; font-weight: 500; outline: none; }
+        .filter-form select:focus { border-color: #805528; }
+        
+        .btn-luxury { background-color: #805528; color: #ffffff; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 8px 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; border: none; font-size: 14px; }
+        .btn-luxury:hover { background-color: #633d11; color: #ffffff; text-decoration: none; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(128, 85, 40, 0.2); }
+        
+        .btn-outline-luxury { background-color: transparent; color: #805528; border: 1.5px solid #dfa974; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 8px 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; font-size: 14px; }
+        .btn-outline-luxury:hover { background-color: #f6f3ef; color: #633d11; text-decoration: none; }
+        
+        .btn-pdf { color: #ba1a1a; border-color: #ba1a1a; }
+        .btn-pdf:hover { background-color: #ffdad6; color: #ba1a1a; }
+        
+        .btn-excel { color: #0b5c2d; border-color: #0b5c2d; }
+        .btn-excel:hover { background-color: #e2f5ea; color: #0b5c2d; }
+        
+        /* KPI Cards */
+        .kpi-card { background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 12px 24px -8px rgba(30, 41, 59, 0.05); border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; height: 100%; transition: all 0.3s ease; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 20px 32px -8px rgba(30, 41, 59, 0.1); }
+        .kpi-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; color: #50453b; font-size: 15px; font-weight: 600; }
+        .kpi-header .material-symbols-outlined { color: #dfa974; }
+        .kpi-card h3 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px; }
+        
+        /* Highlight Total Revenue */
+        .kpi-card.total-revenue { background: linear-gradient(135deg, #fcf9f5 0%, #f6f3ef 100%); border: 1px solid #dfa974; }
+        .kpi-card.total-revenue h3 { color: #805528; }
+        .kpi-card.total-revenue .kpi-header .material-symbols-outlined { color: #805528; }
+
+        /* Table */
+        .table-container { background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 12px 24px -8px rgba(30, 41, 59, 0.05); border: 1px solid rgba(212, 195, 182, 0.3); margin-top: 32px; }
+        .section-header { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #805528; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+        
+        .table-luxury { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; }
+        .table-luxury th { background-color: #fcf9f5; color: #805528; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 16px; border-bottom: 2px solid rgba(212, 195, 182, 0.3); text-align: right; }
+        .table-luxury th:first-child { text-align: center; }
+        .table-luxury td { padding: 16px; border-bottom: 1px solid #f0ede9; color: #1c1c1a; font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+        .table-luxury td:first-child { text-align: center; font-weight: 500; color: #50453b; }
+        .table-luxury tbody tr:hover { background-color: #faf8f5; }
+        
+        .total-row td { background-color: #f6f3ef; font-weight: 700; color: #805528; font-size: 15px; border-bottom: none; border-top: 2px solid #dfa974; }
+        .total-row td:first-child { text-align: right; text-transform: uppercase; }
+
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 24px; vertical-align: middle; }
+    </style>
+}
+
+<div class="mb-4">
+    <a asp-action="Manager" class="btn-outline-luxury mb-4" style="border: none; padding-left: 0; background: transparent;">
+        <span class="material-symbols-outlined">arrow_back</span> Quay lại Bảng điều khiển
+    </a>
+    <h2 class="page-title">Báo Cáo Tài Chính @(Model.Month == 0 ? "Toàn Thời Gian" : "Tháng")</h2>
+    <p class="page-subtitle">Báo cáo doanh thu chi tiết theo @(Model.Month == 0 ? "tháng" : "ngày") và nguồn thu</p>
+</div>
+
+<div class="top-bar-luxury">
+    <form asp-action="FinancialReport" method="get" class="filter-form">
+        <label style="font-family: 'Inter', sans-serif; font-weight: 500; color: #50453b;">Kỳ Báo Cáo:</label>
+        <select name="month">
+            <option value="0" selected="@(Model.Month == 0)">All-Time</option>
+            @for (int i = 1; i <= 12; i++)
+            {
+                if (i == Model.Month) { <option value="@i" selected>Tháng @i</option> }
+                else { <option value="@i">Tháng @i</option> }
+            }
+        </select>
+        <select name="year">
+            <option value="0" selected="@(Model.Year == 0)">All-Time</option>
+            @for (int y = 2023; y <= DateTime.Now.Year + 1; y++)
+            {
+                if (y == Model.Year) { <option value="@y" selected>Năm @y</option> }
+                else { <option value="@y">Năm @y</option> }
+            }
+        </select>
+        <button type="submit" class="btn-luxury">
+            <span class="material-symbols-outlined" style="font-size: 18px;">filter_alt</span> Lọc
+        </button>
+    </form>
+    
+    <div style="display: flex; gap: 12px;">
+        <a href="@Url.Action("ExportExcel", new { month = Model.Month, year = Model.Year })" class="btn-outline-luxury btn-excel">
+            <span class="material-symbols-outlined" style="font-size: 20px;">table</span> Xuất Excel
+        </a>
+        <a href="@Url.Action("ExportPdf", new { month = Model.Month, year = Model.Year })" class="btn-outline-luxury btn-pdf">
+            <span class="material-symbols-outlined" style="font-size: 20px;">picture_as_pdf</span> Xuất PDF
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="kpi-card total-revenue">
+            <div class="kpi-header">
+                <span class="material-symbols-outlined">account_balance</span>
+                TỔNG DOANH THU
+            </div>
+            <h3>@Model.TotalRevenue.ToString("N0") ₫</h3>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="material-symbols-outlined">bedroom_parent</span>
+                DOANH THU PHÒNG
+            </div>
+            <h3>@Model.TotalRoomRevenue.ToString("N0") ₫</h3>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="material-symbols-outlined">restaurant</span>
+                DOANH THU F&B
+            </div>
+            <h3>@Model.TotalFnBRevenue.ToString("N0") ₫</h3>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="material-symbols-outlined">map</span>
+                DOANH THU TOUR
+            </div>
+            <h3>@Model.TotalTourRevenue.ToString("N0") ₫</h3>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <h5 class="section-header">
+        <span class="material-symbols-outlined">calendar_month</span> Chi Tiết Doanh Thu Theo @(Model.Month == 0 ? "Tháng" : "Ngày")
+    </h5>
+    
+    <div style="overflow-x: auto;">
+        <table class="table-luxury">
+            <thead>
+                <tr>
+                    <th style="width: 100px;">@(Model.Month == 0 ? "Tháng" : "Ngày")</th>
+                    <th>Doanh Thu Phòng</th>
+                    <th>Doanh Thu F&B</th>
+                    <th>Doanh Thu Tour</th>
+                    <th style="color: #1c1c1a; font-weight: 700;">Tổng Cộng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var day in Model.DailyRevenues)
+                {
+                    <tr>
+                        <td>@(Model.Month == 0 ? day.Date.ToString("MM/yyyy") : day.Date.ToString("dd/MM/yyyy"))</td>
+                        <td>@day.RoomRevenue.ToString("N0")</td>
+                        <td>@day.FnBRevenue.ToString("N0")</td>
+                        <td>@day.TourRevenue.ToString("N0")</td>
+                        <td style="font-weight: 600; color: #805528;">@day.TotalRevenue.ToString("N0")</td>
+                    </tr>
+                }
+                
+                <tr class="total-row">
+                    <td>TỔNG CỘNG</td>
+                    <td>@Model.TotalRoomRevenue.ToString("N0")</td>
+                    <td>@Model.TotalFnBRevenue.ToString("N0")</td>
+                    <td>@Model.TotalTourRevenue.ToString("N0")</td>
+                    <td>@Model.TotalRevenue.ToString("N0") ₫</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
