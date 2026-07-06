@@ -5,185 +5,524 @@
     Layout = "_DashboardLayout";
 }
 
-<div class="container-fluid refund-container py-4">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef; /* surface-container-low */
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5; /* surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974; /* primary-container */
+            color: #633d11; /* on-primary-container */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury.outline {
+            background-color: transparent;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+        }
+        .btn-luxury.outline:hover {
+            background-color: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            box-shadow: none;
+        }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+            transition: all 0.2s;
+            background: transparent;
+            margin: 0 2px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .action-btn.large {
+            width: auto;
+            padding: 0 12px;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .action-btn:hover {
+            background: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            text-decoration: none;
+        }
+        .action-btn.delete:hover {
+            background: #ffdad6;
+            color: #ba1a1a;
+            border-color: #ba1a1a;
+        }
+        .action-btn.success:hover {
+            background: #e2f5ea;
+            color: #0b5c2d;
+            border-color: #0b5c2d;
+        }
+        .action-btn.info:hover {
+            background: #e1f5fe;
+            color: #0277bd;
+            border-color: #0277bd;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .luxury-badge.blue {
+            background-color: #d3e4fe;
+            color: #0b1c30;
+        }
+        .luxury-badge.warning {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+        .luxury-badge.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-badge.danger {
+            background-color: #ffdad6;
+            color: #ba1a1a;
+        }
+        .luxury-badge.info {
+            background-color: #e1f5fe;
+            color: #0277bd;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        
+        /* Alert Styling */
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-alert.error {
+            background-color: #ffdad6;
+            color: #93000a;
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-input {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #1c1c1a;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .filter-input:focus {
+            border-color: #dfa974;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(223, 169, 116, 0.2);
+        }
+        .input-group-luxury {
+            display: flex;
+            align-items: center;
+            background-color: #f6f3ef;
+            border-radius: 8px;
+            padding: 0 16px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .input-group-luxury:focus-within {
+            border-color: #dfa974;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(223, 169, 116, 0.2);
+        }
+        .input-group-luxury .material-symbols-outlined {
+            color: #827569;
+            font-size: 20px;
+        }
+        .input-group-luxury input {
+            border: none;
+            background: transparent;
+            padding: 10px 8px;
+            outline: none;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+    </style>
+}
+
+<div class="header-container mt-4">
+    <div>
+        <h2 class="page-title">
+            @ViewData["Title"]
+        </h2>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+        </div>
         @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
         {
-            <a asp-action="WalkInBooking" class="btn btn-primary shadow-sm"><i class="fa fa-plus"></i> Đặt Phòng Tại Quầy</a>
+            <a asp-action="WalkInBooking" class="btn-luxury" style="padding: 8px 16px; font-size: 14px;">
+                <span class="material-symbols-outlined" style="font-size: 20px;">add</span> Đặt Phòng Tại Quầy
+            </a>
         }
     </div>
+</div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    }
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="luxury-alert success alert-dismissible fade show" role="alert" id="alert-success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="luxury-alert error alert-dismissible fade show" role="alert" id="alert-error">
+        <span class="material-symbols-outlined fill">error</span>
+        <div>@TempData["Error"]</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    }
-
-    <div class="card premium-card mb-4">
-        <div class="card-body p-3">
-            <form asp-action="Index" method="get" class="m-0">
-                <div class="row gx-2 gy-2 align-items-center">
-                    <div class="col-md-3">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white text-muted"><i class="fa fa-search"></i></span>
-                            </div>
-                            <input type="text" name="searchString" value="@ViewBag.CurrentSearch" class="form-control border-left-0" placeholder="Mã BKG, Khách hàng, Email, Phòng..." />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white text-muted"><i class="fa fa-calendar"></i></span>
-                            </div>
-                            <input type="date" name="dateFilter" value="@ViewBag.CurrentDate" class="form-control border-left-0" title="Lọc theo ngày Check-in" />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <select name="statusFilter" class="form-control custom-select">
-                            <option value="">-- Tất cả trạng thái --</option>
-                            @foreach (PhucNguyenResort.Enums.BookingStatus status in Enum.GetValues(typeof(PhucNguyenResort.Enums.BookingStatus)))
-                            {
-                                if (ViewBag.CurrentStatus != null && (PhucNguyenResort.Enums.BookingStatus)ViewBag.CurrentStatus == status)
-                                {
-                                    <option value="@status" selected="selected">@status</option>
-                                }
-                                else
-                                {
-                                    <option value="@status">@status</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    <div class="col-md-3 d-flex" style="gap: 10px;">
-                        <button type="submit" class="btn btn-primary flex-grow-1"><i class="fa fa-filter"></i> Lọc</button>
-                        <a asp-action="Index" asp-route-clearFilter="true" class="btn btn-outline-secondary" title="Xóa bộ lọc (Xem tất cả)"><i class="fa fa-refresh"></i></a>
-                    </div>
+<div class="luxury-card mb-4" style="padding: 16px 24px;">
+    <form asp-action="Index" method="get" class="m-0">
+        <div class="filter-container">
+            <div style="flex: 1; min-width: 250px;">
+                <div class="input-group-luxury">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch" placeholder="Mã BKG, Khách hàng, Email, Phòng..." />
                 </div>
-            </form>
+            </div>
+            <div style="width: 200px;">
+                <div class="input-group-luxury">
+                    <span class="material-symbols-outlined">event</span>
+                    <input type="date" name="dateFilter" value="@ViewBag.CurrentDate" title="Lọc theo ngày Check-in" style="cursor: pointer;" />
+                </div>
+            </div>
+            <div style="width: 200px;">
+                <select name="statusFilter" class="filter-input" style="width: 100%;">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    @foreach (PhucNguyenResort.Enums.BookingStatus status in Enum.GetValues(typeof(PhucNguyenResort.Enums.BookingStatus)))
+                    {
+                        if (ViewBag.CurrentStatus != null && (PhucNguyenResort.Enums.BookingStatus)ViewBag.CurrentStatus == status)
+                        {
+                            <option value="@status" selected="selected">@status</option>
+                        }
+                        else
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-luxury" style="padding: 8px 24px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">filter_alt</span> Lọc
+                </button>
+                <a asp-action="Index" asp-route-clearFilter="true" class="btn-luxury outline" title="Xóa bộ lọc" style="padding: 8px 16px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; margin: 0;">refresh</span>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Đặt Phòng</span>
+            <span class="luxury-badge blue">@(Model?.Count() ?? 0)</span>
         </div>
     </div>
-
-    <div class="card premium-card mb-4">
-        <div class="premium-card-header d-flex align-items-center">
-            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;">
-                <i class="fa fa-calendar-check-o"></i>
-            </div>
-            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Danh Sách Đặt Phòng (Bookings)</h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table premium-table mb-0" width="100%" cellspacing="0">
-                    <thead>
+    
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="bookings-table">
+            <thead>
+                <tr>
+                    <th>BKG_ID</th>
+                    <th>Khách Hàng</th>
+                    <th>Phòng</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Cọc / Tổng</th>
+                    <th>Trạng Thái</th>
+                    @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
+                    {
+                        <th style="text-align: right;">Thao Tác</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
                         <tr>
-                            <th class="pl-4">BKG_ID</th>
-                            <th>Khách Hàng</th>
-                            <th>Phòng</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Cọc / Tổng</th>
-                            <th>Trạng Thái</th>
+                            <td><strong style="color: #1c1c1a; font-weight: 600;">#@item.BookingId</strong></td>
+                            <td>
+                                <strong style="color: #1c1c1a;">@item.User?.FullName</strong><br />
+                                <span style="color: #827569; font-size: 13px;">@item.User?.Email</span>
+                            </td>
+                            <td>
+                                <span class="luxury-badge" style="margin-bottom: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">meeting_room</span>
+                                    @(item.BookingDetails != null && item.BookingDetails.Any(bd => bd.Room != null) ? string.Join(", ", item.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : "Chưa xếp phòng")
+                                </span><br />
+                                <span style="color: #827569; font-size: 13px;">
+                                    @(item.BookingDetails != null ? string.Join(", ", item.BookingDetails.GroupBy(bd => bd.RoomCategory?.CategoryName).Select(g => $"{g.Count()}x {g.Key}")) : "")
+                                </span>
+                            </td>
+                            <td style="color: #50453b;">
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #827569;">login</span>
+                                    @item.CheckInDate.ToString("dd/MM/yyyy")
+                                </div>
+                            </td>
+                            <td style="color: #50453b;">
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #827569;">logout</span>
+                                    @item.CheckOutDate.ToString("dd/MM/yyyy")
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 500; color: #805528;">@item.DepositAmount?.ToString("N0")</div>
+                                <div style="color: #827569; font-size: 13px;">/ @item.TotalAmount?.ToString("N0")</div>
+                            </td>
+                            <td>
+                                @{
+                                    var badgeClass = item.BookingStatus switch
+                                    {
+                                        PhucNguyenResort.Enums.BookingStatus.Reserved => "warning",
+                                        PhucNguyenResort.Enums.BookingStatus.Arrived => "info",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedIn => "success",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedOut => "",
+                                        PhucNguyenResort.Enums.BookingStatus.Cancelled => "danger",
+                                        PhucNguyenResort.Enums.BookingStatus.NoShow => "danger",
+                                        _ => ""
+                                    };
+                                    var statusText = item.BookingStatus switch
+                                    {
+                                        PhucNguyenResort.Enums.BookingStatus.Reserved => "Reserved",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedIn => "Checked-in",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedOut => "Checked-out",
+                                        PhucNguyenResort.Enums.BookingStatus.Cancelled => "Cancelled",
+                                        PhucNguyenResort.Enums.BookingStatus.NoShow => "No-show",
+                                        _ => item.BookingStatus.ToString()
+                                    };
+                                    var iconName = item.BookingStatus switch
+                                    {
+                                        PhucNguyenResort.Enums.BookingStatus.Reserved => "schedule",
+                                        PhucNguyenResort.Enums.BookingStatus.Arrived => "flight_land",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedIn => "how_to_reg",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedOut => "done_all",
+                                        PhucNguyenResort.Enums.BookingStatus.Cancelled => "cancel",
+                                        PhucNguyenResort.Enums.BookingStatus.NoShow => "person_off",
+                                        _ => "info"
+                                    };
+                                }
+                                <span class="luxury-badge @badgeClass">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">@iconName</span> @statusText
+                                </span>
+                            </td>
                             @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
                             {
-                                <th class="pr-4 text-end">Thao Tác</th>
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <div style="display: flex; justify-content: flex-end; gap: 4px; flex-wrap: wrap; max-width: 250px; margin-left: auto;">
+                                        @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.PendingPayment || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived)
+                                        {
+                                            <a asp-action="CheckIn" asp-route-id="@item.BookingId" class="action-btn large success" title="@(item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived ? "Giao phòng" : "Check-in")">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">how_to_reg</span>
+                                                @(item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived ? "Giao phòng" : "Check-in")
+                                            </a>
+                                        }
+                                        @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedIn)
+                                        {
+                                            <a asp-action="CheckOut" asp-route-id="@item.BookingId" class="action-btn large delete" title="Check-out">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">logout</span> Check-out
+                                            </a>
+                                            <a asp-action="ExportManifest" asp-route-id="@item.BookingId" target="_blank" class="action-btn info" title="Báo Cáo Tạm Trú">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">description</span>
+                                            </a>
+                                        }
+                                        else if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedOut)
+                                        {
+                                            <a asp-action="PrintInvoice" asp-route-id="@item.BookingId" target="_blank" class="action-btn large" title="In Hóa Đơn">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">print</span> In Hóa Đơn
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="ExportManifest" asp-route-id="@item.BookingId" target="_blank" class="action-btn info" title="Báo Cáo Tạm Trú">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">description</span>
+                                            </a>
+                                        }
+                                        @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
+                                        {
+                                            <form asp-controller="Bookings" asp-action="Cancel" asp-route-id="@item.BookingId" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận hủy booking này?');">
+                                                <button type="submit" class="action-btn delete" title="Hủy Booking">
+                                                    <span class="material-symbols-outlined" style="font-size: 20px;">cancel</span>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
                             }
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="pl-4 fw-bold">#@item.BookingId</td>
-                                <td>
-                                    <strong>@item.User?.FullName</strong><br />
-                                    <span class="small text-muted">@item.User?.Email</span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-light border p-2">@(item.BookingDetails != null && item.BookingDetails.Any(bd => bd.Room != null) ? string.Join(", ", item.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room!.RoomNumber)) : "Chưa xếp phòng")</span><br />
-                                    <span class="small text-muted">@(item.BookingDetails != null ? string.Join(", ", item.BookingDetails.GroupBy(bd => bd.RoomCategory?.CategoryName).Select(g => $"{g.Count()}x {g.Key}")) : "")</span>
-                                </td>
-                                <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
-                                <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>
-                                <td>
-                                    @item.DepositAmount?.ToString("N0")<br />
-                                    <span class="small text-muted">/ @item.TotalAmount?.ToString("N0")</span>
-                                </td>
-                                <td>
-                                    @{
-                                        var badgeClass = item.BookingStatus switch
-                                        {
-                                            PhucNguyenResort.Enums.BookingStatus.Reserved => "badge-pastel-warning",
-                                            PhucNguyenResort.Enums.BookingStatus.Arrived => "badge-pastel-info",
-                                            PhucNguyenResort.Enums.BookingStatus.CheckedIn => "badge-pastel-success",
-                                            PhucNguyenResort.Enums.BookingStatus.CheckedOut => "badge-pastel-secondary",
-                                            PhucNguyenResort.Enums.BookingStatus.Cancelled => "badge-pastel-danger",
-                                            PhucNguyenResort.Enums.BookingStatus.NoShow => "badge-pastel-danger",
-                                            _ => "badge-pastel-secondary"
-                                        };
-                                        var statusText = item.BookingStatus switch
-                                        {
-                                            PhucNguyenResort.Enums.BookingStatus.Reserved => "Reserved",
-                                            PhucNguyenResort.Enums.BookingStatus.CheckedIn => "Checked-in",
-                                            PhucNguyenResort.Enums.BookingStatus.CheckedOut => "Checked-out",
-                                            PhucNguyenResort.Enums.BookingStatus.Cancelled => "Cancelled",
-                                            PhucNguyenResort.Enums.BookingStatus.NoShow => "No-show",
-                                            _ => item.BookingStatus.ToString()
-                                        };
-                                    }
-                                    <span class="badge @badgeClass">@statusText</span>
-                                </td>
-                                @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
-                                {
-                                    <td class="pr-4 text-end">
-                                        <div class="d-flex justify-content-end flex-wrap" style="gap: 5px;">
-                                            @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.PendingPayment || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived)
-                                            {
-                                                <a asp-action="CheckIn" asp-route-id="@item.BookingId" class="btn btn-sm btn-success">
-                                                    @(item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived ? "Giao phòng" : "Check-in")
-                                                </a>
-                                            }
-                                            @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedIn)
-                                            {
-                                                <a asp-action="CheckOut" asp-route-id="@item.BookingId" class="btn btn-sm btn-danger">Check-out</a>
-                                                <a asp-action="ExportManifest" asp-route-id="@item.BookingId" target="_blank" class="btn btn-sm btn-outline-info">Báo Cáo Tạm Trú</a>
-                                            }
-                                            else if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.CheckedOut)
-                                            {
-                                                <a asp-action="PrintInvoice" asp-route-id="@item.BookingId" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-print"></i> In Hóa Đơn</a>
-                                            }
-                                            else
-                                            {
-                                                <a asp-action="ExportManifest" asp-route-id="@item.BookingId" target="_blank" class="btn btn-sm btn-outline-info">Báo Cáo Tạm Trú</a>
-                                            }
-                                            @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved)
-                                            {
-                                                <form asp-controller="Bookings" asp-action="Cancel" asp-route-id="@item.BookingId" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận hủy booking này?');">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Hủy</button>
-                                                </form>
-                                            }
-                                        </div>
-                                    </td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">event_busy</span>
+                                <div>Không có đặt phòng nào.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alerts = document.querySelectorAll('#alert-success, #alert-error');
+            alerts.forEach(function (el) {
+                if (el) {
+                    el.style.transition = "opacity 0.5s ease";
+                    el.style.opacity = "0";
+                    setTimeout(() => el.remove(), 500);
+                }
+            });
+        }, 4000);
+        
+        // Handle dismiss buttons
+        document.querySelectorAll('.luxury-alert .close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var alert = this.closest('.luxury-alert');
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            });
+        });
+    </script>
+}

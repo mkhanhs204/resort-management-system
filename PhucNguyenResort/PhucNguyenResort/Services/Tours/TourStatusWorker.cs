@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,25 +40,26 @@ namespace PhucNguyenResort.Services.Tours
                             UPDATE TourBookings
                             SET BookingStatus = 'Completed'
                             FROM TourBookings b
-                            INNER JOIN TourSchedules s ON b.TourScheduleId = s.TourScheduleId
+                            INNER JOIN TourSchedules s ON b.ScheduleId = s.ScheduleId
+                            INNER JOIN Tours t ON s.TourId = t.TourId
                             WHERE b.BookingStatus = 'CheckedIn'
                             AND (
                                 s.TourDate < CAST(GETDATE() AS DATE) 
-                                OR (s.TourDate = CAST(GETDATE() AS DATE) AND s.EndTime <= CAST(GETDATE() AS TIME))
+                                OR (s.TourDate = CAST(GETDATE() AS DATE) AND DATEADD(hour, ISNULL(t.DurationHours, 0), s.StartTime) <= CAST(GETDATE() AS TIME))
                             )
                         ");
 
                         // --- HÀNH ĐỘNG 2: CẬP NHẬT TRẠNG THÁI TOURSCHEULES (LỊCH TRÌNH VẬN HÀNH TỔNG) ---
-                        // Giữ nguyên logic ban đầu của bạn nhưng đồng bộ mốc EndTime chuẩn xác
-                        await context.Database.ExecuteSqlRawAsync(@"
-                            UPDATE TourSchedules
-                            SET Status = 'Completed'
-                            WHERE Status != 'Completed' AND Status != 'Cancelled'
-                            AND (
-                                TourDate < CAST(GETDATE() AS DATE) 
-                                OR (TourDate = CAST(GETDATE() AS DATE) AND EndTime <= CAST(GETDATE() AS TIME))
-                            )
-                        ");
+                        // Bỏ qua vì TourSchedules không có cột Status trong Database (Status là NotMapped)
+                        // await context.Database.ExecuteSqlRawAsync(@""
+                        //     UPDATE TourSchedules
+                        //     SET Status = 'Completed'
+                        //     WHERE Status != 'Completed' AND Status != 'Cancelled'
+                        //     AND (
+                        //         TourDate < CAST(GETDATE() AS DATE) 
+                        //         OR (TourDate = CAST(GETDATE() AS DATE) AND EndTime <= CAST(GETDATE() AS TIME))
+                        //     )
+                        // "");
                     }
                 }
                 catch (Exception ex)

@@ -2,115 +2,352 @@
 @using PhucNguyenResort.Enums
 
 @{
-    ViewData["Title"] = "Create Dining Table";
+    ViewData["Title"] = "Thêm Bàn Ăn Mới";
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 }
 
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-lg-10 offset-lg-1">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fa fa-plus-circle mr-2"></i> @ViewData["Title"]</h4>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .form-control, .form-select {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #1c1c1a;
+            transition: all 0.2s;
+            box-shadow: none;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff;
+            border-color: #dfa974;
+            box-shadow: 0 0 0 4px rgba(223, 169, 116, 0.1);
+        }
+        .form-label {
+            color: #1c1c1a;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-secondary-luxury {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary-luxury:hover {
+            background-color: #e5e2de;
+            color: #1c1c1a;
+            text-decoration: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom Switch styling */
+        .custom-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .custom-switch-input {
+            width: 44px;
+            height: 24px;
+            background-color: #d4c3b6;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            outline: none;
+            flex-shrink: 0;
+            margin: 0;
+            transition: background-color 0.3s ease;
+        }
+        .custom-switch-input::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .custom-switch-input:checked {
+            background-color: #dfa974;
+        }
+        .custom-switch-input:checked::before {
+            transform: translateX(20px);
+        }
+        .custom-switch-input:focus {
+            box-shadow: 0 0 0 4px rgba(223, 169, 116, 0.2);
+        }
+        .custom-switch-label {
+            font-weight: 600;
+            color: #1c1c1a;
+            padding-left: 12px;
+            cursor: pointer;
+            margin-bottom: 0;
+            user-select: none;
+        }
+        /* Image Preview Box */
+        .image-preview-container {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            background-color: #f6f3ef;
+            border: 1px dashed #d4c3b6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .image-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .image-preview-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #a09386;
+            gap: 8px;
+        }
+        .image-preview-placeholder .material-symbols-outlined {
+            font-size: 48px;
+            color: #d4c3b6;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Thêm Bàn Ăn
+        </h2>
+        <p class="page-subtitle">Tạo thông tin bàn ăn mới cho khu vực nhà hàng.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-secondary-luxury">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<div class="luxury-card">
+    <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px;">
+        Thông Tin Bàn Ăn
+    </div>
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;" role="alert"></div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="TableNumber" class="form-label fw-bold">Mã Bàn <span class="text-danger">*</span></label>
+                        <input asp-for="TableNumber" class="form-control" placeholder="Ví dụ: T01, VIP-1" />
+                        <span asp-validation-for="TableNumber" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-8 mb-4">
+                        <label asp-for="TableName" class="form-label fw-bold">Tên Bàn <span class="text-danger">*</span></label>
+                        <input asp-for="TableName" class="form-control" placeholder="Ví dụ: Bàn hướng vườn" />
+                        <span asp-validation-for="TableName" class="text-danger small"></span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form asp-action="Create">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <h5 class="font-weight-bold mb-3">Basic Information</h5>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="TableNumber" class="form-label fw-bold"></label>
-                                <input asp-for="TableNumber" class="form-control" placeholder="e.g., T01, VIP-1" />
-                                <span asp-validation-for="TableNumber" class="text-danger"></span>
-                            </div>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="Capacity" class="form-label fw-bold">Sức chứa (người)</label>
+                        <input asp-for="Capacity" class="form-control" type="number" min="1" max="50" placeholder="1" />
+                        <span asp-validation-for="Capacity" class="text-danger small"></span>
+                    </div>
 
-                            <div class="col-md-8 mb-3">
-                                <label asp-for="TableName" class="form-label fw-bold"></label>
-                                <input asp-for="TableName" class="form-control" placeholder="e.g., Garden View Table" />
-                                <span asp-validation-for="TableName" class="text-danger"></span>
-                            </div>
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="Status" class="form-label fw-bold">Trạng thái</label>
+                        <div style="position: relative;">
+                            <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<DiningTableStatus>()">
+                            </select>
+                            <span class="material-symbols-outlined" style="position: absolute; right: 12px; top: 10px; pointer-events: none; color: #827569;">arrow_drop_down</span>
                         </div>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="Capacity" class="form-label fw-bold"></label>
-                                <input asp-for="Capacity" class="form-control" type="number" min="1" max="50" />
-                                <span asp-validation-for="Capacity" class="text-danger"></span>
-                            </div>
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="DisplayOrder" class="form-label fw-bold">Thứ tự hiển thị</label>
+                        <input asp-for="DisplayOrder" class="form-control" type="number" min="0" placeholder="0" />
+                        <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+                    </div>
+                </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="Status" class="form-label fw-bold"></label>
-                                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<DiningTableStatus>()">
-                                </select>
-                                <span asp-validation-for="Status" class="text-danger"></span>
-                            </div>
+                <div class="row mt-2">
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="Area" class="form-label fw-bold">Khu vực</label>
+                        <input asp-for="Area" class="form-control" placeholder="Trong nhà, Sân vườn..." />
+                        <span asp-validation-for="Area" class="text-danger small"></span>
+                    </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="DisplayOrder" class="form-label fw-bold"></label>
-                                <input asp-for="DisplayOrder" class="form-control" type="number" min="0" />
-                                <span asp-validation-for="DisplayOrder" class="text-danger"></span>
-                            </div>
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="TableType" class="form-label fw-bold">Loại bàn</label>
+                        <input asp-for="TableType" class="form-control" placeholder="Tiêu chuẩn, VIP..." />
+                        <span asp-validation-for="TableType" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <label asp-for="LocationNote" class="form-label fw-bold">Vị trí cụ thể</label>
+                        <input asp-for="LocationNote" class="form-control" placeholder="Gần cửa sổ..." />
+                        <span asp-validation-for="LocationNote" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label fw-bold">Mô tả dành cho khách hàng</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" maxlength="500" placeholder="Mô tả ngắn gọn về bàn để thu hút khách..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4 p-3" style="background-color: #f0ede9; border-radius: 8px;">
+                    <div class="custom-switch-wrapper">
+                        <input asp-for="IsReservable" class="custom-switch-input" type="checkbox" id="isReservableSwitch" checked />
+                        <label class="custom-switch-label" for="isReservableSwitch">Cho phép khách hàng đặt trước</label>
+                    </div>
+                    <div class="form-text mt-2" style="font-size: 13px; color: #50453b; margin-left: 56px;">Tắt tuỳ chọn này đối với bàn nội bộ, bàn sơ cua, hoặc bàn đang bảo trì không muốn khách hàng tự đặt.</div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="mb-4">
+                    <label asp-for="ImageUrl" class="form-label fw-bold">Đường dẫn hình ảnh</label>
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <img id="imagePreview" src="" alt="Preview" />
+                        <div class="image-preview-placeholder" id="imagePlaceholder">
+                            <span class="material-symbols-outlined">table_restaurant</span>
+                            <span style="font-size: 13px;">Chưa có ảnh</span>
                         </div>
-
-                        <hr />
-                        <h5 class="font-weight-bold mb-3">Customer Display</h5>
-                        <div class="mb-3">
-                            <label asp-for="ImageUrl" class="form-label fw-bold"></label>
-                            <input asp-for="ImageUrl" class="form-control" placeholder="/images/tables/table-01.jpg" />
-                            <small class="form-text text-muted">Use a public image path under wwwroot. If empty, customer UI will show a fallback icon.</small>
-                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label fw-bold"></label>
-                            <textarea asp-for="Description" class="form-control" rows="3" maxlength="500" placeholder="Short description shown to customers when choosing a table."></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="Area" class="form-label fw-bold"></label>
-                                <input asp-for="Area" class="form-control" placeholder="Indoor, Garden, Poolside..." />
-                                <span asp-validation-for="Area" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="TableType" class="form-label fw-bold"></label>
-                                <input asp-for="TableType" class="form-control" placeholder="Standard, Couple, Family, VIP..." />
-                                <span asp-validation-for="TableType" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="LocationNote" class="form-label fw-bold"></label>
-                                <input asp-for="LocationNote" class="form-control" placeholder="Near window, garden corner..." />
-                                <span asp-validation-for="LocationNote" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="custom-control custom-checkbox">
-                                <input asp-for="IsReservable" class="custom-control-input" />
-                                <label asp-for="IsReservable" class="custom-control-label fw-bold"></label>
-                            </div>
-                            <small class="form-text text-muted">Turn this off for staff-only, backup, or maintenance setup tables that should not appear in customer reservation search.</small>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="fa fa-arrow-left"></i> Back to List
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-save"></i> Create Table
-                            </button>
-                        </div>
-                    </form>
+                    </div>
+                    <input asp-for="ImageUrl" class="form-control" id="imageUrlInput" placeholder="/images/tables/table-01.jpg" />
+                    <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                    <div class="form-text mt-2" style="font-size: 12px; color: #827569;">Nhập URL hình ảnh. Nếu để trống, hệ thống sẽ hiển thị ảnh mặc định.</div>
                 </div>
             </div>
         </div>
-    </div>
+        
+        <hr style="border-color: #e5e2de; margin: 32px 0;" />
+        <div style="display: flex; gap: 16px;">
+            <button type="submit" class="btn-luxury">
+                <span class="material-symbols-outlined">save</span> Thêm Bàn Ăn
+            </button>
+            <a asp-action="Index" class="btn-secondary-luxury">
+                Hủy bỏ
+            </a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUrlInput = document.getElementById('imageUrlInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const imagePlaceholder = document.getElementById('imagePlaceholder');
+
+            function updateImagePreview() {
+                const url = imageUrlInput.value.trim();
+                if (url) {
+                    imagePreview.src = url;
+                    imagePreview.style.display = 'block';
+                    imagePlaceholder.style.display = 'none';
+                } else {
+                    imagePreview.src = '';
+                    imagePreview.style.display = 'none';
+                    imagePlaceholder.style.display = 'flex';
+                }
+            }
+
+            // Update on load if value exists
+            updateImagePreview();
+
+            // Update on input change
+            imageUrlInput.addEventListener('input', updateImagePreview);
+            
+            // Handle image load error
+            imagePreview.addEventListener('error', function() {
+                imagePreview.style.display = 'none';
+                imagePlaceholder.style.display = 'flex';
+                imagePlaceholder.innerHTML = '<span class="material-symbols-outlined" style="color: #ba1a1a;">broken_image</span><span style="font-size: 13px; color: #ba1a1a;">Ảnh lỗi</span>';
+            });
+            
+            // Reset placeholder on successful load
+            imagePreview.addEventListener('load', function() {
+                imagePlaceholder.innerHTML = '<span class="material-symbols-outlined">table_restaurant</span><span style="font-size: 13px;">Chưa có ảnh</span>';
+            });
+        });
+    </script>
 }

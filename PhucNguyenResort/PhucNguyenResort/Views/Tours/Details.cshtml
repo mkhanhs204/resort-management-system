@@ -225,17 +225,22 @@
         </div>
 
         <!-- Schedules summary -->
-        @if (Model?.TourSchedules != null && Model.TourSchedules.Any())
-        {
-            <div class="luxury-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="color: #805528;">calendar_month</span>
-                        <span style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #1c1c1a;">Lịch Trình Đang Mở</span>
-                    </div>
-                    <span class="luxury-badge">@Model.TourSchedules.Count</span>
+        <div class="luxury-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="color: #805528;">calendar_month</span>
+                    <span style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #1c1c1a;">Lịch Trình Đang Mở</span>
                 </div>
-                <div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="luxury-badge">@(Model?.TourSchedules?.Count ?? 0)</span>
+                    <a asp-controller="TourSchedules" asp-action="Create" asp-route-tourId="@Model?.TourId" class="btn-luxury" style="padding: 6px 16px; font-size: 14px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">add</span> Thêm
+                    </a>
+                </div>
+            </div>
+            <div>
+                @if (Model?.TourSchedules != null && Model.TourSchedules.Any())
+                {
                     <table class="luxury-table">
                         <thead>
                             <tr>
@@ -255,9 +260,15 @@
                             }
                         </tbody>
                     </table>
-                </div>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: 24px; background-color: #fcf9f5; border-radius: 8px; color: #827569;">
+                        <em>Chưa có lịch trình nào cho tour này.</em>
+                    </div>
+                }
             </div>
-        }
+        </div>
     </div>
 
     <!-- Right: Image -->

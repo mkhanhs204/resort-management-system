@@ -1,7 +1,7 @@
 @using PhucNguyenResort.Enums
 @model IReadOnlyList<PhucNguyenResort.ViewModels.TableReservations.TableReservationStaffListViewModel>
 @{
-    ViewData["Title"] = "Manage Table Reservations";
+    ViewData["Title"] = "Quản Lý Đặt Bàn";
     Layout = "_DashboardLayout";
     var selectedDate = ViewBag.SelectedDate as DateTime?;
     var selectedStatus = ViewBag.SelectedStatus as TableReservationStatus?;
@@ -10,86 +10,324 @@
     var emptyColspan = canManageReservationStatus ? 9 : 8;
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-calendar-check-o mr-2" style="color: #007bff;"></i> Manage Table Reservations
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">
-                    @(canManageReservationStatus ? "Review customer reservations and update their service status." : "Monitor customer table reservations across restaurant operations.")
-                </p>
-            </div>
-            <a asp-controller="Dashboard" asp-action="@backAction" class="btn btn-outline-secondary">
-                <i class="fa fa-arrow-left mr-1"></i> Back
-            </a>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528;
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef;
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury.outline {
+            background-color: transparent;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+        }
+        .btn-luxury.outline:hover {
+            background-color: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .luxury-badge.blue { background-color: #d3e4fe; color: #0b1c30; }
+        .luxury-badge.green { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-badge.orange { background-color: #ffe8d6; color: #9c4221; }
+        .luxury-badge.red { background-color: #ffdad6; color: #ba1a1a; }
+        .luxury-badge.grey { background-color: #e3e2e0; color: #44474e; }
+        .luxury-badge.purple { background-color: #eaddff; color: #21005d; }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        
+        /* Alert Styling */
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-alert.danger { background-color: #ffdad6; color: #ba1a1a; }
+        
+        .input-group-luxury {
+            display: flex;
+            align-items: center;
+            background: #f6f3ef;
+            border-radius: 8px;
+            padding: 2px 12px;
+            border: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .input-group-luxury:focus-within {
+            border-color: #dfa974;
+            background: #ffffff;
+        }
+        .input-group-luxury input, .input-group-luxury select {
+            border: none;
+            background: transparent;
+            outline: none;
+            padding: 6px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            color: #1c1c1a;
+        }
+        .input-group-luxury .material-symbols-outlined {
+            color: #827569;
+            font-size: 20px;
+        }
+        
+        /* Select wrapper to style dropdown arrow */
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .select-wrapper select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 32px;
+            cursor: pointer;
+        }
+        .select-wrapper::after {
+            content: 'expand_more';
+            font-family: 'Material Symbols Outlined';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #827569;
+            pointer-events: none;
+        }
+        
+        /* Mini action buttons for table rows */
+        .btn-mini {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-mini.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .btn-mini.success:hover { background-color: #d1ebd9; }
+        .btn-mini.info { background-color: #d3e4fe; color: #0b1c30; }
+        .btn-mini.info:hover { background-color: #c0d8fc; }
+        .btn-mini.primary { background-color: #dfa974; color: #633d11; }
+        .btn-mini.primary:hover { background-color: #d19a63; }
+        .btn-mini.dark { background-color: #e3e2e0; color: #44474e; }
+        .btn-mini.dark:hover { background-color: #d2d1cf; }
+        .btn-mini.danger { background-color: transparent; border: 1px solid #ffdad6; color: #ba1a1a; }
+        .btn-mini.danger:hover { background-color: #ffdad6; }
+        .btn-mini.warning { background-color: #ffe8d6; color: #9c4221; }
+        .btn-mini.warning:hover { background-color: #f7dac4; }
+    </style>
+}
+
+<div class="header-container mt-4">
+    <div>
+        <h2 class="page-title">
+            <span class="material-symbols-outlined" style="font-size: 32px; vertical-align: bottom; margin-right: 8px;">calendar_month</span>
+            Quản Lý Đặt Bàn
+        </h2>
+        <p class="page-subtitle">
+            @(canManageReservationStatus ? "Xem xét các yêu cầu đặt bàn và cập nhật trạng thái phục vụ." : "Theo dõi tình trạng đặt bàn của khách trong toàn hệ thống nhà hàng.")
+        </p>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined">today</span>
+            <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
         </div>
     </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fa fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fa fa-exclamation-triangle mr-2"></i> @TempData["ErrorMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+    <div class="luxury-alert success alert-dismissible fade show" role="alert" id="alert-success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer; opacity: 0.5;">
+            <span class="material-symbols-outlined">close</span>
         </button>
     </div>
 }
 
-<div class="card-box mb-4" style="border-left: 5px solid #007bff;">
-    <form asp-controller="Dashboard" asp-action="TableReservations" method="get" class="row align-items-end" style="font-family: 'Cabin', sans-serif;">
-        <div class="col-md-4 mb-2">
-            <label class="font-weight-bold">Reservation date</label>
-            <input type="date" name="date" value="@(selectedDate?.ToString("yyyy-MM-dd"))" class="form-control" />
-        </div>
-        <div class="col-md-4 mb-2">
-            <label class="font-weight-bold">Status</label>
-            <select name="status" class="form-control">
-                <option value="">All statuses</option>
-                @foreach (var status in Enum.GetValues<TableReservationStatus>())
-                {
-                    <option value="@status" selected="@(selectedStatus == status)">@status</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-4 mb-2">
-            <button type="submit" class="btn btn-primary mr-2">
-                <i class="fa fa-search mr-1"></i> Filter
-            </button>
-            <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-outline-secondary">
-                Clear
-            </a>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="luxury-alert danger alert-dismissible fade show" role="alert" id="alert-danger">
+        <span class="material-symbols-outlined fill">error</span>
+        <div>@TempData["ErrorMessage"]</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer; opacity: 0.5;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
+
+<div class="luxury-card" style="padding: 16px 24px; margin-bottom: 24px;">
+    <form asp-controller="Dashboard" asp-action="TableReservations" method="get">
+        <div class="row align-items-end">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <label style="font-size: 13px; font-weight: 600; color: #827569; margin-bottom: 8px; display: block;">Ngày Đặt Bàn</label>
+                <div class="input-group-luxury">
+                    <span class="material-symbols-outlined">calendar_today</span>
+                    <input type="date" name="date" value="@(selectedDate?.ToString("yyyy-MM-dd"))" />
+                </div>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <label style="font-size: 13px; font-weight: 600; color: #827569; margin-bottom: 8px; display: block;">Trạng Thái</label>
+                <div class="input-group-luxury">
+                    <span class="material-symbols-outlined">filter_list</span>
+                    <div class="select-wrapper">
+                        <select name="status">
+                            <option value="">Tất cả trạng thái</option>
+                            @foreach (var status in Enum.GetValues<TableReservationStatus>())
+                            {
+                                <option value="@status" selected="@(selectedStatus == status)">@status</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex" style="gap: 12px; flex-wrap: wrap;">
+                <button type="submit" class="btn-luxury" style="padding: 6px 20px; height: 36px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">search</span> Lọc
+                </button>
+                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn-luxury outline" style="padding: 6px 20px; height: 36px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">restart_alt</span> Làm Mới
+                </a>
+            </div>
         </div>
     </form>
 </div>
 
-<div class="card-box" style="border-top: 5px solid #007bff;">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle" style="font-family: 'Cabin', sans-serif;">
-            <thead class="bg-light">
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Đặt Bàn</span>
+            <span class="luxury-badge blue">@(Model?.Count ?? 0) Đơn</span>
+        </div>
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table class="luxury-table">
+            <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Guest</th>
-                    <th>Table</th>
-                    <th>Date & Time</th>
-                    <th>Party</th>
-                    <th>Status</th>
-                    <th>Billing</th>
-                    <th>Requests</th>
+                    <th>Mã Đơn</th>
+                    <th>Khách Hàng</th>
+                    <th>Bàn Ăn</th>
+                    <th>Thời Gian</th>
+                    <th>Số Khách</th>
+                    <th>Trạng Thái</th>
+                    <th>Thanh Toán</th>
+                    <th>Yêu Cầu Thêm</th>
                     @if (canManageReservationStatus)
                     {
-                        <th class="text-right">Action</th>
+                        <th style="text-align: right;">Thao Tác</th>
                     }
                 </tr>
             </thead>
@@ -97,8 +335,11 @@
                 @if (Model == null || !Model.Any())
                 {
                     <tr>
-                        <td colspan="@emptyColspan" class="text-center text-muted py-4">
-                            <i class="fa fa-inbox fa-2x mb-2"></i><br />No table reservations found.
+                        <td colspan="@emptyColspan" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">event_busy</span>
+                                <div>Không có đơn đặt bàn nào được tìm thấy.</div>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -108,168 +349,179 @@
                     {
                         <tr>
                             <td>
-                                <strong>@reservation.ReservationCode</strong>
-                                <br /><small class="text-muted">#@reservation.ReservationId</small>
+                                <div style="font-weight: 600; color: #1c1c1a; font-size: 15px;">@reservation.ReservationCode</div>
+                                <div style="color: #827569; font-size: 13px;">#@reservation.ReservationId</div>
                             </td>
                             <td>
-                                @reservation.CustomerName
+                                <div style="font-weight: 500; color: #1c1c1a;">@reservation.CustomerName</div>
                                 @if (!string.IsNullOrWhiteSpace(reservation.CustomerPhone))
                                 {
-                                    <br /><small class="text-muted">@reservation.CustomerPhone</small>
+                                    <div style="color: #827569; font-size: 13px; display: flex; align-items: center; gap: 4px;">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">call</span> @reservation.CustomerPhone
+                                    </div>
                                 }
                             </td>
                             <td>
-                                Table <strong>@reservation.TableNumber</strong>
-                                <br /><small class="text-muted">Capacity @reservation.Capacity</small>
+                                <div style="font-weight: 600; color: #1c1c1a;">Bàn @reservation.TableNumber</div>
+                                <div style="color: #827569; font-size: 13px;">Sức chứa: @reservation.Capacity</div>
                             </td>
                             <td>
-                                @reservation.ReservationDate.ToString("dd/MM/yyyy")
-                                <br /><small class="text-muted">@reservation.ReservationTime.ToString(@"hh\:mm") - @reservation.DurationMinutes min</small>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #827569;">calendar_month</span>
+                                    <span>@reservation.ReservationDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div style="color: #827569; font-size: 13px; display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                                    <span>@reservation.ReservationTime.ToString(@"hh\:mm") (@reservation.DurationMinutes phút)</span>
+                                </div>
                             </td>
-                            <td>@reservation.PartySize</td>
+                            <td>
+                                <span class="luxury-badge" style="background-color: transparent; border: 1px solid #d4c3b6;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">group</span> @reservation.PartySize Người
+                                </span>
+                            </td>
                             <td>
                                 @if (reservation.Status == TableReservationStatus.Pending)
                                 {
-                                    <span class="badge badge-warning">Pending</span>
+                                    <span class="luxury-badge orange"><span class="material-symbols-outlined" style="font-size: 14px;">pending</span> Chờ duyệt</span>
                                 }
                                 else if (reservation.Status == TableReservationStatus.Confirmed)
                                 {
-                                    <span class="badge badge-success">Confirmed</span>
+                                    <span class="luxury-badge green"><span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span> Đã xác nhận</span>
                                 }
                                 else if (reservation.Status == TableReservationStatus.Seated)
                                 {
-                                    <span class="badge badge-primary">Seated</span>
+                                    <span class="luxury-badge blue"><span class="material-symbols-outlined" style="font-size: 14px;">chair</span> Đã ngồi</span>
                                 }
                                 else if (reservation.Status == TableReservationStatus.Completed)
                                 {
-                                    <span class="badge badge-secondary">Completed</span>
+                                    <span class="luxury-badge grey"><span class="material-symbols-outlined" style="font-size: 14px;">done_all</span> Hoàn tất</span>
                                 }
                                 else if (reservation.Status == TableReservationStatus.NoShow)
                                 {
-                                    <span class="badge badge-dark">No Show</span>
+                                    <span class="luxury-badge purple"><span class="material-symbols-outlined" style="font-size: 14px;">person_off</span> Vắng mặt</span>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-danger">Cancelled</span>
+                                    <span class="luxury-badge red"><span class="material-symbols-outlined" style="font-size: 14px;">cancel</span> Đã hủy</span>
                                 }
                             </td>
-                            <td style="min-width: 210px;">
+                            <td style="min-width: 200px;">
                                 @if (!reservation.BookingId.HasValue)
                                 {
-                                    <span class="badge badge-light border text-muted">No room booking</span>
+                                    <span class="luxury-badge" style="background-color: #f6f3ef;">Khách vãng lai</span>
                                 }
                                 else if (reservation.IsChargedToRoom)
                                 {
-                                    <span class="badge badge-success">Charged</span>
-                                    <br />
-                                    <small class="text-muted">
-                                        @reservation.ChargedAmount.ToString("N0") VND
+                                    <span class="luxury-badge green"><span class="material-symbols-outlined" style="font-size: 14px;">receipt_long</span> Ghi nợ phòng</span>
+                                    <div style="color: #827569; font-size: 12px; margin-top: 4px;">
+                                        <strong>@reservation.ChargedAmount.ToString("N0") VND</strong>
                                         @if (reservation.ChargedAt.HasValue)
                                         {
-                                            <span> at @reservation.ChargedAt.Value.ToString("dd/MM HH:mm")</span>
+                                            <span style="display: block;">Lúc: @reservation.ChargedAt.Value.ToString("dd/MM HH:mm")</span>
                                         }
-                                    </small>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-light border text-muted">Pending checkout</span>
+                                    <span class="luxury-badge orange"><span class="material-symbols-outlined" style="font-size: 14px;">hourglass_empty</span> Chờ thanh toán</span>
                                 }
                                 @if (canManageReservationStatus && reservation.Status == TableReservationStatus.Seated)
                                 {
-                                    <br />
-                                    <a asp-controller="TableFoodOrders" asp-action="Checkout" asp-route-reservationId="@reservation.ReservationId" class="btn btn-sm btn-outline-warning mt-2">
-                                        <i class="fa fa-credit-card mr-1"></i> Checkout
-                                    </a>
+                                    <div style="margin-top: 8px;">
+                                        <a asp-controller="TableFoodOrders" asp-action="Checkout" asp-route-reservationId="@reservation.ReservationId" class="btn-mini warning">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">credit_card</span> Thanh Toán
+                                        </a>
+                                    </div>
                                 }
                             </td>
-                            <td style="max-width: 220px;">
+                            <td style="max-width: 200px;">
                                 @if (string.IsNullOrWhiteSpace(reservation.SpecialRequests))
                                 {
-                                    <span class="text-muted">None</span>
+                                    <span style="color: #b9aba0; font-style: italic;">Không có</span>
                                 }
                                 else
                                 {
-                                    <span>@reservation.SpecialRequests</span>
+                                    <div style="font-size: 13px; color: #50453b; line-height: 1.4;">@reservation.SpecialRequests</div>
                                 }
                             </td>
                             @if (canManageReservationStatus)
                             {
-                                <td class="text-right" style="min-width: 220px;">
-                                    @if (reservation.CanConfirm)
-                                    {
-                                        <form asp-controller="Dashboard" asp-action="ConfirmTableReservation" method="post" class="d-inline">
-                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
-                                            <button type="submit" class="btn btn-sm btn-success">
-                                                <i class="fa fa-check mr-1"></i> Confirm
-                                            </button>
-                                        </form>
-                                    }
-                                    @if (reservation.CanSeat)
-                                    {
-                                        <form asp-controller="Dashboard" asp-action="SeatTableReservation" method="post" class="d-inline ml-1">
-                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
-                                            <button type="submit" class="btn btn-sm btn-info">
-                                                <i class="fa fa-cutlery mr-1"></i> Seat
-                                            </button>
-                                        </form>
-                                    }
-                                    @if (reservation.CanComplete)
-                                    {
-                                        <form asp-controller="Dashboard" asp-action="CompleteTableReservation" method="post" class="d-inline ml-1">
-                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
-                                            <button type="submit" class="btn btn-sm btn-primary">
-                                                <i class="fa fa-flag-checkered mr-1"></i> Complete
-                                            </button>
-                                        </form>
-                                    }
-                                    else if (reservation.Status == TableReservationStatus.Seated)
-                                    {
-                                        <span class="badge badge-warning ml-1">Checkout required</span>
-                                    }
-                                    @if (reservation.Status == TableReservationStatus.Seated)
-                                    {
-                                        <a asp-controller="TableFoodOrders" asp-action="Create" asp-route-reservationId="@reservation.ReservationId" class="btn btn-sm btn-success ml-1">
-                                            <i class="fa fa-plus mr-1"></i> Order
-                                        </a>
-                                        <a asp-controller="TableFoodOrders" asp-action="ByReservation" asp-route-reservationId="@reservation.ReservationId" class="btn btn-sm btn-outline-primary ml-1">
-                                            <i class="fa fa-list mr-1"></i> Orders
-                                        </a>
-                                    }
-                                    @if (reservation.CanMarkNoShow)
-                                    {
-                                        <form asp-controller="Dashboard" asp-action="MarkTableReservationNoShow" method="post" class="d-inline ml-1" onsubmit="return confirm('Mark this reservation as no-show?');">
-                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
-                                            <button type="submit" class="btn btn-sm btn-dark">
-                                                <i class="fa fa-user-times mr-1"></i> No Show
-                                            </button>
-                                        </form>
-                                    }
-                                    else if (reservation.Status == TableReservationStatus.Confirmed && reservation.NoShowAvailableAt.HasValue)
-                                    {
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-secondary ml-1"
-                                                disabled
-                                                title="No-show is available after @reservation.NoShowAvailableAt.Value.ToString("dd/MM/yyyy HH:mm")">
-                                            <i class="fa fa-user-times mr-1"></i> No Show
-                                        </button>
-                                        <small class="text-muted d-block mt-1">
-                                            Available after @reservation.NoShowAvailableAt.Value.ToString("HH:mm")
-                                        </small>
-                                    }
-                                    @if (reservation.CanCancel)
-                                    {
-                                        <form asp-controller="Dashboard" asp-action="CancelTableReservation" method="post" class="d-inline ml-1" onsubmit="return confirm('Cancel this table reservation?');">
-                                            <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
-                                            <input type="hidden" name="reason" value="Cancelled by F&B staff" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="fa fa-times mr-1"></i> Cancel
-                                            </button>
-                                        </form>
-                                    }
-                                    @if (!reservation.CanConfirm && !reservation.CanSeat && !reservation.CanComplete && !reservation.CanMarkNoShow && !reservation.CanCancel)
-                                    {
-                                        <span class="text-muted">No action</span>
-                                    }
+                                <td style="text-align: right; min-width: 260px;">
+                                    <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px;">
+                                        @if (reservation.CanConfirm)
+                                        {
+                                            <form asp-controller="Dashboard" asp-action="ConfirmTableReservation" method="post" style="margin: 0;">
+                                                <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                                <button type="submit" class="btn-mini success" title="Xác nhận">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">check</span> Duyệt
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (reservation.CanSeat)
+                                        {
+                                            <form asp-controller="Dashboard" asp-action="SeatTableReservation" method="post" style="margin: 0;">
+                                                <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                                <button type="submit" class="btn-mini info" title="Đã xếp bàn">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">restaurant</span> Phục vụ
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (reservation.CanComplete)
+                                        {
+                                            <form asp-controller="Dashboard" asp-action="CompleteTableReservation" method="post" style="margin: 0;">
+                                                <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                                <button type="submit" class="btn-mini primary" title="Hoàn tất">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">flag</span> Xong
+                                                </button>
+                                            </form>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Seated)
+                                        {
+                                            <span class="luxury-badge orange" style="font-size: 11px;">Cần thanh toán</span>
+                                        }
+                                        @if (reservation.Status == TableReservationStatus.Seated)
+                                        {
+                                            <a asp-controller="TableFoodOrders" asp-action="Create" asp-route-reservationId="@reservation.ReservationId" class="btn-mini success" title="Gọi món">
+                                                <span class="material-symbols-outlined" style="font-size: 16px;">add</span> Gọi
+                                            </a>
+                                            <a asp-controller="TableFoodOrders" asp-action="ByReservation" asp-route-reservationId="@reservation.ReservationId" class="btn-mini info" title="Xem danh sách món">
+                                                <span class="material-symbols-outlined" style="font-size: 16px;">list</span> Xem
+                                            </a>
+                                        }
+                                        @if (reservation.CanMarkNoShow)
+                                        {
+                                            <form asp-controller="Dashboard" asp-action="MarkTableReservationNoShow" method="post" style="margin: 0;" onsubmit="return confirm('Đánh dấu khách vắng mặt?');">
+                                                <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                                <button type="submit" class="btn-mini dark" title="Vắng mặt">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">person_off</span> Vắng
+                                                </button>
+                                            </form>
+                                        }
+                                        else if (reservation.Status == TableReservationStatus.Confirmed && reservation.NoShowAvailableAt.HasValue)
+                                        {
+                                            <div style="text-align: right; width: 100%;">
+                                                <button type="button" class="btn-mini dark" disabled style="opacity: 0.5;" title="Vắng mặt sẽ khả dụng sau @reservation.NoShowAvailableAt.Value.ToString("dd/MM/yyyy HH:mm")">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">person_off</span> Vắng
+                                                </button>
+                                                <div style="font-size: 11px; color: #827569; margin-top: 4px;">Từ @reservation.NoShowAvailableAt.Value.ToString("HH:mm")</div>
+                                            </div>
+                                        }
+                                        @if (reservation.CanCancel)
+                                        {
+                                            <form asp-controller="Dashboard" asp-action="CancelTableReservation" method="post" style="margin: 0;" onsubmit="return confirm('Hủy đơn đặt bàn này?');">
+                                                <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                                                <input type="hidden" name="reason" value="Cancelled by F&B staff" />
+                                                <button type="submit" class="btn-mini danger" title="Hủy">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">close</span> Hủy
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (!reservation.CanConfirm && !reservation.CanSeat && !reservation.CanComplete && !reservation.CanMarkNoShow && !reservation.CanCancel && reservation.Status != TableReservationStatus.Seated)
+                                        {
+                                            <span style="color: #b9aba0; font-size: 13px; font-style: italic;">Không</span>
+                                        }
+                                    </div>
                                 </td>
                             }
                         </tr>
@@ -279,3 +531,28 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alerts = document.querySelectorAll('#alert-success, #alert-danger');
+            alerts.forEach(function (el) {
+                if (el) {
+                    el.style.transition = "opacity 0.5s ease";
+                    el.style.opacity = "0";
+                    setTimeout(() => el.remove(), 500);
+                }
+            });
+        }, 4000);
+        
+        // Handle dismiss buttons
+        document.querySelectorAll('.luxury-alert .btn-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var alert = this.closest('.luxury-alert');
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            });
+        });
+    </script>
+}

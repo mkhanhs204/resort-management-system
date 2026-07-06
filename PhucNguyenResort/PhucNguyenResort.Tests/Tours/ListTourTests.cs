@@ -14,7 +14,7 @@ namespace PhucNguyenResort.Tests.Tours
         {
             // Arrange
             var mockTourService = new Mock<ITourCatalogService>();
-            var controller = new ToursController(mockTourService.Object, null!);
+            var controller = new ToursController(mockTourService.Object, null!, null!);
             var tours = new List<Tour>
             {
                 new Tour { TourId = 1, TourName = "Tour 1" },

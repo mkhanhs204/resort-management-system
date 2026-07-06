@@ -1,62 +1,236 @@
 @model PhucNguyenResort.ViewModels.MenuCategories.MenuCategoryDetailViewModel
 
 @{
-    ViewData["Title"] = "Delete Menu Category";
+    ViewData["Title"] = "Xóa Danh Mục Thực Đơn";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container-fluid refund-container py-4">
-    <div class="row justify-content-center">
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .btn-luxury-danger {
+            background-color: #fff0f0;
+            color: #d32f2f;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: 1px solid #ffcdd2;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury-danger:hover:not(:disabled) {
+            background-color: #d32f2f;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury-danger:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary-luxury {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary-luxury:hover {
+            background-color: #e5e2de;
+            color: #1c1c1a;
+            text-decoration: none;
+        }
+        .alert-luxury {
+            background-color: #fff8e1;
+            border: 1px solid #ffecb3;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .alert-luxury .material-symbols-outlined {
+            color: #f57f17;
+            font-size: 32px;
+        }
+        .alert-luxury-content h4 {
+            color: #f57f17;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .alert-luxury-content p {
+            color: #50453b;
+            margin: 0;
+            font-size: 14px;
+        }
+        .alert-luxury-danger {
+            background-color: #fff0f0;
+            border: 1px solid #ffcdd2;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .alert-luxury-danger .material-symbols-outlined {
+            color: #d32f2f;
+            font-size: 32px;
+        }
+        .alert-luxury-danger-content h4 {
+            color: #d32f2f;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .alert-luxury-danger-content p {
+            color: #50453b;
+            margin: 0;
+            font-size: 14px;
+        }
+        .detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0ede9;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            width: 30%;
+            color: #50453b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .detail-value {
+            width: 70%;
+            color: #1c1c1a;
+            font-weight: 500;
+            font-size: 15px;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">Xóa Danh Mục</h2>
+        <p class="page-subtitle">Xác nhận xóa danh mục thực đơn khỏi hệ thống.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-secondary-luxury">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert-luxury-danger alert-dismissible fade show" role="alert">
+        <span class="material-symbols-outlined">error</span>
+        <div class="alert-luxury-danger-content">
+            <h4>Lỗi!</h4>
+            <p>@TempData["ErrorMessage"]</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="margin-left: auto;"></button>
+    </div>
+}
+
+<div class="alert-luxury">
+    <span class="material-symbols-outlined">warning</span>
+    <div class="alert-luxury-content">
+        <h4>Bạn có chắc chắn muốn xóa danh mục này?</h4>
+        <p>Hành động này không thể hoàn tác.</p>
+    </div>
+</div>
+
+<div class="luxury-card">
+    <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined" style="color: #d32f2f;">delete_forever</span> Đang xóa: @Model.CategoryName
+    </div>
+    
+    <div class="row">
         <div class="col-md-8">
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
-                    <i class="fa fa-exclamation-circle mr-2"></i> @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-
-            <div class="alert alert-warning shadow-sm mb-4" role="alert">
-                <h4 class="alert-heading"><i class="fa fa-exclamation-triangle"></i> Are you sure?</h4>
-                <p>Are you sure you want to delete the category <strong>@Model.CategoryName</strong>?</p>
-                <hr>
-                <p class="mb-0 text-muted small">This action cannot be undone.</p>
+            <div class="detail-row">
+                <div class="detail-label">Tên Danh Mục</div>
+                <div class="detail-value fw-bold fs-5">@Model.CategoryName</div>
             </div>
-
-            <div class="card premium-card shadow-sm mb-4 border-danger">
-                <div class="premium-card-header bg-danger text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0 text-white"><i class="fa fa-trash mr-2"></i> Delete Menu Category</h4>
-                    <a asp-action="Index" class="btn btn-sm btn-light text-danger fw-bold"><i class="fa fa-arrow-left"></i> Back to List</a>
-                </div>
-                <div class="card-body p-4">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4 text-muted">Category name</dt>
-                        <dd class="col-sm-8 fw-bold">@Model.CategoryName</dd>
-
-                        <dt class="col-sm-4 text-muted">Menu items</dt>
-                        <dd class="col-sm-8">
-                            <span class="badge badge-light border p-2">@Model.MenuItemCount items</span>
-                            @if (Model.MenuItemCount > 0)
-                            {
-                                <div class="text-danger mt-2 small"><i class="fa fa-info-circle"></i> You cannot delete a category that still has menu items.</div>
-                            }
-                        </dd>
-                    </dl>
-                </div>
-                <div class="card-footer bg-light p-3">
-                    <form asp-action="DeleteConfirmed" asp-route-id="@Model.CategoryId" method="post" class="d-flex gap-2 justify-content-end">
-                        @Html.AntiForgeryToken()
-                        @if (Model.MenuItemCount > 0)
-                        {
-                            <button type="button" class="btn btn-danger" disabled><i class="fa fa-trash"></i> Delete Category</button>
-                        }
-                        else
-                        {
-                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Delete Category</button>
-                        }
-                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-                    </form>
+            
+            <div class="detail-row">
+                <div class="detail-label">Số Lượng Món Ăn</div>
+                <div class="detail-value">
+                    <span style="display: inline-block; padding: 4px 12px; background-color: #f0ede9; border: 1px solid #d4c3b6; border-radius: 999px; font-size: 13px; font-weight: 600;">
+                        @Model.MenuItemCount món
+                    </span>
+                    @if (Model.MenuItemCount > 0)
+                    {
+                        <div style="color: #d32f2f; margin-top: 8px; font-size: 13px; display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">info</span> 
+                            Bạn không thể xóa danh mục đang có món ăn.
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
+    
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.CategoryId" method="post" class="mt-4 pt-4 border-top" style="display: flex; gap: 16px; border-color: #e5e2de !important;">
+        @Html.AntiForgeryToken()
+        @if (Model.MenuItemCount > 0)
+        {
+            <button type="button" class="btn-luxury-danger" disabled>
+                <span class="material-symbols-outlined">delete</span> Xác Nhận Xóa
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn-luxury-danger">
+                <span class="material-symbols-outlined">delete</span> Xác Nhận Xóa
+            </button>
+        }
+        <a asp-action="Index" class="btn-secondary-luxury">
+            Hủy bỏ
+        </a>
+    </form>
 </div>

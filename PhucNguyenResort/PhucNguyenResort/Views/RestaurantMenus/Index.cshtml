@@ -1,106 +1,412 @@
 @model PhucNguyenResort.ViewModels.RestaurantMenus.MenuItemIndexViewModel
 
 @{
-    ViewData["Title"] = "Restaurant Menu";
+    ViewData["Title"] = "Quản Lý Món Ăn";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container-fluid refund-container py-4">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
-        <a asp-action="Create" class="btn btn-premium-action btn-primary shadow-sm">
-            <i class="fa fa-plus-circle"></i> Add menu item
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef; /* surface-container-low */
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5; /* surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974; /* primary-container */
+            color: #633d11; /* on-primary-container */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury.outline {
+            background-color: transparent;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+        }
+        .btn-luxury.outline:hover {
+            background-color: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            box-shadow: none;
+        }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+            transition: all 0.2s;
+            background: transparent;
+            margin: 0 2px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .action-btn.large {
+            width: auto;
+            padding: 0 12px;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .action-btn:hover {
+            background: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            text-decoration: none;
+        }
+        .action-btn.delete:hover {
+            background: #ffdad6;
+            color: #ba1a1a;
+            border-color: #ba1a1a;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .luxury-badge.blue {
+            background-color: #d3e4fe;
+            color: #0b1c30;
+        }
+        .luxury-badge.green {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-badge.orange {
+            background-color: #ffe8d6;
+            color: #9c4221;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        
+        /* Form & Input Styling */
+        .input-group-luxury {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #d4c3b6;
+            border-radius: 8px;
+            padding: 8px 16px;
+            transition: all 0.2s;
+        }
+        .input-group-luxury:focus-within {
+            border-color: #805528;
+            box-shadow: 0 0 0 3px rgba(128, 85, 40, 0.1);
+        }
+        .input-group-luxury .material-symbols-outlined {
+            color: #827569;
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        .input-luxury {
+            border: none;
+            background: transparent;
+            width: 100%;
+            color: #1c1c1a;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
+        .input-luxury::placeholder {
+            color: #a09386;
+        }
+        .select-luxury {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            color: #1c1c1a;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        /* Alert Styling */
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+    </style>
+}
+
+<div class="header-container mt-4">
+    <div>
+        <h2 class="page-title">
+            @ViewData["Title"]
+        </h2>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+        </div>
+        <a asp-action="Create" class="btn-luxury" style="padding: 8px 16px; font-size: 14px;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">add</span> Tạo Mới
         </a>
     </div>
+</div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="luxury-alert success alert-dismissible fade show" role="alert" id="alert-success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer; opacity: 0.5;">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+}
+
+<div class="luxury-card" style="margin-bottom: 24px;">
+    <form asp-action="Index" method="get">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label asp-for="SearchTerm" style="font-size: 13px; font-weight: 600; color: #50453b; margin-bottom: 8px; display: block;">Tìm theo tên món</label>
+                <div class="input-group-luxury">
+                    <span class="material-symbols-outlined">search</span>
+                    <input asp-for="SearchTerm" class="input-luxury" placeholder="Tên món ăn..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="CategoryId" style="font-size: 13px; font-weight: 600; color: #50453b; margin-bottom: 8px; display: block;">Danh mục</label>
+                <div class="input-group-luxury" style="position: relative;">
+                    <span class="material-symbols-outlined">category</span>
+                    <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="select-luxury">
+                        <option value="">Tất cả danh mục</option>
+                    </select>
+                    <span class="material-symbols-outlined" style="position: absolute; right: 12px; pointer-events: none;">arrow_drop_down</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="IsAvailable" style="font-size: 13px; font-weight: 600; color: #50453b; margin-bottom: 8px; display: block;">Trạng thái bán</label>
+                <div class="input-group-luxury" style="position: relative;">
+                    <span class="material-symbols-outlined">storefront</span>
+                    <select asp-for="IsAvailable" class="select-luxury">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="true">Đang bán</option>
+                        <option value="false">Hết hàng</option>
+                    </select>
+                    <span class="material-symbols-outlined" style="position: absolute; right: 12px; pointer-events: none;">arrow_drop_down</span>
+                </div>
+            </div>
+            <div class="col-md-2" style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-luxury" style="padding: 8px 16px; flex: 1; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">filter_alt</span> Lọc
+                </button>
+                <a asp-action="Index" class="btn-luxury outline" style="padding: 8px 12px; flex: 0 0 auto; justify-content: center;" title="Làm mới">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span>
+                </a>
+            </div>
         </div>
-    }
+    </form>
+</div>
 
-    <div class="card premium-card mb-4">
-        <div class="card-body">
-            <form asp-action="Index" method="get" class="row g-2 align-items-end">
-                <div class="col-md-4">
-                    <label asp-for="SearchTerm" class="form-label fw-bold">Search by name</label>
-                    <input asp-for="SearchTerm" class="form-control" placeholder="Menu item name" />
-                </div>
-                <div class="col-md-3">
-                    <label asp-for="CategoryId" class="form-label fw-bold">Category</label>
-                    <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
-                        <option value="">All categories</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label asp-for="IsAvailable" class="form-label fw-bold">Selling status</label>
-                    <select asp-for="IsAvailable" class="form-select">
-                        <option value="">All statuses</option>
-                        <option value="true">Selling</option>
-                        <option value="false">Out of stock</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill"><i class="fa fa-filter"></i> Filter</button>
-                    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fa fa-refresh"></i> Reset</a>
-                </div>
-            </form>
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Món Ăn</span>
+            <span class="luxury-badge blue">@(Model?.Items?.Count() ?? 0)</span>
         </div>
     </div>
-
-    <div class="card premium-card mb-4">
-        <div class="premium-card-header d-flex align-items-center">
-            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;">
-                <i class="fa fa-coffee"></i>
-            </div>
-            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Menu Items List</h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table premium-table mb-0" width="100%" cellspacing="0">
-                    <thead>
+    
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="menu-items-table">
+            <thead>
+                <tr>
+                    <th>Tên Món Ăn</th>
+                    <th>Danh Mục</th>
+                    <th style="text-align: right;">Giá Bán</th>
+                    <th>Trạng Thái</th>
+                    <th style="text-align: right;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Items != null && Model.Items.Any())
+                {
+                    foreach (var item in Model.Items)
+                    {
                         <tr>
-                            <th class="pl-4">Name</th>
-                            <th>Category</th>
-                            <th class="text-end">Price</th>
-                            <th>Selling status</th>
-                            <th class="pr-4 text-end">Actions</th>
+                            <td>
+                                <strong style="color: #1c1c1a; font-weight: 600; font-size: 16px;">@item.ItemName</strong>
+                            </td>
+                            <td>
+                                <span class="luxury-badge" style="background-color: transparent; border: 1px solid #d4c3b6;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">label</span> 
+                                    @(string.IsNullOrEmpty(item.CategoryName) ? "Chưa phân loại" : item.CategoryName)
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <strong style="color: #805528; font-size: 16px;">@item.Price.ToString("N0") VND</strong>
+                            </td>
+                            <td>
+                                @if (item.IsAvailable)
+                                {
+                                    <span class="luxury-badge green">
+                                        <span class="material-symbols-outlined fill" style="font-size: 16px;">check_circle</span> Đang bán
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="luxury-badge orange">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">remove_shopping_cart</span> Hết hàng
+                                    </span>
+                                }
+                            </td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                <div style="display: flex; justify-content: flex-end; gap: 4px;">
+                                    <a asp-action="Details" asp-route-id="@item.MenuItemId" class="action-btn" title="Xem chi tiết">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.MenuItemId" class="action-btn" title="Sửa">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+                                    </a>
+                                    <a asp-action="Discontinue" asp-route-id="@item.MenuItemId" class="action-btn delete" title="Ngừng bán">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">block</span>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Items)
-                        {
-                            <tr>
-                                <td class="pl-4 fw-bold">@item.ItemName</td>
-                                <td><span class="badge badge-light border p-2">@(string.IsNullOrEmpty(item.CategoryName) ? "None" : item.CategoryName)</span></td>
-                                <td class="text-end font-weight-bold">@item.Price.ToString("N0")</td>
-                                <td>
-                                    @if (item.IsAvailable)
-                                    {
-                                        <span class="badge badge-pastel-success">Selling</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-pastel-warning">Out of stock</span>
-                                    }
-                                </td>
-                                <td class="pr-4 text-end">
-                                    <a asp-action="Edit" asp-route-id="@item.MenuItemId" class="btn-action-icon edit" title="Edit"><i class="fa fa-pencil"></i></a>
-                                    <a asp-action="Details" asp-route-id="@item.MenuItemId" class="btn-action-icon view" title="Details"><i class="fa fa-eye"></i></a>
-                                    <a asp-action="Discontinue" asp-route-id="@item.MenuItemId" class="btn-action-icon delete" title="Discontinue"><i class="fa fa-ban"></i></a>
-                                </td>
-                            </tr>
-                        }
-                        @if (!Model.Items.Any())
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-4">No menu items found.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">local_dining</span>
+                                <div>Không tìm thấy món ăn nào.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alerts = document.querySelectorAll('#alert-success');
+            alerts.forEach(function (el) {
+                if (el) {
+                    el.style.transition = "opacity 0.5s ease";
+                    el.style.opacity = "0";
+                    setTimeout(() => el.remove(), 500);
+                }
+            });
+        }, 4000);
+        
+        // Handle dismiss buttons
+        document.querySelectorAll('.luxury-alert .btn-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var alert = this.closest('.luxury-alert');
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            });
+        });
+    </script>
+}

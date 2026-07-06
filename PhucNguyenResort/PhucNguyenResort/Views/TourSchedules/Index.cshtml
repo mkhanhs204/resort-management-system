@@ -216,22 +216,13 @@
         </div>
         
         <div style="display: flex; align-items: center; gap: 10px;">
-            <label for="tourSortFilter" style="font-weight: 600; color: #50453b; margin: 0;">Sắp xếp:</label>
+            <label for="tourNameFilter" style="font-weight: 600; color: #50453b; margin: 0;">Tìm kiếm:</label>
+            <input type="text" id="tourNameFilter" class="form-control" placeholder="Nhập tên tour..." style="width: 250px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; height: auto; font-family: 'Inter', sans-serif;" />
+
+            <label for="tourSortFilter" style="font-weight: 600; color: #50453b; margin: 0; margin-left: 10px;">Sắp xếp:</label>
             <select id="tourSortFilter" class="form-control" style="width: 150px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; height: auto; font-family: 'Inter', sans-serif;">
                 <option value="newest">Mới nhất</option>
                 <option value="oldest">Cũ nhất</option>
-            </select>
-
-            <label for="tourNameFilter" style="font-weight: 600; color: #50453b; margin: 0; margin-left: 10px;">Lọc theo tour:</label>
-            <select id="tourNameFilter" class="form-control" style="width: 250px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; height: auto; font-family: 'Inter', sans-serif;">
-                <option value="">-- Tất cả các tour --</option>
-                @if (Model != null)
-                {
-                    foreach (var tourName in Model.Where(m => m.Tour != null && !string.IsNullOrEmpty(m.Tour.TourName)).Select(m => m.Tour!.TourName).Distinct())
-                    {
-                        <option value="@tourName">@tourName</option>
-                    }
-                }
             </select>
         </div>
 
@@ -411,7 +402,7 @@
                 if (row.cells.length === 1) return; // Ignore "no schedules" row
                 var tourNameCell = row.cells[1].textContent.trim().toLowerCase();
                 
-                if (selectedTour === "" || tourNameCell === selectedTour) {
+                if (selectedTour === "" || tourNameCell.includes(selectedTour)) {
                     filteredRows.push(row);
                 } else {
                     row.style.display = 'none';
@@ -459,7 +450,7 @@
             if (btnNext) btnNext.disabled = currentPage >= totalPages;
         }
 
-        document.getElementById('tourNameFilter')?.addEventListener('change', function() {
+        document.getElementById('tourNameFilter')?.addEventListener('input', function() {
             currentPage = 1;
             applyFilterAndSort();
         });

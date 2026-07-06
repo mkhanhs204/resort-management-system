@@ -32,40 +32,40 @@
             </div>
 
             <ul class="list-unstyled components">
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Action"]?.ToString() != "FinancialReport" && ViewContext.RouteData.Values["Action"]?.ToString() != "TableReservations" && ViewContext.RouteData.Values["Action"]?.ToString() != "FoodOrders" ? "active" : "")">
                     <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
                 </li>
                 
                 @if (User.IsInRole("System Admin") || User.IsInRole("Business Manager"))
                 {
                     <li>
-                        <p>MANAGEMENT</p>
+                        <p>QUẢN LÝ CHUNG</p>
                     </li>
                     @if (User.IsInRole("System Admin"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "StaffAccounts" ? "active" : "")">
-                            <a asp-controller="StaffAccounts" asp-action="Index"><i class="fa fa-users"></i> Staff Accounts</a>
+                            <a asp-controller="StaffAccounts" asp-action="Index"><i class="fa fa-users"></i> Tài Khoản Nhân Viên</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Roles" ? "active" : "")">
-                            <a href="#"><i class="fa fa-shield"></i> System Roles</a>
+                            <a href="#"><i class="fa fa-shield"></i> Vai Trò Hệ Thống</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")">
-                            <a href="#"><i class="fa fa-cogs"></i> System Management</a>
+                            <a href="#"><i class="fa fa-cogs"></i> Cài Đặt Hệ Thống</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Backup" ? "active" : "")">
-                            <a href="#"><i class="fa fa-database"></i> Backup & Restore</a>
+                            <a href="#"><i class="fa fa-database"></i> Sao Lưu & Phục Hồi</a>
                         </li>
                     }
                     @if (User.IsInRole("Business Manager"))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
-                            <a href="#"><i class="fa fa-bar-chart"></i> Business Reports</a>
+                        <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "FinancialReport" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="FinancialReport"><i class="fa fa-bar-chart"></i> Business Reports</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Review" ? "active" : "")">
-                            <a asp-controller="Review" asp-action="Manage"><i class="fa fa-star"></i> Customer Reviews</a>
+                            <a asp-controller="Review" asp-action="Manage"><i class="fa fa-star"></i> Đánh Giá Của Khách</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Refunds" ? "active" : "")">
-                            <a asp-controller="Refunds" asp-action="Index"><i class="fa fa-money"></i> Refunds</a>
+                            <a asp-controller="Refunds" asp-action="Index"><i class="fa fa-money"></i> Quản Lý Hoàn Tiền</a>
                         </li>
                     }
                 }
@@ -73,30 +73,30 @@
                 @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager") || User.IsInRole("Housekeeping Staff"))
                 {
                     <li>
-                        <p>ROOMS</p>
+                        <p>PHÒNG NGHỈ</p>
                     </li>
                     @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reception" ? "active" : "")">
-                            <a asp-controller="Reception" asp-action="Index"><i class="fa fa-calendar-check-o"></i> Manage Bookings</a>
+                            <a asp-controller="Reception" asp-action="Index"><i class="fa fa-calendar-check-o"></i> Quản Lý Đặt Phòng</a>
                         </li>
                     }
                     @if (User.IsInRole("Receptionist") || User.IsInRole("Housekeeping Staff") || User.IsInRole("Business Manager"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                            <a asp-controller="Rooms" asp-action="Index"><i class="fa fa-bed"></i> Manage Rooms</a>
+                            <a asp-controller="Rooms" asp-action="Index"><i class="fa fa-bed"></i> Quản Lý Phòng</a>
                         </li>
                     }
                     @if (User.IsInRole("Business Manager"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RoomCategories" ? "active" : "")">
-                            <a asp-controller="RoomCategories" asp-action="Index"><i class="fa fa-tags"></i> Room Categories</a>
+                            <a asp-controller="RoomCategories" asp-action="Index"><i class="fa fa-tags"></i> Hạng Phòng</a>
                         </li>
                     }
                     @if (User.IsInRole("Housekeeping Staff"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Housekeeping" ? "active" : "")">
-                            <a href="#"><i class="fa fa-paint-brush"></i> Housekeeping</a>
+                            <a href="#"><i class="fa fa-paint-brush"></i> Dọn Phòng</a>
                         </li>
                     }
                 }
@@ -104,43 +104,43 @@
                 @if (User.IsInRole("Maintenance Staff"))
                 {
                     <li>
-                        <p>MAINTENANCE</p>
+                        <p>BẢO TRÌ</p>
                     </li>
                     <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
-                        <a href="#"><i class="fa fa-wrench"></i> Service Requests</a>
+                        <a href="#"><i class="fa fa-wrench"></i> Yêu Cầu Sửa Chữa</a>
                     </li>
                 }
 
                 @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
                 {
                     <li>
-                        <p>FOOD & BEVERAGE</p>
+                        <p>NHÀ HÀNG & ẨM THỰC</p>
                     </li>
                     @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "MenuCategories" ? "active" : "")">
-                            <a asp-controller="MenuCategories" asp-action="Index"><i class="fa fa-list"></i> Menu Categories</a>
+                            <a asp-controller="MenuCategories" asp-action="Index"><i class="fa fa-list"></i> Danh Mục Món Ăn</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "RestaurantMenus" ? "active" : "")">
-                            <a asp-controller="RestaurantMenus" asp-action="Index"><i class="fa fa-coffee"></i> Restaurant Menus</a>
+                            <a asp-controller="RestaurantMenus" asp-action="Index"><i class="fa fa-coffee"></i> Quản Lý Món Ăn</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tables" ? "active" : "")">
-                            <a asp-controller="Tables" asp-action="Index"><i class="fa fa-table"></i> Manage Tables</a>
+                            <a asp-controller="Tables" asp-action="Index"><i class="fa fa-table"></i> Quản Lý Bàn Ăn</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "TableReservations" ? "active" : "")">
-                            <a asp-controller="Dashboard" asp-action="TableReservations"><i class="fa fa-calendar-check-o"></i> Table Reservations</a>
+                            <a asp-controller="Dashboard" asp-action="TableReservations"><i class="fa fa-calendar-check-o"></i> Quản Lý Đặt Bàn</a>
                         </li>
                     }
                     @if (User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "FoodOrders" ? "active" : "")">
-                            <a asp-controller="Dashboard" asp-action="FoodOrders"><i class="fa fa-cutlery"></i> Orders</a>
+                            <a asp-controller="Dashboard" asp-action="FoodOrders"><i class="fa fa-cutlery"></i> Đơn Gọi Món</a>
                         </li>
                     }
                     @if (User.IsInRole("Kitchen Staff"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventory" ? "active" : "")">
-                            <a href="#"><i class="fa fa-archive"></i> Kitchen Inventory</a>
+                            <a href="#"><i class="fa fa-archive"></i> Kho Bếp</a>
                         </li>
                     }
                 }
@@ -148,13 +148,20 @@
                 @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
                 {
                     <li>
-                        <p>SERVICES & TOURS</p>
+                        <p>DỊCH VỤ & TOUR</p>
                     </li>
                     
-                    @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
+                    @if (User.IsInRole("Business Manager"))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tours" ? "active" : "")">
-                            <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Manage Tours</a>
+                            <a asp-controller="Tours" asp-action="Index"><i class="fa fa-map-o"></i> Quản Lý Tour</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Business Manager"))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "TourSchedules" ? "active" : "")">
+                            <a asp-controller="TourSchedules" asp-action="Index"><i class="fa fa-calendar"></i> Lịch Trình Tour</a>
                         </li>
                     }
 
@@ -176,16 +183,16 @@
                     <button type="button" id="sidebarCollapse" class="btn btn-outline-dark d-md-none" style="border-color: #dfa974; color: #dfa974;">
                         <i class="fa fa-bars"></i>
                     </button>
-                    <span class="ml-3" style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #805528; letter-spacing: 0.5px;">Dashboard</span>
+                    <span class="ml-3" style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #805528; letter-spacing: 0.5px;">Bảng Điều Khiển</span>
                 </div>
                 <div class="nav-right" style="display: flex; align-items: center; gap: 12px; font-family: 'Inter', sans-serif;">
                     <div class="user-profile" style="display: flex; align-items: center;">
                         <img src="~/img/blog/blog-1.jpg" alt="User" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid #dfa974; margin-right: 8px; object-fit: cover;">
-                        <span style="font-weight: 600; color: #1c1c1a; font-size: 14px;">@(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Staff Member")</span>
+                        <span style="font-weight: 600; color: #1c1c1a; font-size: 14px;">@(User.Identity != null && User.Identity.IsAuthenticated ? User.Identity.Name : "Nhân Viên")</span>
                     </div>
                     <div style="width: 1px; height: 24px; background-color: #e5e2de; margin: 0 4px;"></div>
-                    <a href="/" class="btn btn-sm" style="background-color: #fcf9f5; color: #805528; border: 1px solid #dfa974; border-radius: 8px; padding: 6px 12px; transition: all 0.2s;" title="View Website" onmouseover="this.style.backgroundColor='#dfa974'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#fcf9f5'; this.style.color='#805528';"><i class="fa fa-globe"></i></a>
-                    <a asp-controller="Account" asp-action="Logout" class="btn btn-sm" style="background-color: #ffdad6; color: #ba1a1a; border: 1px solid #ffdad6; border-radius: 8px; padding: 6px 12px; transition: all 0.2s;" title="Logout" onmouseover="this.style.backgroundColor='#ba1a1a'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#ffdad6'; this.style.color='#ba1a1a';"><i class="fa fa-sign-out"></i></a>
+                    <a href="/" class="btn btn-sm" style="background-color: #fcf9f5; color: #805528; border: 1px solid #dfa974; border-radius: 8px; padding: 6px 12px; transition: all 0.2s;" title="Xem Website" onmouseover="this.style.backgroundColor='#dfa974'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#fcf9f5'; this.style.color='#805528';"><i class="fa fa-globe"></i></a>
+                    <a asp-controller="Account" asp-action="Logout" class="btn btn-sm" style="background-color: #ffdad6; color: #ba1a1a; border: 1px solid #ffdad6; border-radius: 8px; padding: 6px 12px; transition: all 0.2s;" title="Đăng Xuất" onmouseover="this.style.backgroundColor='#ba1a1a'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#ffdad6'; this.style.color='#ba1a1a';"><i class="fa fa-sign-out"></i></a>
                 </div>
             </nav>
 

@@ -1,124 +1,402 @@
 @model IEnumerable<PhucNguyenResort.Models.Room>
 
 @{
-    ViewData["Title"] = "Manage Rooms";
+    ViewData["Title"] = "Quản Lý Phòng";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container-fluid refund-container py-4">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 page-title">@ViewData["Title"]</h1>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef; /* surface-container-low */
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .luxury-table thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .luxury-table tbody tr:hover {
+            background-color: #fcf9f5; /* surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974; /* primary-container */
+            color: #633d11; /* on-primary-container */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury.outline {
+            background-color: transparent;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+        }
+        .btn-luxury.outline:hover {
+            background-color: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            box-shadow: none;
+        }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d4c3b6;
+            color: #50453b;
+            transition: all 0.2s;
+            background: transparent;
+            margin: 0 2px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .action-btn.large {
+            width: auto;
+            padding: 0 12px;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .action-btn:hover {
+            background: #f6f3ef;
+            color: #805528;
+            border-color: #805528;
+            text-decoration: none;
+        }
+        .action-btn.delete:hover {
+            background: #ffdad6;
+            color: #ba1a1a;
+            border-color: #ba1a1a;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .luxury-badge.blue {
+            background-color: #d3e4fe;
+            color: #0b1c30;
+        }
+        .luxury-badge.warning {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+        .luxury-badge.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .luxury-badge.danger {
+            background-color: #ffdad6;
+            color: #ba1a1a;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-input {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #1c1c1a;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .filter-input:focus {
+            border-color: #dfa974;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(223, 169, 116, 0.2);
+        }
+        .input-group-luxury {
+            display: flex;
+            align-items: center;
+            background-color: #f6f3ef;
+            border-radius: 8px;
+            padding: 0 16px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .input-group-luxury:focus-within {
+            border-color: #dfa974;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(223, 169, 116, 0.2);
+        }
+        .input-group-luxury .material-symbols-outlined {
+            color: #827569;
+            font-size: 20px;
+        }
+        .input-group-luxury input {
+            border: none;
+            background: transparent;
+            padding: 10px 8px;
+            outline: none;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+    </style>
+}
+
+<div class="header-container mt-4">
+    <div>
+        <h2 class="page-title">
+            @ViewData["Title"]
+        </h2>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+        </div>
         @if (User.IsInRole("Business Manager"))
         {
-            <a asp-action="Create" class="btn btn-premium-action btn-primary shadow-sm">
-                <i class="fa fa-plus-circle"></i> Create New
+            <a asp-action="Create" class="btn-luxury" style="padding: 8px 16px; font-size: 14px;">
+                <span class="material-symbols-outlined" style="font-size: 20px;">add</span> Tạo Mới
             </a>
         }
     </div>
+</div>
 
-    <!-- Filter Form -->
-    <div class="card premium-card mb-4">
-        <div class="card-body">
-            <form method="get" asp-action="Index" class="row g-3 align-items-center">
-                <div class="col-md-4">
-                    <input type="text" name="searchString" class="form-control" placeholder="Search by Room or Floor..." value="@ViewBag.SearchString">
+<div class="luxury-card mb-4" style="padding: 16px 24px;">
+    <form asp-action="Index" method="get" class="m-0">
+        <div class="filter-container">
+            <div style="flex: 1; min-width: 250px;">
+                <div class="input-group-luxury">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" name="searchString" class="form-control" placeholder="Tìm theo số phòng hoặc tầng..." value="@ViewBag.SearchString" style="background:transparent;border:none;box-shadow:none;">
                 </div>
-                <div class="col-md-3">
-                    <select name="categoryId" class="form-control" asp-items="ViewBag.Categories">
-                        <option value="">-- All Categories --</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select name="statusFilter" class="form-control" asp-items="Html.GetEnumSelectList<PhucNguyenResort.Enums.RoomStatus>()">
-                        <option value="">-- All Statuses --</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100"><i class="fa fa-filter"></i> Filter</button>
-                </div>
-            </form>
+            </div>
+            <div style="width: 200px;">
+                <select name="categoryId" class="filter-input" style="width: 100%;" asp-items="ViewBag.Categories">
+                    <option value="">-- Tất cả loại phòng --</option>
+                </select>
+            </div>
+            <div style="width: 200px;">
+                <select name="statusFilter" class="filter-input" style="width: 100%;" asp-items="Html.GetEnumSelectList<PhucNguyenResort.Enums.RoomStatus>()">
+                    <option value="">-- Tất cả trạng thái --</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-luxury" style="padding: 8px 24px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">filter_alt</span> Lọc
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Phòng</span>
+            <span class="luxury-badge blue">@(Model?.Count() ?? 0)</span>
         </div>
     </div>
-
-    <div class="card premium-card mb-4">
-        <div class="premium-card-header d-flex align-items-center">
-            <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;">
-                <i class="fa fa-bed"></i>
-            </div>
-            <h6 class="m-0 font-weight-bold text-dark" style="font-size: 1.1rem;">Danh sách Phòng (Rooms)</h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table premium-table mb-0" width="100%" cellspacing="0">
-                    <thead>
+    
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="rooms-table">
+            <thead>
+                <tr>
+                    <th>Số Phòng</th>
+                    <th>Loại Phòng</th>
+                    <th>Tầng</th>
+                    <th>Trạng Thái</th>
+                    <th style="text-align: right;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model) {
                         <tr>
-                            <th class="pl-4">@Html.DisplayNameFor(model => model.RoomNumber)</th>
-                            <th>Category</th>
-                            <th>@Html.DisplayNameFor(model => model.FloorNumber)</th>
-                            <th>@Html.DisplayNameFor(model => model.Status)</th>
-                            <th class="pr-4 text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model) {
-                            <tr>
-                                <td class="pl-4 fw-bold">@Html.DisplayFor(modelItem => item.RoomNumber)</td>
-                                <td><span class="badge badge-light border p-2">@(item.Category?.CategoryName ?? "None")</span></td>
-                                <td>Tầng @Html.DisplayFor(modelItem => item.FloorNumber)</td>
-                                <td>
-                                    @{
-                                        var badgeClass = item.Status switch
-                                        {
-                                            PhucNguyenResort.Enums.RoomStatus.Available => "badge-pastel-success",
-                                            PhucNguyenResort.Enums.RoomStatus.Occupied => "badge-pastel-danger",
-                                            PhucNguyenResort.Enums.RoomStatus.Maintenance => "badge-pastel-warning",
-                                            PhucNguyenResort.Enums.RoomStatus.NeedsCleaning => "badge-pastel-secondary",
-                                            _ => "badge-pastel-secondary"
-                                        };
-                                    }
-                                    <span class="badge @badgeClass">@item.Status</span>
-                                </td>
-                                <td class="pr-4 text-end">
-                                    <a asp-action="Edit" asp-route-id="@item.RoomId" class="btn-action-icon edit" title="Sửa"><i class="fa fa-pencil"></i></a>
-                                    <a asp-action="Details" asp-route-id="@item.RoomId" class="btn-action-icon view" title="Xem chi tiết"><i class="fa fa-eye"></i></a>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background-color: #f0ede9; display: flex; align-items: center; justify-content: center; color: #827569;">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">bed</span>
+                                    </div>
+                                    <strong style="color: #1c1c1a; font-weight: 600; font-size: 16px;">@Html.DisplayFor(modelItem => item.RoomNumber)</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="luxury-badge" style="margin-bottom: 4px;">
+                                    @(item.Category?.CategoryName ?? "Chưa xếp loại")
+                                </span>
+                            </td>
+                            <td style="color: #50453b;">
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #827569;">layers</span>
+                                    Tầng @Html.DisplayFor(modelItem => item.FloorNumber)
+                                </div>
+                            </td>
+                            <td>
+                                @{
+                                    var badgeClass = item.Status switch
+                                    {
+                                        PhucNguyenResort.Enums.RoomStatus.Available => "success",
+                                        PhucNguyenResort.Enums.RoomStatus.Occupied => "danger",
+                                        PhucNguyenResort.Enums.RoomStatus.Maintenance => "warning",
+                                        PhucNguyenResort.Enums.RoomStatus.NeedsCleaning => "",
+                                        _ => ""
+                                    };
+                                    var iconName = item.Status switch
+                                    {
+                                        PhucNguyenResort.Enums.RoomStatus.Available => "check_circle",
+                                        PhucNguyenResort.Enums.RoomStatus.Occupied => "person",
+                                        PhucNguyenResort.Enums.RoomStatus.Maintenance => "build",
+                                        PhucNguyenResort.Enums.RoomStatus.NeedsCleaning => "cleaning_services",
+                                        _ => "info"
+                                    };
+                                }
+                                <span class="luxury-badge @badgeClass">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">@iconName</span> @item.Status
+                                </span>
+                            </td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                <div style="display: flex; justify-content: flex-end; gap: 4px;">
+                                    <a asp-action="Details" asp-route-id="@item.RoomId" class="action-btn" title="Xem chi tiết">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.RoomId" class="action-btn" title="Sửa">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+                                    </a>
                                     @if (User.IsInRole("Business Manager"))
                                     {
-                                        <a asp-action="Delete" asp-route-id="@item.RoomId" class="btn-action-icon delete" title="Xóa"><i class="fa fa-trash"></i></a>
+                                        <a asp-action="Delete" asp-route-id="@item.RoomId" class="action-btn delete" title="Xóa">
+                                            <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                        </a>
                                     }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- Pagination -->
-        @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
-        {
-            <div class="card-footer bg-white border-top-0 d-flex justify-content-center pb-3">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination mb-0">
-                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, searchString = ViewBag.SearchString, statusFilter = ViewBag.StatusFilter, categoryId = ViewBag.CurrentCategory })" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = ViewBag.SearchString, statusFilter = ViewBag.StatusFilter, categoryId = ViewBag.CurrentCategory })">@i</a>
-                            </li>
-                        }
-                        
-                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, searchString = ViewBag.SearchString, statusFilter = ViewBag.StatusFilter, categoryId = ViewBag.CurrentCategory })" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">bed</span>
+                                <div>Không có phòng nào.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div style="display: flex; justify-content: center; margin-top: 24px;">
+            <ul class="pagination mb-0" style="display: flex; gap: 4px; list-style: none; padding: 0;">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="action-btn" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, searchString = ViewBag.SearchString, statusFilter = ViewBag.StatusFilter, categoryId = ViewBag.CurrentCategory })" style="@(ViewBag.CurrentPage == 1 ? "opacity: 0.5; pointer-events: none;" : "")">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
+                    </a>
+                </li>
+                
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="action-btn" href="@Url.Action("Index", new { page = i, searchString = ViewBag.SearchString, statusFilter = ViewBag.StatusFilter, categoryId = ViewBag.CurrentCategory })" style="@(i == ViewBag.CurrentPage ? "background: #805528; color: white; border-color: #805528;" : "")">@i</a>
+                    </li>
+                }
+                
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="action-btn" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, searchString = ViewBag.SearchString, statusFilter = ViewBag.StatusFilter, categoryId = ViewBag.CurrentCategory })" style="@(ViewBag.CurrentPage == ViewBag.TotalPages ? "opacity: 0.5; pointer-events: none;" : "")">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    }
 </div>
