@@ -4,6 +4,7 @@ using PhucNguyenResort.Constants;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Services.FoodOrders;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.ViewModels.FoodOrders;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,13 @@ public class FoodOrdersController : Controller
 {
     private readonly IFoodOrderService _foodOrderService;
     private readonly ResortDbContext _context;
+    private readonly INotificationService _notificationService;
 
-    public FoodOrdersController(IFoodOrderService foodOrderService, ResortDbContext context)
+    public FoodOrdersController(IFoodOrderService foodOrderService, ResortDbContext context, INotificationService notificationService)
     {
         _foodOrderService = foodOrderService;
         _context = context;
+        _notificationService = notificationService;
     }
 
     /// <summary>
@@ -124,6 +127,7 @@ public class FoodOrdersController : Controller
         if (result.Status == FoodOrderCreateStatus.Created)
         {
             TempData["SuccessMessage"] = "Food order has been sent to the kitchen.";
+            
             return RedirectToAction(nameof(Details), new { id = result.FoodOrderId });
         }
 
