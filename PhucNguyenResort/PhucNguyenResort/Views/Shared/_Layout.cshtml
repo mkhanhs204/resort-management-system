@@ -6,7 +6,9 @@
                      (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("SearchRooms", StringComparison.OrdinalIgnoreCase)) ||
                      (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("AboutUs", StringComparison.OrdinalIgnoreCase)) ||
                      (currentController.Equals("CustomerTourBooking", StringComparison.OrdinalIgnoreCase) && (currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) || currentAction.Equals("Details", StringComparison.OrdinalIgnoreCase))) ||
-                     (currentController.Equals("Review", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("PublicList", StringComparison.OrdinalIgnoreCase));
+                     (currentController.Equals("Review", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("PublicList", StringComparison.OrdinalIgnoreCase)) ||
+                     currentController.Equals("FoodOrders", StringComparison.OrdinalIgnoreCase) ||
+                     currentController.Equals("TableReservations", StringComparison.OrdinalIgnoreCase);
 
     string IsActive(string controller, string action = "")
     {
@@ -234,6 +236,25 @@
             <div class="hidden xl:flex items-center space-x-4">
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button id="notification-bell" class="relative text-on-secondary-container hover:text-primary transition-colors duration-300 p-1 nav-item" title="Thông báo">
+                            <span class="material-symbols-outlined text-[24px]">notifications</span>
+                            <span id="notification-badge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-error text-on-error text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">0</span>
+                        </button>
+                        <!-- Notification Dropdown -->
+                        <div id="notification-dropdown" class="hidden opacity-0 scale-95 absolute right-[-240px] mt-3 w-96 bg-surface rounded-xl shadow-ambient border border-outline-variant/20 transition-all duration-200 z-50 overflow-hidden">
+                            <div class="px-4 py-3 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+                                <h4 class="font-label-lg text-on-surface font-bold">Thông báo</h4>
+                                <button id="notification-mark-all" class="text-primary text-[12px] font-semibold hover:underline">Đọc tất cả</button>
+                            </div>
+                            <div id="notification-list" class="max-h-[400px] overflow-y-auto"></div>
+                            <div id="notification-empty" class="hidden px-4 py-10 text-center">
+                                <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">notifications_off</span>
+                                <p class="text-on-surface-variant text-[13px]">Chưa có thông báo nào</p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="relative group cursor-pointer">
                         <div class="text-on-secondary-container hover:text-primary transition-colors duration-300 font-label-lg text-label-lg flex items-center border-b-2 border-transparent pt-1.5 pb-1 whitespace-nowrap nav-item">
                             @User.Identity.Name <span class="material-symbols-outlined ml-1">expand_more</span>
@@ -915,6 +936,12 @@
             }
         });
     </script>
+    
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F3j6gL65UMR2r97xCkSIR0sP/1mQzHIZCy0rQiONAiCWIjIFFlYHEudGLaO+/bU4v7hvBsCjUDw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="~/js/notifications.js"></script>
+    }
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>

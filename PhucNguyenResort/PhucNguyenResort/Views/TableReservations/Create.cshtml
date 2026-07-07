@@ -1,110 +1,391 @@
 @model PhucNguyenResort.ViewModels.TableReservations.TableReservationCreateViewModel
+@inject PhucNguyenResort.Services.RestaurantMenus.IRestaurantMenuService MenuService
 
 @{
-    ViewData["Title"] = "Confirm Table Reservation";
+    ViewData["Title"] = "Hoàn tất đặt bàn";
+    var userEmail = User.Identity?.Name ?? "";
+    var menuItems = await MenuService.GetAvailableMenuItemsAsync();
 }
 
-<div class="tr-page">
-    <div class="tr-container tr-container-narrow">
-        <div class="tr-back-nav">
-            <a asp-action="Search"><i class="fa fa-arrow-left"></i> Back to search</a>
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fcf9f5 !important;
+            color: #1c1c1a;
+            -webkit-font-smoothing: antialiased;
+        }
+        .luxury-shadow {
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.06);
+        }
+        .input-inset {
+            background-color: #fcf9f5;
+            transition: all 0.3s ease;
+        }
+        .input-inset:focus {
+            outline: none;
+            border-color: #dfa974 !important;
+            box-shadow: 0 0 0 1px #dfa974;
+        }
+        .step-active {
+            color: #805528;
+            border-bottom: 2px solid #805528;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+}
+
+<div class="-mt-[40px] md:-mt-[80px]">
+    <div class="pt-32 pb-section-gap-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+        <!-- Header Section -->
+        <div class="mb-stack-lg text-center md:text-left">
+            <nav class="flex items-center justify-center md:justify-start gap-2 mb-4 text-on-surface-variant font-label-sm uppercase tracking-widest">
+                <a asp-action="Search" class="hover:text-primary transition-colors">Nhà hàng</a>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                <span class="text-primary">Đặt bàn</span>
+            </nav>
+            <h1 class="font-headline-lg text-headline-lg mb-2">Hoàn tất đặt bàn</h1>
+            <p class="text-on-surface-variant font-body-lg">Vui lòng cung cấp thông tin để chúng tôi chuẩn bị đón tiếp bạn chu đáo nhất.</p>
         </div>
 
-        <div class="tr-confirm-card">
-            <div class="tr-confirm-layout">
-                <div class="tr-table-image tr-confirm-image">
-                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-                    {
-                        <img src="@Model.ImageUrl" alt="@Model.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                        <div class="tr-image-fallback" style="display:none;">
-                            <i class="fa fa-cutlery"></i>
+        <form asp-action="Create" method="post" id="reservation-form">
+            <input type="hidden" asp-for="TableId" />
+            <input type="hidden" asp-for="TableNumber" />
+            <input type="hidden" asp-for="TableName" />
+            <input type="hidden" asp-for="ImageUrl" />
+            <input type="hidden" asp-for="Description" />
+            <input type="hidden" asp-for="Area" />
+            <input type="hidden" asp-for="TableType" />
+            <input type="hidden" asp-for="LocationNote" />
+            <input type="hidden" asp-for="Capacity" />
+            <input type="hidden" asp-for="ReservationDate" />
+            <input type="hidden" asp-for="ReservationTime" />
+            <input type="hidden" asp-for="DurationMinutes" />
+            <input type="hidden" asp-for="PartySize" />
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+                <!-- Left Column: Forms and Menu -->
+                <div class="lg:col-span-8 flex flex-col gap-stack-lg">
+                    <!-- Summary Card Mobile Only -->
+                    <div class="lg:hidden bg-surface-container-lowest border border-outline-variant/20 p-stack-md rounded-xl luxury-shadow mb-stack-md">
+                        <div class="flex items-center gap-stack-md">
+                            <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                                {
+                                    <img class="w-full h-full object-cover" src="@Model.ImageUrl" alt="@Model.TableName" onerror="this.onerror=null;this.src='https://placehold.co/400x300?text=No+Image'" />
+                                }
+                                else
+                                {
+                                    <div class="w-full h-full bg-surface-variant flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-4xl text-on-surface-variant/50">restaurant</span>
+                                    </div>
+                                }
+                            </div>
+                            <div>
+                                <h3 class="font-headline-sm text-headline-sm text-on-surface">@Model.TableName</h3>
+                                <p class="text-on-surface-variant font-label-lg">@Model.Area • @Model.ReservationTime.ToString(@"hh\:mm"), @Model.ReservationDate.ToString("dd/MM/yyyy")</p>
+                            </div>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="tr-image-fallback">
-                            <i class="fa fa-cutlery"></i>
-                        </div>
-                    }
-                </div>
-                <div>
-            <div class="tr-confirm-header">
-                <span class="tr-eyebrow">Confirm Reservation</span>
-                <h1>@Model.TableName</h1>
-                <p>Table @Model.TableNumber</p>
-            </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.Description))
-                    {
-                        <p class="tr-table-description tr-confirm-description">@Model.Description</p>
-                    }
-                    <div class="tr-table-meta tr-confirm-meta">
-                        @if (!string.IsNullOrWhiteSpace(Model.Area))
-                        {
-                            <span><i class="fa fa-map-marker"></i> @Model.Area</span>
-                        }
-                        @if (!string.IsNullOrWhiteSpace(Model.TableType))
-                        {
-                            <span><i class="fa fa-tag"></i> @Model.TableType</span>
-                        }
-                        @if (!string.IsNullOrWhiteSpace(Model.LocationNote))
-                        {
-                            <span><i class="fa fa-location-arrow"></i> @Model.LocationNote</span>
-                        }
                     </div>
+
+                    <!-- Guest Info Form -->
+                    <section class="bg-surface-container-lowest border border-outline-variant/20 p-stack-lg md:p-10 rounded-xl luxury-shadow">
+                        <h2 class="font-headline-sm text-headline-sm mb-stack-lg flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">person</span>
+                            Thông tin khách hàng
+                        </h2>
+                        
+                        <div asp-validation-summary="ModelOnly" class="text-error mb-4"></div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+                            <div class="flex flex-col gap-2">
+                                <label class="font-label-lg text-on-surface-variant">Họ và tên *</label>
+                                <input class="input-inset border border-outline-variant/30 px-4 py-3 rounded-lg text-on-surface" value="" placeholder="Nhập họ và tên" type="text" name="GuestName"/>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="font-label-lg text-on-surface-variant">Số điện thoại *</label>
+                                <input class="input-inset border border-outline-variant/30 px-4 py-3 rounded-lg text-on-surface" placeholder="Nhập số điện thoại" type="tel" name="GuestPhone"/>
+                            </div>
+                            <div class="flex flex-col gap-2 md:col-span-2">
+                                <label class="font-label-lg text-on-surface-variant">Địa chỉ Email *</label>
+                                <input class="input-inset border border-outline-variant/30 px-4 py-3 rounded-lg text-on-surface" value="@userEmail" placeholder="Nhập địa chỉ email" type="email" name="GuestEmail"/>
+                            </div>
+                            <div class="flex flex-col gap-2 md:col-span-2">
+                                <label class="font-label-lg text-on-surface-variant">Ghi chú đặc biệt (Dị ứng, Kỷ niệm...)</label>
+                                <textarea asp-for="SpecialRequests" id="SpecialRequestsInput" class="input-inset border border-outline-variant/30 px-4 py-3 rounded-lg text-on-surface resize-none" placeholder="VD: Chúng tôi kỷ niệm 10 năm ngày cưới, vui lòng sắp xếp vị trí lãng mạn..." rows="4"></textarea>
+                                <span asp-validation-for="SpecialRequests" class="text-error text-sm"></span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Pre-order Menu Section -->
+                    <section class="bg-surface-container-lowest border border-outline-variant/20 p-stack-lg md:p-10 rounded-xl luxury-shadow relative">
+                        <div class="flex justify-between items-end mb-stack-lg">
+                            <div>
+                                <h2 class="font-headline-sm text-headline-sm mb-1 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">restaurant_menu</span>
+                                    Chọn món trước (Tùy chọn)
+                                </h2>
+                                <p class="text-on-surface-variant font-body-md">Tiết kiệm thời gian chờ đợi bằng cách chọn trước menu của bạn.</p>
+                            </div>
+                        </div>
+                        
+                        @if (menuItems.Any())
+                        {
+                            <div class="relative group/slider">
+                                <div class="flex overflow-x-auto gap-6 snap-x snap-mandatory no-scrollbar pb-4" id="menu-slider">
+                                    @foreach (var item in menuItems)
+                                    {
+                                        <div class="snap-start shrink-0 w-[280px] md:w-[320px] bg-white rounded-xl overflow-hidden border border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow menu-item-card flex flex-col">
+                                            <div class="h-48 overflow-hidden">
+                                                <img class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWNufBJf9h0_ozJY8LZUy4FMPLEE36mZPfb91Nlg6IAykttMuJM6_Z3gwQQ8GHfPvvfFGbwMbUoztsZ0a3eEUhX6m-btpOUfWB0PdMXbIyW2mf2fdqv5ZUVSacvkQ3HEXD13wk-hyFaBcMo2Oqdu4ZzxermRUKbHiWYr_92yDXDww_65eRkzHHrmp4NZAgnoshGQaoyOKYijH4h2mEN0QoWFrowmSrhN2rwIhuX-7kvFJyxtOvsCHdlvPepUF8O9SHtZfGzeWFqsJ0" onerror="this.onerror=null;this.src='https://placehold.co/400x300?text=No+Image'"/>
+                                            </div>
+                                            <div class="p-6 flex flex-col flex-1 justify-between">
+                                                <div>
+                                                    <div class="flex justify-between items-start mb-2">
+                                                        <h4 class="font-headline-sm text-[22px] text-on-surface item-name leading-tight">@item.ItemName</h4>
+                                                        <span class="text-primary font-bold item-price text-[18px] ml-2" data-price="@item.Price">@item.Price.ToString("N0")đ</span>
+                                                    </div>
+                                                    <p class="text-on-surface-variant font-label-sm mb-6">@item.CategoryName</p>
+                                                </div>
+                                                <div class="h-[50px] relative overflow-hidden">
+                                                    <button type="button" class="absolute inset-0 w-full h-full border border-primary text-primary font-label-lg rounded-md hover:bg-primary hover:text-white transition-all btn-preorder bg-white z-10">Thêm vào yêu cầu</button>
+                                                    <div class="quantity-controls absolute inset-0 w-full h-full bg-white border border-primary rounded-md flex items-center justify-between px-2 opacity-0 pointer-events-none transition-all z-20">
+                                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-variant rounded-md btn-minus"><span class="material-symbols-outlined text-[20px]">remove</span></button>
+                                                        <span class="font-bold text-primary quantity-val text-lg">0</span>
+                                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-variant rounded-md btn-plus"><span class="material-symbols-outlined text-[20px]">add</span></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                
+                                <button type="button" id="slider-prev" class="absolute -left-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-white border border-outline-variant/30 rounded-full shadow-lg flex items-center justify-center text-primary opacity-0 group-hover/slider:opacity-100 transition-opacity disabled:opacity-0 disabled:cursor-not-allowed z-10 hover:bg-surface-variant">
+                                    <span class="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                <button type="button" id="slider-next" class="absolute -right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-white border border-outline-variant/30 rounded-full shadow-lg flex items-center justify-center text-primary opacity-0 group-hover/slider:opacity-100 transition-opacity disabled:opacity-0 disabled:cursor-not-allowed z-10 hover:bg-surface-variant">
+                                    <span class="material-symbols-outlined">chevron_right</span>
+                                </button>
+                            </div>
+                        }
+                    </section>
                 </div>
+
+                <!-- Right Column: Sidebar Summary -->
+                <aside class="lg:col-span-4 sticky top-28">
+                    <div class="bg-surface-container-lowest border border-outline-variant/20 rounded-xl luxury-shadow overflow-hidden">
+                        <div class="h-40 overflow-hidden relative">
+                            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                            {
+                                <img class="w-full h-full object-cover" src="@Model.ImageUrl" alt="@Model.TableName" onerror="this.onerror=null;this.src='https://placehold.co/400x300?text=No+Image'"/>
+                            }
+                            else
+                            {
+                                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu-u168YV_cu9PrXeNc__PbFaeJLSUVBC_KX-VmiF91uiOYtL-barE_AkZN4P3yZBqikwao6JmuEijlqZjsRH2PFhxgRvoKka29gM_3DzC282VH4w9-2FmBCQl0n9XhBCsesrol7vbxEYQu_TWXR9eB8iXzLBWZQ-9d8ZYcHFjXFDPPcV0Y1DTQNUxWtEykihHJb7HUdgOAiJrn11V3nGLh9TPdYw12QiYQOtNSiV6s3ORvMWBHPJ_tlfaZK8Ew2maOfg0wDdxPKbl"/>
+                            }
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-stack-md">
+                                <h3 class="text-white font-headline-sm">@Model.TableName</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="p-stack-lg space-y-6">
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-4">
+                                    <span class="material-symbols-outlined text-primary mt-1">location_on</span>
+                                    <div>
+                                        <p class="font-label-lg text-on-surface-variant">Vị trí đã chọn</p>
+                                        <p class="font-body-md text-on-surface font-semibold">@Model.Area</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <span class="material-symbols-outlined text-primary mt-1">calendar_month</span>
+                                    <div>
+                                        <p class="font-label-lg text-on-surface-variant">Thời gian</p>
+                                        <p class="font-body-md text-on-surface font-semibold">@Model.ReservationTime.ToString(@"hh\:mm"), @Model.ReservationDate.ToString("dd/MM/yyyy")</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <span class="material-symbols-outlined text-primary mt-1">groups</span>
+                                    <div>
+                                        <p class="font-label-lg text-on-surface-variant">Số lượng khách</p>
+                                        <p class="font-body-md text-on-surface font-semibold">@Model.PartySize Người</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-dashed border-outline-variant/40 pt-6">
+                                <h4 class="font-label-lg text-on-surface-variant mb-4 uppercase tracking-tighter">Yêu cầu bổ sung</h4>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-body-md text-on-surface">Món chọn trước</span>
+                                    <span class="font-bold text-on-surface" id="selected-menu-count">0</span>
+                                </div>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="font-body-md text-on-surface">Phí dịch vụ (10%)</span>
+                                    <span class="font-bold text-on-surface">Miễn phí</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-surface-container p-4 rounded-lg">
+                                <div class="flex justify-between items-center text-primary">
+                                    <span class="font-label-lg uppercase font-bold">Tổng tạm tính</span>
+                                    <span class="font-headline-sm" id="total-price-text">0đ</span>
+                                </div>
+                                <p class="text-[11px] text-on-surface-variant mt-2">* Thanh toán tại nhà hàng sau khi dùng bữa. Một số món đặt trước có thể yêu cầu đặt cọc.</p>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary-container text-on-primary-container py-4 rounded-xl font-label-lg text-headline-sm-mobile shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all">
+                                Xác Nhận Đặt Bàn
+                            </button>
+                            
+                            <div class="flex items-center justify-center gap-2 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                                <span class="text-label-sm">Đảm bảo bảo mật &amp; riêng tư</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assistance Card -->
+                    <div class="mt-gutter p-6 bg-secondary-container/30 border border-secondary-container rounded-xl flex items-center gap-4">
+                        <span class="material-symbols-outlined text-secondary text-4xl">support_agent</span>
+                        <div>
+                            <p class="font-label-lg text-secondary font-bold">Cần hỗ trợ gấp?</p>
+                            <p class="text-label-sm text-on-secondary-container">Gọi ngay: 1900 8888 (24/7)</p>
+                        </div>
+                    </div>
+                </aside>
             </div>
-
-            <div asp-validation-summary="ModelOnly" class="tr-alert tr-alert-danger"></div>
-
-            <div class="tr-summary-grid">
-                <div><span>Date</span><strong>@Model.ReservationDate.ToString("MMM dd, yyyy")</strong></div>
-                <div><span>Time</span><strong>@Model.ReservationTime.ToString(@"hh\:mm")</strong></div>
-                <div><span>Guests</span><strong>@Model.PartySize</strong></div>
-                <div><span>Capacity</span><strong>@Model.Capacity</strong></div>
-            </div>
-
-            <div class="tr-alert tr-alert-warning">
-                <i class="fa fa-clock-o"></i>
-                Please arrive within 30 minutes of your reservation time. After this hold period, the table may be released or marked as no-show.
-            </div>
-
-            <form asp-action="Create" method="post" class="tr-create-form">
-                @Html.AntiForgeryToken()
-                <input asp-for="TableId" type="hidden" />
-                <input asp-for="TableNumber" type="hidden" />
-                <input asp-for="TableName" type="hidden" />
-                <input asp-for="ImageUrl" type="hidden" />
-                <input asp-for="Description" type="hidden" />
-                <input asp-for="Area" type="hidden" />
-                <input asp-for="TableType" type="hidden" />
-                <input asp-for="LocationNote" type="hidden" />
-                <input asp-for="Capacity" type="hidden" />
-                <input asp-for="ReservationDate" type="hidden" />
-                <input asp-for="ReservationTime" type="hidden" />
-                <input asp-for="DurationMinutes" type="hidden" />
-                <input asp-for="PartySize" type="hidden" />
-
-                <div class="tr-field">
-                    <label asp-for="SpecialRequests">Special Requests</label>
-                    <textarea asp-for="SpecialRequests" class="tr-input tr-textarea" maxlength="500" rows="4" placeholder="Window seat, birthday setup, dietary note..."></textarea>
-                    <span asp-validation-for="SpecialRequests" class="text-danger"></span>
-                </div>
-
-                <div class="tr-actions">
-                    <a asp-action="Search" class="tr-btn tr-btn-outline">Cancel</a>
-                    <button type="submit" class="tr-btn tr-btn-primary">
-                        <i class="fa fa-check"></i> Submit Reservation
-                    </button>
-                </div>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/table-reservations.css" />
-}
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Micro-interactions
+        document.querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.parentElement.querySelector('label')?.classList.add('text-primary');
+            });
+            el.addEventListener('blur', () => {
+                el.parentElement.querySelector('label')?.classList.remove('text-primary');
+            });
+        });
+
+        let totalItems = 0;
+        let totalPrice = 0;
+        const selectedDishes = [];
+
+        function formatPrice(price) {
+            return price.toLocaleString('vi-VN') + 'đ';
+        }
+
+        // Handle pre-order items with quantity
+        document.querySelectorAll('.menu-item-card').forEach(card => {
+            const btnPreorder = card.querySelector('.btn-preorder');
+            const controls = card.querySelector('.quantity-controls');
+            const btnMinus = card.querySelector('.btn-minus');
+            const btnPlus = card.querySelector('.btn-plus');
+            const qtyVal = card.querySelector('.quantity-val');
+            
+            const name = card.querySelector('.item-name').innerText;
+            const priceVal = parseFloat(card.querySelector('.item-price').getAttribute('data-price') || 0);
+
+            let qty = 0;
+
+            const updateCart = () => {
+                // remove existing from array
+                const index = selectedDishes.findIndex(d => d.name === name);
+                if (index > -1) selectedDishes.splice(index, 1);
+                
+                if (qty > 0) {
+                    selectedDishes.push({ name: name, price: priceVal, qty: qty });
+                }
+                
+                totalItems = selectedDishes.reduce((sum, item) => sum + item.qty, 0);
+                totalPrice = selectedDishes.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                
+                document.getElementById('selected-menu-count').innerText = totalItems;
+                document.getElementById('total-price-text').innerText = formatPrice(totalPrice);
+            };
+
+            btnPreorder.addEventListener('click', () => {
+                qty = 1;
+                qtyVal.innerText = qty;
+                btnPreorder.classList.add('opacity-0', 'pointer-events-none');
+                controls.classList.remove('opacity-0', 'pointer-events-none');
+                controls.classList.add('opacity-100', 'pointer-events-auto');
+                updateCart();
+            });
+
+            btnPlus.addEventListener('click', () => {
+                qty++;
+                qtyVal.innerText = qty;
+                updateCart();
+            });
+
+            btnMinus.addEventListener('click', () => {
+                qty--;
+                if (qty <= 0) {
+                    qty = 0;
+                    controls.classList.remove('opacity-100', 'pointer-events-auto');
+                    controls.classList.add('opacity-0', 'pointer-events-none');
+                    btnPreorder.classList.remove('opacity-0', 'pointer-events-none');
+                } else {
+                    qtyVal.innerText = qty;
+                }
+                updateCart();
+            });
+        });
+
+        // Slider functionality
+        const slider = document.getElementById('menu-slider');
+        const btnPrev = document.getElementById('slider-prev');
+        const btnNext = document.getElementById('slider-next');
+
+        if (slider && btnPrev && btnNext) {
+            const updateButtons = () => {
+                btnPrev.disabled = slider.scrollLeft <= 0;
+                btnNext.disabled = slider.scrollLeft >= (slider.scrollWidth - slider.clientWidth - 1);
+            };
+            
+            slider.addEventListener('scroll', updateButtons);
+            // trigger once on load, after a slight delay for layout
+            setTimeout(updateButtons, 100);
+
+            btnPrev.addEventListener('click', () => {
+                slider.scrollBy({ left: -340, behavior: 'smooth' });
+            });
+            btnNext.addEventListener('click', () => {
+                slider.scrollBy({ left: 340, behavior: 'smooth' });
+            });
+        }
+
+        // Append selected items to Special Requests before submit
+        document.getElementById('reservation-form').addEventListener('submit', function(e) {
+            const specialReqs = document.getElementById('SpecialRequestsInput');
+            if (selectedDishes.length > 0) {
+                let itemsStr = "\n\n--- Món chọn trước ---\n";
+                selectedDishes.forEach(item => {
+                    itemsStr += `- ${item.name} x${item.qty} (${formatPrice(item.price * item.qty)})\n`;
+                });
+                
+                // Avoid duplicating if user submits multiple times
+                if (!specialReqs.value.includes("--- Món chọn trước ---")) {
+                    specialReqs.value = (specialReqs.value || "") + itemsStr;
+                }
+            }
+        });
+    </script>
 }

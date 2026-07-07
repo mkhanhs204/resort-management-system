@@ -3,6 +3,7 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Email;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.ViewModels.FoodOrders;
 using System.Net;
 
@@ -14,11 +15,13 @@ public class FoodOrderService : IFoodOrderService
 
     private readonly ResortDbContext _context;
     private readonly IEmailSender _emailSender;
+    private readonly INotificationService _notificationService;
 
-    public FoodOrderService(ResortDbContext context, IEmailSender emailSender)
+    public FoodOrderService(ResortDbContext context, IEmailSender emailSender, INotificationService notificationService)
     {
         _context = context;
         _emailSender = emailSender;
+        _notificationService = notificationService;
     }
 
     public async Task<MenuCategoryBrowseViewModel> BuildMenuCategoriesAsync(int? bookingId, int? userId)
@@ -758,6 +761,13 @@ public class FoodOrderService : IFoodOrderService
                 foodOrder.Booking.User.Email,
                 $"{subject} - Order #{foodOrder.FoodOrderId}",
                 htmlBody);
+
+            // Send In-App Notification
+            await _notificationService.CreateAsync(
+                foodOrder.Booking.UserId,
+                subject,
+                $"{message} Đơn hàng: #{foodOrder.FoodOrderId}."
+            );
         }
         catch
         {
