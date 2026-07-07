@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Services.Payments;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.ViewModels.Payments;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -14,20 +15,23 @@ namespace PhucNguyenResort.Controllers
         private readonly ResortDbContext _context;
         private readonly PhucNguyenResort.Services.Email.IEmailSender _emailSender;
         private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
+        private readonly INotificationService _notificationService;
 
         public PaymentController(
             IVnPayService vnPayService, 
             ResortDbContext context,
             PhucNguyenResort.Services.Email.IEmailSender emailSender,
-            Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
+            Microsoft.AspNetCore.Hosting.IWebHostEnvironment env,
+            INotificationService notificationService)
         {
             _vnPayService = vnPayService;
             _context = context;
             _emailSender = emailSender;
             _env = env;
+            _notificationService = notificationService;
         }
 
-        public IActionResult VNPayReturn()
+        public async Task<IActionResult> VNPayReturn()
         {
             var response = _vnPayService.ExecutePayment(Request.Query);
             if (!response.Success)
@@ -102,6 +106,13 @@ namespace PhucNguyenResort.Controllers
 
                                 // Chạy ngầm việc gửi mail để không chặn request của khách
                                 _ = _emailSender.SendEmailAsync(booking.User.Email, "Xác nhận đặt phòng và thanh toán thành công - PhucNguyen Resort", htmlBody);
+
+                                // Gửi thông báo trong app (In-App Notification)
+                                await _notificationService.CreateAsync(
+                                    booking.UserId,
+                                    "Đặt phòng thành công 🎉",
+                                    $"Thanh toán thành công. Đơn đặt phòng #{booking.BookingId} từ {booking.CheckInDate:dd/MM/yyyy} đến {booking.CheckOutDate:dd/MM/yyyy} đã được xác nhận. Kiểm tra email để xem chi tiết."
+                                );
                             }
                         }
                     }
