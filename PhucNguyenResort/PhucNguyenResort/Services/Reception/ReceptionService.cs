@@ -6,6 +6,7 @@ using PhucNguyenResort.Services.Bookings;
 using PhucNguyenResort.ViewModels.Bookings;
 using PhucNguyenResort.Helpers;
 using PhucNguyenResort.Services.Email;
+using PhucNguyenResort.Services.Notifications;
 using Microsoft.AspNetCore.Hosting;
 
 namespace PhucNguyenResort.Services.Reception
@@ -16,13 +17,15 @@ namespace PhucNguyenResort.Services.Reception
         private readonly IBookingGuestService _bookingGuestService;
         private readonly IEmailSender _emailSender;
         private readonly IWebHostEnvironment _env;
+        private readonly INotificationService _notificationService;
 
-        public ReceptionService(ResortDbContext context, IBookingGuestService bookingGuestService, IEmailSender emailSender, IWebHostEnvironment env)
+        public ReceptionService(ResortDbContext context, IBookingGuestService bookingGuestService, IEmailSender emailSender, IWebHostEnvironment env, INotificationService notificationService)
         {
             _context = context;
             _bookingGuestService = bookingGuestService;
             _emailSender = emailSender;
             _env = env;
+            _notificationService = notificationService;
         }
 
         public async Task<List<Booking>> GetBookingsAsync(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter = null)
@@ -291,7 +294,7 @@ namespace PhucNguyenResort.Services.Reception
                         await _context.SaveChangesAsync();
                     }
 
-                    if (booking.RoomHandoverTime.Value.Date <= booking.CheckInDate.Date)
+                    if (booking.RoomHandoverTime.Value.Date == booking.CheckInDate.Date)
                     {
                         var handoverTime = booking.RoomHandoverTime.Value.TimeOfDay;
                         if (handoverTime < TimeSpan.FromHours(14))
@@ -856,7 +859,7 @@ namespace PhucNguyenResort.Services.Reception
                     TransactionId = 0,
                     TransactionTypeName = "Tiền phòng đặt trước",
                     Amount = baseRoomCharge,
-                    CreatedAt = booking.CreatedAt
+                    CreatedAt = DateTime.Now
                 });
             }
             model.Transactions = transactions;
@@ -925,7 +928,7 @@ namespace PhucNguyenResort.Services.Reception
                     FolioId = folio.FolioId,
                     TransactionType = FolioTransactionType.RoomCharge,
                     Amount = baseRoomCharge,
-                    CreatedAt = booking.CreatedAt
+                    CreatedAt = now
                 });
             }
 
@@ -1008,6 +1011,13 @@ namespace PhucNguyenResort.Services.Reception
 
                     // Fire and forget
                     _ = _emailSender.SendEmailAsync(booking.User.Email, "Thông báo Nhận phòng (Check-in) Thành công - PhucNguyen Resort", htmlBody);
+
+                    // Send In-App Notification for Check-in
+                    _ = _notificationService.CreateAsync(
+                        booking.UserId,
+                        "Check-in thành công 🔑",
+                        $"Bạn đã nhận phòng thành công cho đơn đặt phòng #{booking.BookingId} (Phòng: {roomName}). Chúc bạn có một kỳ nghỉ thật tuyệt vời tại PhucNguyen Resort!"
+                    );
                 }
             }
             catch
@@ -1098,7 +1108,7 @@ namespace PhucNguyenResort.Services.Reception
                     TransactionId = 0,
                     TransactionTypeName = "Tiền phòng đặt trước",
                     Amount = baseRoomCharge,
-                    CreatedAt = booking.CreatedAt
+                    CreatedAt = DateTime.Now
                 });
             }
 
@@ -1187,6 +1197,13 @@ namespace PhucNguyenResort.Services.Reception
                                        .Replace("{{FinalAmount}}", (invoice.FinalAmount ?? 0).ToString("N0"));
 
                     _ = _emailSender.SendEmailAsync(booking.User.Email, "Cảm ơn Quý khách - Thông báo Check-out thành công từ PhucNguyen Resort", htmlBody);
+
+                    // Send In-App Notification for Check-out
+                    _ = _notificationService.CreateAsync(
+                        booking.UserId,
+                        "Check-out thành công 🏨",
+                        $"Bạn đã trả phòng thành công cho đơn đặt phòng #{booking.BookingId} (Phòng: {roomName}). Cảm ơn bạn đã lựa chọn PhucNguyen Resort, hy vọng sớm được đón tiếp bạn trở lại!"
+                    );
                 }
             }
             catch

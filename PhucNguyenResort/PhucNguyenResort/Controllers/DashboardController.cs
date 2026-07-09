@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data; // Nhận diện ResortDbContext
 using PhucNguyenResort.Enums; // Nhận diện trạng thái TourBookingStatus
 using PhucNguyenResort.Models;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.Services.TableReservations;
+using PhucNguyenResort.Services.Dashboard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,17 +31,24 @@ namespace PhucNguyenResort.Web.Controllers
         private readonly PhucNguyenResort.Services.Kots.IKotService _kotService;
         private readonly PhucNguyenResort.Data.ResortDbContext _context;
         private readonly ITableReservationService _tableReservationService;
+        private readonly INotificationService _notificationService;
+
+        private readonly IDashboardReportService _reportService;
 
         public DashboardController(
             PhucNguyenResort.Services.FoodOrders.IFoodOrderService foodOrderService,
             PhucNguyenResort.Services.Kots.IKotService kotService,
             PhucNguyenResort.Data.ResortDbContext context,
-            ITableReservationService tableReservationService)
+            ITableReservationService tableReservationService,
+            INotificationService notificationService,
+            IDashboardReportService reportService)
         {
             _foodOrderService = foodOrderService;
             _kotService = kotService;
             _context = context;
             _tableReservationService = tableReservationService;
+            _notificationService = notificationService;
+            _reportService = reportService;
         }
 
         // Trang chính: Tự động chuyển hướng đến dashboard phù hợp với role của người dùng
@@ -84,15 +93,110 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 2. Business Manager Dashboard
         [Authorize(Roles = "Business Manager")]
-        public async Task<IActionResult> Manager()
+        public async Task<IActionResult> Manager(int? month, int? year)
         {
-            var model = await _tableReservationService.GetFnBDashboardAsync(DateTime.Today);
+            var date = DateTime.Today;
+            var tableReservations = await _tableReservationService.GetFnBDashboardAsync(date);
+            var occupancy = await _reportService.GetOccupancyDataAsync(month ?? date.Month, year ?? date.Year);
+            var revenue = await _reportService.GetRevenueBreakdownAsync(month ?? date.Month, year ?? date.Year);
+            
+            // If month/year is 0, we treat it as All-Time
+            if (month == 0 || year == 0)
+            {
+                occupancy = await _reportService.GetOccupancyDataAsync(null, null);
+                revenue = await _reportService.GetRevenueBreakdownAsync(null, null);
+                month = 0;
+                year = 0;
+            }
+            else
+            {
+                month = month ?? date.Month;
+                year = year ?? date.Year;
+            }
+
+            var model = new PhucNguyenResort.ViewModels.Dashboard.ManagerDashboardViewModel
+            {
+                TableReservationDashboard = tableReservations,
+                Occupancy = occupancy,
+                Revenue = revenue,
+                SelectedMonth = month,
+                SelectedYear = year
+            };
             
             ViewBag.TotalRoomCategories = await _context.RoomCategories.CountAsync();
             ViewBag.TotalTours = await _context.Tours.CountAsync();
             ViewBag.PendingRefunds = await _context.Refunds.CountAsync(r => r.RefundStatus == PhucNguyenResort.Enums.RefundStatus.Pending);
 
             return View(model);
+        }
+
+        [Authorize(Roles = "Business Manager")]
+        public async Task<IActionResult> FinancialReport(int? month, int? year)
+        {
+            if (month == 0 || year == 0)
+            {
+                var report = await _reportService.GetFinancialReportAsync(null, null);
+                report.Month = 0;
+                report.Year = 0;
+                return View(report);
+            }
+            else
+            {
+                int m = month ?? DateTime.Today.Month;
+                int y = year ?? DateTime.Today.Year;
+
+                if (m < 1 || m > 12 || y < 2000 || y > 2100)
+                {
+                    return BadRequest("Invalid month or year.");
+                }
+
+                var report = await _reportService.GetFinancialReportAsync(m, y);
+                return View(report);
+            }
+        }
+
+        [Authorize(Roles = "Business Manager")]
+        public async Task<IActionResult> ExportExcel(int? month, int? year)
+        {
+            if (month == 0 || year == 0)
+            {
+                var bytes = await _reportService.ExportToExcelAsync(null, null);
+                return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"FinancialReport_AllTime.xlsx");
+            }
+            else
+            {
+                int m = month ?? DateTime.Today.Month;
+                int y = year ?? DateTime.Today.Year;
+                if (m < 1 || m > 12 || y < 2000 || y > 2100)
+                {
+                    return BadRequest("Invalid month or year.");
+                }
+
+                var bytes = await _reportService.ExportToExcelAsync(m, y);
+                return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"FinancialReport_{y}_{m:D2}.xlsx");
+            }
+        }
+
+        [Authorize(Roles = "Business Manager")]
+        public async Task<IActionResult> ExportPdf(int? month, int? year)
+        {
+            if (month == 0 || year == 0)
+            {
+                var bytes = await _reportService.ExportToPdfAsync(null, null);
+                return File(bytes, "application/pdf", $"FinancialReport_AllTime.pdf");
+            }
+            else
+            {
+                int m = month ?? DateTime.Today.Month;
+                int y = year ?? DateTime.Today.Year;
+                if (m < 1 || m > 12 || y < 2000 || y > 2100)
+                {
+                    return BadRequest("Invalid month or year.");
+                }
+
+                var bytes = await _reportService.ExportToPdfAsync(m, y);
+                return File(bytes, "application/pdf", $"FinancialReport_{y}_{m:D2}.pdf");
+            }
         }
 
         // 3. Receptionist (Front Desk) Dashboard
@@ -195,6 +299,8 @@ namespace PhucNguyenResort.Web.Controllers
                 ? "Table reservation confirmed successfully."
                 : "Unable to confirm this table reservation.";
 
+
+
             return RedirectToAction(nameof(TableReservations));
         }
 
@@ -259,6 +365,8 @@ namespace PhucNguyenResort.Web.Controllers
             TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
                 ? "Table reservation cancelled successfully."
                 : "Unable to cancel this table reservation.";
+
+
 
             return RedirectToAction(nameof(TableReservations));
         }

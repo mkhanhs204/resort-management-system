@@ -3,6 +3,7 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Email;
+using PhucNguyenResort.Services.Notifications;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,11 +14,13 @@ namespace PhucNguyenResort.Services.Refunds
     {
         private readonly ResortDbContext _context;
         private readonly IEmailSender _emailSender;
+        private readonly INotificationService _notificationService;
 
-        public RefundService(ResortDbContext context, IEmailSender emailSender)
+        public RefundService(ResortDbContext context, IEmailSender emailSender, INotificationService notificationService)
         {
             _context = context;
             _emailSender = emailSender;
+            _notificationService = notificationService;
         }
 
         public async Task<IEnumerable<Refund>> GetRefundsAsync(RefundStatus? status)
@@ -74,6 +77,13 @@ namespace PhucNguyenResort.Services.Refunds
                     </div>
                 ";
                 await _emailSender.SendEmailAsync(refund.Booking.User.Email, subject, message);
+
+                // Send In-App Notification
+                await _notificationService.CreateAsync(
+                    refund.Booking.UserId,
+                    "Hoàn tiền thành công 💸",
+                    $"Yêu cầu hoàn tiền {refund.RefundAmount:N0} VNĐ cho đơn đặt phòng #{refund.BookingId} đã được xử lý. Vui lòng kiểm tra tài khoản ngân hàng."
+                );
             }
 
             return new ProcessRefundResult { Success = true };

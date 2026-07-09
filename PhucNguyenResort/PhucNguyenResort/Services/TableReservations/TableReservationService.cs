@@ -3,6 +3,7 @@ using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Email;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.ViewModels.TableReservations;
 using System.Data;
 using System.Net;
@@ -20,11 +21,13 @@ public class TableReservationService : ITableReservationService
 
     private readonly ResortDbContext _context;
     private readonly IEmailSender _emailSender;
+    private readonly INotificationService _notificationService;
 
-    public TableReservationService(ResortDbContext context, IEmailSender emailSender)
+    public TableReservationService(ResortDbContext context, IEmailSender emailSender, INotificationService notificationService)
     {
         _context = context;
         _emailSender = emailSender;
+        _notificationService = notificationService;
     }
 
     public async Task<IReadOnlyList<AvailableTableViewModel>> SearchAvailableTablesAsync(
@@ -830,6 +833,13 @@ public class TableReservationService : ITableReservationService
                 reservation.User.Email,
                 $"{subject} - {reservation.ReservationCode}",
                 htmlBody);
+
+            // Send In-App Notification
+            await _notificationService.CreateAsync(
+                reservation.UserId,
+                subject,
+                $"{message} Đặt bàn: {reservation.ReservationCode}."
+            );
         }
         catch
         {

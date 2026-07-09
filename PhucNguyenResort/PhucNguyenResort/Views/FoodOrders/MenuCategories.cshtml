@@ -1,111 +1,227 @@
 @model PhucNguyenResort.ViewModels.FoodOrders.MenuCategoryBrowseViewModel
+@using System.Text.Json
 
 @{
-    ViewData["Title"] = "Room Service";
+    ViewData["Title"] = "Thực Đơn Tại Phòng";
 }
 
-<div class="rs-page">
-    <div class="rs-container">
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .luxury-shadow {
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.06);
+        }
+        .luxury-gradient-overlay {
+            background: linear-gradient(180deg, rgba(28, 28, 26, 0) 0%, rgba(28, 28, 26, 0.85) 100%);
+        }
+        .booking-bar-blur {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .cat-card-img { transition: transform 0.7s ease; }
+        .group:hover .cat-card-img { transform: scale(1.05); }
+    </style>
+}
 
-        @* -- Booking Info Bar -- *@
-        @if (Model.BookingId > 0)
+<main>
+
+    <!-- Hero Section -->
+    <section class="relative h-[65vh] min-h-[500px] pb-16 w-full flex flex-col items-center justify-center bg-inverse-surface">
+        
+        @if (Model.BookingId > 0 && !string.IsNullOrWhiteSpace(Model.RoomNumber))
         {
-            <div class="rs-booking-bar">
-                <div class="booking-info">
-                    <span class="room-badge"><i class="fa fa-bed"></i> Room @Model.RoomNumber</span>
-                    <span class="booking-id">Booking #@Model.BookingId · @Model.CustomerName</span>
-                </div>
-                <div class="booking-actions">
-                    <a asp-action="MyOrders" class="rs-btn rs-btn-outline rs-btn-sm">
-                        <i class="fa fa-list"></i> My Orders
+            <!-- Floating Booking Info Bar -->
+            <div class="absolute top-8 left-1/2 -translate-x-1/2 z-40 w-full max-w-xl px-margin-mobile md:px-0">
+                <div class="bg-surface rounded-full border border-outline/15 shadow-md py-3 px-8 flex justify-between items-center">
+                    <div class="flex items-center gap-stack-sm text-secondary">
+                        <span class="material-symbols-outlined text-[20px]">room_service</span>
+                        <span class="font-label-lg tracking-widest uppercase">Phòng @Model.RoomNumber</span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-outline/20"></div>
+                    <div class="flex items-center gap-stack-sm text-on-surface-variant">
+                        <span class="font-label-lg text-primary">Booking #@Model.BookingId</span>
+                    </div>
+                    <a asp-action="MyOrders" class="flex items-center text-primary hover:scale-105 transition-transform" title="My Orders">
+                        <span class="material-symbols-outlined">list_alt</span>
                     </a>
                 </div>
             </div>
         }
+        <div class="absolute inset-0 bg-cover bg-center opacity-40 pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1544148103-0773bf10d330?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-transparent to-transparent opacity-80 pointer-events-none"></div>
+        <div class="relative z-10 text-center max-w-3xl px-margin-mobile md:px-0 mt-20">
+            <h1 class="font-headline-lg text-[64px] leading-tight text-white mb-stack-md font-bold tracking-tight">
+                Nghệ Thuật <br/><span class="text-primary-fixed-dim italic font-light">Ẩm Thực Tại Phòng</span>
+            </h1>
+            <p class="text-surface-variant text-body-lg mb-stack-lg max-w-xl mx-auto opacity-90 shadow-sm">
+                Trải nghiệm ẩm thực tinh hoa được phục vụ riêng cho không gian nghỉ dưỡng của bạn. 
+                Sẵn sàng phục vụ 24/7.
+            </p>
+            <div class="flex gap-4 justify-center">
+                <a href="#category-grid-section" class="bg-primary-fixed-dim text-on-primary-fixed px-8 py-3 rounded-full font-label-lg uppercase tracking-wider hover:bg-primary-fixed transition-colors backdrop-blur-md">
+                    Khám Phá Danh Mục
+                </a>
+                <a asp-action="OrderMenu" asp-route-bookingId="@(Model.BookingId > 0 ? Model.BookingId : null)" class="bg-surface/20 text-white backdrop-blur-md border border-white/20 px-8 py-3 rounded-full font-label-lg uppercase tracking-wider hover:bg-white/30 transition-colors">
+                    Xem Toàn Bộ Thực Đơn
+                </a>
+            </div>
+        </div>
+    </section>
 
-        @* -- Hero Section -- *@
-        <div class="rs-hero">
-            <h1>Room <span>Service</span></h1>
-            <p>Explore our curated dining experience, delivered straight to your room</p>
+    <!-- Overlapping Content Section -->
+    <div class="relative z-20 -mt-20 bg-surface rounded-t-[3rem] shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)] w-full pt-12 pb-20">
+        <!-- Category Grid Section -->
+        <section class="max-w-container-max mx-auto px-margin-desktop" id="category-grid-section">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-stack-lg gap-stack-md">
+            <div class="space-y-2">
+                <span class="text-primary font-label-lg tracking-[0.2em] uppercase">Bộ Sưu Tập Ẩm Thực</span>
+                <h2 class="font-headline-md text-headline-md">Khám Phá Danh Mục</h2>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" class="p-2 rounded-full border border-outline/20 hover:border-primary text-secondary hover:text-primary transition-all" onclick="changeCatPage(-1)" id="cat-prev-btn">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button type="button" class="p-2 rounded-full border border-outline/20 hover:border-primary text-secondary hover:text-primary transition-all" onclick="changeCatPage(1)" id="cat-next-btn">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
         </div>
 
-        @* -- Messages -- *@
-        @if (!string.IsNullOrWhiteSpace(Model.Message))
-        {
-            <div class="rs-alert rs-alert-info">
-                <i class="fa fa-info-circle"></i> @Model.Message
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter" id="category-grid">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- View Full Menu Button (Bottom) -->
+        <div class="mt-12 text-center">
+            <a asp-action="OrderMenu" asp-route-bookingId="@(Model.BookingId > 0 ? Model.BookingId : null)" class="inline-flex items-center gap-2 bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-label-lg uppercase tracking-widest shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
+                <span class="material-symbols-outlined">restaurant_menu</span>
+                Xem Toàn Bộ Thực Đơn & Đặt Món
+            </a>
+        </div>
+        </div>
+    </section>
+    </div> <!-- Close Overlapping Content Section -->
+
+    <!-- Order Assistance CTA -->
+    <section class="bg-surface-container py-stack-lg">
+        <div class="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row items-center justify-between gap-stack-md">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">support_agent</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-sm text-lg text-on-surface">Cần được gợi ý?</h3>
+                    <p class="text-body-md text-on-surface-variant">Nhân viên hỗ trợ ẩm thực của chúng tôi luôn sẵn sàng hỗ trợ bạn.</p>
+                </div>
             </div>
+            <button class="border border-outline px-6 py-2 rounded-lg font-label-lg text-on-surface hover:bg-surface-variant transition-colors">
+                Gọi Lễ Tân (Nhấn số 0)
+            </button>
+        </div>
+    </section>
+
+</main>
+
+@section Scripts {
+    <script>
+        const categories = @Html.Raw(JsonSerializer.Serialize(Model.Categories.Select(c => new {
+            id = c.CategoryId,
+            name = c.CategoryName,
+            imageUrl = c.ImageUrl,
+            count = c.ItemCount
+        })));
+        
+        const bookingIdParam = @(Model.BookingId > 0 ? Model.BookingId.ToString() : "null");
+        
+        const CAT_PER_PAGE = 4;
+        let currentCatPage = 1;
+        
+        const fallbackImages = {
+            "Breakfast": "https://lh3.googleusercontent.com/aida-public/AB6AXuAqEVHO0OTG-LauaMPGCuZY_SaEE15NBPqNc6YcCGICUQYyfIO4FykFc3QucUbebXewqdsG4GNVGq9Yft_sbSxW0b2NH24hnNOf3LMJZAfd3ogTn7Vgkovt_FFLFYX5CZAuTWEeusinBBOLIhvtKqctvxqQJVynRdphikKSYl5HH-Tg18e1G9jQ2K9S2tl9O_2nB-0moHVk0SCr3nUzTpp5Wz1Bh1y8XNU_8Ypq9XAs4cCmAxb6h0FZjbiMaQHtbVx7898dT6oJNbPf",
+            "Cocktails & Wine": "https://lh3.googleusercontent.com/aida-public/AB6AXuDXP8iyXUMf8kz-JfeezjvyvNOa0BW44e8ydMRAYAWBAFo1QgolHJkOOprOZE5skCljoQhC9ZMIgU-Xp5ILv0AgkD0H18kico7pyT1mLu-3i0F5FfMZ4IyH0R4VrDTESBzKERjAna9eIR2Q6c0-WYP9ovHtlzIKdpIRjDx9s8TC8X44g6-yVhRCPJpjXrnjZRefXGymChfxOvUqTTw8Kioo6uKja5Ykw_oLbUvLBKVoSwcuyGYM1LN0UvMjuJtxXy3DSHVRkOImbyNh",
+            "Fine Dining": "https://lh3.googleusercontent.com/aida-public/AB6AXuBaj4sgUeFeRNPEyyZEZHhRVzJhswkYYHNfLhEcZEGPzVG5F-M65jczuWsoiot7p3X18lK91V-QXQOqAPV6w1zFpcV0DTVyWwAuY-CLbatpjiMuQyXdQpnBjq3DQ_2SgnS0dExTMBliKSaCrAXQnfJ9ACoZl9OEMADKM1vcirDmf6P63vjiT6Y3pEAk9E2gKrlh8Mb9VfVRtwwuTq8A0kpnNF_k61kWeNfRifTqRfHyBVjASdx29EpgQ-xJhAWizTpLL_U5G6cYzV92",
+            "Local Specialities": "https://lh3.googleusercontent.com/aida-public/AB6AXuDiky1tSkCmdqA-7_I7TDL2B3ButQ2uBJ4iAZtqd0jCVkXLq1vlrAFiU-KoLRXPLK1N65vBSIHCFZEytMxPzHjbgdivpBQFGmw7iP1uC04RPZ1JSjLjom6BlaCLr0cLHp51Z4W95WQojWcm0-DkYa3UYocsvV-Ft3vvycPtC06j05mLipiJAkBftNvPR1pWaX0aHBkx9eIqryrJjvYyaGn23F45kjykKjG56zxTnG0a_1j6I_yCsX_tugpg291rupkiiZKaOEJoOf-e",
+            "Default": "https://lh3.googleusercontent.com/aida-public/AB6AXuAp2nTjwTEziFEYff-kVSu8N9ZFeJ0Qb5--rk_zAvPRHPdhuEy3SpFU1l5Nv_vnqlXG-AkmjWMNLCyFeHrZWiGGaYpY0VgpyGNf3_uxl3UXV_8NbtROIlZ_sIPxapTAnXZHAQgloHmXIL0xWI4daCEB00g90APM_CzIQ_VZEtuE5-77u89QaudmjATyGu3qwTd7nm0drH80dRDaGoOwFNqxQ0eq1ZRGdD2T2mpoMne5XrL3irJ8T446OJiHWBZ2cp4gujep3me70vLC"
+        };
+
+        function getImageUrl(cat) {
+            if (cat.imageUrl) return cat.imageUrl;
+            let name = cat.name;
+            let match = Object.keys(fallbackImages).find(k => name.toLowerCase().includes(k.toLowerCase()));
+            return match ? fallbackImages[match] : fallbackImages["Default"];
         }
 
-        @* -- Category Cards Grid -- *@
-        @if (Model.Categories.Any())
-        {
-            <div class="rs-categories-grid">
-                @foreach (var category in Model.Categories)
-                {
-                    <a asp-action="OrderMenu"
-                       asp-route-bookingId="@(Model.BookingId > 0 ? Model.BookingId : null)"
-                       asp-route-categoryId="@category.CategoryId"
-                       class="rs-category-card" id="category-card-@category.CategoryId">
-                        @if (!string.IsNullOrWhiteSpace(category.ImageUrl))
-                        {
-                            <img src="@category.ImageUrl" alt="@category.CategoryName"
-                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
-                            <div class="no-image-placeholder" style="display:none;">
-                                <i class="fa fa-cutlery"></i>
+        function renderCategories() {
+            const grid = document.getElementById('category-grid');
+            
+            const totalPages = Math.ceil(categories.length / CAT_PER_PAGE) || 1;
+            if(currentCatPage > totalPages) currentCatPage = totalPages;
+            
+            const start = (currentCatPage - 1) * CAT_PER_PAGE;
+            const end = start + CAT_PER_PAGE;
+            const currentCats = categories.slice(start, end);
+            
+            if (categories.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-on-surface-variant">Hiện tại chưa có danh mục nào.</div>';
+            } else {
+                grid.innerHTML = currentCats.map((cat, idx) => {
+                    const spanClass = (idx % 3 === 0) ? "md:col-span-8" : "md:col-span-4";
+                    const img = getImageUrl(cat);
+                    
+                    let url = '/FoodOrders/OrderMenu?categoryId=' + cat.id;
+                    if (bookingIdParam) url += '&bookingId=' + bookingIdParam;
+                    
+                    return `
+                    <a href="${url}" class="group relative ${spanClass} h-[400px] overflow-hidden rounded-xl bg-surface-container shadow-sm border border-outline/5 block transition-all hover:shadow-xl">
+                        <div class="absolute inset-0 bg-cover bg-center cat-card-img" style="background-image: url('${img}')"></div>
+                        <div class="absolute inset-0 luxury-gradient-overlay opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                        <div class="absolute bottom-0 left-0 p-stack-lg w-full flex justify-between items-end">
+                            <div>
+                                <h3 class="font-headline-sm text-headline-sm text-white mb-1">${cat.name}</h3>
+                                <p class="text-surface-variant font-label-lg text-white opacity-80">${cat.count} món</p>
                             </div>
-                        }
-                        else
-                        {
-                            <div class="no-image-placeholder">
-                                <i class="fa fa-cutlery"></i>
+                            <div class="bg-primary-container text-on-primary-container w-12 h-12 flex items-center justify-center rounded-full transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                                <span class="material-symbols-outlined">arrow_forward</span>
                             </div>
-                        }
-                        <div class="card-overlay">
-                            <h3>@category.CategoryName</h3>
-                            <span class="item-count">@category.ItemCount item@(category.ItemCount != 1 ? "s" : "")</span>
                         </div>
                     </a>
-                }
-            </div>
-
-            @* -- View Full Menu Button -- *@
-            <div class="rs-view-full-menu">
-                <a asp-action="OrderMenu"
-                   asp-route-bookingId="@(Model.BookingId > 0 ? Model.BookingId : null)"
-                   class="rs-btn rs-btn-primary" id="view-full-menu-btn">
-                    <i class="fa fa-th-large"></i> View Full Menu
-                </a>
-            </div>
-        }
-        else
-        {
-            <div class="rs-empty-state">
-                <div class="empty-icon"><i class="fa fa-cutlery"></i></div>
-                <h3>No Menu Available</h3>
-                <p>Our kitchen is currently not serving. Please check back later.</p>
-            </div>
-        }
-
-        @* -- Bottom Navigation -- *@
-        <div class="rs-bottom-nav">
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <a asp-action="MyOrders">
-                    <i class="fa fa-clock-o"></i> My Orders
-                </a>
+                    `;
+                }).join('');
             }
-            else
-            {
-                <a asp-controller="Account" asp-action="Login">
-                    <i class="fa fa-sign-in"></i> Sign in to order
-                </a>
+            
+            const prevBtn = document.getElementById('cat-prev-btn');
+            const nextBtn = document.getElementById('cat-next-btn');
+            
+            if (currentCatPage === 1) {
+                prevBtn.classList.add('opacity-30', 'cursor-not-allowed');
+                prevBtn.disabled = true;
+            } else {
+                prevBtn.classList.remove('opacity-30', 'cursor-not-allowed');
+                prevBtn.disabled = false;
             }
-        </div>
+            
+            if (currentCatPage === totalPages || totalPages === 0) {
+                nextBtn.classList.add('opacity-30', 'cursor-not-allowed');
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.classList.remove('opacity-30', 'cursor-not-allowed');
+                nextBtn.disabled = false;
+            }
+        }
 
-    </div>
-</div>
+        function changeCatPage(dir) {
+            const totalPages = Math.ceil(categories.length / CAT_PER_PAGE);
+            currentCatPage += dir;
+            if(currentCatPage < 1) currentCatPage = 1;
+            if(currentCatPage > totalPages) currentCatPage = totalPages;
+            renderCategories();
+        }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/room-service.css" />
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+        });
+    </script>
 }

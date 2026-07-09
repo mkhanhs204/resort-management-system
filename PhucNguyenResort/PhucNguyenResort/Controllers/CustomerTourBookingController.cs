@@ -7,6 +7,7 @@ using PhucNguyenResort.Services.Tours;
 using PhucNguyenResort.ViewModels.Payments;
 using PhucNguyenResort.ViewModels.Tours;
 using System.Security.Claims;
+using PhucNguyenResort.Services.Notifications;
 
 namespace PhucNguyenResort.Controllers
 {
@@ -20,17 +21,20 @@ namespace PhucNguyenResort.Controllers
         private readonly IVnPayService _vnPayService;
         private readonly ResortDbContext _context;
         private readonly PhucNguyenResort.Services.Email.IEmailSender _emailSender;
+        private readonly INotificationService _notificationService;
 
         public CustomerTourBookingController(
             ICustomerTourBookingService tourBookingService,
             IVnPayService vnPayService,
             ResortDbContext context,
-            PhucNguyenResort.Services.Email.IEmailSender emailSender)
+            PhucNguyenResort.Services.Email.IEmailSender emailSender,
+            INotificationService notificationService)
         {
             _tourBookingService = tourBookingService;
             _vnPayService = vnPayService;
             _context = context;
             _emailSender = emailSender;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -377,7 +381,7 @@ namespace PhucNguyenResort.Controllers
                         </tr>
                         <tr>
                             <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Thời gian</td>
-                            <td style='padding: 10px; border: 1px solid #ddd;'>{booking.Schedule?.StartTime?.ToString(@"hh\:mm")}</td>
+                            <td style='padding: 10px; border: 1px solid #ddd;'>{(booking.Schedule?.StartTime.HasValue == true ? booking.Schedule.StartTime.Value.ToString(@"hh\:mm") : "")}</td>
                         </tr>
                         <tr>
                             <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Số người</td>
@@ -408,6 +412,16 @@ namespace PhucNguyenResort.Controllers
                 </div>";
 
                 _ = _emailSender.SendEmailAsync(booking.User.Email, subject, htmlBody);
+
+                // Gửi thông báo trong app (In-App Notification)
+                if (booking.UserId.HasValue)
+                {
+                    await _notificationService.CreateAsync(
+                        booking.UserId.Value,
+                        "Xác nhận đặt tour thành công 🌴",
+                        $"Tour '{booking.Schedule?.Tour?.TourName}' lúc {(booking.Schedule?.StartTime.HasValue == true ? booking.Schedule.StartTime.Value.ToString(@"hh\:mm") : "")} ngày {booking.Schedule?.TourDate?.ToString("dd/MM/yyyy")} đã được xác nhận. Vui lòng xem mã vé trong lịch sử đặt tour."
+                    );
+                }
             }
         }
     }

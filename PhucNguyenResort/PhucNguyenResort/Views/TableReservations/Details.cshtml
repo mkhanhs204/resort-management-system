@@ -2,153 +2,294 @@
 @model PhucNguyenResort.ViewModels.TableReservations.TableReservationDetailViewModel
 
 @{
-    ViewData["Title"] = "Reservation " + Model.ReservationCode;
-    var statusClass = Model.Status switch
+    ViewData["Title"] = "Chi tiết đặt bàn " + Model.ReservationCode;
+    
+    // Status UI Mappings
+    var statusBg = Model.Status switch
     {
-        TableReservationStatus.Pending => "pending",
-        TableReservationStatus.Confirmed => "confirmed",
-        TableReservationStatus.Seated => "seated",
-        TableReservationStatus.Completed => "completed",
-        TableReservationStatus.Cancelled => "cancelled",
-        TableReservationStatus.NoShow => "noshow",
-        _ => "pending"
+        TableReservationStatus.Pending => "bg-primary-container/20 text-primary",
+        TableReservationStatus.Confirmed => "bg-secondary-container/50 text-on-secondary-container",
+        TableReservationStatus.Seated => "bg-green-100 text-green-800",
+        TableReservationStatus.Completed => "bg-gray-100 text-gray-800",
+        TableReservationStatus.Cancelled => "bg-error-container text-on-error-container",
+        TableReservationStatus.NoShow => "bg-purple-100 text-purple-800",
+        _ => "bg-surface-variant text-on-surface-variant"
     };
+
+    var statusText = Model.Status switch
+    {
+        TableReservationStatus.Pending => "Chờ xác nhận",
+        TableReservationStatus.Confirmed => "Đã xác nhận",
+        TableReservationStatus.Seated => "Đang sử dụng",
+        TableReservationStatus.Completed => "Hoàn tất",
+        TableReservationStatus.Cancelled => "Đã hủy",
+        TableReservationStatus.NoShow => "Không đến",
+        _ => Model.Status.ToString()
+    };
+
     var canCancel = (Model.Status == TableReservationStatus.Pending || Model.Status == TableReservationStatus.Confirmed)
         && Model.ReservationDate.Date.Add(Model.ReservationTime) > DateTime.Now;
+
+    bool isSuccess = TempData["SuccessMessage"] != null;
+    string pageTitle = isSuccess ? "Đặt Bàn Thành Công!" : "Chi Tiết Đặt Bàn";
+    string pageSubtitle = isSuccess 
+        ? "Cảm ơn quý khách. Yêu cầu đặt bàn của quý khách đã được ghi nhận."
+        : "Thông tin chi tiết về yêu cầu đặt bàn của quý khách tại Phúc Nguyên Resort.";
 }
 
-<div class="tr-page">
-    <div class="tr-container tr-container-narrow">
-        <div class="tr-back-nav">
-            <a asp-action="MyReservations"><i class="fa fa-arrow-left"></i> My Reservations</a>
-        </div>
-
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="tr-alert tr-alert-success">
-                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
-            </div>
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
         }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="tr-alert tr-alert-danger">
-                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
-            </div>
+        body {
+            background-color: #fcf9f5 !important;
+            color: #1c1c1a;
+            -webkit-font-smoothing: antialiased;
         }
+        .luxury-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.04);
+        }
+        .grain-overlay {
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            opacity: 0.03;
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+        }
+        .success-checkmark-draw {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: dash 1s ease-in-out forwards;
+        }
+        @@keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+    </style>
+}
 
-        <div class="tr-detail-card">
-            <div class="tr-detail-hero">
-                <div class="tr-table-image tr-detail-image">
-                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+<!-- Grain Overlay -->
+<div class="grain-overlay"></div>
+
+<div class="-mt-[40px] md:-mt-[80px]">
+    <div class="min-h-screen pt-32 pb-24 px-margin-mobile md:px-margin-desktop">
+        <div class="max-w-3xl mx-auto relative z-10">
+            <!-- Header Section -->
+            <div class="text-center mb-12">
+                @if (isSuccess || Model.Status == TableReservationStatus.Confirmed)
+                {
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-primary-container/10 rounded-full mb-6">
+                        <svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle class="opacity-20" cx="12" cy="12" r="10"></circle>
+                            <path class="success-checkmark-draw" d="M7 13l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                }
+                else if (Model.Status == TableReservationStatus.Cancelled)
+                {
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-error-container/20 rounded-full mb-6">
+                        <span class="material-symbols-outlined text-4xl text-error">cancel</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-surface-variant rounded-full mb-6">
+                        <span class="material-symbols-outlined text-4xl text-on-surface-variant">info</span>
+                    </div>
+                }
+                <h1 class="font-headline-lg text-headline-lg mb-4">@pageTitle</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto">
+                    @pageSubtitle
+                </p>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="bg-error-container/20 border border-error/20 text-error px-4 py-3 rounded-lg mb-8 flex items-center gap-2">
+                    <span class="material-symbols-outlined">error</span>
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <!-- Booking Summary Card -->
+            <div class="bg-surface-container-lowest luxury-shadow rounded-xl border border-outline-variant/15 overflow-hidden mb-8">
+                <!-- Card Header -->
+                <div class="p-8 border-b border-outline-variant/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-surface-bright/50">
+                    <div>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest">Mã đặt bàn</span>
+                        <div class="flex items-center mt-1">
+                            <span class="font-headline-sm text-headline-sm text-primary">@Model.ReservationCode</span>
+                            <span class="ml-3 px-3 py-1 @statusBg text-[10px] font-bold rounded-full uppercase tracking-tighter">@statusText</span>
+                        </div>
+                    </div>
+                    <div class="text-right hidden md:block">
+                        <span class="material-symbols-outlined text-outline-variant text-4xl">restaurant</span>
+                    </div>
+                </div>
+
+                <!-- Card Body (Grid) -->
+                <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+                    <!-- Column 1 -->
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container text-primary flex-shrink-0">
+                                <span class="material-symbols-outlined">storefront</span>
+                            </div>
+                            <div>
+                                <p class="font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Nhà hàng / Bàn</p>
+                                <p class="font-body-md text-body-md font-semibold text-on-surface">@Model.TableName</p>
+                                <p class="font-label-sm text-on-surface-variant mt-0.5">Số @Model.TableNumber • Sức chứa: @Model.Capacity người</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container text-primary flex-shrink-0">
+                                <span class="material-symbols-outlined">calendar_today</span>
+                            </div>
+                            <div>
+                                <p class="font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Ngày & Giờ</p>
+                                <p class="font-body-md text-body-md font-semibold text-on-surface">@Model.ReservationTime.ToString(@"hh\:mm"), @Model.ReservationDate.ToString("dd/MM/yyyy")</p>
+                                <p class="font-label-sm text-on-surface-variant mt-0.5">Thời lượng: @Model.DurationMinutes phút</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Column 2 -->
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container text-primary flex-shrink-0">
+                                <span class="material-symbols-outlined">groups</span>
+                            </div>
+                            <div>
+                                <p class="font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Số lượng khách</p>
+                                <p class="font-body-md text-body-md font-semibold text-on-surface">@Model.PartySize Người</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container text-primary flex-shrink-0">
+                                <span class="material-symbols-outlined">deck</span>
+                            </div>
+                            <div>
+                                <p class="font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Vị trí</p>
+                                <p class="font-body-md text-body-md font-semibold text-on-surface">@Model.Area</p>
+                                @if (!string.IsNullOrWhiteSpace(Model.LocationNote))
+                                {
+                                    <p class="font-label-sm text-on-surface-variant mt-0.5">@Model.LocationNote</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extended Info Section -->
+                <div class="px-8 pb-8 grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 pt-4 border-t border-dashed border-outline-variant/30">
+                    <div>
+                        <p class="font-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Thời gian tạo</p>
+                        <p class="font-body-sm text-on-surface">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Thời gian xác nhận</p>
+                        <p class="font-body-sm text-on-surface">@(Model.ConfirmedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa xác nhận")</p>
+                    </div>
+                    
+                    @if (Model.BookingId.HasValue)
                     {
-                        <img src="@Model.ImageUrl" alt="@Model.TableName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                        <div class="tr-image-fallback" style="display:none;">
-                            <i class="fa fa-cutlery"></i>
+                        <div>
+                            <p class="font-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Liên kết phòng</p>
+                            <p class="font-body-sm text-on-surface font-semibold">Mã Booking: #@Model.BookingId</p>
                         </div>
                     }
-                    else
+                    
+                    @if (Model.IsChargedToRoom)
                     {
-                        <div class="tr-image-fallback">
-                            <i class="fa fa-cutlery"></i>
+                        <div>
+                            <p class="font-label-sm text-on-surface-variant/60 uppercase tracking-widest mb-1">Hóa đơn nhà hàng</p>
+                            <p class="font-body-sm text-primary font-semibold">Đã ghi nợ @Model.ChargedAmount.ToString("N0")đ vào phòng</p>
+                            @if (Model.ChargedAt.HasValue)
+                            {
+                                <p class="font-label-sm text-on-surface-variant text-[11px] mt-0.5">Lúc @Model.ChargedAt.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                            }
                         </div>
                     }
                 </div>
-                <div>
-            <div class="tr-detail-header">
-                <div>
-                    <span class="tr-eyebrow">Reservation</span>
-                    <h1>@Model.ReservationCode</h1>
-                    <p class="tr-detail-subtitle">@Model.TableName</p>
-                </div>
-                <span class="tr-status @statusClass">@Model.Status</span>
-            </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.Description))
-                    {
-                        <p class="tr-table-description">@Model.Description</p>
-                    }
-                    <div class="tr-table-meta tr-confirm-meta">
-                        @if (!string.IsNullOrWhiteSpace(Model.Area))
+
+                <!-- Special Requests / Pre-ordered Dishes -->
+                @if (!string.IsNullOrWhiteSpace(Model.SpecialRequests))
+                {
+                    <div class="bg-surface-container-low/50 p-8 border-t border-outline-variant/10">
+                        <h3 class="font-label-lg text-label-lg text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-[20px]">room_service</span>
+                            Yêu Cầu Đặc Biệt & Món Chọn Trước
+                        </h3>
+                        <div class="font-body-md text-on-surface-variant whitespace-pre-line leading-relaxed">@Model.SpecialRequests</div>
+                    </div>
+                }
+                
+                @if (Model.Status == TableReservationStatus.Cancelled)
+                {
+                    <div class="bg-error-container/10 p-8 border-t border-error/20">
+                        <h3 class="font-label-lg text-label-lg text-error uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[20px]">cancel</span>
+                            Thông tin hủy bàn
+                        </h3>
+                        <p class="font-body-md text-on-surface-variant"><strong>Lý do:</strong> @(Model.CancellationReason ?? "Không có lý do.")</p>
+                        @if (Model.CancelledAt.HasValue)
                         {
-                            <span><i class="fa fa-map-marker"></i> @Model.Area</span>
+                            <p class="font-label-sm text-on-surface-variant mt-2">Hủy lúc: @Model.CancelledAt.Value.ToString("dd/MM/yyyy HH:mm")</p>
                         }
-                        @if (!string.IsNullOrWhiteSpace(Model.TableType))
-                        {
-                            <span><i class="fa fa-tag"></i> @Model.TableType</span>
-                        }
-                        @if (!string.IsNullOrWhiteSpace(Model.LocationNote))
-                        {
-                            <span><i class="fa fa-location-arrow"></i> @Model.LocationNote</span>
-                        }
+                    </div>
+                }
+
+                <!-- Rules/Notes -->
+                <div class="p-8 border-t border-outline-variant/10 flex gap-3 items-start bg-surface-bright/50">
+                    <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">info</span>
+                    <div class="space-y-1">
+                        <p class="font-label-sm text-label-sm text-on-surface uppercase tracking-widest">Lưu ý quy định</p>
+                        <p class="font-body-md text-on-surface-variant text-[14px] leading-relaxed">
+                            Thời gian giữ bàn tối đa là 2 giờ. Sau 30 phút so với giờ đặt nếu quý khách không đến, hệ thống sẽ tự động hủy bàn (No Show). Vui lòng liên hệ lễ tân nếu quý khách cần thay đổi thời gian.
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="tr-detail-grid">
-                <div><span>Table</span><strong>@Model.TableName</strong></div>
-                <div><span>Table Number</span><strong>@Model.TableNumber</strong></div>
-                <div><span>Capacity</span><strong>@Model.Capacity guests</strong></div>
-                <div><span>Date</span><strong>@Model.ReservationDate.ToString("MMM dd, yyyy")</strong></div>
-                <div><span>Time</span><strong>@Model.ReservationTime.ToString(@"hh\:mm")</strong></div>
-                <div><span>Party Size</span><strong>@Model.PartySize guests</strong></div>
-                <div><span>Duration</span><strong>@Model.DurationMinutes minutes</strong></div>
-                <div><span>Created</span><strong>@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")</strong></div>
-                <div><span>Confirmed</span><strong>@(Model.ConfirmedAt?.ToString("MMM dd, yyyy HH:mm") ?? "Not yet")</strong></div>
-                <div><span>Room Booking</span><strong>@(Model.BookingId.HasValue ? $"Booking #{Model.BookingId}" : "Not linked")</strong></div>
-                <div>
-                    <span>Room Bill</span>
-                    <strong>
-                        @(Model.IsChargedToRoom ? $"Charged {Model.ChargedAmount:N0} VND" : "Not charged")
-                    </strong>
-                </div>
-            </div>
-
-            @if (Model.IsChargedToRoom && Model.ChargedAt.HasValue)
-            {
-                <div class="tr-note">
-                    <span>Charge to Room</span>
-                    <p>This restaurant charge was added to your room bill at @Model.ChargedAt.Value.ToString("MMM dd, yyyy HH:mm").</p>
-                </div>
-            }
-
-            @if (!string.IsNullOrWhiteSpace(Model.SpecialRequests))
-            {
-                <div class="tr-note">
-                    <span>Special Requests</span>
-                    <p>@Model.SpecialRequests</p>
-                </div>
-            }
-
-            @if (Model.Status == TableReservationStatus.Cancelled)
-            {
-                <div class="tr-note tr-note-danger">
-                    <span>Cancellation</span>
-                    <p>@(Model.CancellationReason ?? "No cancellation reason provided.")</p>
-                    @if (Model.CancelledAt.HasValue)
-                    {
-                        <small>@Model.CancelledAt.Value.ToString("MMM dd, yyyy HH:mm")</small>
-                    }
-                </div>
-            }
-
-            <div class="tr-actions">
-                <a asp-action="Search" class="tr-btn tr-btn-outline">
-                    <i class="fa fa-plus"></i> New Reservation
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a asp-action="MyReservations" class="bg-primary-container hover:bg-primary-container/90 text-on-primary-container px-8 py-4 rounded-xl font-label-lg text-label-lg transition-all active:scale-95 luxury-shadow flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">history</span>
+                    Xem Lịch Sử Đặt Bàn
                 </a>
+                
                 @if (canCancel)
                 {
-                    <form asp-action="Cancel" asp-route-id="@Model.ReservationId" method="post" class="tr-inline-form">
+                    <form asp-action="Cancel" asp-route-id="@Model.ReservationId" method="post" class="inline-block flex-1 sm:flex-none">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="reason" value="Cancelled by customer." />
-                        <button type="submit" class="tr-btn tr-btn-danger" onclick="return confirm('Cancel this reservation?');">
-                            <i class="fa fa-times"></i> Cancel Reservation
+                        <input type="hidden" name="reason" value="Khách hàng tự hủy trên hệ thống." />
+                        <button type="submit" class="w-full sm:w-auto border border-error text-error hover:bg-error/5 px-8 py-4 rounded-xl font-label-lg text-label-lg transition-all active:scale-95 flex items-center justify-center gap-2" onclick="return confirm('Bạn có chắc chắn muốn hủy đặt bàn này không?');">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                            Hủy Đặt Bàn
                         </button>
                     </form>
                 }
             </div>
+
+            <!-- Map/Location Teaser -->
+            <div class="mt-16 rounded-xl overflow-hidden h-48 relative border border-outline-variant/15 luxury-shadow">
+                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                {
+                    <img class="w-full h-full object-cover" src="@Model.ImageUrl" alt="@Model.TableName" onerror="this.onerror=null;this.src='https://placehold.co/800x400?text=No+Image';" />
+                }
+                else
+                {
+                    <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3lvp55uYwVYyp0d6Dulmv-XNlKs2b_yMbRrrs3jk1tAeyqYsnn3rmJJS07NY9bHWrUrzVHMjCV9GpXMZsI0yp1aDCbz7kVPTOmO0OHwUg21HBNJFjSzwVj_u1uZqI4LJK2V4lYSatxBTppUUJWI1VAhkqx8rZP7AosLCOstcJMxW72R6Ex8bfNzdSQZzTcBFCuAj1s44XPxYkcZrQo9LHa8P0dcklRRR1-pkHF_czOatWVuHjyDFAXA" alt="Resort Map" />
+                }
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end p-6">
+                    <div class="text-white">
+                        <p class="font-label-sm text-label-sm opacity-80 uppercase tracking-widest">Địa điểm</p>
+                        <p class="font-body-md font-semibold">@Model.TableName - @Model.Area</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-@section Styles {
-    <link rel="stylesheet" href="~/css/table-reservations.css" />
-}
