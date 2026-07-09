@@ -304,8 +304,15 @@ namespace PhucNguyenResort.Web.Controllers
         [Authorize(Roles = "Tour Guide")]
         public async Task<IActionResult> TourGuide()
         {
+            var currentUserId = GetCurrentUserId();
+            if (!currentUserId.HasValue)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             var schedules = await _context.TourSchedules
                 .Include(s => s.Tour)
+                .Where(s => s.GuideId == currentUserId.Value)
                 .OrderBy(s => s.TourDate)
                 .ThenBy(s => s.StartTime)
                 .ToListAsync();

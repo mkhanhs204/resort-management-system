@@ -105,6 +105,12 @@ public class DiningTableService : IDiningTableService
         return await query.AnyAsync();
     }
 
+    public async Task<int> GetReservationCountAsync(int tableId)
+    {
+        return await _context.TableReservations
+            .CountAsync(r => r.TableId == tableId);
+    }
+
     private static string NormalizeDisplayName(string? tableName, string? tableNumber)
     {
         if (!string.IsNullOrWhiteSpace(tableName))

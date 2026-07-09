@@ -443,7 +443,7 @@
                             @if (User.IsInRole("Receptionist") || User.IsInRole("Admin"))
                             {
                                 <td style="text-align: right; white-space: nowrap;">
-                                    <div style="display: flex; justify-content: flex-end; gap: 4px; flex-wrap: wrap; max-width: 250px; margin-left: auto;">
+                                    <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
                                         @if (item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Reserved || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.PendingPayment || item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived)
                                         {
                                             <a asp-action="CheckIn" asp-route-id="@item.BookingId" class="action-btn large success" title="@(item.BookingStatus == PhucNguyenResort.Enums.BookingStatus.Arrived ? "Giao phòng" : "Check-in")">
