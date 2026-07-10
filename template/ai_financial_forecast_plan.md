@@ -37,26 +37,26 @@ namespace PhucNguyenResort.ViewModels.Dashboard
     {
         public int ForecastMonth { get; set; }       // Tháng dự báo
         public int ForecastYear { get; set; }        // Năm dự báo
-      
+    
         // Dự báo doanh thu
         public decimal PredictedTotalRevenue { get; set; }
         public decimal PredictedRoomRevenue { get; set; }
         public decimal PredictedFnBRevenue { get; set; }
         public decimal PredictedTourRevenue { get; set; }
-      
+    
         // Dự báo công suất phòng
         public double PredictedOccupancyRate { get; set; }
-      
+    
         // So sánh với tháng trước
         public decimal RevenueChangePercent { get; set; }
         public double OccupancyChangePercent { get; set; }
-      
+    
         // Nhận xét/phân tích từ AI
         public string AiAnalysis { get; set; } = "";
-      
+    
         // Dữ liệu lịch sử để vẽ biểu đồ xu hướng (6 tháng gần nhất + 1 tháng dự báo)
         public List<MonthlyDataPoint> HistoricalData { get; set; } = new();
-      
+    
         // Thời gian tạo dự báo
         public DateTime GeneratedAt { get; set; }
     }
@@ -137,7 +137,7 @@ public class ForecastService : IForecastService
         // 1. Xác định tháng dự báo = tháng hiện tại + 1
         var today = DateTime.Today;
         var forecastDate = today.AddMonths(1);
-      
+    
         // 2. Lấy dữ liệu 6 tháng gần nhất
         var historicalData = new List<MonthlyDataPoint>();
         for (int i = 6; i >= 1; i--)
@@ -145,7 +145,7 @@ public class ForecastService : IForecastService
             var targetDate = today.AddMonths(-i + 1); // Bao gồm cả tháng hiện tại
             var revenue = await _reportService.GetRevenueBreakdownAsync(targetDate.Month, targetDate.Year);
             var occupancy = await _reportService.GetOccupancyDataAsync(targetDate.Month, targetDate.Year);
-          
+        
             historicalData.Add(new MonthlyDataPoint
             {
                 Label = $"{targetDate.Month:D2}/{targetDate.Year}",
@@ -157,11 +157,11 @@ public class ForecastService : IForecastService
                 IsForecast = false
             });
         }
-      
+    
         // 3. Xây dựng prompt và gọi Gemini API
         var prompt = BuildForecastPrompt(historicalData, forecastDate);
         var aiResponse = await CallGeminiApiAsync(prompt);
-      
+    
         // 4. Parse response JSON và trả về ViewModel
         // ... (parse JSON, tính toán % thay đổi, ghép biểu đồ)
     }

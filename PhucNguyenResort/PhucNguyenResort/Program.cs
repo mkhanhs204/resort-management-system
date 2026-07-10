@@ -77,6 +77,7 @@ builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
 builder.Services.AddScoped<ITableReservationService, TableReservationService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Dashboard.IDashboardReportService, PhucNguyenResort.Services.Dashboard.DashboardReportService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Dashboard.IForecastService, PhucNguyenResort.Services.Dashboard.ForecastService>();
 builder.Services.AddScoped<ITableFoodOrderService, TableFoodOrderService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Kots.IKotService, PhucNguyenResort.Services.Kots.KotService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Tables.IDiningTableService, PhucNguyenResort.Services.Tables.DiningTableService>();

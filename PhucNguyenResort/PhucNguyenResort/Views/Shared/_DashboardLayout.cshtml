@@ -61,6 +61,9 @@
                         <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "FinancialReport" ? "active" : "")">
                             <a asp-controller="Dashboard" asp-action="FinancialReport"><i class="fa fa-bar-chart"></i> Business Reports</a>
                         </li>
+                        <li class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Forecast" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="Forecast"><i class="fa fa-line-chart"></i> Dự Báo AI</a>
+                        </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Review" ? "active" : "")">
                             <a asp-controller="Review" asp-action="Manage"><i class="fa fa-star"></i> Đánh Giá Của Khách</a>
                         </li>
