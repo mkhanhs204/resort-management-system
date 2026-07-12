@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
+using System.Security.Claims;
 
 namespace PhucNguyenResort.Web.Controllers
 {
@@ -20,9 +21,16 @@ namespace PhucNguyenResort.Web.Controllers
         // Action hiển thị lịch trình Dashboard của Tour Guide
         public async Task<IActionResult> Index()
         {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentGuideId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             // 🔥 LOẠI BỎ HỦY: Chỉ lấy những lịch trình có trạng thái thực tế không bị hủy hoàn toàn từ cấu hình (nếu có)
             var schedules = await _context.TourSchedules
                 .Include(s => s.Tour)
+                .Where(s => s.GuideId == currentGuideId)
                 .OrderBy(s => s.TourDate)
                 .ToListAsync();
 
@@ -94,9 +102,15 @@ namespace PhucNguyenResort.Web.Controllers
         // Action xem danh sách vận hành hành khách (Guest List)
         public async Task<IActionResult> Participants(int scheduleId)
         {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentGuideId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             var schedule = await _context.TourSchedules
                 .Include(s => s.Tour)
-                .FirstOrDefaultAsync(s => s.ScheduleId == scheduleId);
+                .FirstOrDefaultAsync(s => s.ScheduleId == scheduleId && s.GuideId == currentGuideId);
 
             if (schedule == null) return NotFound();
 
@@ -159,10 +173,16 @@ namespace PhucNguyenResort.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int tourBookingId, TourBookingStatus status)
         {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int currentGuideId))
+            {
+                return Json(new { success = false, message = "Bạn cần đăng nhập lại để thực hiện thao tác này." });
+            }
+
             var booking = await _context.TourBookings
                 .Include(b => b.Schedule)
                 .ThenInclude(s => s.Tour)
-                .FirstOrDefaultAsync(b => b.TourBookingId == tourBookingId);
+                .FirstOrDefaultAsync(b => b.TourBookingId == tourBookingId && b.Schedule.GuideId == currentGuideId);
 
             if (booking == null)
             {

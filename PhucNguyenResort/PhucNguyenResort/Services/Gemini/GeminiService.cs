@@ -91,7 +91,7 @@ namespace PhucNguyenResort.Services.Gemini
                     generationConfig = new
                     {
                         temperature = 0.4, // Độ sáng tạo vừa phải để đảm bảo tính chính xác
-                        maxOutputTokens = 1000
+                        maxOutputTokens = 8000 // Tăng max token vì gemini-2.5-flash cần nhiều token để thinking
                     }
                 };
 

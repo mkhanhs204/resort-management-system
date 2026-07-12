@@ -97,25 +97,45 @@ public class TablesController : Controller
         return View(model);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpGet]
     public async Task<IActionResult> Delete(int id)
+    {
+        var table = await _tableService.GetByIdAsync(id);
+        if (table == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.ReservationCount = await _tableService.GetReservationCountAsync(id);
+
+        return View(table);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
         try
         {
+            var table = await _tableService.GetByIdAsync(id);
+            if (table == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var result = await _tableService.DeleteAsync(id);
             if (result)
             {
-                TempData["SuccessMessage"] = "Xóa bàn thành công.";
+                TempData["SuccessMessage"] = $"Xóa bàn \"{table.TableName}\" thành công.";
             }
             else
             {
                 TempData["ErrorMessage"] = "Không tìm thấy bàn để xóa.";
             }
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
-            TempData["ErrorMessage"] = ex.Message;
+            TempData["ErrorMessage"] = "Không thể xóa bàn này vì đang có đặt bàn hoạt động.";
         }
         catch (Exception)
         {

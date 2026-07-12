@@ -347,11 +347,10 @@
                                     <a asp-action="Edit" asp-route-id="@item.TableId" class="action-btn" title="Sửa">
                                         <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
                                     </a>
-                                    <form asp-action="Delete" asp-route-id="@item.TableId" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bàn ăn này?');">
-                                        <button type="submit" class="action-btn delete" title="Xóa">
-                                            <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
-                                        </button>
-                                    </form>
+                                    <a asp-action="Delete" asp-route-id="@item.TableId"
+                                       class="action-btn delete" title="Xóa" id="btn-delete-@item.TableId">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

@@ -199,7 +199,7 @@
                     <tbody>
                         @{
                             var nextTours = activeSchedules != null 
-                                ? activeSchedules.Where(s => (ViewData[$"Status_{s.ScheduleId}"]?.ToString() ?? "") == "Upcoming").Take(2).ToList()
+                                ? activeSchedules.Where(s => (ViewData[$"Status_{s.ScheduleId}"]?.ToString() ?? "") == "Upcoming" && s.TourDate?.Date == DateTime.Today).ToList()
                                 : new List<dynamic>();
                         }
                         @if (nextTours.Any())
@@ -229,47 +229,109 @@
     </div>
 
     <div class="col-lg-4">
-        <div class="action-card mb-4">
+        <div class="action-card mb-4" style="background: linear-gradient(135deg, #fdfbf7 0%, #f6f3ef 100%);">
             <h5 class="section-header">
-                <span class="material-symbols-outlined" style="color: #ba1a1a;">campaign</span> Thông Báo
+                <span class="material-symbols-outlined" style="color: #dfa974;">routine</span> Thời Tiết Dự Kiến
             </h5>
-            <div class="notice-container mt-3">
-                <div class="notice-item">
-                    <strong style="color: #1c1c1a;">[⚠️ Chú ý Thời Tiết]</strong> Biển động nhẹ vào buổi chiều, các tour đường thủy chú ý áo phao đầy đủ cho du khách.
+            <div class="mt-3">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h4 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px;">Hòa Lạc</h4>
+                        <p style="color: #827569; font-size: 14px; font-weight: 500; margin-bottom: 0;">Hôm nay</p>
+                    </div>
+                    <span id="current-weather-icon" class="material-symbols-outlined" style="font-size: 40px; color: #f59e0b; font-variation-settings: 'FILL' 1;">light_mode</span>
                 </div>
-                <div class="notice-item">
-                    <strong style="color: #1c1c1a;">[📢 Quy định mới]</strong> Hoàn thành báo cáo sĩ số khách (Manifest) chậm nhất 15 phút sau khi khởi hành tour.
+                <div style="display: flex; align-items: flex-end; gap: 16px; margin-top: 16px;">
+                    <span id="current-temperature" style="font-size: 36px; font-weight: 700; color: #1c1c1a; line-height: 1;">--°C</span>
+                    <div style="color: #50453b; font-size: 13px; padding-bottom: 4px;">
+                        <p id="current-weather-desc" style="margin-bottom: 2px; font-weight: 600;">Đang tải...</p>
+                        <p id="current-weather-details" style="margin-bottom: 0;">Độ ẩm: --% • Gió: --km/h</p>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="action-card">
-            <h5 class="section-header">
-                <span class="material-symbols-outlined" style="color: #0b5c2d;">home_repair_service</span> Thiết Bị
-            </h5>
-            <div class="list-group luxury-list mt-3">
-                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 20px; color: #805528;">speaker_phone</span>
-                        Bộ đàm điều hành
-                    </span>
-                    <span class="status-badge confirmed" style="font-size: 11px;">Kênh 02</span>
-                </div>
-                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 20px; color: #805528;">medical_services</span>
-                        Túi y tế
-                    </span>
-                    <span class="status-badge confirmed" style="font-size: 11px;">Sẵn sàng</span>
-                </div>
-                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 20px; color: #805528;">badge</span>
-                        Thẻ Hướng Dẫn Viên
-                    </span>
-                    <span class="status-badge completed" style="font-size: 11px;">Bắt buộc</span>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(212, 195, 182, 0.5); text-align: center;">
+                    <div>
+                        <p style="font-size: 12px; color: #827569; margin-bottom: 4px;">Ngày mai</p>
+                        <span id="day1-icon" class="material-symbols-outlined" style="color: #f59e0b; font-size: 24px; margin-bottom: 4px;">partly_cloudy_day</span>
+                        <p id="day1-temp" style="font-size: 14px; font-weight: 600; color: #1c1c1a; margin-bottom: 0;">--°</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 12px; color: #827569; margin-bottom: 4px;">Ngày 3</p>
+                        <span id="day2-icon" class="material-symbols-outlined" style="color: #f59e0b; font-size: 24px; margin-bottom: 4px; font-variation-settings: 'FILL' 1;">light_mode</span>
+                        <p id="day2-temp" style="font-size: 14px; font-weight: 600; color: #1c1c1a; margin-bottom: 0;">--°</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 12px; color: #827569; margin-bottom: 4px;">Ngày 4</p>
+                        <span id="day3-icon" class="material-symbols-outlined" style="color: #a4b5ce; font-size: 24px; margin-bottom: 4px; font-variation-settings: 'FILL' 1;">cloud</span>
+                        <p id="day3-temp" style="font-size: 14px; font-weight: 600; color: #1c1c1a; margin-bottom: 0;">--°</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Tọa độ Hòa Lạc
+            const lat = 21.0116; 
+            const lon = 105.5283;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max&timezone=Asia%2FBangkok&forecast_days=4`;
+
+            function getWeatherInfo(code) {
+                if (code === 0) return { text: 'Quang đãng', icon: 'light_mode', color: '#f59e0b' };
+                if (code >= 1 && code <= 3) return { text: 'Có mây', icon: 'partly_cloudy_day', color: '#f59e0b' };
+                if (code === 45 || code === 48) return { text: 'Sương mù', icon: 'foggy', color: '#a4b5ce' };
+                if (code >= 51 && code <= 67) return { text: 'Mưa', icon: 'rainy', color: '#3b82f6' };
+                if (code >= 71 && code <= 77) return { text: 'Tuyết', icon: 'ac_unit', color: '#93c5fd' };
+                if (code >= 80 && code <= 82) return { text: 'Mưa rào', icon: 'rainy', color: '#3b82f6' };
+                if (code >= 95) return { text: 'Dông sét', icon: 'thunderstorm', color: '#64748b' };
+                return { text: 'Không rõ', icon: 'cloud', color: '#a4b5ce' };
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const current = data.current;
+                    const daily = data.daily;
+                    
+                    const currInfo = getWeatherInfo(current.weather_code);
+                    
+                    // Cập nhật thời tiết hiện tại
+                    const iconEl = document.getElementById('current-weather-icon');
+                    if(iconEl) {
+                        iconEl.innerText = currInfo.icon;
+                        iconEl.style.color = currInfo.color;
+                    }
+                    
+                    const tempEl = document.getElementById('current-temperature');
+                    if(tempEl) tempEl.innerText = Math.round(current.temperature_2m) + '°C';
+                    
+                    const descEl = document.getElementById('current-weather-desc');
+                    if(descEl) descEl.innerText = currInfo.text;
+                    
+                    const detailsEl = document.getElementById('current-weather-details');
+                    if(detailsEl) detailsEl.innerText = `Độ ẩm: ${current.relative_humidity_2m}% • Gió: ${current.wind_speed_10m}km/h`;
+
+                    // Cập nhật dự báo 3 ngày tiếp theo
+                    for (let i = 1; i <= 3; i++) {
+                        const dInfo = getWeatherInfo(daily.weather_code[i]);
+                        
+                        const dIconEl = document.getElementById(`day${i}-icon`);
+                        if(dIconEl) {
+                            dIconEl.innerText = dInfo.icon;
+                            dIconEl.style.color = dInfo.color;
+                        }
+                        
+                        const dTempEl = document.getElementById(`day${i}-temp`);
+                        if(dTempEl) dTempEl.innerText = Math.round(daily.temperature_2m_max[i]) + '°';
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching weather:", err);
+                    const descEl = document.getElementById('current-weather-desc');
+                    if(descEl) descEl.innerText = 'Không thể tải dữ liệu';
+                });
+        });
+    </script>
+}

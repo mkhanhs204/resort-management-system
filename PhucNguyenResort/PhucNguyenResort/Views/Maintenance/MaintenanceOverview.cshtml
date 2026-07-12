@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Maintenance Overview";
+    Layout = "_DashboardLayout";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-wrench mr-2" style="color: #6c757d;"></i> Maintenance — Tổng quan vận hành
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Hệ thống thống kê dữ liệu, tiếp nhận sửa chữa trang thiết bị resort.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545; padding: 25px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); border-radius: 4px;">
+            <i class="fa fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+            <h5 class="text-muted mb-1" style="font-family: 'Cabin', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Sự cố chưa xử lý</h5>
+            <h2 class="mt-1 font-weight-bold display-4" style="font-family: 'Lora', serif; color: #dc3545;">@ViewData["PendingTasksCount"]</h2>
+            <p class="text-muted mb-0 mt-2" style="font-family: 'Cabin', sans-serif; font-size: 13px;">Các phòng đang bị khóa và chờ đội kỹ thuật hỗ trợ khắc phục.</p>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745; padding: 25px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); border-radius: 4px;">
+            <i class="fa fa-check-circle fa-2x text-success mb-2"></i>
+            <h5 class="text-muted mb-1" style="font-family: 'Cabin', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Đã khắc phục hôm nay</h5>
+            <h2 class="mt-1 font-weight-bold display-4" style="font-family: 'Lora', serif; color: #28a745;">@ViewData["ResolvedTodayCount"]</h2>
+            <p class="text-muted mb-0 mt-2" style="font-family: 'Cabin', sans-serif; font-size: 13px;">Hiệu suất xử lý sự cố thiết bị của tổ bảo trì tính đến thời điểm hiện tại.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-lg-8 mb-4">
+        <div class="card-box p-4 h-100" style="border-left: 5px solid #17a2b8; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); border-radius: 4px; font-family: 'Cabin', sans-serif;">
+            <h6 class="font-weight-bold text-info mb-3" style="font-size: 16px;"><i class="fa fa-info-circle mr-1"></i> Luồng vận hành đồng bộ:</h6>
+            <p class="text-secondary" style="font-size: 14px; line-height: 1.6;">
+                When a maintenance technician completes a repair and clicks <strong>"Mark Resolved"</strong> inside the Maintenance Requests queue, the system automatically changes the room status to <strong>Needs Cleaning</strong>.
+            </p>
+            <p class="text-secondary" style="font-size: 14px; line-height: 1.6; margin-bottom: 0;">
+                The room will immediately appear in the **Housekeeping Staff** workflow queue for proper tool dust vacuuming and detailing before being marked ready to welcome guests.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4 text-center">
+        <div class="card-box p-4 h-100" style="border: 1px dashed #dfa974; background: #fdfefe; box-shadow: 0 0 10px rgba(0,0,0,0.02); border-radius: 4px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <i class="fa fa-wrench fa-3x mb-3" style="color: #dfa974;"></i>
+            <h5 class="font-weight-bold mb-2" style="font-family: 'Lora', serif; color: #333;">Sẵn sàng làm việc?</h5>
+            <p class="text-muted small px-2 mb-4" style="font-family: 'Cabin', sans-serif; font-size: 14px;">Hãy chuyển sang mục yêu cầu bảo trì để xem chi tiết danh sách trang thiết bị hỏng cần sửa chữa.</p>
+            <div>
+                <a asp-controller="Maintenance" asp-action="Details" class="btn btn-warning btn-lg shadow-sm font-weight-bold" style="font-family: 'Cabin', sans-serif; border-radius: 30px; padding: 12px 35px; background-color: #dfa974; border-color: #dfa974; color: #fff;">
+                    Xem Maintenance Requests <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
