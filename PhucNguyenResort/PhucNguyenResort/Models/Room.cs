@@ -1,6 +1,5 @@
+﻿using PhucNguyenResort.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using PhucNguyenResort.Enums;
 
 namespace PhucNguyenResort.Models;
 
@@ -17,6 +16,10 @@ public class Room
     public int? FloorNumber { get; set; }
 
     public RoomStatus Status { get; set; } = RoomStatus.Available;
+
+    // BỔ SUNG: Lưu vết tên tài khoản nhân viên đang dọn dẹp phòng này
+    [StringLength(100)]
+    public string? AssignedStaffName { get; set; }
 
     public RoomCategory? Category { get; set; }
     public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();

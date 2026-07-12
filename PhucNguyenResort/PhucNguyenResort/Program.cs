@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Hubs;
@@ -39,7 +38,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             {
                 var dbContext = context.HttpContext.RequestServices.GetRequiredService<ResortDbContext>();
                 var userIdString = context.Principal?.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                
+
                 if (int.TryParse(userIdString, out int userId))
                 {
                     var isBlocked = await dbContext.Users
@@ -108,7 +107,8 @@ builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PdpdDataPur
 builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourBookingCleanupJob>();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Email.OtpCleanupJob>();
 builder.Services.AddHostedService<PhucNguyenResort.Services.Bookings.PendingBookingCleanupJob>();
-
+builder.Services.AddScoped<PhucNguyenResort.Services.Housekeeping.IHousekeepingService, PhucNguyenResort.Services.Housekeeping.HousekeepingService>();
+builder.Services.AddScoped<PhucNguyenResort.Services.Maintenance.IMaintenanceService, PhucNguyenResort.Services.Maintenance.MaintenanceService>();
 // Service tự động cập nhật đồng bộ trạng thái Tour theo thời gian thực vừa thêm
 builder.Services.AddHostedService<PhucNguyenResort.Services.Tours.TourStatusWorker>();
 
