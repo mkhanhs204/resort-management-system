@@ -27,30 +27,30 @@
     - [2.8 Payment Status](#28-payment-status)
     - [2.9 Folio Status](#29-folio-status)
   - [3. Detailed Design](#3-detailed-design)
-    - [3.1 Auth, Profiles & Master Data](#31-auth-profiles--master-data)
-    - [3.2 Room Reservation & Front Desk](#32-room-reservation--front-desk)
-    - [3.3 Restaurant POS & Room Service](#33-restaurant-pos--room-service)
-    - [3.4 Tour Booking & Feedback System](#34-tour-booking--feedback-system)
-    - [3.5 Consolidated Billing & Dashboards](#35-consolidated-billing--dashboards)
+    - [3.1 Auth, Profiles &amp; Master Data](#31-auth-profiles--master-data)
+    - [3.2 Room Reservation &amp; Front Desk](#32-room-reservation--front-desk)
+    - [3.3 Restaurant POS &amp; Room Service](#33-restaurant-pos--room-service)
+    - [3.4 Tour Booking &amp; Feedback System](#34-tour-booking--feedback-system)
+    - [3.5 Consolidated Billing &amp; Dashboards](#35-consolidated-billing--dashboards)
 
 ---
 
-# **I. Record of Changes** {#i-record-of-changes}
+# **I. Record of Changes**
 
-| Date | A*/M/D | In charge | Change Description |
-|------|--------|-----------|-------------------|
-| 29/06/2026 | A | Group 1 | Initial version – Full SDS document created |
-| | | | |
+| Date       | A*/M/D | In charge | Change Description                           |
+| ---------- | ------ | --------- | -------------------------------------------- |
+| 29/06/2026 | A      | Group 1   | Initial version – Full SDS document created |
+|            |        |           |                                              |
 
 \*A - Added M - Modified D - Deleted
 
 ---
 
-# **II. Software Design Document** {#ii-software-design-document}
+# **II. Software Design Document**
 
-## **1. High Level Design** {#1-high-level-design}
+## **1. High Level Design**
 
-### **1.1 Software Architecture** {#11-software-architecture}
+### **1.1 Software Architecture**
 
 PhucNguyen Resort & Tour Hub is built using the **ASP.NET Core MVC** architectural pattern, targeting **.NET 8.0**. The system follows a **three-layer architecture** that separates concerns into Presentation, Business Logic, and Data Access layers.
 
@@ -103,20 +103,20 @@ graph TB
 
 #### Architecture Components Description
 
-| No | Component | Technology | Description |
-|----|-----------|-----------|-------------|
-| 01 | **Web Browser** | HTML5, CSS3, JavaScript | Client-side user interface, responsible for rendering web pages and handling user interactions. |
-| 02 | **Controllers** | ASP.NET Core MVC | 22 controllers handling HTTP requests, implementing application logic flow, managing request/response lifecycle, and enforcing authorization policies. |
-| 03 | **Views** | Razor (.cshtml) | 23 view directories containing Razor templates for rendering HTML pages with server-side data binding. |
-| 04 | **ViewModels** | C# Classes | 18 ViewModel groups acting as data transfer objects between Controllers and Views, encapsulating presentation-specific data. |
-| 05 | **Services** | C# Classes (DI) | 19 service packages implementing business logic, registered via Dependency Injection (Scoped lifetime). Each service has an interface and implementation. |
-| 06 | **Background Jobs** | IHostedService | 4 background hosted services: `PdpdDataPurgeJob`, `TourBookingCleanupJob`, `OtpCleanupJob`, `PendingBookingCleanupJob`. |
-| 07 | **ResortDbContext** | EF Core 8.0 | Central database context managing 27 entity sets, applying entity configurations, and seeding initial data. |
-| 08 | **Entity Models** | C# POCO Classes | 27 entity models representing database tables with Data Annotation attributes for validation. |
-| 09 | **SQL Server** | MSSQL | Relational database storing all application data. Migrations applied automatically on startup. |
-| 10 | **VNPay** | Payment Gateway API | External payment service for processing online deposits and final checkout payments. |
-| 11 | **Google OAuth** | OAuth 2.0 | External authentication provider for Google sign-in support. |
-| 12 | **SMTP Email** | MailKit | Email service for sending booking confirmations, OTP verification, and notifications. |
+| No | Component                 | Technology              | Description                                                                                                                                               |
+| -- | ------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 01 | **Web Browser**     | HTML5, CSS3, JavaScript | Client-side user interface, responsible for rendering web pages and handling user interactions.                                                           |
+| 02 | **Controllers**     | ASP.NET Core MVC        | 22 controllers handling HTTP requests, implementing application logic flow, managing request/response lifecycle, and enforcing authorization policies.    |
+| 03 | **Views**           | Razor (.cshtml)         | 23 view directories containing Razor templates for rendering HTML pages with server-side data binding.                                                    |
+| 04 | **ViewModels**      | C# Classes              | 18 ViewModel groups acting as data transfer objects between Controllers and Views, encapsulating presentation-specific data.                              |
+| 05 | **Services**        | C# Classes (DI)         | 19 service packages implementing business logic, registered via Dependency Injection (Scoped lifetime). Each service has an interface and implementation. |
+| 06 | **Background Jobs** | IHostedService          | 4 background hosted services:`PdpdDataPurgeJob`, `TourBookingCleanupJob`, `OtpCleanupJob`, `PendingBookingCleanupJob`.                            |
+| 07 | **ResortDbContext** | EF Core 8.0             | Central database context managing 27 entity sets, applying entity configurations, and seeding initial data.                                               |
+| 08 | **Entity Models**   | C# POCO Classes         | 27 entity models representing database tables with Data Annotation attributes for validation.                                                             |
+| 09 | **SQL Server**      | MSSQL                   | Relational database storing all application data. Migrations applied automatically on startup.                                                            |
+| 10 | **VNPay**           | Payment Gateway API     | External payment service for processing online deposits and final checkout payments.                                                                      |
+| 11 | **Google OAuth**    | OAuth 2.0               | External authentication provider for Google sign-in support.                                                                                              |
+| 12 | **SMTP Email**      | MailKit                 | Email service for sending booking confirmations, OTP verification, and notifications.                                                                     |
 
 #### Authentication & Authorization
 
@@ -131,7 +131,7 @@ The system uses **Cookie-based Authentication** with the following configuration
 
 ---
 
-### **1.2 Package Diagram** {#12-package-diagram}
+### **1.2 Package Diagram**
 
 ```mermaid
 graph TB
@@ -224,22 +224,22 @@ graph TB
 
 #### Package Descriptions
 
-| No | Package | Description |
-|----|---------|-------------|
-| 01 | **Controllers** | Contains 22 MVC controllers responsible for handling HTTP requests, processing user input, invoking service methods, and returning appropriate views or redirects. Each controller is mapped to a specific feature module. |
-| 02 | **Services** | Contains 19 service sub-packages, each with an interface (e.g., `IBookingService`) and implementation (e.g., `BookingService`). Services encapsulate all business logic and data access operations using the Repository pattern through EF Core DbContext. |
-| 03 | **Models** | Contains 27 POCO entity classes representing database tables. Models use Data Annotations for validation constraints (`[Required]`, `[StringLength]`, `[Range]`, `[EmailAddress]`). |
-| 04 | **Enums** | Contains 15 enumeration types defining valid states and types for domain objects (e.g., `BookingStatus`, `RoomStatus`, `FoodOrderStatus`, `KotStatus`). |
-| 05 | **Data** | Contains `ResortDbContext` (27 DbSets), `SeedData` (initial data seeding), and database migrations. Auto-migration is applied on application startup. |
-| 06 | **ViewModels** | Contains 18 ViewModel sub-packages. ViewModels are used to pass data between Controllers and Views, often aggregating data from multiple entities. |
-| 07 | **Views** | Contains 23 Razor view directories + shared layouts. Views implement the UI using Bootstrap and custom CSS. |
-| 08 | **Helpers** | Utility and helper classes for common operations across the application. |
-| 09 | **Constants** | Application-wide constant values. |
-| 10 | **Configurations** | Entity Framework entity type configurations using Fluent API. |
+| No | Package                  | Description                                                                                                                                                                                                                                                   |
+| -- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 01 | **Controllers**    | Contains 22 MVC controllers responsible for handling HTTP requests, processing user input, invoking service methods, and returning appropriate views or redirects. Each controller is mapped to a specific feature module.                                    |
+| 02 | **Services**       | Contains 19 service sub-packages, each with an interface (e.g.,`IBookingService`) and implementation (e.g., `BookingService`). Services encapsulate all business logic and data access operations using the Repository pattern through EF Core DbContext. |
+| 03 | **Models**         | Contains 27 POCO entity classes representing database tables. Models use Data Annotations for validation constraints (`[Required]`, `[StringLength]`, `[Range]`, `[EmailAddress]`).                                                                   |
+| 04 | **Enums**          | Contains 15 enumeration types defining valid states and types for domain objects (e.g.,`BookingStatus`, `RoomStatus`, `FoodOrderStatus`, `KotStatus`).                                                                                                |
+| 05 | **Data**           | Contains`ResortDbContext` (27 DbSets), `SeedData` (initial data seeding), and database migrations. Auto-migration is applied on application startup.                                                                                                      |
+| 06 | **ViewModels**     | Contains 18 ViewModel sub-packages. ViewModels are used to pass data between Controllers and Views, often aggregating data from multiple entities.                                                                                                            |
+| 07 | **Views**          | Contains 23 Razor view directories + shared layouts. Views implement the UI using Bootstrap and custom CSS.                                                                                                                                                   |
+| 08 | **Helpers**        | Utility and helper classes for common operations across the application.                                                                                                                                                                                      |
+| 09 | **Constants**      | Application-wide constant values.                                                                                                                                                                                                                             |
+| 10 | **Configurations** | Entity Framework entity type configurations using Fluent API.                                                                                                                                                                                                 |
 
 ---
 
-### **1.3 Database Design** {#13-database-design}
+### **1.3 Database Design**
 
 The database consists of **27 tables** managed by Entity Framework Core with SQL Server. The following describes each table and its fields.
 
@@ -289,387 +289,387 @@ erDiagram
 
 Stores system role definitions for Role-Based Access Control (RBAC).
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | RoleId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | RoleName | | | ✓ | ✓ | Unique role name (e.g., Admin, Customer, Receptionist, F&B Staff, Kitchen Staff, Housekeeping, Maintenance, Tour Guide, Business Manager). Max 50 chars. |
+| No | Field    | PK | FK | UN | NN | Description                                                                                                                                              |
+| -- | -------- | -- | -- | -- | -- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 01 | RoleId   | ✓ |    |    | ✓ | Auto-increment primary key                                                                                                                               |
+| 02 | RoleName |    |    | ✓ | ✓ | Unique role name (e.g., Admin, Customer, Receptionist, F&B Staff, Kitchen Staff, Housekeeping, Maintenance, Tour Guide, Business Manager). Max 50 chars. |
 
 #### **1.3.2 Users**
 
 Stores user account information including authentication credentials.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | UserId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | FullName | | | | ✓ | User's full name. Max 100 chars. |
-| 03 | Email | | | ✓ | ✓ | User's email address, must be unique. Max 100 chars. Validated with `[EmailAddress]`. |
-| 04 | PasswordHash | | | | ✓ | Hashed password (never stored in plain text). Max 255 chars. |
-| 05 | PhoneNumber | | | | | Optional phone number. Max 20 chars. Validated with `[Phone]`. |
-| 06 | RoleId | | ✓ | | ✓ | Foreign key to `Roles(RoleId)`. Determines user permissions. |
-| 07 | IsActive | | | | ✓ | Indicates if account is active. Default: `true`. |
-| 08 | IsBlocked | | | | ✓ | Indicates if account is blocked. Default: `false`. Blocked users are auto-signed-out. |
-| 09 | CreatedAt | | | | ✓ | Account creation timestamp. Default: `DateTime.Now`. |
+| No | Field        | PK | FK | UN | NN | Description                                                                            |
+| -- | ------------ | -- | -- | -- | -- | -------------------------------------------------------------------------------------- |
+| 01 | UserId       | ✓ |    |    | ✓ | Auto-increment primary key                                                             |
+| 02 | FullName     |    |    |    | ✓ | User's full name. Max 100 chars.                                                       |
+| 03 | Email        |    |    | ✓ | ✓ | User's email address, must be unique. Max 100 chars. Validated with`[EmailAddress]`. |
+| 04 | PasswordHash |    |    |    | ✓ | Hashed password (never stored in plain text). Max 255 chars.                           |
+| 05 | PhoneNumber  |    |    |    |    | Optional phone number. Max 20 chars. Validated with`[Phone]`.                        |
+| 06 | RoleId       |    | ✓ |    | ✓ | Foreign key to`Roles(RoleId)`. Determines user permissions.                          |
+| 07 | IsActive     |    |    |    | ✓ | Indicates if account is active. Default:`true`.                                      |
+| 08 | IsBlocked    |    |    |    | ✓ | Indicates if account is blocked. Default:`false`. Blocked users are auto-signed-out. |
+| 09 | CreatedAt    |    |    |    | ✓ | Account creation timestamp. Default:`DateTime.Now`.                                  |
 
 #### **1.3.3 UserProfiles**
 
 Stores extended user profile information including identity documents.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | ProfileId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | UserId | | ✓ | ✓ | ✓ | Foreign key to `Users(UserId)`. One-to-one relationship. |
-| 03 | DateOfBirth | | | | | User's date of birth |
-| 04 | Gender | | | | | Gender (enum: Male, Female, Other) |
-| 05 | Address | | | | | User's address |
-| 06 | Nationality | | | | | User's nationality |
-| 07 | PassportNumber | | | | | CCCD/Passport number (encrypted storage) |
-| 08 | ProfileImageUrl | | | | | URL to profile image |
+| No | Field           | PK | FK | UN | NN | Description                                               |
+| -- | --------------- | -- | -- | -- | -- | --------------------------------------------------------- |
+| 01 | ProfileId       | ✓ |    |    | ✓ | Auto-increment primary key                                |
+| 02 | UserId          |    | ✓ | ✓ | ✓ | Foreign key to`Users(UserId)`. One-to-one relationship. |
+| 03 | DateOfBirth     |    |    |    |    | User's date of birth                                      |
+| 04 | Gender          |    |    |    |    | Gender (enum: Male, Female, Other)                        |
+| 05 | Address         |    |    |    |    | User's address                                            |
+| 06 | Nationality     |    |    |    |    | User's nationality                                        |
+| 07 | PassportNumber  |    |    |    |    | CCCD/Passport number (encrypted storage)                  |
+| 08 | ProfileImageUrl |    |    |    |    | URL to profile image                                      |
 
 #### **1.3.4 EmailOtps**
 
 Stores One-Time Password codes for email verification.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | Id | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | Email | | | | ✓ | Email address associated with OTP |
-| 03 | OtpCode | | | | ✓ | The OTP code |
-| 04 | ExpiresAt | | | | ✓ | Expiration timestamp |
-| 05 | IsUsed | | | | ✓ | Whether OTP has been consumed |
+| No | Field     | PK | FK | UN | NN | Description                       |
+| -- | --------- | -- | -- | -- | -- | --------------------------------- |
+| 01 | Id        | ✓ |    |    | ✓ | Auto-increment primary key        |
+| 02 | Email     |    |    |    | ✓ | Email address associated with OTP |
+| 03 | OtpCode   |    |    |    | ✓ | The OTP code                      |
+| 04 | ExpiresAt |    |    |    | ✓ | Expiration timestamp              |
+| 05 | IsUsed    |    |    |    | ✓ | Whether OTP has been consumed     |
 
 #### **1.3.5 RoomCategories**
 
 Stores room category/type definitions with pricing and capacity.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | CategoryId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | CategoryName | | | | ✓ | Name of room category (e.g., Deluxe, Suite) |
-| 03 | Description | | | | | Category description |
-| 04 | MaxOccupancy | | | | ✓ | Maximum number of guests |
-| 05 | PricePerNight | | | | ✓ | Base price per night. Range: 0–999,999,999. |
-| 06 | IsActive | | | | ✓ | Whether category is active for booking |
+| No | Field         | PK | FK | UN | NN | Description                                  |
+| -- | ------------- | -- | -- | -- | -- | -------------------------------------------- |
+| 01 | CategoryId    | ✓ |    |    | ✓ | Auto-increment primary key                   |
+| 02 | CategoryName  |    |    |    | ✓ | Name of room category (e.g., Deluxe, Suite)  |
+| 03 | Description   |    |    |    |    | Category description                         |
+| 04 | MaxOccupancy  |    |    |    | ✓ | Maximum number of guests                     |
+| 05 | PricePerNight |    |    |    | ✓ | Base price per night. Range: 0–999,999,999. |
+| 06 | IsActive      |    |    |    | ✓ | Whether category is active for booking       |
 
 #### **1.3.6 RoomCategoryImages**
 
 Stores multiple images for each room category.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | ImageId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | CategoryId | | ✓ | | ✓ | FK to `RoomCategories(CategoryId)` |
-| 03 | ImageUrl | | | | ✓ | URL of the image |
+| No | Field      | PK | FK | UN | NN | Description                         |
+| -- | ---------- | -- | -- | -- | -- | ----------------------------------- |
+| 01 | ImageId    | ✓ |    |    | ✓ | Auto-increment primary key          |
+| 02 | CategoryId |    | ✓ |    | ✓ | FK to`RoomCategories(CategoryId)` |
+| 03 | ImageUrl   |    |    |    | ✓ | URL of the image                    |
 
 #### **1.3.7 Rooms**
 
 Stores individual physical room information.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | RoomId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | RoomNumber | | | ✓ | | Room number identifier. Max 20 chars. |
-| 03 | CategoryId | | ✓ | | ✓ | FK to `RoomCategories(CategoryId)` |
-| 04 | FloorNumber | | | | | Floor number. Range: 0–200. |
-| 05 | Status | | | | ✓ | Room operational status (enum: Available, Occupied, Maintenance, NeedsCleaning). Default: `Available`. |
+| No | Field       | PK | FK | UN | NN | Description                                                                                             |
+| -- | ----------- | -- | -- | -- | -- | ------------------------------------------------------------------------------------------------------- |
+| 01 | RoomId      | ✓ |    |    | ✓ | Auto-increment primary key                                                                              |
+| 02 | RoomNumber  |    |    | ✓ |    | Room number identifier. Max 20 chars.                                                                   |
+| 03 | CategoryId  |    | ✓ |    | ✓ | FK to`RoomCategories(CategoryId)`                                                                     |
+| 04 | FloorNumber |    |    |    |    | Floor number. Range: 0–200.                                                                            |
+| 05 | Status      |    |    |    | ✓ | Room operational status (enum: Available, Occupied, Maintenance, NeedsCleaning). Default:`Available`. |
 
 #### **1.3.8 Bookings**
 
 Stores room booking/reservation records.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | BookingId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | UserId | | ✓ | | ✓ | FK to `Users(UserId)`. The customer who made the booking. |
-| 03 | CheckInDate | | | | ✓ | Expected check-in date |
-| 04 | CheckOutDate | | | | ✓ | Expected check-out date |
-| 05 | NumberOfAdults | | | | | Number of adult guests. Range: 1–20. |
-| 06 | NumberOfChildren | | | | | Number of child guests. Range: 0–10. |
-| 07 | BookingStatus | | | | ✓ | Booking status (enum: Reserved, Arrived, CheckedIn, CheckedOut, Cancelled, NoShow, PendingPayment). Default: `Reserved`. |
-| 08 | DepositAmount | | | | | Deposit amount. Range: 0–999,999,999. |
-| 09 | TotalAmount | | | | | Total estimated cost. Range: 0–999,999,999. |
-| 10 | CreatedAt | | | | ✓ | Booking creation timestamp |
-| 11 | PdpdConsentChecked | | | | ✓ | PDPA consent flag (Decree 356/2025 compliance) |
-| 12 | ConsentTimestamp | | | | | Timestamp when consent was given |
-| 13 | ExpectedArrivalTime | | | | | Expected arrival time |
-| 14 | ActualCheckInTime | | | | | Actual check-in timestamp |
-| 15 | RoomHandoverTime | | | | | Room key handover timestamp |
-| 16 | ActualCheckOutTime | | | | | Actual check-out timestamp |
+| No | Field               | PK | FK | UN | NN | Description                                                                                                               |
+| -- | ------------------- | -- | -- | -- | -- | ------------------------------------------------------------------------------------------------------------------------- |
+| 01 | BookingId           | ✓ |    |    | ✓ | Auto-increment primary key                                                                                                |
+| 02 | UserId              |    | ✓ |    | ✓ | FK to`Users(UserId)`. The customer who made the booking.                                                                |
+| 03 | CheckInDate         |    |    |    | ✓ | Expected check-in date                                                                                                    |
+| 04 | CheckOutDate        |    |    |    | ✓ | Expected check-out date                                                                                                   |
+| 05 | NumberOfAdults      |    |    |    |    | Number of adult guests. Range: 1–20.                                                                                     |
+| 06 | NumberOfChildren    |    |    |    |    | Number of child guests. Range: 0–10.                                                                                     |
+| 07 | BookingStatus       |    |    |    | ✓ | Booking status (enum: Reserved, Arrived, CheckedIn, CheckedOut, Cancelled, NoShow, PendingPayment). Default:`Reserved`. |
+| 08 | DepositAmount       |    |    |    |    | Deposit amount. Range: 0–999,999,999.                                                                                    |
+| 09 | TotalAmount         |    |    |    |    | Total estimated cost. Range: 0–999,999,999.                                                                              |
+| 10 | CreatedAt           |    |    |    | ✓ | Booking creation timestamp                                                                                                |
+| 11 | PdpdConsentChecked  |    |    |    | ✓ | PDPA consent flag (Decree 356/2025 compliance)                                                                            |
+| 12 | ConsentTimestamp    |    |    |    |    | Timestamp when consent was given                                                                                          |
+| 13 | ExpectedArrivalTime |    |    |    |    | Expected arrival time                                                                                                     |
+| 14 | ActualCheckInTime   |    |    |    |    | Actual check-in timestamp                                                                                                 |
+| 15 | RoomHandoverTime    |    |    |    |    | Room key handover timestamp                                                                                               |
+| 16 | ActualCheckOutTime  |    |    |    |    | Actual check-out timestamp                                                                                                |
 
 #### **1.3.9 BookingDetails**
 
 Links bookings to room categories and assigned rooms.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | BookingDetailId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | BookingId | | ✓ | | ✓ | FK to `Bookings(BookingId)` |
-| 03 | RoomCategoryId | | ✓ | | ✓ | FK to `RoomCategories(CategoryId)` |
-| 04 | RoomId | | ✓ | | | FK to `Rooms(RoomId)`. Nullable — assigned during check-in. |
+| No | Field           | PK | FK | UN | NN | Description                                                   |
+| -- | --------------- | -- | -- | -- | -- | ------------------------------------------------------------- |
+| 01 | BookingDetailId | ✓ |    |    | ✓ | Auto-increment primary key                                    |
+| 02 | BookingId       |    | ✓ |    | ✓ | FK to`Bookings(BookingId)`                                  |
+| 03 | RoomCategoryId  |    | ✓ |    | ✓ | FK to`RoomCategories(CategoryId)`                           |
+| 04 | RoomId          |    | ✓ |    |    | FK to`Rooms(RoomId)`. Nullable — assigned during check-in. |
 
 #### **1.3.10 BookingGuests**
 
 Stores guest registration information for stay registration compliance.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | BookingGuestId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | BookingId | | ✓ | | ✓ | FK to `Bookings(BookingId)` |
-| 03 | FullName | | | | ✓ | Guest full name |
-| 04 | DateOfBirth | | | | | Guest date of birth |
-| 05 | Nationality | | | | | Guest nationality |
-| 06 | PassportNumber | | | | | CCCD/Passport number |
-| 07 | Gender | | | | | Guest gender |
+| No | Field          | PK | FK | UN | NN | Description                  |
+| -- | -------------- | -- | -- | -- | -- | ---------------------------- |
+| 01 | BookingGuestId | ✓ |    |    | ✓ | Auto-increment primary key   |
+| 02 | BookingId      |    | ✓ |    | ✓ | FK to`Bookings(BookingId)` |
+| 03 | FullName       |    |    |    | ✓ | Guest full name              |
+| 04 | DateOfBirth    |    |    |    |    | Guest date of birth          |
+| 05 | Nationality    |    |    |    |    | Guest nationality            |
+| 06 | PassportNumber |    |    |    |    | CCCD/Passport number         |
+| 07 | Gender         |    |    |    |    | Guest gender                 |
 
 #### **1.3.11 MenuCategories**
 
 Stores food/beverage menu categories.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | CategoryId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | CategoryName | | | | ✓ | Category name (e.g., Appetizer, Main Course, Beverage) |
-| 03 | Description | | | | | Category description |
-| 04 | IsActive | | | | ✓ | Whether category is active |
+| No | Field        | PK | FK | UN | NN | Description                                            |
+| -- | ------------ | -- | -- | -- | -- | ------------------------------------------------------ |
+| 01 | CategoryId   | ✓ |    |    | ✓ | Auto-increment primary key                             |
+| 02 | CategoryName |    |    |    | ✓ | Category name (e.g., Appetizer, Main Course, Beverage) |
+| 03 | Description  |    |    |    |    | Category description                                   |
+| 04 | IsActive     |    |    |    | ✓ | Whether category is active                             |
 
 #### **1.3.12 MenuItems**
 
 Stores individual food/beverage items.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | MenuItemId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | CategoryId | | ✓ | | ✓ | FK to `MenuCategories(CategoryId)` |
-| 03 | ItemName | | | | ✓ | Name of the menu item |
-| 04 | Description | | | | | Item description |
-| 05 | Price | | | | ✓ | Unit price. Range: 0–999,999,999. |
-| 06 | ImageUrl | | | | | Image URL |
-| 07 | IsAvailable | | | | ✓ | Whether item is currently available for ordering |
+| No | Field       | PK | FK | UN | NN | Description                                      |
+| -- | ----------- | -- | -- | -- | -- | ------------------------------------------------ |
+| 01 | MenuItemId  | ✓ |    |    | ✓ | Auto-increment primary key                       |
+| 02 | CategoryId  |    | ✓ |    | ✓ | FK to`MenuCategories(CategoryId)`              |
+| 03 | ItemName    |    |    |    | ✓ | Name of the menu item                            |
+| 04 | Description |    |    |    |    | Item description                                 |
+| 05 | Price       |    |    |    | ✓ | Unit price. Range: 0–999,999,999.               |
+| 06 | ImageUrl    |    |    |    |    | Image URL                                        |
+| 07 | IsAvailable |    |    |    | ✓ | Whether item is currently available for ordering |
 
 #### **1.3.13 DiningTables**
 
 Stores restaurant table information.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | TableId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | TableNumber | | | ✓ | ✓ | Unique table number |
-| 03 | Capacity | | | | ✓ | Maximum seating capacity |
-| 04 | Location | | | | | Table location (e.g., Indoor, Outdoor, VIP) |
-| 05 | Status | | | | ✓ | Table status (enum: Available, Occupied, Reserved, Maintenance). Default: `Available`. |
+| No | Field       | PK | FK | UN | NN | Description                                                                             |
+| -- | ----------- | -- | -- | -- | -- | --------------------------------------------------------------------------------------- |
+| 01 | TableId     | ✓ |    |    | ✓ | Auto-increment primary key                                                              |
+| 02 | TableNumber |    |    | ✓ | ✓ | Unique table number                                                                     |
+| 03 | Capacity    |    |    |    | ✓ | Maximum seating capacity                                                                |
+| 04 | Location    |    |    |    |    | Table location (e.g., Indoor, Outdoor, VIP)                                             |
+| 05 | Status      |    |    |    | ✓ | Table status (enum: Available, Occupied, Reserved, Maintenance). Default:`Available`. |
 
 #### **1.3.14 TableReservations**
 
 Stores restaurant table reservation records.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | ReservationId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | UserId | | ✓ | | ✓ | FK to `Users(UserId)` |
-| 03 | TableId | | ✓ | | ✓ | FK to `DiningTables(TableId)` |
-| 04 | BookingId | | ✓ | | | FK to `Bookings(BookingId)`. Optional. |
-| 05 | ReservationDate | | | | ✓ | Date of reservation |
-| 06 | StartTime | | | | ✓ | Reservation start time |
-| 07 | EndTime | | | | ✓ | Reservation end time |
-| 08 | NumberOfGuests | | | | ✓ | Number of guests |
-| 09 | Status | | | | ✓ | Reservation status (enum: Pending, Confirmed, Seated, Completed, Cancelled, NoShow) |
-| 10 | SpecialRequests | | | | | Customer special requests |
+| No | Field           | PK | FK | UN | NN | Description                                                                         |
+| -- | --------------- | -- | -- | -- | -- | ----------------------------------------------------------------------------------- |
+| 01 | ReservationId   | ✓ |    |    | ✓ | Auto-increment primary key                                                          |
+| 02 | UserId          |    | ✓ |    | ✓ | FK to`Users(UserId)`                                                              |
+| 03 | TableId         |    | ✓ |    | ✓ | FK to`DiningTables(TableId)`                                                      |
+| 04 | BookingId       |    | ✓ |    |    | FK to`Bookings(BookingId)`. Optional.                                             |
+| 05 | ReservationDate |    |    |    | ✓ | Date of reservation                                                                 |
+| 06 | StartTime       |    |    |    | ✓ | Reservation start time                                                              |
+| 07 | EndTime         |    |    |    | ✓ | Reservation end time                                                                |
+| 08 | NumberOfGuests  |    |    |    | ✓ | Number of guests                                                                    |
+| 09 | Status          |    |    |    | ✓ | Reservation status (enum: Pending, Confirmed, Seated, Completed, Cancelled, NoShow) |
+| 10 | SpecialRequests |    |    |    |    | Customer special requests                                                           |
 
 #### **1.3.15 FoodOrders**
 
 Stores food order records for room service and table orders.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | FoodOrderId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | OrderType | | | | ✓ | Type of order (enum: RoomService, TableOrder). Default: `RoomService`. |
-| 03 | BookingId | | ✓ | | | FK to `Bookings(BookingId)`. For room service orders. |
-| 04 | BookingDetailId | | ✓ | | | FK to `BookingDetails(BookingDetailId)`. Links to specific room. |
-| 05 | TableReservationId | | ✓ | | | FK to `TableReservations(ReservationId)`. For table orders. |
-| 06 | OrderStatus | | | | ✓ | Order status (enum: Pending, Cooking, Delivered, Cancelled). Default: `Pending`. |
-| 07 | TotalAmount | | | | | Total order amount. Range: 0–999,999,999. |
-| 08 | OrderedAt | | | | ✓ | Order creation timestamp |
-| 09 | RequestedDeliveryAt | | | | | Requested delivery time |
-| 10 | CustomerNote | | | | | Special customer notes |
-| 11 | IsChargedToRoom | | | | ✓ | Whether charge is posted to room folio. Default: `false`. |
-| 12 | ChargedAt | | | | | Timestamp when charged to room |
-| 13 | IsPaidAtRestaurant | | | | ✓ | Whether paid directly at restaurant. Default: `false`. |
-| 14 | PaidAt | | | | | Payment timestamp |
+| No | Field               | PK | FK | UN | NN | Description                                                                       |
+| -- | ------------------- | -- | -- | -- | -- | --------------------------------------------------------------------------------- |
+| 01 | FoodOrderId         | ✓ |    |    | ✓ | Auto-increment primary key                                                        |
+| 02 | OrderType           |    |    |    | ✓ | Type of order (enum: RoomService, TableOrder). Default:`RoomService`.           |
+| 03 | BookingId           |    | ✓ |    |    | FK to`Bookings(BookingId)`. For room service orders.                            |
+| 04 | BookingDetailId     |    | ✓ |    |    | FK to`BookingDetails(BookingDetailId)`. Links to specific room.                 |
+| 05 | TableReservationId  |    | ✓ |    |    | FK to`TableReservations(ReservationId)`. For table orders.                      |
+| 06 | OrderStatus         |    |    |    | ✓ | Order status (enum: Pending, Cooking, Delivered, Cancelled). Default:`Pending`. |
+| 07 | TotalAmount         |    |    |    |    | Total order amount. Range: 0–999,999,999.                                        |
+| 08 | OrderedAt           |    |    |    | ✓ | Order creation timestamp                                                          |
+| 09 | RequestedDeliveryAt |    |    |    |    | Requested delivery time                                                           |
+| 10 | CustomerNote        |    |    |    |    | Special customer notes                                                            |
+| 11 | IsChargedToRoom     |    |    |    | ✓ | Whether charge is posted to room folio. Default:`false`.                        |
+| 12 | ChargedAt           |    |    |    |    | Timestamp when charged to room                                                    |
+| 13 | IsPaidAtRestaurant  |    |    |    | ✓ | Whether paid directly at restaurant. Default:`false`.                           |
+| 14 | PaidAt              |    |    |    |    | Payment timestamp                                                                 |
 
 #### **1.3.16 FoodOrderItems**
 
 Stores individual line items within a food order.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | OrderItemId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | FoodOrderId | | ✓ | | ✓ | FK to `FoodOrders(FoodOrderId)` |
-| 03 | MenuItemId | | ✓ | | ✓ | FK to `MenuItems(MenuItemId)` |
-| 04 | Quantity | | | | ✓ | Quantity ordered. Range: 1+. |
-| 05 | UnitPrice | | | | ✓ | Snapshot price at time of order |
-| 06 | Subtotal | | | | ✓ | Quantity × UnitPrice |
+| No | Field       | PK | FK | UN | NN | Description                      |
+| -- | ----------- | -- | -- | -- | -- | -------------------------------- |
+| 01 | OrderItemId | ✓ |    |    | ✓ | Auto-increment primary key       |
+| 02 | FoodOrderId |    | ✓ |    | ✓ | FK to`FoodOrders(FoodOrderId)` |
+| 03 | MenuItemId  |    | ✓ |    | ✓ | FK to`MenuItems(MenuItemId)`   |
+| 04 | Quantity    |    |    |    | ✓ | Quantity ordered. Range: 1+.     |
+| 05 | UnitPrice   |    |    |    | ✓ | Snapshot price at time of order  |
+| 06 | Subtotal    |    |    |    | ✓ | Quantity × UnitPrice            |
 
 #### **1.3.17 KOT (Kitchen Order Tickets)**
 
 Stores kitchen order ticket records linked to food orders.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | KotId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | FoodOrderId | | ✓ | ✓ | ✓ | FK to `FoodOrders(FoodOrderId)`. One-to-one. |
-| 03 | Status | | | | ✓ | KOT status (enum: Pending, Cooking, Ready, Completed, Cancelled). Default: `Pending`. |
-| 04 | CreatedAt | | | | ✓ | KOT creation timestamp |
+| No | Field       | PK | FK | UN | NN | Description                                                                            |
+| -- | ----------- | -- | -- | -- | -- | -------------------------------------------------------------------------------------- |
+| 01 | KotId       | ✓ |    |    | ✓ | Auto-increment primary key                                                             |
+| 02 | FoodOrderId |    | ✓ | ✓ | ✓ | FK to`FoodOrders(FoodOrderId)`. One-to-one.                                          |
+| 03 | Status      |    |    |    | ✓ | KOT status (enum: Pending, Cooking, Ready, Completed, Cancelled). Default:`Pending`. |
+| 04 | CreatedAt   |    |    |    | ✓ | KOT creation timestamp                                                                 |
 
 #### **1.3.18 Tours**
 
 Stores tour/activity package definitions.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | TourId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | TourName | | | | ✓ | Name of the tour |
-| 03 | Description | | | | | Tour description and itinerary |
-| 04 | Duration | | | | | Tour duration |
-| 05 | Price | | | | ✓ | Price per person. Range: 0–999,999,999. |
-| 06 | MaxCapacity | | | | ✓ | Maximum participants per schedule |
-| 07 | ImageUrl | | | | | Tour image URL |
-| 08 | IsActive | | | | ✓ | Whether tour is available for booking |
+| No | Field       | PK | FK | UN | NN | Description                              |
+| -- | ----------- | -- | -- | -- | -- | ---------------------------------------- |
+| 01 | TourId      | ✓ |    |    | ✓ | Auto-increment primary key               |
+| 02 | TourName    |    |    |    | ✓ | Name of the tour                         |
+| 03 | Description |    |    |    |    | Tour description and itinerary           |
+| 04 | Duration    |    |    |    |    | Tour duration                            |
+| 05 | Price       |    |    |    | ✓ | Price per person. Range: 0–999,999,999. |
+| 06 | MaxCapacity |    |    |    | ✓ | Maximum participants per schedule        |
+| 07 | ImageUrl    |    |    |    |    | Tour image URL                           |
+| 08 | IsActive    |    |    |    | ✓ | Whether tour is available for booking    |
 
 #### **1.3.19 TourSchedules**
 
 Stores specific tour schedule instances.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | ScheduleId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | TourId | | ✓ | | ✓ | FK to `Tours(TourId)` |
-| 03 | GuideId | | ✓ | | | FK to `Users(UserId)`. Assigned tour guide. |
-| 04 | ScheduleDate | | | | ✓ | Date of the tour |
-| 05 | StartTime | | | | ✓ | Tour start time |
-| 06 | AvailableSlots | | | | ✓ | Remaining available slots |
+| No | Field          | PK | FK | UN | NN | Description                                  |
+| -- | -------------- | -- | -- | -- | -- | -------------------------------------------- |
+| 01 | ScheduleId     | ✓ |    |    | ✓ | Auto-increment primary key                   |
+| 02 | TourId         |    | ✓ |    | ✓ | FK to`Tours(TourId)`                       |
+| 03 | GuideId        |    | ✓ |    |    | FK to`Users(UserId)`. Assigned tour guide. |
+| 04 | ScheduleDate   |    |    |    | ✓ | Date of the tour                             |
+| 05 | StartTime      |    |    |    | ✓ | Tour start time                              |
+| 06 | AvailableSlots |    |    |    | ✓ | Remaining available slots                    |
 
 #### **1.3.20 TourBookings**
 
 Stores customer tour booking records.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | TourBookingId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | BookingId | | ✓ | | | FK to `Bookings(BookingId)`. Nullable — can be standalone. |
-| 03 | UserId | | ✓ | | | FK to `Users(UserId)` |
-| 04 | ScheduleId | | ✓ | | ✓ | FK to `TourSchedules(ScheduleId)` |
-| 05 | Participants | | | | | Number of participants. Range: 1–1000. |
-| 06 | TotalAmount | | | | | Total amount. Range: 0–999,999,999. |
-| 07 | BookingStatus | | | | ✓ | Status (enum: Pending, Confirmed, Completed, Cancelled). Default: `Pending`. |
-| 08 | CancellationReason | | | | | Reason for cancellation. Max 500 chars. |
-| 09 | PrimaryGuestName | | | | | Primary guest name. Max 100 chars. |
-| 10 | PrimaryGuestDateOfBirth | | | | | Primary guest date of birth |
-| 11 | PrimaryGuestGender | | | | | Primary guest gender |
-| 12 | PrimaryGuestPassportNumber | | | | | Primary guest passport. Max 500 chars. |
-| 13 | PrimaryGuestNationality | | | | | Primary guest nationality. Max 50 chars. |
-| 14 | CreatedAt | | | | ✓ | Creation timestamp |
+| No | Field                      | PK | FK | UN | NN | Description                                                                   |
+| -- | -------------------------- | -- | -- | -- | -- | ----------------------------------------------------------------------------- |
+| 01 | TourBookingId              | ✓ |    |    | ✓ | Auto-increment primary key                                                    |
+| 02 | BookingId                  |    | ✓ |    |    | FK to`Bookings(BookingId)`. Nullable — can be standalone.                  |
+| 03 | UserId                     |    | ✓ |    |    | FK to`Users(UserId)`                                                        |
+| 04 | ScheduleId                 |    | ✓ |    | ✓ | FK to`TourSchedules(ScheduleId)`                                            |
+| 05 | Participants               |    |    |    |    | Number of participants. Range: 1–1000.                                       |
+| 06 | TotalAmount                |    |    |    |    | Total amount. Range: 0–999,999,999.                                          |
+| 07 | BookingStatus              |    |    |    | ✓ | Status (enum: Pending, Confirmed, Completed, Cancelled). Default:`Pending`. |
+| 08 | CancellationReason         |    |    |    |    | Reason for cancellation. Max 500 chars.                                       |
+| 09 | PrimaryGuestName           |    |    |    |    | Primary guest name. Max 100 chars.                                            |
+| 10 | PrimaryGuestDateOfBirth    |    |    |    |    | Primary guest date of birth                                                   |
+| 11 | PrimaryGuestGender         |    |    |    |    | Primary guest gender                                                          |
+| 12 | PrimaryGuestPassportNumber |    |    |    |    | Primary guest passport. Max 500 chars.                                        |
+| 13 | PrimaryGuestNationality    |    |    |    |    | Primary guest nationality. Max 50 chars.                                      |
+| 14 | CreatedAt                  |    |    |    | ✓ | Creation timestamp                                                            |
 
 #### **1.3.21 Reviews**
 
 Stores customer reviews and ratings.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | ReviewId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | UserId | | ✓ | | ✓ | FK to `Users(UserId)` |
-| 03 | BookingId | | ✓ | | | FK to `Bookings(BookingId)` |
-| 04 | Rating | | | | ✓ | Star rating (1–5) |
-| 05 | Comment | | | | | Written review content |
-| 06 | CreatedAt | | | | ✓ | Review submission timestamp |
-| 07 | IsApproved | | | | ✓ | Moderation status. Default: `false`. |
+| No | Field      | PK | FK | UN | NN | Description                           |
+| -- | ---------- | -- | -- | -- | -- | ------------------------------------- |
+| 01 | ReviewId   | ✓ |    |    | ✓ | Auto-increment primary key            |
+| 02 | UserId     |    | ✓ |    | ✓ | FK to`Users(UserId)`                |
+| 03 | BookingId  |    | ✓ |    |    | FK to`Bookings(BookingId)`          |
+| 04 | Rating     |    |    |    | ✓ | Star rating (1–5)                    |
+| 05 | Comment    |    |    |    |    | Written review content                |
+| 06 | CreatedAt  |    |    |    | ✓ | Review submission timestamp           |
+| 07 | IsApproved |    |    |    | ✓ | Moderation status. Default:`false`. |
 
 #### **1.3.22 GuestFolios**
 
 Stores consolidated billing folios for each guest stay.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | FolioId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | BookingId | | ✓ | ✓ | | FK to `Bookings(BookingId)`. One-to-one. |
-| 03 | TotalRoomCharges | | | | ✓ | Total room charges. Default: 0. |
-| 04 | TotalFoodCharges | | | | ✓ | Total food charges. Default: 0. |
-| 05 | TotalTourCharges | | | | ✓ | Total tour charges. Default: 0. |
-| 06 | TotalAmount | | | | ✓ | Grand total. Default: 0. |
-| 07 | Status | | | | ✓ | Folio status (enum: Unpaid, PartialPaid, Paid, Refunded, Cancelled). Default: `Unpaid`. |
+| No | Field            | PK | FK | UN | NN | Description                                                                              |
+| -- | ---------------- | -- | -- | -- | -- | ---------------------------------------------------------------------------------------- |
+| 01 | FolioId          | ✓ |    |    | ✓ | Auto-increment primary key                                                               |
+| 02 | BookingId        |    | ✓ | ✓ |    | FK to`Bookings(BookingId)`. One-to-one.                                                |
+| 03 | TotalRoomCharges |    |    |    | ✓ | Total room charges. Default: 0.                                                          |
+| 04 | TotalFoodCharges |    |    |    | ✓ | Total food charges. Default: 0.                                                          |
+| 05 | TotalTourCharges |    |    |    | ✓ | Total tour charges. Default: 0.                                                          |
+| 06 | TotalAmount      |    |    |    | ✓ | Grand total. Default: 0.                                                                 |
+| 07 | Status           |    |    |    | ✓ | Folio status (enum: Unpaid, PartialPaid, Paid, Refunded, Cancelled). Default:`Unpaid`. |
 
 #### **1.3.23 FolioTransactions**
 
 Records individual charge/payment transactions on a folio.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | TransactionId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | FolioId | | ✓ | | ✓ | FK to `GuestFolios(FolioId)` |
-| 03 | TransactionType | | | | ✓ | Type (enum: RoomCharge, FoodCharge, TourCharge, Payment, Refund, Adjustment) |
-| 04 | Amount | | | | ✓ | Transaction amount |
-| 05 | Description | | | | | Transaction description |
-| 06 | CreatedAt | | | | ✓ | Transaction timestamp |
+| No | Field           | PK | FK | UN | NN | Description                                                                  |
+| -- | --------------- | -- | -- | -- | -- | ---------------------------------------------------------------------------- |
+| 01 | TransactionId   | ✓ |    |    | ✓ | Auto-increment primary key                                                   |
+| 02 | FolioId         |    | ✓ |    | ✓ | FK to`GuestFolios(FolioId)`                                                |
+| 03 | TransactionType |    |    |    | ✓ | Type (enum: RoomCharge, FoodCharge, TourCharge, Payment, Refund, Adjustment) |
+| 04 | Amount          |    |    |    | ✓ | Transaction amount                                                           |
+| 05 | Description     |    |    |    |    | Transaction description                                                      |
+| 06 | CreatedAt       |    |    |    | ✓ | Transaction timestamp                                                        |
 
 #### **1.3.24 Invoices**
 
 Stores consolidated invoices generated at checkout.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | InvoiceId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | FolioId | | ✓ | ✓ | ✓ | FK to `GuestFolios(FolioId)`. One-to-one. |
-| 03 | InvoiceNumber | | | | | Auto-generated invoice number. Max 50 chars. |
-| 04 | TotalAmount | | | | | Pre-tax total. Range: 0–999,999,999. |
-| 05 | TaxAmount | | | | | Tax amount. Range: 0–999,999,999. |
-| 06 | FinalAmount | | | | | Final amount after tax. Range: 0–999,999,999. |
-| 07 | InvoiceStatus | | | | ✓ | Status (enum: Draft, Issued, Paid, Cancelled). Default: `Draft`. |
-| 08 | IssuedAt | | | | ✓ | Invoice issue timestamp |
+| No | Field         | PK | FK | UN | NN | Description                                                       |
+| -- | ------------- | -- | -- | -- | -- | ----------------------------------------------------------------- |
+| 01 | InvoiceId     | ✓ |    |    | ✓ | Auto-increment primary key                                        |
+| 02 | FolioId       |    | ✓ | ✓ | ✓ | FK to`GuestFolios(FolioId)`. One-to-one.                        |
+| 03 | InvoiceNumber |    |    |    |    | Auto-generated invoice number. Max 50 chars.                      |
+| 04 | TotalAmount   |    |    |    |    | Pre-tax total. Range: 0–999,999,999.                             |
+| 05 | TaxAmount     |    |    |    |    | Tax amount. Range: 0–999,999,999.                                |
+| 06 | FinalAmount   |    |    |    |    | Final amount after tax. Range: 0–999,999,999.                    |
+| 07 | InvoiceStatus |    |    |    | ✓ | Status (enum: Draft, Issued, Paid, Cancelled). Default:`Draft`. |
+| 08 | IssuedAt      |    |    |    | ✓ | Invoice issue timestamp                                           |
 
 #### **1.3.25 Payments**
 
 Stores payment transaction records.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | PaymentId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | InvoiceId | | ✓ | | | FK to `Invoices(InvoiceId)`. Nullable. |
-| 03 | TourBookingId | | ✓ | | | FK to `TourBookings(TourBookingId)`. Nullable. |
-| 04 | PaymentMethod | | | | | Method (enum: Cash, CreditCard, DebitCard, VNPay, MoMo, BankTransfer) |
-| 05 | Amount | | | | | Payment amount. Range: 0–999,999,999. |
-| 06 | PaymentStatus | | | | | Status (enum: Pending, Success, Failed, Refunded) |
-| 07 | TransactionCode | | | | | External transaction code (VNPay). Max 100 chars. |
-| 08 | PaidAt | | | | | Payment timestamp |
+| No | Field           | PK | FK | UN | NN | Description                                                           |
+| -- | --------------- | -- | -- | -- | -- | --------------------------------------------------------------------- |
+| 01 | PaymentId       | ✓ |    |    | ✓ | Auto-increment primary key                                            |
+| 02 | InvoiceId       |    | ✓ |    |    | FK to`Invoices(InvoiceId)`. Nullable.                               |
+| 03 | TourBookingId   |    | ✓ |    |    | FK to`TourBookings(TourBookingId)`. Nullable.                       |
+| 04 | PaymentMethod   |    |    |    |    | Method (enum: Cash, CreditCard, DebitCard, VNPay, MoMo, BankTransfer) |
+| 05 | Amount          |    |    |    |    | Payment amount. Range: 0–999,999,999.                                |
+| 06 | PaymentStatus   |    |    |    |    | Status (enum: Pending, Success, Failed, Refunded)                     |
+| 07 | TransactionCode |    |    |    |    | External transaction code (VNPay). Max 100 chars.                     |
+| 08 | PaidAt          |    |    |    |    | Payment timestamp                                                     |
 
 #### **1.3.26 Refunds**
 
 Stores refund records for cancelled bookings.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | RefundId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | BookingId | | ✓ | | ✓ | FK to `Bookings(BookingId)` |
-| 03 | Amount | | | | ✓ | Refund amount |
-| 04 | RefundStatus | | | | ✓ | Status (enum: Pending, Approved, Completed, Rejected) |
-| 05 | Reason | | | | | Refund reason |
-| 06 | CreatedAt | | | | ✓ | Refund request timestamp |
+| No | Field        | PK | FK | UN | NN | Description                                           |
+| -- | ------------ | -- | -- | -- | -- | ----------------------------------------------------- |
+| 01 | RefundId     | ✓ |    |    | ✓ | Auto-increment primary key                            |
+| 02 | BookingId    |    | ✓ |    | ✓ | FK to`Bookings(BookingId)`                          |
+| 03 | Amount       |    |    |    | ✓ | Refund amount                                         |
+| 04 | RefundStatus |    |    |    | ✓ | Status (enum: Pending, Approved, Completed, Rejected) |
+| 05 | Reason       |    |    |    |    | Refund reason                                         |
+| 06 | CreatedAt    |    |    |    | ✓ | Refund request timestamp                              |
 
 #### **1.3.27 Notifications**
 
 Stores system notifications for users.
 
-| No | Field | PK | FK | UN | NN | Description |
-|----|-------|----|----|----|-----|-------------|
-| 01 | NotificationId | ✓ | | | ✓ | Auto-increment primary key |
-| 02 | UserId | | ✓ | | ✓ | FK to `Users(UserId)` |
-| 03 | Title | | | | ✓ | Notification title |
-| 04 | Message | | | | ✓ | Notification content |
-| 05 | IsRead | | | | ✓ | Read status |
-| 06 | CreatedAt | | | | ✓ | Creation timestamp |
+| No | Field          | PK | FK | UN | NN | Description                |
+| -- | -------------- | -- | -- | -- | -- | -------------------------- |
+| 01 | NotificationId | ✓ |    |    | ✓ | Auto-increment primary key |
+| 02 | UserId         |    | ✓ |    | ✓ | FK to`Users(UserId)`     |
+| 03 | Title          |    |    |    | ✓ | Notification title         |
+| 04 | Message        |    |    |    | ✓ | Notification content       |
+| 05 | IsRead         |    |    |    | ✓ | Read status                |
+| 06 | CreatedAt      |    |    |    | ✓ | Creation timestamp         |
 
 ---
 
-## **2. State Transition Diagrams** {#2-state-transition-diagrams}
+## **2. State Transition Diagrams**
 
-### **2.1 Booking Status** {#21-booking-status}
+### **2.1 Booking Status**
 
 Defines the lifecycle of a room booking from creation to completion.
 
@@ -689,17 +689,18 @@ stateDiagram-v2
 ```
 
 **States:**
-| State | Description |
-|-------|-------------|
-| PendingPayment | Booking created, awaiting deposit payment |
-| Reserved | Deposit paid, booking confirmed |
-| Arrived | Guest has arrived at the resort |
-| CheckedIn | Guest checked in, room assigned and occupied |
-| CheckedOut | Guest checked out, all charges settled |
-| Cancelled | Booking cancelled (refund policy applies: 100% if >48h before check-in, 0% otherwise) |
-| NoShow | Guest did not arrive |
 
-### **2.2 Room Status** {#22-room-status}
+| State          | Description                                                                           |
+| -------------- | ------------------------------------------------------------------------------------- |
+| PendingPayment | Booking created, awaiting deposit payment                                             |
+| Reserved       | Deposit paid, booking confirmed                                                       |
+| Arrived        | Guest has arrived at the resort                                                       |
+| CheckedIn      | Guest checked in, room assigned and occupied                                          |
+| CheckedOut     | Guest checked out, all charges settled                                                |
+| Cancelled      | Booking cancelled (refund policy applies: 100% if >48h before check-in, 0% otherwise) |
+| NoShow         | Guest did not arrive                                                                  |
+
+### **2.2 Room Status**
 
 Defines the operational lifecycle of a physical room.
 
@@ -715,14 +716,15 @@ stateDiagram-v2
 ```
 
 **States:**
-| State | Description |
-|-------|-------------|
-| Available | Room is clean and ready for new guests |
-| Occupied | Room is currently occupied by a checked-in guest |
-| NeedsCleaning | Guest has checked out; room requires cleaning |
-| Maintenance | Room is under maintenance; cannot be booked or assigned |
 
-### **2.3 Food Order Status** {#23-food-order-status}
+| State         | Description                                             |
+| ------------- | ------------------------------------------------------- |
+| Available     | Room is clean and ready for new guests                  |
+| Occupied      | Room is currently occupied by a checked-in guest        |
+| NeedsCleaning | Guest has checked out; room requires cleaning           |
+| Maintenance   | Room is under maintenance; cannot be booked or assigned |
+
+### **2.3 Food Order Status**
 
 Defines the lifecycle of a food order (room service or table order).
 
@@ -737,14 +739,15 @@ stateDiagram-v2
 ```
 
 **States:**
-| State | Description |
-|-------|-------------|
-| Pending | Order placed, waiting for kitchen acknowledgment |
-| Cooking | Kitchen is preparing the order (synced from KOT status) |
-| Delivered | Food has been delivered to the guest |
-| Cancelled | Order has been cancelled |
 
-### **2.4 KOT Status** {#24-kot-status}
+| State     | Description                                             |
+| --------- | ------------------------------------------------------- |
+| Pending   | Order placed, waiting for kitchen acknowledgment        |
+| Cooking   | Kitchen is preparing the order (synced from KOT status) |
+| Delivered | Food has been delivered to the guest                    |
+| Cancelled | Order has been cancelled                                |
+
+### **2.4 KOT Status**
 
 Defines the Kitchen Order Ticket workflow.
 
@@ -760,15 +763,16 @@ stateDiagram-v2
 ```
 
 **States:**
-| State | Description |
-|-------|-------------|
-| Pending | KOT created, waiting for kitchen to start |
-| Cooking | Kitchen staff is preparing the food |
-| Ready | Food is ready for pickup/delivery |
-| Completed | Order has been served to the guest |
-| Cancelled | KOT has been cancelled |
 
-### **2.5 Tour Booking Status** {#25-tour-booking-status}
+| State     | Description                               |
+| --------- | ----------------------------------------- |
+| Pending   | KOT created, waiting for kitchen to start |
+| Cooking   | Kitchen staff is preparing the food       |
+| Ready     | Food is ready for pickup/delivery         |
+| Completed | Order has been served to the guest        |
+| Cancelled | KOT has been cancelled                    |
+
+### **2.5 Tour Booking Status**
 
 ```mermaid
 stateDiagram-v2
@@ -781,7 +785,7 @@ stateDiagram-v2
     Cancelled --> [*]
 ```
 
-### **2.6 Table Reservation Status** {#26-table-reservation-status}
+### **2.6 Table Reservation Status**
 
 ```mermaid
 stateDiagram-v2
@@ -797,7 +801,7 @@ stateDiagram-v2
     NoShow --> [*]
 ```
 
-### **2.7 Invoice Status** {#27-invoice-status}
+### **2.7 Invoice Status**
 
 ```mermaid
 stateDiagram-v2
@@ -810,7 +814,7 @@ stateDiagram-v2
     Cancelled --> [*]
 ```
 
-### **2.8 Payment Status** {#28-payment-status}
+### **2.8 Payment Status**
 
 ```mermaid
 stateDiagram-v2
@@ -823,7 +827,7 @@ stateDiagram-v2
     Refunded --> [*]
 ```
 
-### **2.9 Folio Status** {#29-folio-status}
+### **2.9 Folio Status**
 
 ```mermaid
 stateDiagram-v2
@@ -840,9 +844,9 @@ stateDiagram-v2
 
 ---
 
-## **3. Detailed Design** {#3-detailed-design}
+## **3. Detailed Design**
 
-### **3.1 Auth, Profiles & Master Data** {#31-auth-profiles--master-data}
+### **3.1 Auth, Profiles & Master Data**
 
 #### **3.1.1 Class Diagram – Authentication & User Management**
 
@@ -1013,7 +1017,7 @@ sequenceDiagram
 
 ---
 
-### **3.2 Room Reservation & Front Desk** {#32-room-reservation--front-desk}
+### **3.2 Room Reservation & Front Desk**
 
 #### **3.2.1 Class Diagram – Booking & Reception**
 
@@ -1201,7 +1205,7 @@ sequenceDiagram
 
 ---
 
-### **3.3 Restaurant POS & Room Service** {#33-restaurant-pos--room-service}
+### **3.3 Restaurant POS & Room Service**
 
 #### **3.3.1 Class Diagram – Food Orders & KOT**
 
@@ -1310,7 +1314,7 @@ sequenceDiagram
 
 ---
 
-### **3.4 Tour Booking & Feedback System** {#34-tour-booking--feedback-system}
+### **3.4 Tour Booking & Feedback System**
 
 #### **3.4.1 Class Diagram – Tour Management**
 
@@ -1397,7 +1401,7 @@ sequenceDiagram
 
 ---
 
-### **3.5 Consolidated Billing & Dashboards** {#35-consolidated-billing--dashboards}
+### **3.5 Consolidated Billing & Dashboards**
 
 #### **3.5.1 Class Diagram – Dashboard & Reporting**
 

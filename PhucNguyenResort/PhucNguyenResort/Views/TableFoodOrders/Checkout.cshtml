@@ -1,61 +1,238 @@
 @model PhucNguyenResort.ViewModels.TableFoodOrders.TableFoodOrderCheckoutViewModel
 @{
-    ViewData["Title"] = "Table Checkout";
+    ViewData["Title"] = "Thanh Toán Bàn";
     Layout = "_DashboardLayout";
     var hasOrders = Model.Orders.Any(o => o.OrderStatus != PhucNguyenResort.Enums.FoodOrderStatus.Cancelled);
     var isSettled = Model.IsChargedToRoom || Model.IsPaidAtRestaurant;
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-credit-card mr-2" style="color: #007bff;"></i> Table Checkout
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">
-                    @Model.ReservationCode - @Model.TableName (@Model.TableNumber) - Party @Model.PartySize
-                </p>
-            </div>
-            <div>
-                <a asp-action="ByReservation" asp-route-reservationId="@Model.ReservationId" class="btn btn-outline-primary mr-2">
-                    <i class="fa fa-list mr-1"></i> Orders
-                </a>
-                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-outline-secondary">
-                    <i class="fa fa-arrow-left mr-1"></i> Back
-                </a>
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef;
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .luxury-table thead th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td { border-bottom: none; }
+        .luxury-table tbody tr:hover { background-color: #fcf9f5; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury.warning {
+            background-color: #f6e6cd;
+            color: #805528;
+        }
+        .btn-luxury.warning:hover {
+            background-color: #e5b875;
+            color: #633d11;
+        }
+        .btn-secondary-luxury {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary-luxury:hover {
+            background-color: #e5e2de;
+            color: #1c1c1a;
+            text-decoration: none;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .luxury-badge.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-badge.warning { background-color: #fff4ce; color: #7a5900; }
+        .luxury-badge.danger { background-color: #ffdad6; color: #ba1a1a; }
+        .luxury-badge.info { background-color: #d3e4fe; color: #0b1c30; }
+        
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-alert.error { background-color: #ffdad6; color: #93000a; }
+        .luxury-alert.info { background-color: #e8f4fd; color: #004b8f; }
+
+        .form-control {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #1c1c1a;
+            transition: all 0.2s;
+            box-shadow: none;
+        }
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: #dfa974;
+            box-shadow: 0 0 0 4px rgba(223, 169, 116, 0.1);
+        }
+        .summary-card {
+            background-color: #fcf9f5;
+            border: 1px solid #e5e2de;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            <span class="material-symbols-outlined" style="font-size: 36px;">payments</span> Thanh Toán Bàn
+        </h2>
+        <p class="page-subtitle">
+            @Model.ReservationCode - @Model.TableName (@Model.TableNumber) - Số khách: @Model.PartySize
+        </p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <a asp-action="ByReservation" asp-route-reservationId="@Model.ReservationId" class="btn-luxury">
+            <span class="material-symbols-outlined">list_alt</span> Danh sách Đơn
+        </a>
+        <a asp-controller="Dashboard" asp-action="TableReservations" class="btn-secondary-luxury">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại
+        </a>
     </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    <div class="luxury-alert success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+    </div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    <div class="luxury-alert error">
+        <span class="material-symbols-outlined fill">error</span>
+        <div>@TempData["ErrorMessage"]</div>
+    </div>
 }
 
 <div class="row">
     <div class="col-lg-8">
-        <div class="card-box" style="border-top: 5px solid #007bff;">
+        <div class="luxury-card">
+            <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px;">
+                Đơn Hàng Cần Thanh Toán
+            </div>
             <div class="table-responsive">
-                <table class="table table-hover align-middle" style="font-family: 'Cabin', sans-serif;">
-                    <thead class="bg-light">
+                <table class="luxury-table">
+                    <thead>
                         <tr>
-                            <th>Order</th>
-                            <th>Status</th>
-                            <th>Payment</th>
-                            <th class="text-right">Amount</th>
+                            <th>Đơn hàng</th>
+                            <th>Trạng thái</th>
+                            <th>Thanh toán</th>
+                            <th class="text-right">Số tiền</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (!Model.Orders.Any())
                         {
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">No table food orders found.</td>
+                                <td colspan="4" style="text-align: center; padding: 40px; color: #827569;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                        <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">receipt</span>
+                                        <div>Không tìm thấy đơn gọi món nào.</div>
+                                    </div>
+                                </td>
                             </tr>
                         }
                         else
@@ -63,23 +240,23 @@
                             foreach (var order in Model.Orders)
                             {
                                 <tr>
-                                    <td>#@order.FoodOrderId</td>
+                                    <td><strong style="color: #1c1c1a;">#@order.FoodOrderId</strong></td>
                                     <td>@order.OrderStatus</td>
                                     <td>
                                         @if (order.IsChargedToRoom)
                                         {
-                                            <span class="badge badge-success">Charged to room</span>
+                                            <span class="luxury-badge success">Ghi nhận vào phòng</span>
                                         }
                                         else if (order.IsPaidAtRestaurant)
                                         {
-                                            <span class="badge badge-info">Paid at restaurant</span>
+                                            <span class="luxury-badge info">Đã thanh toán tại nhà hàng</span>
                                         }
                                         else
                                         {
-                                            <span class="badge badge-light border text-muted">Unpaid</span>
+                                            <span class="luxury-badge">Chưa thanh toán</span>
                                         }
                                     </td>
-                                    <td class="text-right">@order.TotalAmount.ToString("N0") VND</td>
+                                    <td class="text-right" style="font-weight: 500; color: #805528;">@order.TotalAmount.ToString("N0") VND</td>
                                 </tr>
                             }
                         }
@@ -88,37 +265,43 @@
             </div>
         </div>
     </div>
+    
     <div class="col-lg-4">
-        <div class="card-box" style="border-left: 5px solid #ffc107;">
-            <h4 class="mb-3" style="font-family: 'Lora', serif;">Summary</h4>
-            <div class="d-flex justify-content-between mb-2">
-                <span>Billable total</span>
-                <strong>@Model.TotalAmount.ToString("N0") VND</strong>
+        <div class="luxury-card summary-card">
+            <h4 class="mb-4" style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Tóm tắt</h4>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px;">
+                <span style="color: #50453b;">Tổng cộng</span>
+                <strong style="color: #805528; font-size: 18px;">@Model.TotalAmount.ToString("N0") VND</strong>
             </div>
-            <div class="d-flex justify-content-between mb-3">
-                <span>Room booking</span>
-                <strong>@(Model.LinkedBookingDisplay ?? "None")</strong>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px; font-size: 14px; padding-bottom: 24px; border-bottom: 1px solid #e5e2de;">
+                <span style="color: #50453b;">Phòng đặt</span>
+                <strong style="color: #1c1c1a;">@(Model.LinkedBookingDisplay ?? "Không có")</strong>
             </div>
 
             @if (!hasOrders)
             {
-                <div class="alert alert-info mb-0">No billable orders are available for checkout.</div>
+                <div class="luxury-alert info mb-0" style="padding: 12px 16px;">
+                    <span class="material-symbols-outlined">info</span>
+                    <div>Không có đơn hàng nào cần thanh toán.</div>
+                </div>
             }
             else if (isSettled)
             {
-                <div class="alert alert-success mb-0">
-                    This table bill has already been settled.
+                <div class="luxury-alert success mb-0" style="padding: 12px 16px;">
+                    <span class="material-symbols-outlined fill">check_circle</span>
+                    <div>Hóa đơn bàn này đã được thanh toán.</div>
                 </div>
             }
             else if (Model.CanChargeToRoom)
             {
-                <form asp-action="ChargeToRoom" method="post" onsubmit="return confirm('Charge this table bill to the selected room booking?');">
+                <form asp-action="ChargeToRoom" method="post" onsubmit="return confirm('Ghi nhận hóa đơn bàn này vào phòng đã chọn?');">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="reservationId" value="@Model.ReservationId" />
-                    <div class="form-group">
-                        <label class="font-weight-bold">Confirm room booking</label>
-                        <select name="bookingId" class="form-control" required>
-                            <option value="">Select booking</option>
+                    <div style="margin-bottom: 24px;">
+                        <label style="color: #1c1c1a; font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">Xác nhận phòng đặt</label>
+                        <select name="bookingId" class="form-control" required style="width: 100%;">
+                            <option value="">Chọn phòng đặt</option>
                             @foreach (var booking in Model.BookingOptions)
                             {
                                 <option value="@booking.BookingId" selected="@(Model.SelectedBookingId == booking.BookingId)">
@@ -126,22 +309,23 @@
                                 </option>
                             }
                         </select>
-                        <small class="text-muted d-block mt-1">
-                            The table bill will be added to the selected booking's guest folio.
+                        <small style="color: #827569; display: block; margin-top: 8px; font-size: 12px;">
+                            Hóa đơn bàn sẽ được thêm vào chi phí phòng của khách hàng đã chọn.
                         </small>
                     </div>
-                    <button type="submit" class="btn btn-warning btn-block">
-                        <i class="fa fa-hotel mr-1"></i> Charge to Room
+                    <button type="submit" class="btn-luxury warning w-100 mb-3">
+                        <span class="material-symbols-outlined">hotel</span> Ghi nhận vào Phòng
                     </button>
                 </form>
             }
-            else
+            
+            @if (hasOrders && !isSettled)
             {
-                <form asp-action="PayAtRestaurant" method="post" onsubmit="return confirm('Mark this table bill as paid at restaurant?');">
+                <form asp-action="PayAtRestaurant" method="post" onsubmit="return confirm('Xác nhận hóa đơn bàn này đã thanh toán tại nhà hàng?');">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="reservationId" value="@Model.ReservationId" />
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fa fa-money mr-1"></i> Pay at Restaurant
+                    <button type="submit" class="btn-luxury w-100">
+                        <span class="material-symbols-outlined">point_of_sale</span> Thanh Toán tại Nhà hàng
                     </button>
                 </form>
             }

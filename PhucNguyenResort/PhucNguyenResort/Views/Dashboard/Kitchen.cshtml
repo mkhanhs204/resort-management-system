@@ -1,7 +1,7 @@
 @using PhucNguyenResort.Enums
 @model IEnumerable<PhucNguyenResort.ViewModels.Kots.KotDetailViewModel>
 @{
-    ViewData["Title"] = "Kitchen Staff Dashboard";
+    ViewData["Title"] = "Màn hình Nhân viên Bếp";
     Layout = "_DashboardLayout";
 
     var pendingCount = Model?.Count(k => k.Status == KotStatus.Pending) ?? 0;
@@ -9,66 +9,228 @@
     var readyCount = Model?.Count(k => k.Status == KotStatus.Ready) ?? 0;
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-fire mr-2" style="color: #fd7e14;"></i> Kitchen Staff — KOT Monitor
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">View Kitchen Order Tickets, update cooking status, and mark dishes as ready.</p>
-            </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .luxury-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 32px 48px -12px rgba(30, 41, 59, 0.12);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 16px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury.success {
+            background-color: #e2f5ea;
+            color: #0b5c2d;
+        }
+        .btn-luxury.success:hover {
+            background-color: #0b5c2d;
+            color: #ffffff;
+        }
+        .btn-luxury.warning {
+            background-color: #f6e6cd;
+            color: #805528;
+        }
+        .btn-luxury.warning:hover {
+            background-color: #e5b875;
+            color: #633d11;
+        }
+        
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .luxury-badge.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-badge.warning { background-color: #fff4ce; color: #7a5900; }
+        .luxury-badge.danger { background-color: #ffdad6; color: #ba1a1a; }
+        .luxury-badge.info { background-color: #d3e4fe; color: #0b1c30; }
+
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-alert.error { background-color: #ffdad6; color: #93000a; }
+
+        .kpi-card {
+            text-align: center;
+            padding: 24px;
+            height: 100%;
+        }
+        .kpi-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .kpi-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #1c1c1a;
+            margin-bottom: 4px;
+        }
+        .kpi-title {
+            font-weight: 600;
+            color: #50453b;
+            margin-bottom: 4px;
+        }
+        .kpi-subtitle {
+            font-size: 12px;
+            color: #827569;
+        }
+
+        .kot-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
+        }
+        .kot-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        .kot-body {
+            padding: 16px;
+            flex-grow: 1;
+        }
+        .kot-footer {
+            padding: 16px;
+            background-color: #fcf9f5;
+            border-top: 1px solid #e5e2de;
+        }
+        
+        .kot-header.pending { background-color: #fff4ce; color: #7a5900; border-bottom: 2px solid #e5c365; }
+        .kot-header.cooking { background-color: #f6e6cd; color: #805528; border-bottom: 2px solid #dfa974; }
+        .kot-header.ready { background-color: #e2f5ea; color: #0b5c2d; border-bottom: 2px solid #93d9b1; }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            <span class="material-symbols-outlined" style="font-size: 36px; color: #dfa974;">local_fire_department</span> Nhân viên Bếp — Theo dõi KOT
+        </h2>
+        <p class="page-subtitle">Xem phiếu yêu cầu nhà bếp (KOT), cập nhật trạng thái nấu ăn, và đánh dấu món ăn đã hoàn thành.</p>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; font-size: 14px; color: #827569; display: flex; align-items: center; gap: 6px;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span> @DateTime.Now.ToString("dd MMMM, yyyy")
     </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="luxury-alert success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
     </div>
 }
 
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="luxury-alert error">
+        <span class="material-symbols-outlined fill">error</span>
+        <div>@TempData["ErrorMessage"]</div>
     </div>
 }
 
 <!-- KPI Cards -->
-<div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107;">
-            <h4 style="color: #ffc107;"><i class="fa fa-clock-o"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@pendingCount</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Pending</p>
-            <small class="text-muted">Waiting to start cooking</small>
+<div class="row mb-2">
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="luxury-card kpi-card" style="border-top: 4px solid #fbbc04;">
+            <div class="kpi-icon" style="color: #fbbc04;"><span class="material-symbols-outlined" style="font-size: 36px;">schedule</span></div>
+            <div class="kpi-number">@pendingCount</div>
+            <div class="kpi-title">Chờ xử lý</div>
+            <div class="kpi-subtitle">Đang chờ bắt đầu nấu</div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #fd7e14;">
-            <h4 style="color: #fd7e14;"><i class="fa fa-fire"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@cookingCount</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Cooking</p>
-            <small class="text-muted">Currently being cooked</small>
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="luxury-card kpi-card" style="border-top: 4px solid #dfa974;">
+            <div class="kpi-icon" style="color: #dfa974;"><span class="material-symbols-outlined" style="font-size: 36px;">outdoor_grill</span></div>
+            <div class="kpi-number">@cookingCount</div>
+            <div class="kpi-title">Đang nấu</div>
+            <div class="kpi-subtitle">Đang được chế biến</div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
-            <h4 style="color: #28a745;"><i class="fa fa-check-circle"></i></h4>
-            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@readyCount</h3>
-            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Ready</p>
-            <small class="text-muted">Waiting for pickup</small>
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="luxury-card kpi-card" style="border-top: 4px solid #34a853;">
+            <div class="kpi-icon" style="color: #34a853;"><span class="material-symbols-outlined" style="font-size: 36px;">task_alt</span></div>
+            <div class="kpi-number">@readyCount</div>
+            <div class="kpi-title">Đã xong</div>
+            <div class="kpi-subtitle">Chờ nhân viên phục vụ nhận</div>
         </div>
     </div>
 </div>
@@ -76,85 +238,89 @@
 <!-- Active KOT Cards -->
 <div class="row">
     <div class="col-lg-12">
-        <div class="card-box" style="border-left: 5px solid #fd7e14;">
-            <h5 style="font-family: 'Lora', serif; font-weight: bold; margin-bottom: 20px;">
-                <i class="fa fa-list-alt mr-2" style="color: #fd7e14;"></i> Active Kitchen Order Tickets
-            </h5>
+        <div class="luxury-card" style="padding: 32px;">
+            <h4 style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined" style="color: #dfa974;">receipt_long</span> Phiếu KOT Đang hoạt động
+            </h4>
             
             <div class="row">
-                @if (Model == null || !Model.Any())
+                @if (Model == null || !Model.Any(k => k.Status != KotStatus.Completed))
                 {
-                    <div class="col-12 text-center text-muted p-4">
-                        <i class="fa fa-check-circle fa-3x mb-3 text-success"></i>
-                        <h5>No active orders!</h5>
-                        <p>Kitchen is all caught up.</p>
+                    <div class="col-12" style="text-align: center; padding: 60px 20px; color: #827569;">
+                        <span class="material-symbols-outlined fill" style="font-size: 64px; color: #d4c3b6; margin-bottom: 16px;">check_circle</span>
+                        <h5 style="font-family: 'Playfair Display', serif; color: #50453b; font-size: 20px; margin-bottom: 8px;">Không có đơn nào!</h5>
+                        <p style="font-family: 'Inter', sans-serif;">Nhà bếp đã hoàn thành tất cả.</p>
                     </div>
                 }
                 else
                 {
                     foreach (var kot in Model.Where(k => k.Status != KotStatus.Completed))
                     {
-                        var borderColor = kot.Status == KotStatus.Pending ? "#ffc107" :
-                                          kot.Status == KotStatus.Cooking ? "#fd7e14" : "#28a745";
-                        var headerBg = kot.Status == KotStatus.Pending ? "#fff8e1" :
-                                       kot.Status == KotStatus.Cooking ? "#fff3e0" : "#e8f5e9";
+                        var statusClass = kot.Status == KotStatus.Pending ? "pending" :
+                                          kot.Status == KotStatus.Cooking ? "cooking" : "ready";
                         var serviceLocation = kot.OrderType == FoodOrderType.TableService
-                            ? $"Table {(string.IsNullOrWhiteSpace(kot.TableNumber) ? "N/A" : kot.TableNumber)}{(string.IsNullOrWhiteSpace(kot.TableName) ? "" : $" - {kot.TableName}")}"
-                            : $"Room {(string.IsNullOrWhiteSpace(kot.RoomNumber) ? "N/A" : kot.RoomNumber)}";
+                            ? $"Bàn {(string.IsNullOrWhiteSpace(kot.TableNumber) ? "N/A" : kot.TableNumber)}{(string.IsNullOrWhiteSpace(kot.TableName) ? "" : $" - {kot.TableName}")}"
+                            : $"Phòng {(string.IsNullOrWhiteSpace(kot.RoomNumber) ? "N/A" : kot.RoomNumber)}";
 
-                        <div class="col-md-4 mb-3">
-                            <div class="card shadow-sm rounded" style="border-top: 3px solid @borderColor;">
-                                <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: @headerBg; font-family: 'Cabin', sans-serif;">
-                                    <strong>KOT #@kot.KotId (Ord: #@kot.FoodOrderId) - @serviceLocation</strong>
-                                    <small class="text-muted" title="@kot.CreatedAt.ToString("HH:mm:ss")"><i class="fa fa-clock-o mr-1"></i> @kot.CreatedAt.ToString("HH:mm")</small>
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="luxury-card kot-card">
+                                <div class="kot-header @statusClass">
+                                    <span>KOT #@kot.KotId (Đơn: #@kot.FoodOrderId) <br /><small style="font-weight: 500;">@serviceLocation</small></span>
+                                    <span style="font-size: 13px; font-weight: 500; opacity: 0.8; display: flex; align-items: center; gap: 4px;" title="@kot.CreatedAt.ToString("HH:mm:ss")">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span> @kot.CreatedAt.ToString("HH:mm")
+                                    </span>
                                 </div>
-                                <div class="card-body p-3" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                                    <ul class="list-unstyled mb-0">
+                                <div class="kot-body">
+                                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #1c1c1a;">
                                         @if(kot.Items != null && kot.Items.Any())
                                         {
                                             foreach(var item in kot.Items)
                                             {
-                                                <li class="mb-2 border-bottom pb-1">
-                                                    <strong>@item.Quantity x @item.MenuItemName</strong>
+                                                <li style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0ede9;">
+                                                    <div style="font-weight: 600;">@item.Quantity x @item.MenuItemName</div>
                                                     @if(!string.IsNullOrEmpty(item.Notes))
                                                     {
-                                                        <br /><small class="text-danger"><i class="fa fa-exclamation-triangle mr-1"></i>Note: @item.Notes</small>
+                                                        <div style="font-size: 12px; margin-top: 6px; background: #fff4ce; border-left: 2px solid #e5c365; padding: 4px 8px; color: #7a5900; border-radius: 4px;">
+                                                            <strong>Ghi chú:</strong> @item.Notes
+                                                        </div>
                                                     }
                                                 </li>
                                             }
                                         }
                                         else
                                         {
-                                            <li class="text-muted">No items found.</li>
+                                            <li style="color: #827569; font-style: italic;">Không tìm thấy món ăn nào.</li>
                                         }
                                     </ul>
                                 </div>
-                                <div class="card-footer p-2 text-center bg-white border-top-0">
+                                <div class="kot-footer">
                                     @if (kot.Status == KotStatus.Pending)
                                     {
-                                        <form asp-controller="Dashboard" asp-action="UpdateKotStatus" method="post" style="display:inline;">
+                                        <form asp-controller="Dashboard" asp-action="UpdateKotStatus" method="post" style="margin: 0;">
                                             <input type="hidden" name="kotId" value="@kot.KotId" />
                                             <input type="hidden" name="newStatus" value="Cooking" />
-                                            <button type="submit" class="btn btn-sm btn-outline-warning btn-block font-weight-bold">
-                                                <i class="fa fa-play mr-1"></i> Start Cooking
+                                            <button type="submit" class="btn-luxury warning" style="width: 100%;">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span> Bắt đầu nấu
                                             </button>
                                         </form>
                                     }
                                     else if (kot.Status == KotStatus.Cooking)
                                     {
-                                        <form asp-controller="Dashboard" asp-action="UpdateKotStatus" method="post" style="display:inline;">
+                                        <form asp-controller="Dashboard" asp-action="UpdateKotStatus" method="post" style="margin: 0;">
                                             <input type="hidden" name="kotId" value="@kot.KotId" />
                                             <input type="hidden" name="newStatus" value="Ready" />
-                                            <button type="submit" class="btn btn-sm btn-success btn-block font-weight-bold">
-                                                <i class="fa fa-check mr-1"></i> Mark Ready to Serve
+                                            <button type="submit" class="btn-luxury success" style="width: 100%;">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">check</span> Đánh dấu Đã xong
                                             </button>
                                         </form>
                                     }
                                     else if (kot.Status == KotStatus.Ready)
                                     {
-                                        <span class="badge badge-success py-2 px-3 w-100" style="font-size: 14px;">
-                                            <i class="fa fa-bell mr-1"></i> Awaiting Pickup by F&B
-                                        </span>
+                                        <div style="text-align: center;">
+                                            <span class="luxury-badge success" style="display: block; padding: 10px; font-size: 14px;">
+                                                <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: text-bottom;">notifications</span> Chờ Nhân viên phục vụ nhận món
+                                            </span>
+                                        </div>
                                     }
                                 </div>
                             </div>

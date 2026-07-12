@@ -1,0 +1,331 @@
+@model PhucNguyenResort.ViewModels.Dashboard.ForecastResultViewModel
+@{
+    ViewData["Title"] = "Dự Báo Tài Chính AI";
+    Layout = "_DashboardLayout";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #805528; margin-bottom: 4px; }
+        .page-subtitle { font-family: 'Inter', sans-serif; color: #50453b; font-size: 16px; margin-bottom: 32px; }
+        
+        /* KPI Cards */
+        .kpi-card { background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 12px 24px -8px rgba(30, 41, 59, 0.05); border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; height: 100%; display: flex; align-items: center; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 20px 32px -8px rgba(30, 41, 59, 0.1); }
+        .kpi-icon-wrapper { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0; }
+        .kpi-icon-wrapper.primary { background-color: #f6f3ef; color: #805528; }
+        .kpi-icon-wrapper.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .kpi-icon-wrapper.warning { background-color: #fff8e6; color: #946c00; }
+        .kpi-icon-wrapper.info { background-color: #d3e4fe; color: #0b1c30; }
+        .kpi-details h3 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px; }
+        .kpi-details p { color: #50453b; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+        .kpi-change { font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; }
+        .kpi-change.up { color: #0b5c2d; }
+        .kpi-change.down { color: #ba1a1a; }
+        
+        /* Badge AI */
+        .ai-badge { position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #dfa974 0%, #805528 100%); color: white; font-size: 11px; padding: 4px 8px; border-radius: 20px; font-weight: 600; font-family: 'Inter', sans-serif; }
+        
+        /* Section styling */
+        .section-header { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #805528; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .action-card { background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 12px 24px -8px rgba(30, 41, 59, 0.05); border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; height: 100%; }
+        
+        /* Table */
+        .table-luxury { background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid rgba(212, 195, 182, 0.3); font-family: 'Inter', sans-serif; margin-bottom: 16px; }
+        .table-luxury table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+        .table-luxury th { background-color: #fcf9f5; color: #805528; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 16px; border-bottom: 2px solid rgba(212, 195, 182, 0.3); text-align: left; }
+        .table-luxury td { padding: 16px; border-bottom: 1px solid #f0ede9; color: #1c1c1a; font-size: 14px; vertical-align: middle; }
+        .table-luxury tbody tr:hover { background-color: #faf8f5; }
+        .table-luxury tbody tr:last-child td { border-bottom: none; }
+        
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 24px; vertical-align: middle; }
+        
+        .chart-container { position: relative; height: 350px; width: 100%; }
+        
+        .ai-analysis-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #50453b;
+            padding: 20px;
+            background: linear-gradient(to right, #fcf9f5, #ffffff);
+            border-left: 4px solid #805528;
+            border-radius: 8px;
+        }
+
+        .btn-outline-luxury { background-color: transparent; color: #805528; border: 1.5px solid #dfa974; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 8px; padding: 6px 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; font-size: 14px; }
+        .btn-outline-luxury:hover { background-color: #f6f3ef; color: #633d11; text-decoration: none; }
+    </style>
+}
+
+<div class="mb-4">
+    <a asp-controller="Dashboard" asp-action="Manager" class="btn-outline-luxury mb-3" style="border: none; padding: 0; background: none;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span> Quay lại Bảng điều khiển
+    </a>
+    <h2 class="page-title"><span class="material-symbols-outlined" style="font-size: 36px; color: #dfa974;">auto_awesome</span> Dự Báo Tài Chính AI</h2>
+    <p class="page-subtitle">Dự báo doanh thu tháng @Model.ForecastMonth/@Model.ForecastYear dựa trên dữ liệu lịch sử</p>
+</div>
+
+<!-- KPI Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card" style="border: 1px solid #dfa974;">
+            <div class="ai-badge">AI</div>
+            <div class="kpi-icon-wrapper primary">
+                <span class="material-symbols-outlined">monitoring</span>
+            </div>
+            <div class="kpi-details">
+                <p>TỔNG DOANH THU</p>
+                <h3>@Model.PredictedTotalRevenue.ToString("N0") ₫</h3>
+                @if (Model.RevenueChangePercent >= 0)
+                {
+                    <span class="kpi-change up"><span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span> +@Model.RevenueChangePercent.ToString("0.##")% so với tháng trước</span>
+                }
+                else
+                {
+                    <span class="kpi-change down"><span class="material-symbols-outlined" style="font-size: 16px;">trending_down</span> @Model.RevenueChangePercent.ToString("0.##")% so với tháng trước</span>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper info">
+                <span class="material-symbols-outlined">bedroom_parent</span>
+            </div>
+            <div class="kpi-details">
+                <p>DOANH THU PHÒNG</p>
+                <h3>@Model.PredictedRoomRevenue.ToString("N0") ₫</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper success">
+                <span class="material-symbols-outlined">restaurant</span>
+            </div>
+            <div class="kpi-details">
+                <p>DOANH THU F&B</p>
+                <h3>@Model.PredictedFnBRevenue.ToString("N0") ₫</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card">
+            <div class="kpi-icon-wrapper warning">
+                <span class="material-symbols-outlined">tour</span>
+            </div>
+            <div class="kpi-details">
+                <p>DOANH THU TOUR</p>
+                <h3>@Model.PredictedTourRevenue.ToString("N0") ₫</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Chart -->
+    <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="action-card">
+            <h5 class="section-header mb-4">
+                <span class="material-symbols-outlined">ssid_chart</span> Biểu Đồ Xu Hướng Doanh Thu
+            </h5>
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Analysis & Occupancy -->
+    <div class="col-lg-4">
+        <div class="action-card mb-4">
+            <h5 class="section-header mb-3">
+                <span class="material-symbols-outlined" style="color: #0b5c2d;">psychology</span> Phân Tích Của AI
+            </h5>
+            <div class="ai-analysis-text">
+                @if (string.IsNullOrEmpty(Model.AiAnalysis))
+                {
+                    <em>Chưa có dữ liệu phân tích.</em>
+                }
+                else
+                {
+                    @Model.AiAnalysis
+                }
+            </div>
+        </div>
+        
+        <div class="action-card">
+            <h5 class="section-header mb-4">
+                <span class="material-symbols-outlined">meeting_room</span> Tỷ Lệ Lấp Đầy Dự Báo
+            </h5>
+            <div style="position: relative; height: 180px; width: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                <canvas id="occupancyChart"></canvas>
+                <div style="position: absolute; text-align: center; margin-top: 20px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; color: #805528; margin: 0;">@Model.PredictedOccupancyRate.ToString("0.##")%</h3>
+                    <p style="font-size: 13px; color: #a4b5ce; margin: 0;">Dự báo tháng @Model.ForecastMonth</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="action-card">
+            <h5 class="section-header mb-4">
+                <span class="material-symbols-outlined">table_view</span> Bảng Dữ Liệu Chi Tiết (6 Tháng Gần Nhất + Dự Báo)
+            </h5>
+            <div class="table-luxury">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tháng</th>
+                            <th>Tổng Doanh Thu</th>
+                            <th>DT Phòng</th>
+                            <th>DT F&B</th>
+                            <th>DT Tour</th>
+                            <th>Tỷ Lệ Lấp Đầy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.HistoricalData)
+                        {
+                            <tr style="@(item.IsForecast ? "background-color: #fffdf5; font-weight: 600;" : "")">
+                                <td>
+                                    @item.Label
+                                    @if (item.IsForecast) { <span class="badge" style="background-color: #dfa974; color: white; margin-left: 8px;">Dự báo</span> }
+                                </td>
+                                <td>@item.TotalRevenue.ToString("N0") ₫</td>
+                                <td>@item.RoomRevenue.ToString("N0") ₫</td>
+                                <td>@item.FnBRevenue.ToString("N0") ₫</td>
+                                <td>@item.TourRevenue.ToString("N0") ₫</td>
+                                <td>@item.OccupancyRate.ToString("0.##")%</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <p style="color: #a4b5ce; font-size: 13px; margin: 0;">
+                    ⏱️ Dự báo được tạo lúc: @Model.GeneratedAt.ToString("dd/MM/yyyy HH:mm")
+                </p>
+                <p style="color: #ba1a1a; font-size: 13px; margin: 0; font-weight: 500;">
+                    ⚠️ Lưu ý: Kết quả là ước tính dựa trên AI, chỉ mang tính tham khảo.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Data
+            var labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HistoricalData.Select(d => d.Label)));
+            var dataTotal = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HistoricalData.Select(d => d.TotalRevenue)));
+            var isForecasts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HistoricalData.Select(d => d.IsForecast)));
+
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#50453b';
+
+            // 1. Trend Chart (Line)
+            var ctxTrend = document.getElementById('trendChart').getContext('2d');
+            
+            // Create a custom segment line to make the forecast part dashed
+            var trendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tổng Doanh Thu',
+                        data: dataTotal,
+                        borderColor: '#805528',
+                        backgroundColor: 'rgba(128, 85, 40, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: function(context) {
+                            var index = context.dataIndex;
+                            return isForecasts[index] ? '#dfa974' : '#805528';
+                        },
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        segment: {
+                            borderDash: function(context) {
+                                // Nếu điểm tiếp theo là dự báo, dùng nét đứt
+                                return isForecasts[context.p1DataIndex] ? [5, 5] : undefined;
+                            }
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                    }
+                                    if (isForecasts[context.dataIndex]) {
+                                        label += ' (Dự báo AI)';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(212, 195, 182, 0.2)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // 2. Occupancy Gauge Chart
+            var ctxOcc = document.getElementById('occupancyChart').getContext('2d');
+            var occRate = @Model.PredictedOccupancyRate;
+            var remaining = 100 - occRate;
+            if(remaining < 0) remaining = 0;
+            
+            var occColor = '#dfa974';
+            if (occRate >= 70) occColor = '#0b5c2d'; // Good
+            else if (occRate < 40) occColor = '#ba1a1a'; // Bad
+
+            var occChart = new Chart(ctxOcc, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Đã lấp đầy', 'Trống'],
+                    datasets: [{
+                        data: [occRate, remaining],
+                        backgroundColor: [occColor, '#f0ede9'],
+                        borderWidth: 0,
+                        circumference: 180,
+                        rotation: 270
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        });
+    </script>
+}

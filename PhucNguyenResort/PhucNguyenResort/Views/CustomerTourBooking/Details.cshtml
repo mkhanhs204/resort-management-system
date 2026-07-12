@@ -194,30 +194,30 @@
                                         <h4 class="font-headline-md text-slate-800">Hòa Lạc</h4>
                                         <p class="text-slate-600 font-label-lg">Hôm nay</p>
                                     </div>
-                                    <span class="material-symbols-outlined text-5xl text-yellow-500" style="font-variation-settings: 'FILL' 1;">light_mode</span>
+                                    <span id="current-weather-icon" class="material-symbols-outlined text-5xl text-yellow-500" style="font-variation-settings: 'FILL' 1;">light_mode</span>
                                 </div>
                                 <div class="flex items-end gap-4 mt-2">
-                                    <span class="text-display-md font-bold text-slate-800">28°C</span>
+                                    <span id="current-temperature" class="text-display-md font-bold text-slate-800">--°C</span>
                                     <div class="text-slate-600 font-body-sm pb-1">
-                                        <p>Nắng đẹp</p>
-                                        <p>Độ ẩm: 65% • Gió: 12km/h</p>
+                                        <p id="current-weather-desc" class="font-bold">Đang tải...</p>
+                                        <p id="current-weather-details">Độ ẩm: --% • Gió: --km/h</p>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-blue-200/50 text-center">
                                     <div>
                                         <p class="text-label-sm text-slate-500">Ngày mai</p>
-                                        <span class="material-symbols-outlined text-yellow-500 my-1">partly_cloudy_day</span>
-                                        <p class="font-label-lg text-slate-700">30°</p>
+                                        <span id="day1-icon" class="material-symbols-outlined text-yellow-500 my-1">partly_cloudy_day</span>
+                                        <p id="day1-temp" class="font-label-lg text-slate-700">--°</p>
                                     </div>
                                     <div>
                                         <p class="text-label-sm text-slate-500">Ngày 3</p>
-                                        <span class="material-symbols-outlined text-yellow-500 my-1">light_mode</span>
-                                        <p class="font-label-lg text-slate-700">31°</p>
+                                        <span id="day2-icon" class="material-symbols-outlined text-yellow-500 my-1">light_mode</span>
+                                        <p id="day2-temp" class="font-label-lg text-slate-700">--°</p>
                                     </div>
                                     <div>
                                         <p class="text-label-sm text-slate-500">Ngày 4</p>
-                                        <span class="material-symbols-outlined text-slate-400 my-1">cloud</span>
-                                        <p class="font-label-lg text-slate-700">27°</p>
+                                        <span id="day3-icon" class="material-symbols-outlined text-slate-400 my-1">cloud</span>
+                                        <p id="day3-temp" class="font-label-lg text-slate-700">--°</p>
                                     </div>
                                 </div>
                             </div>
@@ -473,6 +473,62 @@
                     if (e.key === 'ArrowLeft') showPrev();
                 }
             });
+
+            // Lấy thời tiết thực tế
+            const lat = 21.0116; 
+            const lon = 105.5283;
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max&timezone=Asia%2FBangkok&forecast_days=4`;
+
+            function getWeatherInfo(code) {
+                if (code === 0) return { text: 'Quang đãng', icon: 'light_mode', color: '#f59e0b' };
+                if (code >= 1 && code <= 3) return { text: 'Có mây', icon: 'partly_cloudy_day', color: '#f59e0b' };
+                if (code === 45 || code === 48) return { text: 'Sương mù', icon: 'foggy', color: '#94a3b8' };
+                if (code >= 51 && code <= 67) return { text: 'Mưa', icon: 'rainy', color: '#3b82f6' };
+                if (code >= 71 && code <= 77) return { text: 'Tuyết', icon: 'ac_unit', color: '#93c5fd' };
+                if (code >= 80 && code <= 82) return { text: 'Mưa rào', icon: 'rainy', color: '#3b82f6' };
+                if (code >= 95) return { text: 'Dông sét', icon: 'thunderstorm', color: '#475569' };
+                return { text: 'Không rõ', icon: 'cloud', color: '#94a3b8' };
+            }
+
+            fetch(weatherUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const current = data.current;
+                    const daily = data.daily;
+                    
+                    const currInfo = getWeatherInfo(current.weather_code);
+                    
+                    const iconEl = document.getElementById('current-weather-icon');
+                    if(iconEl) {
+                        iconEl.innerText = currInfo.icon;
+                        iconEl.style.color = currInfo.color;
+                    }
+                    
+                    const tempEl = document.getElementById('current-temperature');
+                    if(tempEl) tempEl.innerText = Math.round(current.temperature_2m) + '°C';
+                    
+                    const descEl = document.getElementById('current-weather-desc');
+                    if(descEl) descEl.innerText = currInfo.text;
+                    
+                    const detailsEl = document.getElementById('current-weather-details');
+                    if(detailsEl) detailsEl.innerText = `Độ ẩm: ${current.relative_humidity_2m}% • Gió: ${current.wind_speed_10m}km/h`;
+
+                    for (let i = 1; i <= 3; i++) {
+                        const dInfo = getWeatherInfo(daily.weather_code[i]);
+                        const dIconEl = document.getElementById(`day${i}-icon`);
+                        if(dIconEl) {
+                            dIconEl.innerText = dInfo.icon;
+                            dIconEl.style.color = dInfo.color;
+                        }
+                        const dTempEl = document.getElementById(`day${i}-temp`);
+                        if(dTempEl) dTempEl.innerText = Math.round(daily.temperature_2m_max[i]) + '°';
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching weather:", err);
+                    const descEl = document.getElementById('current-weather-desc');
+                    if(descEl) descEl.innerText = 'Không thể tải dữ liệu';
+                });
         });
     </script>
 }

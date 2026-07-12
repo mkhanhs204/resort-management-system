@@ -226,6 +226,24 @@
         </div>
     </div>
 
+    <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px; background-color: #f6f3ef; border-radius: 8px; padding: 0 12px;">
+            <span class="material-symbols-outlined" style="color: #50453b; font-size: 20px;">search</span>
+            <input type="text" id="filter-name" placeholder="Tìm tên tour..." style="background-color: transparent; border: none; outline: none; padding: 10px 0; width: 100%; font-family: 'Inter', sans-serif; color: #1c1c1a;">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <input type="date" id="filter-date" style="background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 10px 16px; width: 100%; font-family: 'Inter', sans-serif; color: #50453b; outline: none;">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <select id="filter-status" style="background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 10px 16px; width: 100%; font-family: 'Inter', sans-serif; color: #50453b; outline: none;">
+                <option value="">Tất cả trạng thái</option>
+                <option value="Upcoming">Sắp diễn ra</option>
+                <option value="Ongoing">Đang diễn ra</option>
+                <option value="Completed">Đã hoàn thành</option>
+            </select>
+        </div>
+    </div>
+
     <div style="overflow-x: auto;">
         <table class="luxury-table">
             <thead>
@@ -248,7 +266,10 @@
                         var endTimeStr = ViewData[$"EndTime_{item.ScheduleId}"]?.ToString() ?? "N/A";
                         var startHourStr = item.StartTime != null ? item.StartTime.ToString(@"hh\:mm") : "00:00";
 
-                        <tr>
+                        <tr class="schedule-row" 
+                            data-name="@(item.Tour?.TourName?.ToString().ToLower() ?? "")" 
+                            data-date="@(item.TourDate?.ToString("yyyy-MM-dd") ?? "")" 
+                            data-status="@currentStatus">
                             <td style="color: #827569; font-weight: 600;">#@item.ScheduleId.ToString("D2")</td>
                             <td>
                                 <div style="font-weight: 600; color: #1c1c1a; font-size: 15px; margin-bottom: 4px;">@(item.Tour?.TourName ?? "N/A")</div>
@@ -311,4 +332,125 @@
             </tbody>
         </table>
     </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div id="pagination-container" style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;"></div>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemsPerPage = 5;
+            let allItems = Array.from(document.querySelectorAll('.schedule-row'));
+            let filteredItems = [...allItems];
+            let currentPage = 1;
+            const paginationContainer = document.getElementById('pagination-container');
+            
+            function renderPagination() {
+                if (!paginationContainer) return;
+                paginationContainer.innerHTML = '';
+                const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+                
+                if (totalPages <= 1) return;
+                
+                // Prev Button
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'action-btn';
+                prevBtn.style.padding = '6px 10px';
+                if (currentPage === 1) {
+                    prevBtn.style.opacity = '0.5';
+                    prevBtn.style.cursor = 'not-allowed';
+                }
+                prevBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>';
+                prevBtn.disabled = currentPage === 1;
+                if (currentPage > 1) {
+                    prevBtn.onclick = () => showPage(currentPage - 1);
+                }
+                paginationContainer.appendChild(prevBtn);
+                
+                // Page Buttons
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = 'action-btn';
+                    pageBtn.style.padding = '6px 14px';
+                    if (i === currentPage) {
+                        pageBtn.style.backgroundColor = '#805528';
+                        pageBtn.style.color = '#ffffff';
+                    }
+                    pageBtn.innerText = i;
+                    pageBtn.onclick = () => showPage(i);
+                    paginationContainer.appendChild(pageBtn);
+                }
+                
+                // Next Button
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'action-btn';
+                nextBtn.style.padding = '6px 10px';
+                if (currentPage === totalPages) {
+                    nextBtn.style.opacity = '0.5';
+                    nextBtn.style.cursor = 'not-allowed';
+                }
+                nextBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>';
+                nextBtn.disabled = currentPage === totalPages;
+                if (currentPage < totalPages) {
+                    nextBtn.onclick = () => showPage(currentPage + 1);
+                }
+                paginationContainer.appendChild(nextBtn);
+            }
+            
+            function showPage(page) {
+                currentPage = page;
+                const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage < 1) currentPage = 1;
+                
+                allItems.forEach(item => {
+                    item.style.display = 'none';
+                });
+                
+                filteredItems.forEach((item, index) => {
+                    if (index >= (currentPage - 1) * itemsPerPage && index < currentPage * itemsPerPage) {
+                        item.style.display = '';
+                    }
+                });
+                
+                renderPagination();
+            }
+            
+            if (allItems.length > 0) {
+                showPage(1);
+            }
+
+            // Filter logic
+            const filterName = document.getElementById('filter-name');
+            const filterDate = document.getElementById('filter-date');
+            const filterStatus = document.getElementById('filter-status');
+
+            function applyFilters() {
+                const nameVal = filterName.value.toLowerCase().trim();
+                const dateVal = filterDate.value;
+                const statusVal = filterStatus.value;
+
+                filteredItems = allItems.filter(item => {
+                    const itemName = item.getAttribute('data-name') || '';
+                    const itemDate = item.getAttribute('data-date') || '';
+                    const itemStatus = item.getAttribute('data-status') || '';
+
+                    const matchName = !nameVal || itemName.includes(nameVal);
+                    const matchDate = !dateVal || itemDate === dateVal;
+                    const matchStatus = !statusVal || itemStatus === statusVal;
+
+                    return matchName && matchDate && matchStatus;
+                });
+
+                showPage(1);
+            }
+
+            if (filterName) filterName.addEventListener('input', applyFilters);
+            if (filterDate) filterDate.addEventListener('change', applyFilters);
+            if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+        });
+    </script>
+}

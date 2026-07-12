@@ -1,29 +1,154 @@
 @model PhucNguyenResort.ViewModels.TableFoodOrders.TableFoodOrderCreateViewModel
 @{
-    ViewData["Title"] = "Create Table Food Order";
+    ViewData["Title"] = "Tạo Đơn Gọi Món";
     Layout = "_DashboardLayout";
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-cutlery mr-2" style="color: #007bff;"></i> Create Table Food Order
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">
-                    @Model.ReservationCode - @Model.TableName (@Model.TableNumber) - Party @Model.PartySize
-                </p>
-            </div>
-            <div>
-                <a asp-action="ByReservation" asp-route-reservationId="@Model.ReservationId" class="btn btn-outline-primary mr-2">
-                    <i class="fa fa-list mr-1"></i> Orders
-                </a>
-                <a asp-controller="Dashboard" asp-action="TableReservations" class="btn btn-outline-secondary">
-                    <i class="fa fa-arrow-left mr-1"></i> Back
-                </a>
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef;
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .luxury-table thead th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td { border-bottom: none; }
+        .luxury-table tbody tr:hover { background-color: #fcf9f5; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury:disabled {
+            background-color: #e5e2de;
+            color: #a4b5ce;
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed;
+        }
+        .btn-secondary-luxury {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary-luxury:hover {
+            background-color: #e5e2de;
+            color: #1c1c1a;
+            text-decoration: none;
+        }
+        .form-control {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #1c1c1a;
+            transition: all 0.2s;
+            box-shadow: none;
+        }
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: #dfa974;
+            box-shadow: 0 0 0 4px rgba(223, 169, 116, 0.1);
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            <span class="material-symbols-outlined" style="font-size: 36px;">restaurant</span> Tạo Đơn Gọi Món
+        </h2>
+        <p class="page-subtitle">
+            @Model.ReservationCode - @Model.TableName (@Model.TableNumber) - Số khách: @Model.PartySize
+        </p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <a asp-action="ByReservation" asp-route-reservationId="@Model.ReservationId" class="btn-luxury">
+            <span class="material-symbols-outlined">list_alt</span> Danh sách Đơn
+        </a>
+        <a asp-controller="Dashboard" asp-action="TableReservations" class="btn-secondary-luxury">
+            <span class="material-symbols-outlined">arrow_back</span> Quay lại
+        </a>
     </div>
 </div>
 
@@ -35,31 +160,39 @@
     <input asp-for="TableNumber" type="hidden" />
     <input asp-for="PartySize" type="hidden" />
 
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 8px;"></div>
 
-    <div class="card-box mb-4" style="border-left: 5px solid #007bff;">
-        <label asp-for="CustomerNote" class="font-weight-bold">Order note</label>
-        <textarea asp-for="CustomerNote" class="form-control" rows="3" maxlength="500" placeholder="Shared note for this table order"></textarea>
-        <span asp-validation-for="CustomerNote" class="text-danger"></span>
+    <div class="luxury-card mb-4">
+        <label asp-for="CustomerNote" style="color: #1c1c1a; font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">Ghi chú đơn hàng</label>
+        <textarea asp-for="CustomerNote" class="form-control" rows="3" maxlength="500" placeholder="Ghi chú chung cho đơn gọi món của bàn này"></textarea>
+        <span asp-validation-for="CustomerNote" class="text-danger small"></span>
     </div>
 
-    <div class="card-box" style="border-top: 5px solid #007bff;">
+    <div class="luxury-card">
+        <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 24px;">
+            Danh sách món ăn
+        </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle" style="font-family: 'Cabin', sans-serif;">
-                <thead class="bg-light">
+            <table class="luxury-table">
+                <thead>
                     <tr>
-                        <th>Item</th>
-                        <th>Category</th>
-                        <th class="text-right">Price</th>
-                        <th style="width: 120px;">Qty</th>
-                        <th style="width: 260px;">Item note</th>
+                        <th>Món ăn</th>
+                        <th>Danh mục</th>
+                        <th class="text-right">Giá</th>
+                        <th style="width: 120px; text-align: center;">SL</th>
+                        <th style="width: 260px;">Ghi chú món</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (!Model.Items.Any())
                     {
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No menu items are currently available.</td>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: #827569;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                    <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">restaurant_menu</span>
+                                    <div>Hiện chưa có món ăn nào.</div>
+                                </div>
+                            </td>
                         </tr>
                     }
                     else
@@ -73,17 +206,17 @@
                                     <input asp-for="Items[i].CategoryName" type="hidden" />
                                     <input asp-for="Items[i].ImageUrl" type="hidden" />
                                     <input asp-for="Items[i].Price" type="hidden" />
-                                    <strong>@Model.Items[i].ItemName</strong>
+                                    <strong style="color: #1c1c1a; font-weight: 600;">@Model.Items[i].ItemName</strong>
                                 </td>
-                                <td>@Model.Items[i].CategoryName</td>
-                                <td class="text-right">@Model.Items[i].Price.ToString("N0") VND</td>
+                                <td style="color: #50453b;">@Model.Items[i].CategoryName</td>
+                                <td class="text-right" style="font-weight: 500; color: #805528;">@Model.Items[i].Price.ToString("N0") VND</td>
                                 <td>
-                                    <input asp-for="Items[i].Quantity" type="number" min="0" max="1000" class="form-control form-control-sm" />
-                                    <span asp-validation-for="Items[i].Quantity" class="text-danger"></span>
+                                    <input asp-for="Items[i].Quantity" type="number" min="0" max="1000" class="form-control" style="text-align: center;" />
+                                    <span asp-validation-for="Items[i].Quantity" class="text-danger small"></span>
                                 </td>
                                 <td>
-                                    <input asp-for="Items[i].ItemNote" class="form-control form-control-sm" maxlength="500" placeholder="Less spicy, no onion..." />
-                                    <span asp-validation-for="Items[i].ItemNote" class="text-danger"></span>
+                                    <input asp-for="Items[i].ItemNote" class="form-control" maxlength="500" placeholder="Ít cay, không hành..." />
+                                    <span asp-validation-for="Items[i].ItemNote" class="text-danger small"></span>
                                 </td>
                             </tr>
                         }
@@ -91,9 +224,10 @@
                 </tbody>
             </table>
         </div>
-        <div class="text-right">
-            <button type="submit" class="btn btn-primary" @(Model.Items.Any() ? null : "disabled")>
-                <i class="fa fa-paper-plane mr-1"></i> Submit Order
+        <hr style="border-color: #e5e2de; margin: 32px 0;" />
+        <div style="text-align: right;">
+            <button type="submit" class="btn-luxury" @(Model.Items.Any() ? null : "disabled")>
+                <span class="material-symbols-outlined">send</span> Xác nhận Đơn
             </button>
         </div>
     </div>

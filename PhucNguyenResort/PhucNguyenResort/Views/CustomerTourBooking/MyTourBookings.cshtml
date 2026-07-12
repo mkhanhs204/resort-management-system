@@ -119,6 +119,7 @@
                 
                 string statusClass = "";
                 string statusText = "";
+                bool isOngoing = item.BookingStatus == "CheckedIn";
                 bool isCancelled = item.BookingStatus == "Cancelled" || item.BookingStatus == "NoShow";
                 bool isCompleted = item.BookingStatus == "Completed";
                 bool isPending = item.BookingStatus == "Pending";
@@ -128,6 +129,11 @@
                 {
                     statusClass = "bg-tertiary-container/30 text-on-tertiary-container";
                     statusText = "Sắp diễn ra";
+                }
+                else if (isOngoing)
+                {
+                    statusClass = "bg-primary-container text-on-primary-container";
+                    statusText = "Đang diễn ra";
                 }
                 else if (isPending)
                 {

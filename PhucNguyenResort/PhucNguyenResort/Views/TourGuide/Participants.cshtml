@@ -232,12 +232,24 @@
 
 <div class="luxury-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-        <div style="display: flex; align-items: center; gap: 12px; font-family: 'Inter', sans-serif;">
-            <span class="material-symbols-outlined" style="color: #50453b;">search</span>
-            <input type="text" id="search-passenger" class="form-control" placeholder="Tìm tên khách, email..." style="background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; width: 250px;">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; background-color: #f6f3ef; border-radius: 8px; padding: 0 12px; min-width: 250px;">
+                <span class="material-symbols-outlined" style="color: #50453b; font-size: 20px;">search</span>
+                <input type="text" id="search-passenger" placeholder="Tìm tên khách, email..." style="background-color: transparent; border: none; outline: none; padding: 8px 0; width: 100%; font-family: 'Inter', sans-serif;">
+            </div>
+            
+            <div style="min-width: 200px;">
+                <select id="filter-passenger-status" style="background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 16px; width: 100%; font-family: 'Inter', sans-serif; color: #50453b; outline: none; cursor: pointer;">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="Confirmed">Chờ khách đến</option>
+                    <option value="CheckedIn">Khách đã có mặt</option>
+                    <option value="NoShow">Khách vắng mặt</option>
+                    <option value="Completed">Đã hoàn thành</option>
+                </select>
+            </div>
         </div>
 
-        <button type="button" id="btn-checkin-all" class="btn-luxury" style="background: #e2f5ea; color: #0b5c2d; border: 1px solid #0b5c2d;">
+        <button type="button" id="btn-checkin-all" class="btn-luxury" style="background: #e2f5ea; color: #0b5c2d; border: 1px solid #0b5c2d; white-space: nowrap;">
             <span class="material-symbols-outlined">checklist</span> Xác nhận Có mặt Tất cả
         </button>
     </div>
@@ -314,6 +326,11 @@
             </tbody>
         </table>
     </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div id="pagination-container" style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;"></div>
+    }
 </div>
 
 @section Scripts {
@@ -321,6 +338,88 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
+            // --- PAGINATION & SEARCH LOGIC ---
+            const itemsPerPage = 5;
+            let allItems = Array.from(document.querySelectorAll('.passenger-row'));
+            let filteredItems = [...allItems];
+            let currentPage = 1;
+            const paginationContainer = document.getElementById('pagination-container');
+
+            function renderPagination() {
+                if (!paginationContainer) return;
+                paginationContainer.innerHTML = '';
+                const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+                
+                if (totalPages <= 1) return;
+                
+                // Prev Button
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'action-btn';
+                prevBtn.style.padding = '6px 10px';
+                if (currentPage === 1) {
+                    prevBtn.style.opacity = '0.5';
+                    prevBtn.style.cursor = 'not-allowed';
+                }
+                prevBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>';
+                prevBtn.disabled = currentPage === 1;
+                if (currentPage > 1) {
+                    prevBtn.onclick = () => showPage(currentPage - 1);
+                }
+                paginationContainer.appendChild(prevBtn);
+                
+                // Page Buttons
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = 'action-btn';
+                    pageBtn.style.padding = '6px 14px';
+                    if (i === currentPage) {
+                        pageBtn.style.backgroundColor = '#805528';
+                        pageBtn.style.color = '#ffffff';
+                    }
+                    pageBtn.innerText = i;
+                    pageBtn.onclick = () => showPage(i);
+                    paginationContainer.appendChild(pageBtn);
+                }
+                
+                // Next Button
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'action-btn';
+                nextBtn.style.padding = '6px 10px';
+                if (currentPage === totalPages) {
+                    nextBtn.style.opacity = '0.5';
+                    nextBtn.style.cursor = 'not-allowed';
+                }
+                nextBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>';
+                nextBtn.disabled = currentPage === totalPages;
+                if (currentPage < totalPages) {
+                    nextBtn.onclick = () => showPage(currentPage + 1);
+                }
+                paginationContainer.appendChild(nextBtn);
+            }
+            
+            function showPage(page) {
+                currentPage = page;
+                const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage < 1) currentPage = 1;
+                
+                allItems.forEach(item => {
+                    item.style.display = 'none';
+                });
+                
+                filteredItems.forEach((item, index) => {
+                    if (index >= (currentPage - 1) * itemsPerPage && index < currentPage * itemsPerPage) {
+                        item.style.display = '';
+                    }
+                });
+                
+                renderPagination();
+            }
+            
+            if (allItems.length > 0) {
+                showPage(1);
+            }
+            // ----------------------------------
 
             function calculateStats() {
                 var checkedInTickets = 0;
@@ -371,6 +470,9 @@
                                 background: '#fcf9f5',
                                 color: '#1c1c1a'
                             });
+                            
+                            // Re-apply filter if status changed and filter is active
+                            applyPassengerFilters();
                         } else {
                             selectElement.val(oldStatus);
                             Swal.fire({
@@ -393,12 +495,28 @@
                 });
             });
 
-            $('#search-passenger').on('keyup', function() {
-                var value = $(this).val().toLowerCase();
-                $("#passenger-table .passenger-row").filter(function() {
-                    $(this).toggle($(this).find('.target-search').text().toLowerCase().indexOf(value) > -1)
+            // --- FILTER LOGIC ---
+            const searchPassengerInput = document.getElementById('search-passenger');
+            const filterPassengerStatus = document.getElementById('filter-passenger-status');
+
+            function applyPassengerFilters() {
+                const nameVal = (searchPassengerInput.value || '').toLowerCase().trim();
+                const statusVal = (filterPassengerStatus.value || '');
+
+                filteredItems = allItems.filter(item => {
+                    const matchName = !nameVal || $(item).find('.target-search').text().toLowerCase().indexOf(nameVal) > -1;
+                    const itemStatus = $(item).find('.status-selector').val() || '';
+                    const matchStatus = !statusVal || itemStatus === statusVal;
+
+                    return matchName && matchStatus;
                 });
-            });
+                
+                showPage(1);
+            }
+
+            if (searchPassengerInput) searchPassengerInput.addEventListener('input', applyPassengerFilters);
+            if (filterPassengerStatus) filterPassengerStatus.addEventListener('change', applyPassengerFilters);
+            // --------------------
 
             $('#btn-checkin-all').click(function() {
                 var pendingSelectors = $('.status-selector').filter(function() {
@@ -453,6 +571,7 @@
                             successCount++;
                             if(successCount === totalAjax) {
                                 calculateStats();
+                                applyPassengerFilters();
                                 Swal.fire({
                                     title: 'Thành công!', 
                                     text: 'Đã điểm danh toàn đoàn hoàn tất.', 

@@ -11,4 +11,5 @@ public interface IDiningTableService
     Task<bool> UpdateAsync(TableEditVM model);
     Task<bool> DeleteAsync(int id);
     Task<bool> ExistsByTableNumberAsync(string tableNumber, int? excludeTableId = null);
+    Task<int> GetReservationCountAsync(int tableId);
 }
