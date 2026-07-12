@@ -257,7 +257,7 @@ namespace PhucNguyenResort.Web.Controllers
                 .Include(b => b.User)
                 .Include(b => b.BookingDetails)
                     .ThenInclude(bd => bd.Room)
-                .OrderByDescending(b => b.BookingDate)
+                .OrderByDescending(b => b.CreatedAt)
                 .Take(10)
                 .ToListAsync();
 
