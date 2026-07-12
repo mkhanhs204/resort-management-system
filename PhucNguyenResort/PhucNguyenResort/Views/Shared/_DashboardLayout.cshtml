@@ -29,8 +29,38 @@
             </div>
 
             <ul class="list-unstyled components">
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Action"]?.ToString() != "FinancialReport" && ViewContext.RouteData.Values["Action"]?.ToString() != "TableReservations" && ViewContext.RouteData.Values["Action"]?.ToString() != "FoodOrders" ? "active" : "")">
-                    <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
+                @{
+                    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+                    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+
+                    bool isOverviewActive = false;
+                    if (User.IsInRole("Maintenance Staff") && currentController == "Maintenance" && currentAction == "Overview")
+                    {
+                        isOverviewActive = true;
+                    }
+                    else if (User.IsInRole("Housekeeping Staff") && currentController == "Housekeeping" && currentAction == "Overview")
+                    {
+                        isOverviewActive = true;
+                    }
+                    else if (!User.IsInRole("Maintenance Staff") && !User.IsInRole("Housekeeping Staff") && currentController == "Dashboard" && currentAction == "Index")
+                    {
+                        isOverviewActive = true;
+                    }
+                }
+
+                <li class="@(isOverviewActive ? "active" : "")">
+                    @if (User.IsInRole("Maintenance Staff"))
+                    {
+                        <a asp-controller="Maintenance" asp-action="Overview"><i class="fa fa-dashboard"></i> Overview</a>
+                    }
+                    else if (User.IsInRole("Housekeeping Staff"))
+                    {
+                        <a asp-controller="Housekeeping" asp-action="Overview"><i class="fa fa-dashboard"></i> Overview</a>
+                    }
+                    else
+                    {
+                        <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
+                    }
                 </li>
 
                 @if (User.IsInRole("System Admin") || User.IsInRole("Business Manager"))
@@ -95,8 +125,8 @@
                     }
                     @if (User.IsInRole("Housekeeping Staff"))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Housekeeping" ? "active" : "")">
-                            <a href="#"><i class="fa fa-paint-brush"></i> Dọn Phòng</a>
+                        <li class="@(currentController == "Housekeeping" && currentAction == "Details" ? "active" : "")">
+                            <a asp-controller="Housekeeping" asp-action="Details"><i class="fa fa-paint-brush"></i> Housekeeping Queue</a>
                         </li>
                     }
                 }
@@ -106,8 +136,8 @@
                     <li>
                         <p>BẢO TRÌ</p>
                     </li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
-                        <a href="#"><i class="fa fa-wrench"></i> Yêu Cầu Sửa Chữa</a>
+                    <li class="@(currentController == "Maintenance" && currentAction == "Details" ? "active" : "")">
+                        <a asp-controller="Maintenance" asp-action="Details"><i class="fa fa-wrench"></i> Maintenance Requests</a>
                     </li>
                 }
 
