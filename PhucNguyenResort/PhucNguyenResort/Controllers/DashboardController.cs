@@ -7,6 +7,7 @@ using PhucNguyenResort.Models;
 using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.Services.TableReservations;
 using PhucNguyenResort.Services.Dashboard;
+using PhucNguyenResort.Services.Housekeeping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,6 @@ using System.Threading.Tasks;
 
 namespace PhucNguyenResort.Web.Controllers
 {
-    // Cấu trúc ViewModel tạm thời được giữ lại để tránh lỗi tham chiếu nếu có hệ thống khác gọi đến
-    public class TourGuideOverviewViewModel
-    {
-        public int TotalAssignedTours { get; set; }
-        public double CompletionRate { get; set; }
-        public int TotalGuestsServed { get; set; }
-        public List<TourSchedule> ActiveSchedules { get; set; } = new List<TourSchedule>();
-    }
-
     [Authorize(Roles = "System Admin,Business Manager,Receptionist,F&B Staff,Kitchen Staff,Tour Guide,Housekeeping Staff,Maintenance Staff")]
     public class DashboardController : Controller
     {
@@ -32,6 +24,7 @@ namespace PhucNguyenResort.Web.Controllers
         private readonly PhucNguyenResort.Data.ResortDbContext _context;
         private readonly ITableReservationService _tableReservationService;
         private readonly INotificationService _notificationService;
+        private readonly IHousekeepingService _housekeepingService;
 
         private readonly IDashboardReportService _reportService;
         private readonly IForecastService _forecastService;
@@ -42,6 +35,7 @@ namespace PhucNguyenResort.Web.Controllers
             PhucNguyenResort.Data.ResortDbContext context,
             ITableReservationService tableReservationService,
             INotificationService notificationService,
+            IHousekeepingService housekeepingService,
             IDashboardReportService reportService,
             IForecastService forecastService)
         {
@@ -50,47 +44,79 @@ namespace PhucNguyenResort.Web.Controllers
             _context = context;
             _tableReservationService = tableReservationService;
             _notificationService = notificationService;
+            _housekeepingService = housekeepingService;
             _reportService = reportService;
             _forecastService = forecastService;
         }
 
-        // Trang chính: Tự động chuyển hướng đến dashboard phù hợp với role của người dùng
-        public IActionResult Index()
+        // =========================================================================
+        // TRANG CỬA NGÕ: Tự động điều hướng User về đúng trang Overview theo vai trò
+        // =========================================================================
+        public async Task<IActionResult> Index()
         {
-            if (User.IsInRole("System Admin")) return RedirectToAction("Admin");
-            if (User.IsInRole("Business Manager")) return RedirectToAction("Manager");
-            if (User.IsInRole("Receptionist")) return RedirectToAction("Receptionist");
-            if (User.IsInRole("F&B Staff")) return RedirectToAction("FnB");
-            if (User.IsInRole("Kitchen Staff")) return RedirectToAction("Kitchen");
-            if (User.IsInRole("Tour Guide")) return RedirectToAction("TourGuide");
-            if (User.IsInRole("Housekeeping Staff")) return RedirectToAction("Housekeeping");
-            if (User.IsInRole("Maintenance Staff")) return RedirectToAction("Maintenance");
+            if (User.IsInRole("System Admin"))
+                return RedirectToAction("Admin");
+            if (User.IsInRole("Business Manager"))
+                return RedirectToAction("Manager");
+            if (User.IsInRole("Receptionist"))
+                return RedirectToAction("Receptionist");
+            if (User.IsInRole("F&B Staff"))
+                return RedirectToAction("FnB");
+            if (User.IsInRole("Kitchen Staff"))
+                return RedirectToAction("Kitchen");
+            if (User.IsInRole("Tour Guide"))
+                return RedirectToAction("TourGuide");
+
+            // ĐỒNG BỘ 1: Nếu là Housekeeping, hướng về trang Overview mới đặt tên
+            if (User.IsInRole("Housekeeping Staff"))
+            {
+                return RedirectToAction("Overview", "Housekeeping");
+            }
+
+            // ĐỒNG BỘ 2: Nếu là Maintenance, chuyển hướng thẳng sang Controller riêng để xử lý mượt mà
+            if (User.IsInRole("Maintenance Staff"))
+                return RedirectToAction("Overview", "Maintenance");
 
             return View();
         }
 
+        // =========================================================================
+        // PHÂN HỆ HOUSEKEEPING STAFF (QUẢN LÝ TẬP TRUNG TẠI DASHBOARD CONTROLLER)
+        // =========================================================================
+
+        // Trang 1: Xem số liệu tổng quan (File cũ là Index.cshtml)
+        [Authorize(Roles = "Housekeeping Staff")]
+        public async Task<IActionResult> HousekeepingOverview()
+        {
+            ViewData["RoomsNeedCleaningCount"] = await _housekeepingService.GetCountRoomsNeedCleaningAsync();
+            ViewData["CurrentlyCleaningCount"] = await _housekeepingService.GetCountCurrentlyCleaningAsync();
+            ViewData["CleanedTodayCount"] = await _housekeepingService.GetCountCleanedTodayAsync();
+
+            return View("HousekeepingOverview");
+        }
+
+        // Trang 2: Hàng chờ xử lý phòng chi tiết (File cũ là Housekeeping.cshtml)
+        [Authorize(Roles = "Housekeeping Staff")]
+        public async Task<IActionResult> Housekeeping()
+        {
+            ViewData["RoomsNeedCleaningCount"] = await _housekeepingService.GetCountRoomsNeedCleaningAsync();
+            ViewData["CurrentlyCleaningCount"] = await _housekeepingService.GetCountCurrentlyCleaningAsync();
+            ViewData["CleanedTodayCount"] = await _housekeepingService.GetCountCleanedTodayAsync();
+
+            var dirtyRooms = await _housekeepingService.GetDirtyRoomsAsync();
+
+            return View("HousekeepingDetails", dirtyRooms);
+        }
+
+
+        // =========================================================================
+        // CÁC PHÂN HỆ KHÁC (GIỮ NGUYÊN VẸN LOGIC LOG ĐĂNG NHẬP CŨ CỦA DỰ ÁN)
+        // =========================================================================
+
         // 1. System Admin Dashboard
         [Authorize(Roles = "System Admin")]
-        public async Task<IActionResult> Admin()
+        public IActionResult Admin()
         {
-            var totalStaff = await _context.Users.CountAsync();
-            var activeAccounts = await _context.Users.CountAsync(u => u.IsActive && !u.IsBlocked);
-            var systemRoles = await _context.Roles.CountAsync();
-            var inactiveAccounts = totalStaff - activeAccounts;
-
-            ViewBag.TotalStaff = totalStaff;
-            ViewBag.ActiveAccounts = activeAccounts;
-            ViewBag.SystemRoles = systemRoles;
-            ViewBag.InactiveAccounts = inactiveAccounts;
-
-            var recentStaff = await _context.Users
-                .Include(u => u.Role)
-                .OrderByDescending(u => u.CreatedAt)
-                .Take(5)
-                .ToListAsync();
-
-            ViewBag.RecentStaff = recentStaff;
-
             return View();
         }
 
@@ -211,53 +237,16 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 3. Receptionist (Front Desk) Dashboard
         [Authorize(Roles = "Receptionist")]
-        public async Task<IActionResult> Receptionist()
+        public IActionResult Receptionist()
         {
-            var today = DateTime.Today;
-
-            var todaysArrivals = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
-                _context.Bookings.Where(b => b.CheckInDate.Date == today && b.BookingStatus != Enums.BookingStatus.Cancelled)
-            );
-
-            var activeStayGuests = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
-                _context.Bookings.Where(b => b.BookingStatus == Enums.BookingStatus.CheckedIn)
-            );
-
-            var todaysDepartures = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
-                _context.Bookings.Where(b => b.CheckOutDate.Date == today && b.BookingStatus != Enums.BookingStatus.Cancelled)
-            );
-
-            var availableRooms = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.CountAsync(
-                _context.Rooms.Where(r => r.Status == Enums.RoomStatus.Available)
-            );
-
-            var recentBookings = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
-                _context.Bookings
-                    .Include(b => b.User)
-                    .Include(b => b.BookingDetails)
-                        .ThenInclude(bd => bd.Room)
-                    .OrderByDescending(b => b.BookingId)
-                    .Take(5)
-            );
-
-            var model = new PhucNguyenResort.ViewModels.Dashboard.ReceptionistDashboardViewModel
-            {
-                TodaysArrivals = todaysArrivals,
-                ActiveStayGuests = activeStayGuests,
-                TodaysDepartures = todaysDepartures,
-                AvailableRooms = availableRooms,
-                RecentBookings = recentBookings
-            };
-
-            return View(model);
+            return View();
         }
 
         // 4. F&B Staff Dashboard
         [Authorize(Roles = "F&B Staff")]
-        public async Task<IActionResult> FnB()
+        public IActionResult FnB()
         {
-            var model = await _tableReservationService.GetFnBDashboardAsync(DateTime.Today);
-            return View(model);
+            return View();
         }
 
         [Authorize(Roles = "F&B Staff")]
@@ -395,11 +384,20 @@ namespace PhucNguyenResort.Web.Controllers
         public async Task<IActionResult> ChargeFoodOrderToRoom(int foodOrderId)
         {
             var result = await _foodOrderService.ChargeToRoomAsync(foodOrderId);
-            if (result.Status == PhucNguyenResort.Services.FoodOrders.FoodOrderActionStatus.Success) TempData["SuccessMessage"] = "Successfully charged the food order to the room folio.";
-            else TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to charge the food order.";
+
+            if (result.Status == PhucNguyenResort.Services.FoodOrders.FoodOrderActionStatus.Success)
+            {
+                TempData["SuccessMessage"] = "Successfully charged the food order to the room folio.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to charge the food order.";
+            }
+
             return RedirectToAction(nameof(FoodOrders));
         }
 
+        // 5. Kitchen Staff Dashboard
         [Authorize(Roles = "Kitchen Staff")]
         public async Task<IActionResult> Kitchen()
         {
@@ -481,13 +479,6 @@ namespace PhucNguyenResort.Web.Controllers
 
             // Gọi tường minh File View cụ thể nằm trong Views/Dashboard để đảm bảo render đúng giao diện mong muốn
             return View("~/Views/Dashboard/TourGuide.cshtml", activeSchedules);
-        }
-
-        // 8. Maintenance Staff Dashboard
-        [Authorize(Roles = "Maintenance Staff")]
-        public IActionResult Maintenance()
-        {
-            return View();
         }
 
         private int? GetCurrentUserId()

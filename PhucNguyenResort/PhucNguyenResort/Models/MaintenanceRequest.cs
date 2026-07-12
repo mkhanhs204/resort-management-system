@@ -21,6 +21,10 @@ namespace PhucNguyenResort.Models
 
         public DateTime? ResolvedAt { get; set; }
 
+        // 🟢 THÊM CỘT NÀY VÀO ĐỂ LƯU TÊN NHÂN VIÊN TIẾP NHẬN SỬA CHỮA
+        [StringLength(100)]
+        public string? AssignedStaffName { get; set; }
+
         [ForeignKey("RoomId")]
         public virtual Room? Room { get; set; }
     }

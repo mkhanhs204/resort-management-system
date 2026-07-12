@@ -1,0 +1,306 @@
+﻿@using PhucNguyenResort.Enums
+@model List<PhucNguyenResort.ViewModels.Housekeeping.DirtyRoomViewModel>
+@{
+    ViewData["Title"] = "Housekeeping Queue";
+    Layout = "_DashboardLayout";
+    var cleanedRoomsToday = ViewBag.CleanedRoomsToday as List<PhucNguyenResort.ViewModels.Housekeeping.DirtyRoomViewModel> ?? new List<PhucNguyenResort.ViewModels.Housekeeping.DirtyRoomViewModel>();
+}
+
+@if (ViewBag.LocalSuccessMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="font-family: 'Cabin', sans-serif;">
+        <i class="fa fa-check-circle mr-2"></i> @ViewBag.LocalSuccessMessage
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (ViewBag.LocalErrorMessage != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="font-family: 'Cabin', sans-serif;">
+        <i class="fa fa-exclamation-circle mr-2"></i> @ViewBag.LocalErrorMessage
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-paint-brush mr-2" style="color: #6c757d;"></i> Housekeeping — Hàng chờ làm vệ sinh
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Danh sách phòng bẩn khẩn cấp cần dọn dẹp và xử lý sự cố thiết bị.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4" style="font-family: 'Cabin', sans-serif;">
+    <div class="col-md-5 mb-2 mb-md-0">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-light text-muted"><i class="fa fa-search"></i></span>
+            </div>
+            <input type="text" id="searchRoomInput" class="form-control" placeholder="Nhập số phòng cần tìm... (Ví dụ: 101)">
+        </div>
+    </div>
+    <div class="col-md-3 mb-2 mb-md-0">
+        <select id="filterFloorSelect" class="form-control">
+            <option value="">-- Tất cả các tầng --</option>
+            @foreach (var floor in Model.Select(m => m.FloorNumber).Union(cleanedRoomsToday.Select(c => c.FloorNumber)).Distinct().OrderBy(f => f))
+            {
+                <option value="Tầng @floor">Tầng @floor</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select id="filterStatusSelect" class="form-control">
+            <option value="">-- Tất cả trạng thái --</option>
+            <option value="Needs Cleaning">Needs Cleaning (Chờ tiếp nhận)</option>
+            <option value="In Progress">Cleaning In Progress (Đang dọn)</option>
+        </select>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545; padding: 15px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <h5 class="text-muted mb-1" style="font-family: 'Cabin', sans-serif; font-size: 14px;">Rooms Need Cleaning</h5>
+            <h3 class="mt-1 font-weight-bold" style="font-family: 'Lora', serif; color: #dc3545;">@ViewData["RoomsNeedCleaningCount"]</h3>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107; padding: 15px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <h5 class="text-muted mb-1" style="font-family: 'Cabin', sans-serif; font-size: 14px;">Currently Cleaning</h5>
+            <h3 class="mt-1 font-weight-bold" style="font-family: 'Lora', serif; color: #ffc107;">@ViewData["CurrentlyCleaningCount"]</h3>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745; padding: 15px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <h5 class="text-muted mb-1" style="font-family: 'Cabin', sans-serif; font-size: 14px;">Cleaned Today</h5>
+            <h3 class="mt-1 font-weight-bold" style="font-family: 'Lora', serif; color: #28a745;">@ViewData["CleanedTodayCount"]</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <div class="card-box" style="border-left: 5px solid #6c757d; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #333;">
+                    <i class="fa fa-list mr-2" style="color: #6c757d;"></i> Danh sách phòng chờ xử lý
+                </h5>
+                <span class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 13px;">
+                    Nhân viên bấm "Start Cleaning" trước khi vào dọn phòng và "Mark Cleaned" khi hoàn tất.
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Room Number</th>
+                            <th>Category</th>
+                            <th>Reason / Details</th>
+                            <th>Current Status</th>
+                            <th class="text-center" style="width: 290px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var room in Model)
+                            {
+                                <tr class="dirty-room-row" data-room-number="@room.RoomNumber" data-floor="Tầng @room.FloorNumber" data-status="@(room.Status == RoomStatus.CleaningInProgress ? "In Progress" : "Needs Cleaning")">
+                                    <td class="align-middle font-weight-bold" style="font-size: 15px; color: #1a1a1a;">Room @room.RoomNumber</td>
+                                    <td class="align-middle">@room.RoomType</td>
+                                    <td class="align-middle">
+                                        <span class="d-block text-dark">@room.DirtyReason</span>
+                                        @if (room.LastCheckedOutTime.HasValue)
+                                        {
+                                            <small class="text-muted"><i class="fa fa-sign-out mr-1"></i>Checkout: @room.LastCheckedOutTime.Value.ToString("g")</small>
+                                        }
+                                    </td>
+                                    <td class="align-middle">
+                                        @if (room.Status == RoomStatus.CleaningInProgress)
+                                        {
+                                            <span class="badge badge-warning p-2 text-dark" style="font-size: 12px; background-color: #ffc107;">
+                                                <i class="fa fa-refresh fa-spin mr-1"></i> Cleaning In Progress
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger p-2" style="font-size: 12px;">
+                                                <i class="fa fa-clock-o mr-1"></i> Needs Cleaning
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            @if (room.Status == RoomStatus.CleaningInProgress)
+                                            {
+                                                <form asp-controller="Housekeeping" asp-action="MarkCleaned" method="post" class="mr-2 mb-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="roomId" value="@room.RoomId" />
+                                                    <button type="submit" class="btn btn-sm btn-success font-weight-bold shadow-sm" style="padding: 6px 14px; min-width: 125px;">
+                                                        <i class="fa fa-check mr-1"></i> Mark Cleaned
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-controller="Housekeeping" asp-action="StartCleaning" method="post" class="mr-2 mb-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="roomId" value="@room.RoomId" />
+                                                    <button type="submit" class="btn btn-sm btn-warning font-weight-bold text-dark shadow-sm" style="padding: 6px 14px; background-color: #ffc107; border-color: #ffc107; min-width: 125px;">
+                                                        <i class="fa fa-play mr-1"></i> Start Cleaning
+                                                    </button>
+                                                </form>
+                                            }
+
+                                            <button type="button" class="btn btn-sm btn-outline-danger" style="padding: 6px 14px;"
+                                                    data-toggle="modal" data-target="#maintenanceModal-@room.RoomId">
+                                                <i class="fa fa-wrench mr-1"></i> Report Issue
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <div class="modal fade" id="maintenanceModal-@room.RoomId" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content" style="font-family: 'Cabin', sans-serif;">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title font-weight-bold" style="font-family: 'Lora', serif;">
+                                                    <i class="fa fa-wrench mr-2"></i> Report Issue — Room @room.RoomNumber
+                                                </h5>
+                                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <form asp-controller="Housekeeping" asp-action="ReportMaintenance" method="post" class="mb-0">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="roomId" value="@room.RoomId" />
+                                                <div class="modal-body text-left">
+                                                    <p class="text-muted small">Hãy mô tả chi tiết sự cố hỏng hóc hoặc thiết bị lỗi tại phòng này để gửi lệnh sửa chữa đến tổ kỹ thuật Bảo trì.</p>
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold text-dark">Mô tả sự cố / Hỏng hóc:</label>
+                                                        <textarea name="description" class="form-control" rows="4" required 
+                                                                  placeholder="Ví dụ: Điều hòa chảy nước, vòi sen tắm gãy vòi, hỏng ổ cắm điện đầu giường..."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                    <button type="submit" class="btn btn-danger font-weight-bold">Gửi yêu cầu bảo trì</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <h5 class="mb-2" style="font-family: 'Lora', serif;"><i class="fa fa-check-circle fa-2x text-success d-block mb-3"></i>Tất cả các phòng đã sạch sẽ!</h5>
+                                    <p class="mb-0">Hiện tại không có phòng nào nằm trong hàng chờ làm vệ sinh.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card-box" style="border-left: 5px solid #28a745; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <div class="mb-3">
+                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #28a745;">
+                    <i class="fa fa-history mr-2"></i> Phòng bạn đã hoàn thiện hôm nay (Thành tích ca làm việc)
+                </h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Room Number</th>
+                            <th>Category</th>
+                            <th>Nhật ký công việc</th>
+                            <th>Trạng thái hiện tại</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (cleanedRoomsToday != null && cleanedRoomsToday.Any())
+                        {
+                            foreach (var room in cleanedRoomsToday)
+                            {
+                                // Class độc lập 'cleaned-room-row' giúp tránh bị ảnh hưởng bởi JS bộ lọc tìm kiếm
+                                <tr class="cleaned-room-row">
+                                    <td class="align-middle font-weight-bold" style="font-size: 15px; color: #28a745;">Room @room.RoomNumber</td>
+                                    <td class="align-middle">@room.RoomType</td>
+                                    <td class="align-middle text-muted">
+                                        <i class="fa fa-check-circle text-success mr-1"></i> Đã làm sạch & nghiệm thu hoàn tất bàn giao hệ thống.
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge badge-success p-2 text-white" style="font-size: 12px; background-color: #28a745;">
+                                            <i class="fa fa-star mr-1"></i> Sẵn sàng đón khách
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Bạn chưa có thành tích hoàn thành phòng nào trong ca trực hôm nay. Cố lên nhé!
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // SỬA LỖI BỘ LỌC: Chỉ tác động bộ lọc tìm kiếm lên các dòng Chờ xử lý (.dirty-room-row)
+            function filterRooms() {
+                var searchText = $("#searchRoomInput").val().toLowerCase().trim();
+                var selectedFloor = $("#filterFloorSelect").val();
+                var selectedStatus = $("#filterStatusSelect").val();
+
+                $(".dirty-room-row").each(function () {
+                    var roomNumber = $(this).data("room-number").toString().toLowerCase();
+                    var roomFloor = $(this).data("floor");
+                    var roomStatus = $(this).data("status");
+
+                    var matchesSearch = roomNumber.indexOf(searchText) > -1;
+                    var matchesFloor = selectedFloor === "" || roomFloor === selectedFloor;
+                    var matchesStatus = selectedStatus === "" || roomStatus === selectedStatus;
+
+                    if (matchesSearch && matchesFloor && matchesStatus) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+
+            $("#searchRoomInput").on("keyup", filterRooms);
+            $("#filterFloorSelect").on("change", filterRooms);
+            $("#filterStatusSelect").on("change", filterRooms);
+        });
+    </script>
+}

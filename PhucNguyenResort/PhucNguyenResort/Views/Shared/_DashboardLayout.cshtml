@@ -7,7 +7,6 @@
 
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
 
     <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
@@ -15,7 +14,7 @@
     <link rel="stylesheet" href="~/css/flaticon.css" type="text/css">
     <link rel="stylesheet" href="~/css/nice-select.css" type="text/css">
     <link rel="stylesheet" href="~/css/style.css" type="text/css">
-    
+
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" type="text/css">
     
     @await RenderSectionAsync("Styles", required: false)
@@ -24,18 +23,48 @@
 
     <div id="wrapper">
         <nav id="sidebar">
-            <div class="sidebar-header" style="text-align: center; padding: 20px 10px;">
+            <div class="sidebar-header">
                 <a href="/" style="text-decoration: none; display: block;">
-                    <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; color: #dfa974; margin-bottom: 0;">Phúc Nguyên</h3>
-                    <span style="color: #bcc7de; font-size: 13px; display: block; margin-top: 4px; font-family: 'Inter', sans-serif; letter-spacing: 0.5px;">Resort Management</span>
+                    <h3>PhucNguyen</h3>
+                    <span style="color: #aaa; font-size: 13px; display: block; margin-top: 3px; font-weight: normal; letter-spacing: 0.5px;">Resort Management</span>
                 </a>
             </div>
 
             <ul class="list-unstyled components">
-                <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Action"]?.ToString() != "FinancialReport" && ViewContext.RouteData.Values["Action"]?.ToString() != "TableReservations" && ViewContext.RouteData.Values["Action"]?.ToString() != "FoodOrders" ? "active" : "")">
-                    <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
+                @{
+                    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+                    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+
+                    bool isOverviewActive = false;
+                    if (User.IsInRole("Maintenance Staff") && currentController == "Maintenance" && currentAction == "Overview")
+                    {
+                        isOverviewActive = true;
+                    }
+                    else if (User.IsInRole("Housekeeping Staff") && currentController == "Housekeeping" && currentAction == "Overview")
+                    {
+                        isOverviewActive = true;
+                    }
+                    else if (!User.IsInRole("Maintenance Staff") && !User.IsInRole("Housekeeping Staff") && currentController == "Dashboard" && currentAction == "Index")
+                    {
+                        isOverviewActive = true;
+                    }
+                }
+
+                <li class="@(isOverviewActive ? "active" : "")">
+                    @if (User.IsInRole("Maintenance Staff"))
+                    {
+                        <a asp-controller="Maintenance" asp-action="Overview"><i class="fa fa-dashboard"></i> Overview</a>
+                    }
+                    else if (User.IsInRole("Housekeeping Staff"))
+                    {
+                        <a asp-controller="Housekeeping" asp-action="Overview"><i class="fa fa-dashboard"></i> Overview</a>
+                    }
+                    else
+                    {
+                        <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
+                    }
                 </li>
-                
+
                 @if (User.IsInRole("System Admin") || User.IsInRole("Business Manager"))
                 {
                     <li>
@@ -98,8 +127,8 @@
                     }
                     @if (User.IsInRole("Housekeeping Staff"))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Housekeeping" ? "active" : "")">
-                            <a href="#"><i class="fa fa-paint-brush"></i> Dọn Phòng</a>
+                        <li class="@(currentController == "Housekeeping" && currentAction == "Details" ? "active" : "")">
+                            <a asp-controller="Housekeeping" asp-action="Details"><i class="fa fa-paint-brush"></i> Housekeeping Queue</a>
                         </li>
                     }
                 }
@@ -109,8 +138,8 @@
                     <li>
                         <p>BẢO TRÌ</p>
                     </li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
-                        <a href="#"><i class="fa fa-wrench"></i> Yêu Cầu Sửa Chữa</a>
+                    <li class="@(currentController == "Maintenance" && currentAction == "Details" ? "active" : "")">
+                        <a asp-controller="Maintenance" asp-action="Details"><i class="fa fa-wrench"></i> Maintenance Requests</a>
                     </li>
                 }
 
@@ -148,7 +177,7 @@
                     }
                 }
 
-                @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide") || User.IsInRole("Hướng Dẫn Viên"))
+                @if (User.IsInRole("Business Manager") || User.IsInRole("Tour Guide"))
                 {
                     <li>
                         <p>DỊCH VỤ & TOUR</p>
@@ -179,11 +208,10 @@
         </nav>
 
         <div id="content">
-            
-            <!-- Top Navbar -->
-            <nav class="dashboard-nav" style="border-bottom: 1px solid rgba(212, 195, 182, 0.3); background-color: #ffffff; padding: 12px 24px;">
-                <div class="nav-left" style="display: flex; align-items: center;">
-                    <button type="button" id="sidebarCollapse" class="btn btn-outline-dark d-md-none" style="border-color: #dfa974; color: #dfa974;">
+
+            <nav class="dashboard-nav">
+                <div class="nav-left">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-dark d-md-none">
                         <i class="fa fa-bars"></i>
                     </button>
                     <span class="ml-3" style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #805528; letter-spacing: 0.5px;">Bảng Điều Khiển</span>

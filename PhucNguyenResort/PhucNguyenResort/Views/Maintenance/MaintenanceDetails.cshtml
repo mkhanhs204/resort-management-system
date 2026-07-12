@@ -1,0 +1,266 @@
+﻿@model List<PhucNguyenResort.ViewModels.Maintenance.MaintenanceTaskViewModel>
+@{
+    ViewData["Title"] = "Maintenance Requests";
+    Layout = "_DashboardLayout";
+    var resolvedTasksToday = ViewBag.ResolvedTasksToday as List<PhucNguyenResort.ViewModels.Maintenance.MaintenanceTaskViewModel> ?? new List<PhucNguyenResort.ViewModels.Maintenance.MaintenanceTaskViewModel>();
+    string currentStaff = User.Identity?.Name ?? "Unknown Staff";
+}
+
+@if (ViewBag.LocalSuccessMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="font-family: 'Cabin', sans-serif;">
+        <i class="fa fa-check-circle mr-2"></i> @ViewBag.LocalSuccessMessage
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (ViewBag.LocalErrorMessage != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="font-family: 'Cabin', sans-serif;">
+        <i class="fa fa-exclamation-circle mr-2"></i> @ViewBag.LocalErrorMessage
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-wrench mr-2" style="color: #6c757d;"></i> Maintenance — Maintenance Requests
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Danh sách các sự cố trang thiết bị phòng đang chờ đội kỹ thuật hỗ trợ xử lý.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4" style="font-family: 'Cabin', sans-serif;">
+    <div class="col-md-5 mb-2 mb-md-0">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-light text-muted"><i class="fa fa-search"></i></span>
+            </div>
+            <input type="text" id="searchRoomInput" class="form-control" placeholder="Nhập số phòng cần tìm kiếm...">
+        </div>
+    </div>
+    <div class="col-md-3 mb-2 mb-md-0">
+        <select id="filterFloorSelect" class="form-control">
+            <option value="">-- Tất cả các tầng --</option>
+            @foreach (var floor in Model.Select(m => m.FloorNumber).Distinct().OrderBy(f => f))
+            {
+                <option value="Tầng @floor">Tầng @floor</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select id="filterStatusSelect" class="form-control">
+            <option value="">-- Tất cả trạng thái sự cố --</option>
+            <option value="Pending">Pending Fix (Chờ tiếp nhận)</option>
+            <option value="Fixing">Fixing (Đang sửa chữa)</option>
+        </select>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545; padding: 20px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 6px;">
+            <i class="fa fa-exclamation-triangle fa-lg text-danger mb-2"></i>
+            <h3 class="font-weight-bold" style="font-family: 'Lora', serif; color: #dc3545; margin-bottom: 2px;">@ViewData["PendingTasksCount"]</h3>
+            <h6 class="text-muted font-weight-bold mb-0" style="font-family: 'Cabin', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Sự cố chưa xử lý</h6>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745; padding: 20px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 6px;">
+            <i class="fa fa-check-circle fa-lg text-success mb-2"></i>
+            <h3 class="font-weight-bold" style="font-family: 'Lora', serif; color: #28a745; margin-bottom: 2px;">@ViewData["ResolvedTodayCount"]</h3>
+            <h6 class="text-muted font-weight-bold mb-0" style="font-family: 'Cabin', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Đã khắc phục hôm nay</h6>
+        </div>
+    </div>
+</div>
+
+<div class="card-box mb-5" style="border-left: 5px solid #dc3545; background: #fff; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 6px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #333;">
+            <i class="fa fa-list mr-2" style="color: #6c757d;"></i> Yêu cầu xử lý sự cố thiết bị phòng
+        </h5>
+        <span class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 13px;">
+            Tiếp nhận tác vụ trước khi sửa và bấm hoàn thành sau khi kiểm tra thiết bị thực tế.
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
+            <thead>
+                <tr class="bg-light text-dark" style="font-weight: 600;">
+                    <th>Room Number</th>
+                    <th>Category</th>
+                    <th>Issue Description</th>
+                    <th>Reported Time</th>
+                    <th>Current Status</th>
+                    <th class="text-center" style="width: 200px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var task in Model)
+                    {
+                        <tr class="active-task-row" data-room-number="@task.RoomNumber" data-floor="Tầng @task.FloorNumber" data-status="@(string.IsNullOrEmpty(task.AssignedStaffName) ? "Pending" : "Fixing")">
+                            <td class="align-middle font-weight-bold" style="font-size: 15px; color: #1a1a1a;">Room @task.RoomNumber</td>
+                            <td class="align-middle">@task.RoomType</td>
+                            <td class="align-middle text-dark">@task.Description</td>
+                            <td class="align-middle text-muted" style="font-size: 13px;">
+                                <i class="fa fa-clock-o mr-1"></i> @task.CreatedAt.ToString("g")
+                            </td>
+                            <td class="align-middle">
+                                @if (string.IsNullOrEmpty(task.AssignedStaffName))
+                                {
+                                    <span class="badge badge-danger p-2 font-weight-bold" style="font-size: 11px; background-color: #dc3545; color: white; border-radius: 4px;">
+                                        <i class="fa fa-exclamation-triangle mr-1"></i> Pending Fix
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-warning p-2 font-weight-bold text-dark" style="font-size: 11px; background-color: #ffc107; border-radius: 4px;">
+                                        <i class="fa fa-wrench mr-1 fa-spin"></i> Fixing (@task.AssignedStaffName)
+                                    </span>
+                                }
+                            </td>
+                            <td class="align-middle text-center">
+                                @if (string.IsNullOrEmpty(task.AssignedStaffName))
+                                {
+                                    <form asp-controller="Maintenance" asp-action="StartFixing" method="post" class="mb-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="requestId" value="@task.RequestId" />
+                                        <button type="submit" class="btn btn-sm btn-warning font-weight-bold text-dark shadow-sm" style="padding: 7px 15px; border-radius: 4px; min-width: 145px; background-color: #ffc107; border-color: #ffc107;">
+                                            <i class="fa fa-play mr-1"></i> Tiếp nhận tác vụ
+                                        </button>
+                                    </form>
+                                }
+                                else if (task.AssignedStaffName == currentStaff)
+                                {
+                                    <form asp-controller="Maintenance" asp-action="ResolveTask" method="post" class="mb-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="requestId" value="@task.RequestId" />
+                                        <button type="submit" class="btn btn-sm btn-success font-weight-bold shadow-sm" style="padding: 7px 15px; border-radius: 4px; min-width: 145px; background-color: #28a745; border-color: #28a745;">
+                                            <i class="fa fa-check mr-1"></i> Mark Resolved
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-light font-weight-bold text-muted" disabled style="padding: 7px 15px; border-radius: 4px; min-width: 145px; background-color: #f8f9fa;">
+                                        <i class="fa fa-lock mr-1"></i> Đang sửa bởi người khác
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5" style="background: #fafafa;">
+                            <h5 class="mb-2" style="font-family: 'Lora', serif; font-weight: bold; color: #555;">
+                                <i class="fa fa-heartbeat fa-2x text-success d-block mb-3"></i>Không có sự cố nào cần bảo trì!
+                            </h5>
+                            <p class="mb-0" style="font-size: 14px;">Tất cả trang thiết bị tại resort đều đang vận hành ổn định và an toàn.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card-box" style="border-left: 5px solid #28a745; background: #fff; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 6px;">
+    <div class="mb-4">
+        <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #28a745;">
+            <i class="fa fa-history mr-2"></i> Nhật ký & Thành tích sửa chữa của bạn hôm nay
+        </h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
+            <thead>
+                <tr class="bg-light text-dark" style="font-weight: 600;">
+                    <th>Room Number</th>
+                    <th>Category</th>
+                    <th>Nội dung sự cố</th>
+                    <th>Thời gian hoàn thành</th>
+                    <th>Trạng thái hiện tại</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (resolvedTasksToday != null && resolvedTasksToday.Any())
+                {
+                    foreach (var historyTask in resolvedTasksToday)
+                    {
+                        <tr class="resolved-history-row">
+                            <td class="align-middle font-weight-bold" style="font-size: 15px; color: #28a745;">Room @historyTask.RoomNumber</td>
+                            <td class="align-middle">@historyTask.RoomType</td>
+                            <td class="align-middle text-dark">@historyTask.Description</td>
+                            <td class="align-middle text-muted" style="font-size: 13px;">
+                                <i class="fa fa-check text-success mr-1"></i> Đã xử lý @@ @historyTask.ResolvedAt?.ToString("g")
+                            </td>
+                            <td class="align-middle">
+                                <span class="badge badge-success p-2 font-weight-bold" style="font-size: 11px; background-color: #28a745; color: white; border-radius: 4px;">
+                                    <i class="fa fa-handshake-o mr-1"></i> Đã chuyển giao Buồng phòng
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4" style="background: #fafafa;">
+                            Bạn chưa hoàn thành ca sửa chữa nào trong hôm nay. Hãy tiếp nhận các sự cố ở danh sách phía trên nhé!
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // SỬA LỖI BỘ LỌC ĐỘC LẬP: Chỉ thực hiện lọc dữ liệu trên các dòng của Bảng 1 (.active-task-row)
+            function filterMaintenanceTasks() {
+                var searchText = $("#searchRoomInput").val().toLowerCase().trim();
+                var selectedFloor = $("#filterFloorSelect").val();
+                var selectedStatus = $("#filterStatusSelect").val();
+
+                $(".active-task-row").each(function () {
+                    var roomNumber = $(this).data("room-number").toString().toLowerCase();
+                    var roomFloor = $(this).data("floor");
+                    var roomStatus = $(this).data("status");
+
+                    var matchesSearch = roomNumber.indexOf(searchText) > -1;
+                    var matchesFloor = selectedFloor === "" || roomFloor === selectedFloor;
+                    var matchesStatus = selectedStatus === "" || roomStatus === selectedStatus;
+
+                    if (matchesSearch && matchesFloor && matchesStatus) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+
+            $("#searchRoomInput").on("keyup", filterMaintenanceTasks);
+            $("#filterFloorSelect").on("change", filterMaintenanceTasks);
+            $("#filterStatusSelect").on("change", filterMaintenanceTasks);
+        });
+    </script>
+}
