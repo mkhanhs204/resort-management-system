@@ -115,8 +115,19 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 1. System Admin Dashboard
         [Authorize(Roles = "System Admin")]
-        public IActionResult Admin()
+        public async Task<IActionResult> Admin()
         {
+            ViewBag.TotalStaff = await _context.Users.CountAsync();
+            ViewBag.ActiveAccounts = await _context.Users.CountAsync(u => u.IsActive);
+            ViewBag.SystemRoles = await _context.Roles.CountAsync();
+            ViewBag.InactiveAccounts = await _context.Users.CountAsync(u => !u.IsActive || u.IsBlocked);
+            
+            ViewBag.RecentStaff = await _context.Users
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.UserId)
+                .Take(10)
+                .ToListAsync();
+
             return View();
         }
 
@@ -275,9 +286,11 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 4. F&B Staff Dashboard
         [Authorize(Roles = "F&B Staff")]
-        public IActionResult FnB()
+        public async Task<IActionResult> FnB()
         {
-            return View();
+            var date = DateTime.Today;
+            var model = await _tableReservationService.GetFnBDashboardAsync(date);
+            return View(model);
         }
 
         [Authorize(Roles = "F&B Staff")]
