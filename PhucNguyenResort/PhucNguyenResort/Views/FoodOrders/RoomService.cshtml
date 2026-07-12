@@ -1,254 +1,449 @@
 @model PhucNguyenResort.ViewModels.FoodOrders.RoomServiceOrderViewModel
+@using System.Text.Json
 
 @{
-    ViewData["Title"] = "Room Service Menu";
+    ViewData["Title"] = "Thực Đơn Tại Phòng";
 
-    var groupedItems = Model.MenuItems
-        .Select((item, index) => new { Item = item, Index = index })
-        .GroupBy(x => x.Item.CategoryName);
-
-    var categoryNames = Model.MenuItems
+    var categories = Model.MenuItems
         .Select(x => x.CategoryName)
         .Distinct()
         .OrderBy(x => x)
         .ToList();
+
+    var menuItemsJson = JsonSerializer.Serialize(Model.MenuItems.Select(m => new {
+        id = m.MenuItemId,
+        name = m.ItemName,
+        price = m.Price,
+        category = m.CategoryName,
+        imageUrl = m.ImageUrl,
+        description = "",
+        note = m.ItemNote ?? "",
+        quantity = m.Quantity
+    }));
 }
 
-<div class="rs-page">
-    <div class="rs-container">
-
-        @* -- Top Navigation -- *@
-        <div class="rs-back-nav">
-            <a asp-action="RoomService">
-                <i class="fa fa-arrow-left"></i> Back to Categories
-            </a>
-            @if (Model.BookingId > 0)
-            {
-                <span style="font-size: 14px; color: var(--rs-text-muted);">
-                    <i class="fa fa-bed"></i> Room @Model.RoomNumber · Booking #@Model.BookingId
-                </span>
-            }
-        </div>
-
-        @* -- Validation Errors -- *@
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="rs-alert rs-alert-danger">
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <div><i class="fa fa-exclamation-triangle"></i> @error.ErrorMessage</div>
-                }
-            </div>
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
         }
-
-        @* -- Messages -- *@
-        @if (!string.IsNullOrWhiteSpace(Model.Message))
-        {
-            <div class="rs-alert rs-alert-info">
-                <i class="fa fa-info-circle"></i> @Model.Message
-            </div>
+        .luxury-shadow {
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.06);
         }
+        .luxury-gradient-overlay {
+            background: linear-gradient(180deg, rgba(28, 28, 26, 0) 0%, rgba(28, 28, 26, 0.85) 100%);
+        }
+        .booking-bar-blur {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .cat-card-img { transition: transform 0.7s ease; }
+        .group:hover .cat-card-img { transform: scale(1.05); }
+    </style>
+}
 
-        @* -- Search Bar -- *@
-        <div class="rs-search-bar">
-            <span class="search-icon"><i class="fa fa-search"></i></span>
-            <input type="text" id="rs-search-input" placeholder="Search menu items..." autocomplete="off" />
-        </div>
+<main class="pb-section-gap-lg">
 
-        @* -- Category Tabs -- *@
-        <div class="rs-category-tabs">
-            <button class="rs-category-tab @(Model.ActiveCategoryId == null ? "active" : "")" data-category="all">
-                All Menu
-            </button>
-            @foreach (var cat in categoryNames)
-            {
-                var isActive = Model.ActiveCategoryName != null &&
-                    string.Equals(cat, Model.ActiveCategoryName, StringComparison.OrdinalIgnoreCase);
-                <button class="rs-category-tab @(isActive ? "active" : "")" data-category="@cat">
-                    @cat
-                </button>
-            }
-        </div>
-
-        @if (Model.CanPlaceOrder)
+    <!-- Hero Section / Search Bar -->
+    <section class="relative h-[65vh] min-h-[500px] pb-16 w-full flex flex-col items-center justify-center bg-inverse-surface mb-0">
+        
+        @if (Model.BookingId > 0 && !string.IsNullOrWhiteSpace(Model.RoomNumber))
         {
-            @* -- Room Selector -- *@
-            @if (!Model.RoomOptions.Any())
-            {
-                <div class="rs-alert rs-alert-warning">
-                    <i class="fa fa-exclamation-circle"></i>
-                    This booking does not have an assigned room yet, so room service is not available.
+            <!-- Floating Booking Info Bar -->
+            <div class="absolute top-8 left-1/2 -translate-x-1/2 z-40 w-full max-w-xl px-margin-mobile md:px-0">
+                <div class="bg-surface rounded-full border border-outline/15 shadow-md py-3 px-8 flex justify-between items-center">
+                    <div class="flex items-center gap-stack-sm text-secondary">
+                        <span class="material-symbols-outlined text-[20px]">room_service</span>
+                        <span class="font-label-lg tracking-widest uppercase">Phòng @Model.RoomNumber</span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-outline/20"></div>
+                    <div class="flex items-center gap-stack-sm text-on-surface-variant">
+                        <span class="font-label-lg text-primary">Booking #@Model.BookingId</span>
+                    </div>
+                    <button type="button" class="flex items-center text-primary hover:scale-105 transition-transform" onclick="document.getElementById('order-sidebar').scrollIntoView({behavior:'smooth'})">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                    </button>
                 </div>
-            }
-            else if (Model.MenuItems.Any())
+            </div>
+        }
+
+        <div class="absolute inset-0 bg-cover bg-center opacity-40 pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-transparent to-transparent opacity-80 pointer-events-none"></div>
+
+        <div class="relative z-10 text-center w-full max-w-container-max mx-auto px-margin-desktop mt-12">
+            <span class="text-primary font-label-lg uppercase tracking-widest block mb-stack-sm">Dịch Vụ Tại Phòng Đặc Quyền</span>
+            <h1 class="font-headline-lg text-headline-lg text-white mb-stack-md drop-shadow-md">Tinh Hoa Ẩm Thực <br/> Phục Vụ Tận Phòng</h1>
+            <p class="text-surface-variant max-w-2xl mx-auto drop-shadow">Thưởng thức hương vị địa phương và quốc tế tuyệt hảo ngay tại không gian riêng tư của bạn. Từng món ăn được chuẩn bị với nguyên liệu tươi ngon theo mùa.</p>
+        </div>
+    </section>
+
+    <!-- Remove Category Grid Section -->
+
+    <!-- Overlapping Content Section -->
+    <div class="relative z-20 -mt-20 bg-surface rounded-t-[3rem] shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)] w-full pt-8 pb-20">
+    <!-- Category Scrollbar -->
+    <section class="sticky top-20 z-40 bg-surface/80 backdrop-blur-md py-4 border-b border-outline/5">
+        <div class="max-w-container-max mx-auto px-margin-desktop overflow-x-auto hide-scrollbar flex gap-stack-lg whitespace-nowrap items-center" id="category-scrollbar">
+            <button class="px-6 py-2 rounded-full font-label-lg transition-colors luxury-shadow bg-primary text-on-primary" onclick="filterCategory(null)">Tất cả món</button>
+            @foreach(var cat in categories)
             {
-                <form asp-action="OrderMenu" method="post" id="rs-order-form">
-                    @Html.AntiForgeryToken()
-                    <input asp-for="BookingId" type="hidden" />
+                <button class="px-6 py-2 rounded-full text-on-surface-variant hover:bg-surface-variant/50 font-label-lg transition-colors" onclick="filterCategory('@cat')">@cat</button>
+            }
+        </div>
+    </section>
 
-                    @* Room Selection *@
-                    @if (Model.RoomOptions.Count == 1)
-                    {
-                        var selectedRoom = Model.RoomOptions[0];
-                        <input asp-for="BookingDetailId" type="hidden" value="@selectedRoom.BookingDetailId" />
-                        <div class="rs-room-selector">
-                            <label><i class="fa fa-truck"></i> Delivery Room:</label>
-                            <span class="rs-room-info">
-                                Room @selectedRoom.RoomNumber
-                                @if (!string.IsNullOrWhiteSpace(selectedRoom.CategoryName))
-                                {
-                                    <text> — @selectedRoom.CategoryName</text>
-                                }
-                            </span>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="rs-room-selector">
-                            <label for="BookingDetailId"><i class="fa fa-truck"></i> Delivery Room:</label>
-                            <select asp-for="BookingDetailId" id="BookingDetailId" required>
-                                <option value="">Select delivery room</option>
-                                @foreach (var room in Model.RoomOptions)
-                                {
-                                    <option value="@room.BookingDetailId">
-                                        Room @room.RoomNumber@(string.IsNullOrWhiteSpace(room.CategoryName) ? "" : $" — {room.CategoryName}")
-                                    </option>
-                                }
-                            </select>
-                        </div>
-                    }
+    <form asp-action="OrderMenu" method="post" id="rs-order-form">
+        @Html.AntiForgeryToken()
+        <input asp-for="BookingId" type="hidden" />
 
-                    @* Menu Items Grid *@
-                    @foreach (var category in groupedItems)
-                    {
-                        <h2 class="rs-section-title" data-section-category="@category.Key">@category.Key</h2>
-                        <div class="rs-menu-grid">
-                            @foreach (var entry in category)
-                            {
-                                <div class="rs-menu-card @(entry.Item.Quantity > 0 ? "has-quantity" : "")"
-                                     data-item-name="@entry.Item.ItemName"
-                                     data-category="@entry.Item.CategoryName">
+        <!-- Hidden inputs for full form state -->
+        <div id="hidden-inputs-container" style="display:none;">
+            @if (Model.RoomOptions.Count == 1)
+            {
+                <input asp-for="BookingDetailId" type="hidden" value="@Model.RoomOptions[0].BookingDetailId" id="hidden_booking_detail_id" />
+            }
+            @for(int i = 0; i < Model.MenuItems.Count; i++) {
+                <input type="hidden" name="MenuItems[@i].MenuItemId" value="@Model.MenuItems[i].MenuItemId" />
+                <input type="hidden" name="MenuItems[@i].Quantity" id="qty_hidden_@Model.MenuItems[i].MenuItemId" value="@Model.MenuItems[i].Quantity" />
+                <input type="hidden" name="MenuItems[@i].ItemNote" id="note_hidden_@Model.MenuItems[i].MenuItemId" value="@Model.MenuItems[i].ItemNote" />
+            }
+        </div>
 
-                                    @if (!string.IsNullOrWhiteSpace(entry.Item.ImageUrl))
-                                    {
-                                        <img src="@entry.Item.ImageUrl" alt="@entry.Item.ItemName" class="card-image"
-                                             onerror="this.outerHTML='<div class=\'no-image\'><i class=\'fa fa-cutlery\'></i> No image</div>';" />
-                                    }
-                                    else
-                                    {
-                                        <div class="no-image"><i class="fa fa-cutlery"></i> No image</div>
-                                    }
-
-                                    <div class="card-body">
-                                        <div class="item-name">@entry.Item.ItemName</div>
-                                        <div class="item-category">@entry.Item.CategoryName</div>
-                                        <div class="item-price">@entry.Item.Price.ToString("N0") VND</div>
-
-                                        <input name="MenuItems[@entry.Index].MenuItemId" value="@entry.Item.MenuItemId" type="hidden" />
-                                        <input name="MenuItems[@entry.Index].ItemName" value="@entry.Item.ItemName" type="hidden" />
-                                        <input name="MenuItems[@entry.Index].CategoryName" value="@entry.Item.CategoryName" type="hidden" />
-                                        <input name="MenuItems[@entry.Index].ImageUrl" value="@entry.Item.ImageUrl" type="hidden" />
-                                        <input name="MenuItems[@entry.Index].Price" value="@entry.Item.Price" type="hidden" />
-
-                                        <div class="rs-qty-selector">
-                                            <button type="button" class="rs-qty-btn qty-minus">−</button>
-                                            <input name="MenuItems[@entry.Index].Quantity"
-                                                   value="@entry.Item.Quantity"
-                                                   class="rs-qty-value"
-                                                   type="number" min="0" max="1000"
-                                                   data-price="@entry.Item.Price" />
-                                            <button type="button" class="rs-qty-btn qty-plus">+</button>
-                                        </div>
-                                        
-                                        <div style="margin-top: 15px;">
-                                            <textarea name="MenuItems[@entry.Index].ItemNote" maxlength="500" class="form-control" placeholder="Item note for kitchen (e.g., less spicy)" style="font-size: 13px; border-radius: var(--rs-radius-sm); border-color: var(--rs-border); background: #f1f5f9; padding: 10px; min-height: 50px; resize: vertical; width: 100%; box-shadow: none;">@entry.Item.ItemNote</textarea>
-                                        </div>
-                                    </div>
+        <!-- Bento Grid Layout for Menu -->
+        <div class="max-w-container-max mx-auto px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-gutter mt-section-gap-md relative">
+            
+            <div class="lg:col-span-8">
+                @if (!Model.CanPlaceOrder)
+                {
+                    <div class="bg-error-container text-on-error-container p-4 rounded-lg mb-6 flex items-center gap-3">
+                        <i class="fa fa-exclamation-circle text-xl"></i>
+                        <p>Phòng của bạn chưa nhận phòng hoặc không đủ điều kiện để đặt món.</p>
+                    </div>
+                }
+                else if (!Model.RoomOptions.Any())
+                {
+                    <div class="bg-error-container text-on-error-container p-4 rounded-lg mb-6 flex items-center gap-3">
+                        <i class="fa fa-exclamation-circle text-xl"></i>
+                        <p>Bạn chưa được xếp phòng, nên dịch vụ gọi món tại phòng chưa khả dụng.</p>
+                    </div>
+                }
+                
+                <div class="mb-section-gap-md bg-surface rounded-2xl p-6 luxury-shadow border border-outline/5">
+                    <div class="flex flex-col md:flex-row gap-6 items-end">
+                        @if (Model.RoomOptions.Count > 1)
+                        {
+                            <div class="flex-1 w-full">
+                                <label for="BookingDetailId" class="block font-headline-sm text-on-surface mb-2">Chọn phòng giao đồ:</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">room_service</span>
+                                    <select asp-for="BookingDetailId" id="BookingDetailId" required class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl py-3 pl-12 pr-10 text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer">
+                                        <option value="">-- Vui lòng chọn --</option>
+                                        @foreach (var room in Model.RoomOptions)
+                                        {
+                                            <option value="@room.BookingDetailId">
+                                                Phòng @room.RoomNumber@(string.IsNullOrWhiteSpace(room.CategoryName) ? "" : $" ({room.CategoryName})")
+                                            </option>
+                                        }
+                                    </select>
                                 </div>
-                            }
-                        </div>
-                    }
-
-                    <div style="height: 100px;"></div> @* Spacer for sticky bar *@
-
-                    @* Sticky Cart Bar *@
-                    <div class="rs-cart-bar" id="rs-cart-bar">
-                        <div class="rs-container">
-                            <div class="cart-content" style="flex-wrap: wrap; gap: 10px;">
-                                <div style="flex: 1; min-width: 200px;">
-                                    <input asp-for="CustomerNote" class="form-control" placeholder="Order note (e.g., call me, deliver now...)" style="height: 40px; border-radius: 20px; font-size: 13px; border: 1px solid var(--rs-border); padding: 0 16px;" maxlength="500" />
-                                </div>
-                                <div class="cart-info" style="margin-left: auto;">
-                                    <span class="cart-count"><strong>0</strong> items</span>
-                                    <span class="cart-subtotal">0 VND</span>
-                                </div>
-                                <button type="submit" class="rs-btn rs-btn-primary" style="white-space: nowrap;">
-                                    <i class="fa fa-shopping-cart"></i> Place Order
-                                </button>
+                            </div>
+                        }
+                        
+                        <div class="flex-1 w-full">
+                            <label for="menu-search-input" class="block font-headline-sm text-on-surface mb-2">Tìm kiếm món ăn:</label>
+                            <div class="relative group">
+                                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+                                <input id="menu-search-input" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl py-3 pl-12 pr-4 text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-on-surface-variant/50" placeholder="Nhập tên món ăn..." type="text"/>
                             </div>
                         </div>
                     </div>
-                </form>
-            }
-            else
-            {
-                <div class="rs-empty-state">
-                    <div class="empty-icon"><i class="fa fa-cutlery"></i></div>
-                    <h3>No Items Available</h3>
-                    <p>No menu items are currently available. Please check back later.</p>
                 </div>
-            }
-        }
-        else if (Model.MenuItems.Any())
-        {
-            @* Browse-only mode (not logged in or not checked in) *@
-            @foreach (var category in groupedItems)
-            {
-                <h2 class="rs-section-title" data-section-category="@category.Key">@category.Key</h2>
-                <div class="rs-menu-grid">
-                    @foreach (var entry in category)
-                    {
-                        <div class="rs-menu-card"
-                             data-item-name="@entry.Item.ItemName"
-                             data-category="@entry.Item.CategoryName">
 
-                            @if (!string.IsNullOrWhiteSpace(entry.Item.ImageUrl))
-                            {
-                                <img src="@entry.Item.ImageUrl" alt="@entry.Item.ItemName" class="card-image"
-                                     onerror="this.outerHTML='<div class=\'no-image\'><i class=\'fa fa-cutlery\'></i> No image</div>';" />
-                            }
-                            else
-                            {
-                                <div class="no-image"><i class="fa fa-cutlery"></i> No image</div>
-                            }
-
-                            <div class="card-body">
-                                <div class="item-name">@entry.Item.ItemName</div>
-                                <div class="item-category">@entry.Item.CategoryName</div>
-                                <div class="item-price">@entry.Item.Price.ToString("N0") VND</div>
-                            </div>
-                        </div>
-                    }
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter" id="menu-grid">
+                    <!-- Rendered by JS -->
                 </div>
-            }
-        }
-        else
-        {
-            <div class="rs-empty-state">
-                <div class="empty-icon"><i class="fa fa-cutlery"></i></div>
-                <h3>No Items Available</h3>
-                <p>No menu items are currently available. Please check back later.</p>
+                
+                <!-- Pagination Controls for Menu Items -->
+                <div class="flex justify-center items-center gap-2 mt-8" id="menu-pagination-controls">
+                    <!-- JS injected -->
+                </div>
             </div>
-        }
+            
+            <!-- Sticky Order Sidebar -->
+            <div class="lg:col-span-4" id="order-sidebar">
+                <div class="sticky top-40 bg-surface-container-lowest rounded-xl border border-outline/10 p-8 luxury-shadow">
+                    <div class="flex items-center justify-between mb-stack-lg pb-4 border-b border-outline/10">
+                        <h2 class="font-headline-sm text-headline-sm">Đơn Hàng Của Bạn</h2>
+                        <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">@(!string.IsNullOrEmpty(Model.RoomNumber) ? $"Phòng {Model.RoomNumber}" : "Chưa có phòng")</span>
+                    </div>
 
-    </div>
-</div>
+                    <!-- Customer Note -->
+                    <div class="mb-6">
+                        <textarea asp-for="CustomerNote" class="w-full bg-surface-container border border-outline/20 rounded-lg p-3 text-body-md focus:ring-primary focus:border-primary resize-y" rows="2" placeholder="Ghi chú cho nhân viên (VD: Gọi cho tôi khi đến, giao ngay...)"></textarea>
+                    </div>
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/room-service.css" />
-}
+                    <!-- Order items summary -->
+                    <div class="space-y-4 mb-stack-lg max-h-60 overflow-y-auto pr-2" id="order-items-list">
+                        <!-- JS injected -->
+                        <p class="text-on-surface-variant text-center py-8 italic">Thêm món ăn từ thực đơn để bắt đầu đặt hàng.</p>
+                    </div>
+
+                    <div class="space-y-3 pt-6 border-t border-outline/10">
+                        <div class="flex justify-between text-headline-sm text-on-surface font-bold mt-2">
+                            <span>Tổng cộng</span>
+                            <span id="cart-total">0₫</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-stack-lg space-y-4">
+                        <button type="submit" id="confirm-order-btn" class="w-full bg-primary-container text-on-primary-container py-4 rounded-xl font-label-lg text-lg uppercase tracking-widest shadow-lg hover:shadow-xl hover:bg-primary hover:text-white transition-all active:scale-95 disabled:opacity-50" disabled>
+                            Xác Nhận Đặt Món
+                        </button>
+                        <p class="text-[10px] text-center text-on-surface-variant uppercase tracking-widest">Chi phí sẽ được tính vào hóa đơn phòng của bạn</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div> <!-- Close Overlapping Content Section -->
+</main>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/room-service.js"></script>
+    <script>
+        const allItems = @Html.Raw(menuItemsJson);
+        // Configuration
+        const CAT_PER_PAGE = 4;
+        const ITEMS_PER_PAGE = 6;
+        
+        let currentCatPage = 1;
+        let currentItemPage = 1;
+        let currentCategoryFilter = '@Html.Raw(Model.ActiveCategoryName ?? "")' || null;
+        let searchQuery = "";
+        
+        // Mockup fallback images based on category name
+        const fallbackImages = {
+            "Breakfast": "https://lh3.googleusercontent.com/aida-public/AB6AXuAqEVHO0OTG-LauaMPGCuZY_SaEE15NBPqNc6YcCGICUQYyfIO4FykFc3QucUbebXewqdsG4GNVGq9Yft_sbSxW0b2NH24hnNOf3LMJZAfd3ogTn7Vgkovt_FFLFYX5CZAuTWEeusinBBOLIhvtKqctvxqQJVynRdphikKSYl5HH-Tg18e1G9jQ2K9S2tl9O_2nB-0moHVk0SCr3nUzTpp5Wz1Bh1y8XNU_8Ypq9XAs4cCmAxb6h0FZjbiMaQHtbVx7898dT6oJNbPf",
+            "Cocktails & Wine": "https://lh3.googleusercontent.com/aida-public/AB6AXuDXP8iyXUMf8kz-JfeezjvyvNOa0BW44e8ydMRAYAWBAFo1QgolHJkOOprOZE5skCljoQhC9ZMIgU-Xp5ILv0AgkD0H18kico7pyT1mLu-3i0F5FfMZ4IyH0R4VrDTESBzKERjAna9eIR2Q6c0-WYP9ovHtlzIKdpIRjDx9s8TC8X44g6-yVhRCPJpjXrnjZRefXGymChfxOvUqTTw8Kioo6uKja5Ykw_oLbUvLBKVoSwcuyGYM1LN0UvMjuJtxXy3DSHVRkOImbyNh",
+            "Fine Dining": "https://lh3.googleusercontent.com/aida-public/AB6AXuBaj4sgUeFeRNPEyyZEZHhRVzJhswkYYHNfLhEcZEGPzVG5F-M65jczuWsoiot7p3X18lK91V-QXQOqAPV6w1zFpcV0DTVyWwAuY-CLbatpjiMuQyXdQpnBjq3DQ_2SgnS0dExTMBliKSaCrAXQnfJ9ACoZl9OEMADKM1vcirDmf6P63vjiT6Y3pEAk9E2gKrlh8Mb9VfVRtwwuTq8A0kpnNF_k61kWeNfRifTqRfHyBVjASdx29EpgQ-xJhAWizTpLL_U5G6cYzV92",
+            "Local Specialities": "https://lh3.googleusercontent.com/aida-public/AB6AXuDiky1tSkCmdqA-7_I7TDL2B3ButQ2uBJ4iAZtqd0jCVkXLq1vlrAFiU-KoLRXPLK1N65vBSIHCFZEytMxPzHjbgdivpBQFGmw7iP1uC04RPZ1JSjLjom6BlaCLr0cLHp51Z4W95WQojWcm0-DkYa3UYocsvV-Ft3vvycPtC06j05mLipiJAkBftNvPR1pWaX0aHBkx9eIqryrJjvYyaGn23F45kjykKjG56zxTnG0a_1j6I_yCsX_tugpg291rupkiiZKaOEJoOf-e",
+            "Default": "https://lh3.googleusercontent.com/aida-public/AB6AXuAp2nTjwTEziFEYff-kVSu8N9ZFeJ0Qb5--rk_zAvPRHPdhuEy3SpFU1l5Nv_vnqlXG-AkmjWMNLCyFeHrZWiGGaYpY0VgpyGNf3_uxl3UXV_8NbtROIlZ_sIPxapTAnXZHAQgloHmXIL0xWI4daCEB00g90APM_CzIQ_VZEtuE5-77u89QaudmjATyGu3qwTd7nm0drH80dRDaGoOwFNqxQ0eq1ZRGdD2T2mpoMne5XrL3irJ8T446OJiHWBZ2cp4gujep3me70vLC"
+        };
+
+        function getImageUrl(itemOrCategory) {
+            if (itemOrCategory.imageUrl) return itemOrCategory.imageUrl;
+            
+            let name = itemOrCategory.name || itemOrCategory;
+            let match = Object.keys(fallbackImages).find(k => name.toLowerCase().includes(k.toLowerCase()));
+            return match ? fallbackImages[match] : fallbackImages["Default"];
+        }
+
+        // ====== CATEGORY LOGIC REMOVED (Moved to MenuCategories.cshtml) ======
+
+        // ====== MENU PAGINATION ======
+        function getFilteredItems() {
+            return allItems.filter(item => {
+                const matchCat = currentCategoryFilter ? item.category === currentCategoryFilter : true;
+                const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                    (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+                return matchCat && matchSearch;
+            });
+        }
+
+        function filterCategory(cat, scrollToMenu = false) {
+            currentCategoryFilter = cat;
+            currentItemPage = 1;
+            renderMenuItems();
+            updateCategoryScrollbar();
+            
+            if(scrollToMenu) {
+                document.getElementById('menu-grid').scrollIntoView({behavior: 'smooth', block: 'start'});
+            }
+        }
+
+        function updateCategoryScrollbar() {
+            const buttons = document.querySelectorAll('#category-scrollbar button');
+            buttons.forEach(btn => {
+                const text = btn.innerText.trim();
+                const isActive = (text === currentCategoryFilter) || (text === 'Tất cả món' && !currentCategoryFilter);
+                
+                if(isActive) {
+                    btn.className = "px-6 py-2 rounded-full font-label-lg transition-colors luxury-shadow bg-primary text-on-primary";
+                } else {
+                    btn.className = "px-6 py-2 rounded-full text-on-surface-variant hover:bg-surface-variant/50 font-label-lg transition-colors";
+                }
+            });
+        }
+
+        document.getElementById('menu-search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            currentItemPage = 1;
+            renderMenuItems();
+        });
+
+        function changeItemPage(page) {
+            currentItemPage = page;
+            renderMenuItems();
+            document.getElementById('menu-grid').scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+
+        function renderMenuItems() {
+            const grid = document.getElementById('menu-grid');
+            const controls = document.getElementById('menu-pagination-controls');
+            
+            const filtered = getFilteredItems();
+            const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+            if(currentItemPage > totalPages) currentItemPage = totalPages;
+            
+            const start = (currentItemPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const currentItems = filtered.slice(start, end);
+            
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-on-surface-variant">Không tìm thấy món nào phù hợp với tìm kiếm của bạn.</div>`;
+            } else {
+                grid.innerHTML = currentItems.map((item) => {
+                    const img = getImageUrl(item);
+                    return `
+                    <div class="group bg-surface-container-lowest rounded-xl border border-outline/10 overflow-hidden luxury-shadow transition-all duration-500 hover:-translate-y-2 flex flex-col">
+                        <div class="h-48 overflow-hidden relative shrink-0">
+                            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="${img}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'w-full h-full bg-surface-variant flex items-center justify-center\\'><i class=\\'fa fa-cutlery text-3xl text-on-surface-variant\\'></i></div>'"/>
+                            <div class="absolute top-4 left-4 bg-surface-container/90 text-on-surface px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm shadow-sm">${item.category}</div>
+                        </div>
+                        <div class="p-stack-lg flex-grow flex flex-col">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-headline-sm text-headline-sm text-on-surface pr-2">${item.name}</h3>
+                                <span class="text-primary font-bold shrink-0">${new Intl.NumberFormat('vi-VN').format(item.price)}₫</span>
+                            </div>
+                            <p class="text-on-surface-variant text-body-md mb-4 leading-relaxed line-clamp-2 flex-grow">${item.description}</p>
+                            
+                            <!-- Note Input -->
+                            <div class="mb-4">
+                                <input type="text" class="w-full bg-surface text-sm border-outline/20 rounded-lg p-2 focus:ring-primary focus:border-primary" placeholder="Yêu cầu đặc biệt..." value="${item.note}" onchange="updateNote(${item.id}, this.value)" />
+                            </div>
+
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex items-center gap-2"></div>
+                                <div class="flex items-center bg-surface-container rounded-full p-1 border border-outline/5 shadow-sm">
+                                    <button type="button" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-lowest rounded-full" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                    <span class="px-3 font-medium text-on-surface w-10 text-center">${item.quantity}</span>
+                                    <button type="button" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-lowest rounded-full" onclick="updateQuantity(${item.id}, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            }
+            
+            // Render pagination buttons
+            if (totalPages > 1) {
+                let html = `<button type="button" class="w-8 h-8 flex items-center justify-center rounded-full border border-outline/20 hover:border-primary text-secondary hover:text-primary transition-all disabled:opacity-30" onclick="changeItemPage(${currentItemPage - 1})" ${currentItemPage === 1 ? 'disabled' : ''}><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>`;
+                
+                for(let i = 1; i <= totalPages; i++) {
+                    if (i === currentItemPage) {
+                        html += `<button type="button" class="w-8 h-8 flex items-center justify-center rounded-full bg-primary text-on-primary font-bold shadow-sm">${i}</button>`;
+                    } else if (i === 1 || i === totalPages || Math.abs(i - currentItemPage) <= 1) {
+                        html += `<button type="button" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-on-surface-variant transition-colors" onclick="changeItemPage(${i})">${i}</button>`;
+                    } else if (Math.abs(i - currentItemPage) === 2) {
+                        html += `<span class="text-on-surface-variant">...</span>`;
+                    }
+                }
+                
+                html += `<button type="button" class="w-8 h-8 flex items-center justify-center rounded-full border border-outline/20 hover:border-primary text-secondary hover:text-primary transition-all disabled:opacity-30" onclick="changeItemPage(${currentItemPage + 1})" ${currentItemPage === totalPages ? 'disabled' : ''}><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>`;
+                
+                controls.innerHTML = html;
+            } else {
+                controls.innerHTML = '';
+            }
+        }
+
+        // ====== CART STATE MANAGEMENT ======
+        function updateQuantity(id, delta) {
+            const item = allItems.find(i => i.id === id);
+            if(item) {
+                let newQ = item.quantity + delta;
+                if(newQ < 0) newQ = 0;
+                if(newQ > 99) newQ = 99;
+                item.quantity = newQ;
+                
+                // Update hidden input for ASP.NET form binder
+                document.getElementById('qty_hidden_' + id).value = newQ;
+                
+                // Re-render to show updated number
+                renderMenuItems();
+                updateCartSidebar();
+            }
+        }
+
+        function updateNote(id, note) {
+            const item = allItems.find(i => i.id === id);
+            if(item) {
+                item.note = note;
+                document.getElementById('note_hidden_' + id).value = note;
+            }
+        }
+
+        function updateCartSidebar() {
+            const selectedItems = allItems.filter(i => i.quantity > 0);
+            const list = document.getElementById('order-items-list');
+            const totalEl = document.getElementById('cart-total');
+            const btn = document.getElementById('confirm-order-btn');
+            
+            let total = 0;
+            let totalItemsCount = 0;
+            
+            if(selectedItems.length > 0) {
+                list.innerHTML = selectedItems.map(item => {
+                    const itemTotal = item.quantity * item.price;
+                    total += itemTotal;
+                    totalItemsCount += item.quantity;
+                    
+                    return `
+                    <div class="flex flex-col gap-1 text-body-md border-b border-outline/5 pb-2 mb-2 last:border-0 last:pb-0 last:mb-0">
+                        <div class="flex items-start justify-between">
+                            <div class="flex gap-2 items-start">
+                                <span class="font-bold text-primary shrink-0">${item.quantity}x</span>
+                                <span class="text-on-surface line-clamp-2 pr-2">${item.name}</span>
+                            </div>
+                            <span class="font-medium shrink-0 ml-2">${new Intl.NumberFormat('vi-VN').format(itemTotal)}₫</span>
+                        </div>
+                        ${item.note ? `<div class="text-[11px] text-on-surface-variant italic pl-6 opacity-80">- ${item.note}</div>` : ''}
+                    </div>`;
+                }).join('');
+                
+                totalEl.innerText = new Intl.NumberFormat('vi-VN').format(total) + '₫';
+                
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+            } else {
+                list.innerHTML = `<p class="text-on-surface-variant text-center py-8 italic">Thêm món ăn từ thực đơn để bắt đầu đặt hàng.</p>`;
+                totalEl.innerText = '0₫';
+                
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMenuItems();
+            updateCartSidebar();
+            
+            // Check if valid to order
+            const hasRoom = document.getElementById('hidden_booking_detail_id') || document.getElementById('BookingDetailId');
+            if(!hasRoom || !@Model.CanPlaceOrder.ToString().ToLower()) {
+                document.getElementById('confirm-order-btn').disabled = true;
+                // If it was already rendered enabled by updateCartSidebar, force disable
+            }
+        });
+    </script>
 }

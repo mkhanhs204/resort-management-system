@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
+using PhucNguyenResort.Hubs;
 using PhucNguyenResort.Services.FoodOrders;
 using PhucNguyenResort.Services.MenuCategories;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.Services.RestaurantMenus;
 using PhucNguyenResort.Services.TableFoodOrders;
 using PhucNguyenResort.Services.TableReservations;
@@ -17,6 +19,9 @@ if (builder.Environment.IsDevelopment())
 {
     mvcBuilder.AddRazorRuntimeCompilation();
 }
+
+// SignalR
+builder.Services.AddSignalR();
 
 // Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -76,6 +81,7 @@ builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
 builder.Services.AddScoped<ITableReservationService, TableReservationService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Dashboard.IDashboardReportService, PhucNguyenResort.Services.Dashboard.DashboardReportService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Dashboard.IForecastService, PhucNguyenResort.Services.Dashboard.ForecastService>();
 builder.Services.AddScoped<ITableFoodOrderService, TableFoodOrderService>();
@@ -137,5 +143,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data; // Nhận diện ResortDbContext
 using PhucNguyenResort.Enums; // Nhận diện trạng thái TourBookingStatus
 using PhucNguyenResort.Models;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.Services.TableReservations;
 using PhucNguyenResort.Services.Dashboard;
 using System;
@@ -30,6 +31,7 @@ namespace PhucNguyenResort.Web.Controllers
         private readonly PhucNguyenResort.Services.Kots.IKotService _kotService;
         private readonly PhucNguyenResort.Data.ResortDbContext _context;
         private readonly ITableReservationService _tableReservationService;
+        private readonly INotificationService _notificationService;
 
         private readonly IDashboardReportService _reportService;
         private readonly IForecastService _forecastService;
@@ -39,6 +41,7 @@ namespace PhucNguyenResort.Web.Controllers
             PhucNguyenResort.Services.Kots.IKotService kotService,
             PhucNguyenResort.Data.ResortDbContext context,
             ITableReservationService tableReservationService,
+            NotificationService notificationService,
             IDashboardReportService reportService,
             IForecastService forecastService)
         {
@@ -46,6 +49,7 @@ namespace PhucNguyenResort.Web.Controllers
             _kotService = kotService;
             _context = context;
             _tableReservationService = tableReservationService;
+            _notificationService = notificationService;
             _reportService = reportService;
             _forecastService = forecastService;
         }
@@ -305,6 +309,8 @@ namespace PhucNguyenResort.Web.Controllers
                 ? "Table reservation confirmed successfully."
                 : "Unable to confirm this table reservation.";
 
+
+
             return RedirectToAction(nameof(TableReservations));
         }
 
@@ -369,6 +375,8 @@ namespace PhucNguyenResort.Web.Controllers
             TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
                 ? "Table reservation cancelled successfully."
                 : "Unable to cancel this table reservation.";
+
+
 
             return RedirectToAction(nameof(TableReservations));
         }

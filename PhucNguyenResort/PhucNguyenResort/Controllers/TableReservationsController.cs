@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PhucNguyenResort.Services.Notifications;
 using PhucNguyenResort.Services.TableReservations;
 using PhucNguyenResort.ViewModels.TableReservations;
 
@@ -12,10 +13,12 @@ public class TableReservationsController : Controller
     private static readonly TimeSpan DefaultReservationTime = new(18, 0, 0);
 
     private readonly ITableReservationService _reservationService;
+    private readonly INotificationService _notificationService;
 
-    public TableReservationsController(ITableReservationService reservationService)
+    public TableReservationsController(ITableReservationService reservationService, INotificationService notificationService)
     {
         _reservationService = reservationService;
+        _notificationService = notificationService;
     }
 
     [HttpGet]
@@ -118,6 +121,7 @@ public class TableReservationsController : Controller
         if (result.Status == TableReservationCreateStatus.Created)
         {
             TempData["SuccessMessage"] = "Your table reservation request has been submitted.";
+            
             return RedirectToAction(nameof(Details), new { id = result.ReservationId });
         }
 

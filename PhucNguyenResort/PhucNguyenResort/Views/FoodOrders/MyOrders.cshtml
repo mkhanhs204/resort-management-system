@@ -2,180 +2,236 @@
 @model IEnumerable<PhucNguyenResort.ViewModels.FoodOrders.FoodOrderDetailViewModel>
 
 @{
-    ViewData["Title"] = "My Room Service Orders";
-
-    var activeCount = Model?.Count(o => o.OrderStatus != FoodOrderStatus.Delivered && o.OrderStatus != FoodOrderStatus.Cancelled) ?? 0;
+    ViewData["Title"] = "Đơn Hàng Của Tôi - Phúc Nguyên Resort";
+    
+    var activeOrders = Model?.Where(o => o.OrderStatus != FoodOrderStatus.Delivered && o.OrderStatus != FoodOrderStatus.Cancelled).OrderByDescending(o => o.OrderedAt).ToList() ?? new();
+    var pastOrders = Model?.Where(o => o.OrderStatus == FoodOrderStatus.Delivered || o.OrderStatus == FoodOrderStatus.Cancelled).OrderByDescending(o => o.OrderedAt).ToList() ?? new();
 }
 
-<div class="rs-page">
-    <div class="rs-container">
+@section Styles {
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fcf9f5;
+        }
+        .order-card {
+            background-color: #FFFFFF;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .order-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 40px -10px rgba(30, 41, 59, 0.08);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+}
 
-        @* -- Page Header -- *@
-        <div class="rs-page-header">
-            <h1>My <span style="color: var(--rs-primary);">Orders</span></h1>
-            <a asp-action="RoomService" class="rs-btn rs-btn-primary rs-btn-sm">
-                <i class="fa fa-plus"></i> New Order
-            </a>
+<main class="pt-20 pb-section-gap-lg max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <!-- Header Section -->
+    <header class="mb-stack-lg flex flex-col md:flex-row md:items-end justify-between gap-stack-md mt-stack-lg">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Đơn Hàng Của Tôi</h1>
+            <p class="text-on-surface-variant font-body-md max-w-2xl">Theo dõi các yêu cầu dịch vụ phòng và ẩm thực của bạn tại resort. Chúng tôi cam kết mang đến trải nghiệm tinh tế nhất.</p>
         </div>
+        <a href="@Url.Action("RoomService", "FoodOrders")" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-label-lg transition-all hover:shadow-lg active:scale-95 group">
+            <span class="material-symbols-outlined">restaurant</span>
+            Đặt thêm
+        </a>
+    </header>
 
-        @* -- Messages -- *@
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="rs-alert rs-alert-success">
-                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+        <aside class="lg:col-span-3 space-y-stack-md sticky top-24 z-10">
+            <div class="bg-surface-container-low p-stack-md rounded-xl border border-outline/10">
+                <h3 class="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant mb-stack-md">Lọc đơn hàng</h3>
+                <div class="space-y-2" id="order-filters">
+                    <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-variant transition-colors cursor-pointer group">
+                        <input type="checkbox" checked value="active" class="rounded border-outline text-primary focus:ring-primary-container" />
+                        <span class="font-body-md text-on-surface group-hover:text-primary">Đang thực hiện</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-variant transition-colors cursor-pointer group">
+                        <input type="checkbox" checked value="delivered" class="rounded border-outline text-primary focus:ring-primary-container" />
+                        <span class="font-body-md text-on-surface group-hover:text-primary">Đã giao</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-variant transition-colors cursor-pointer group">
+                        <input type="checkbox" checked value="cancelled" class="rounded border-outline text-primary focus:ring-primary-container" />
+                        <span class="font-body-md text-on-surface group-hover:text-primary">Đã hủy</span>
+                    </label>
+                </div>
             </div>
-        }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="rs-alert rs-alert-danger">
-                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <div class="bg-primary/5 p-stack-md rounded-xl border border-primary/10">
+                <p class="font-body-md text-primary italic">"Trải nghiệm ẩm thực tại phòng luôn sẵn sàng phục vụ quý khách 24/7."</p>
             </div>
-        }
+        </aside>
 
-        @if (Model == null || !Model.Any())
-        {
-            <div class="rs-empty-state">
-                <div class="empty-icon"><i class="fa fa-inbox"></i></div>
-                <h3>No Orders Yet</h3>
-                <p>You haven't placed any room service orders yet. Browse our menu to get started.</p>
-                <a asp-action="RoomService" class="rs-btn rs-btn-primary">
-                    <i class="fa fa-cutlery"></i> Browse Menu
-                </a>
-            </div>
-        }
-        else
-        {
-            @* -- Filter Tabs -- *@
-            <div class="rs-filter-tabs">
-                <button class="rs-filter-tab active" data-filter="all">
-                    All (@Model.Count())
-                </button>
-                <button class="rs-filter-tab" data-filter="active">
-                    Active (@activeCount)
-                </button>
-                <button class="rs-filter-tab" data-filter="delivered">
-                    Delivered (@Model.Count(o => o.OrderStatus == FoodOrderStatus.Delivered))
-                </button>
-                <button class="rs-filter-tab" data-filter="cancelled">
-                    Cancelled (@Model.Count(o => o.OrderStatus == FoodOrderStatus.Cancelled))
-                </button>
-            </div>
-
-            @* -- Order Cards -- *@
-            @foreach (var order in Model)
+        <div class="lg:col-span-9 space-y-gutter">
+            
+            @if (activeOrders.Any())
             {
-                var canCancel = order.OrderStatus == FoodOrderStatus.Pending
-                    && (!order.KitchenStatus.HasValue || order.KitchenStatus == KotStatus.Pending)
-                    && !order.IsChargedToRoom;
-
-                var statusClass = order.OrderStatus switch
-                {
-                    FoodOrderStatus.Pending => "pending",
-                    FoodOrderStatus.Cooking => "cooking",
-                    FoodOrderStatus.Delivered => "delivered",
-                    FoodOrderStatus.Cancelled => "cancelled",
-                    _ => "pending"
-                };
-
-                var filterStatus = order.OrderStatus == FoodOrderStatus.Delivered ? "delivered" :
-                    order.OrderStatus == FoodOrderStatus.Cancelled ? "cancelled" : "active";
-
-                // Progress percentage
-                var progressPercent = order.OrderStatus switch
-                {
-                    FoodOrderStatus.Pending => 15,
-                    FoodOrderStatus.Cooking => 50,
-                    FoodOrderStatus.Delivered => 100,
-                    _ => 0
-                };
-
-                <div class="rs-history-card" data-status="@filterStatus">
-                    <div class="card-top">
-                        <div>
-                            <div class="order-id">Order #@order.FoodOrderId</div>
-                        </div>
-                        <span class="rs-status-badge @statusClass">@order.OrderStatus</span>
-                    </div>
-
-                    <div class="card-meta">
-                        <span><i class="fa fa-clock-o"></i> @order.OrderedAt.ToString("MMM dd, yyyy · hh:mm tt")</span>
-                        <span><i class="fa fa-bed"></i> Room @(string.IsNullOrWhiteSpace(order.RoomNumber) ? "N/A" : order.RoomNumber)</span>
-                        <span><i class="fa fa-bookmark-o"></i> Booking #@order.BookingId</span>
-                    </div>
-
-                    @* Mini Progress Bar (only for active orders) *@
-                    @if (order.OrderStatus != FoodOrderStatus.Cancelled && order.OrderStatus != FoodOrderStatus.Delivered)
-                    {
-                        <div class="rs-mini-progress">
-                            <div class="progress-fill" style="width: @(progressPercent)%;"></div>
-                        </div>
-                    }
-
-                    <div class="card-items">
-                        @{
-                            var itemsSummary = string.Join(", ", order.Items.Select(i => $"{i.ItemName} x{i.Quantity}"));
-                            if (itemsSummary.Length > 80)
-                            {
-                                itemsSummary = itemsSummary.Substring(0, 77) + "...";
+                <section class="order-section" data-type="active">
+                    <h2 class="font-headline-sm text-headline-sm mb-stack-md flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-primary"></span>
+                        Đang diễn ra
+                    </h2>
+                    <div class="space-y-gutter">
+                        @foreach (var order in activeOrders)
+                        {
+                            var badgeClass = order.OrderStatus == FoodOrderStatus.Pending ? "bg-secondary-container text-on-secondary-container" : "bg-tertiary-container text-on-tertiary-container";
+                            var statusText = order.OrderStatus == FoodOrderStatus.Pending ? "Chờ xác nhận" : "Đang chuẩn bị";
+                            var imgUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuB5yFxF4xjyBypTk1Y_Rxm81XcrvX5oALCB-ANDmlVbArDMj2OJJX8WqN4LfIN0KtUR4_Ji2SDSFMytslHO5WHcMDD-uwUPrJ1diQB2P3E-4DqMEs8jlPuor60G4WNWX9ZRC_QQBn2gNCWaOcXz9MdKj9_KD7yG1vTH4EXKoQkvczBYMSmmbhvgrTS-Y0iItgDxm7eqhTNtTXTHDe7mux-qJm3DD4A4mztgRyTF-ak2YjCSydOojepjwLRzP1pB4VzQf8NB0MqhhuRr";
+                            if (order.Items.Any(i => i.CategoryName.Contains("Wine") || i.CategoryName.Contains("Drink"))) {
+                                imgUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuAE7tReXiySsR8HalujPiYSiNvv8sC0gPdEfR_-wewgvbT1gTVpSzN8drJBJ0J_8Bwdvj0YvaCSG3I7mQ_y2oBM7Z5q0i__U-ORIKoQDkKiRmRWHjOmSOdV_MbSzSLSSMHbgwpd2d7K6kDMmZWB42AaKlXHjGOpnP5sXYbUsDdRMiegYxJweYwh_RlyP9hJAUWlf7eNpoGzhSIOjWVPP-cQ5_ISNuMWMAskn7P2NzMHvkcq_wUARt-LGmEcD578-zsPD6NIb_dUCQAF";
                             }
+
+                            <div class="order-card p-stack-lg rounded-xl border border-outline/10 shadow-sm flex flex-col md:flex-row gap-gutter cursor-pointer" onclick="window.location.href='@Url.Action("Details", new { id = order.FoodOrderId })'">
+                                <div class="w-full md:w-32 h-32 rounded-lg overflow-hidden shrink-0 bg-surface-container">
+                                    <img src="@imgUrl" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-stack-sm">
+                                        <h3 class="font-headline-sm text-on-surface">Order #PNR-@order.FoodOrderId</h3>
+                                        <span class="status-badge @badgeClass">@statusText</span>
+                                    </div>
+                                    
+                                    <div class="space-y-1 mb-stack-md">
+                                        @foreach(var item in order.Items)
+                                        {
+                                            <p class="text-on-surface-variant font-body-md">• @item.Quantity.ToString("D2") @item.ItemName</p>
+                                        }
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between border-t border-outline/10 pt-stack-md">
+                                        <div>
+                                            <p class="text-label-sm text-on-surface-variant uppercase">Đặt lúc</p>
+                                            <p class="font-label-lg text-primary">@order.OrderedAt.ToString("HH:mm, dd/MM")</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-label-sm text-on-surface-variant uppercase">Tổng thanh toán</p>
+                                            <p class="font-headline-sm text-on-surface">@order.TotalAmount.ToString("N0") ₫</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         }
-                        @itemsSummary
                     </div>
+                </section>
+            }
 
-                    <div class="card-bottom">
-                        <div class="order-total">@order.TotalAmount.ToString("N0") VND</div>
-                        <div style="display: flex; gap: 8px;">
-                            <a asp-action="Details" asp-route-id="@order.FoodOrderId"
-                               class="rs-btn rs-btn-outline rs-btn-sm">
-                                View Details <i class="fa fa-arrow-right"></i>
-                            </a>
-                            @if (canCancel)
-                            {
-                                <button type="button" class="rs-btn rs-btn-danger rs-btn-sm"
-                                        data-cancel-order
-                                        data-cancel-action="@Url.Action("Cancel", new { id = order.FoodOrderId })">
-                                    <i class="fa fa-times"></i> Cancel
-                                </button>
-                            }
-                        </div>
+            @if (pastOrders.Any())
+            {
+                <section class="order-section @(activeOrders.Any() ? "pt-section-gap-md" : "")">
+                    <h2 class="font-headline-sm text-headline-sm mb-stack-md text-on-surface-variant">Lịch sử đơn hàng</h2>
+                    <div class="space-y-gutter opacity-80 hover:opacity-100 transition-opacity">
+                        @foreach (var order in pastOrders)
+                        {
+                            var typeStatus = order.OrderStatus == FoodOrderStatus.Cancelled ? "cancelled" : "delivered";
+                            var badgeClass = order.OrderStatus == FoodOrderStatus.Cancelled ? "bg-error-container text-on-error-container" : "bg-surface-variant text-on-surface-variant";
+                            var statusText = order.OrderStatus == FoodOrderStatus.Cancelled ? "Đã hủy" : "Đã giao";
+                            
+                            var itemsSummary = string.Join(", ", order.Items.Select(i => $"{i.Quantity.ToString("D2")} {i.ItemName}"));
+
+                            <div class="order-history-card bg-surface-container-low p-stack-lg rounded-xl border border-outline/10 flex flex-col md:flex-row gap-gutter cursor-pointer hover:shadow-md transition-shadow" data-type="@typeStatus" onclick="window.location.href='@Url.Action("Details", new { id = order.FoodOrderId })'">
+                                <div class="flex-grow">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-stack-sm">
+                                        <h3 class="font-label-lg text-on-surface">Order #PNR-@order.FoodOrderId</h3>
+                                        <span class="status-badge @badgeClass">@statusText</span>
+                                    </div>
+                                    <p class="text-on-surface-variant font-body-md mb-stack-md">@itemsSummary</p>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-label-sm text-on-surface-variant">Ngày: @order.OrderedAt.ToString("dd/MM/yyyy")</p>
+                                        <p class="font-label-lg text-on-surface">@order.TotalAmount.ToString("N0") ₫</p>
+                                    </div>
+                                </div>
+                                <div class="flex md:flex-col justify-end gap-2" onclick="event.stopPropagation()">
+                                    <a href="@Url.Action("RoomService", "FoodOrders")" class="px-4 py-2 text-primary border border-primary/20 rounded-lg font-label-lg hover:bg-primary/5 transition-colors text-center inline-block">Yêu cầu lại</a>
+                                </div>
+                            </div>
+                        }
                     </div>
+                </section>
+            }
+            
+            @if (!activeOrders.Any() && !pastOrders.Any())
+            {
+                <div class="text-center py-section-gap-md">
+                    <div class="w-24 h-24 mx-auto bg-surface-container rounded-full flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-[40px] text-on-surface-variant">receipt_long</span>
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm mb-2">Chưa có đơn hàng nào</h3>
+                    <p class="text-on-surface-variant font-body-md mb-8">Bạn chưa đặt món ăn hay dịch vụ phòng nào.</p>
+                    <a href="@Url.Action("RoomService", "FoodOrders")" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-label-lg transition-all hover:shadow-lg active:scale-95">
+                        <span class="material-symbols-outlined">restaurant</span>
+                        Xem Menu & Đặt món
+                    </a>
                 </div>
             }
 
-            @* -- Empty State for Filtered Results -- *@
-            <div class="rs-empty-state" id="rs-empty-filtered" style="display: none;">
-                <div class="empty-icon"><i class="fa fa-filter"></i></div>
-                <h3>No Orders Found</h3>
-                <p>No orders match the selected filter.</p>
+            <div id="no-filtered-results" class="hidden text-center py-section-gap-md">
+                <div class="w-24 h-24 mx-auto bg-surface-container rounded-full flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-[40px] text-on-surface-variant">filter_list_off</span>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm mb-2">Không tìm thấy đơn hàng</h3>
+                <p class="text-on-surface-variant font-body-md mb-8">Không có đơn hàng nào phù hợp với bộ lọc bạn đã chọn.</p>
             </div>
-        }
 
-    </div>
-</div>
-
-@* -- Cancel Confirmation Modal -- *@
-<div class="rs-modal-backdrop" id="rs-cancel-modal">
-    <div class="rs-modal">
-        <h3><i class="fa fa-exclamation-triangle" style="color: var(--rs-danger);"></i> Cancel Order</h3>
-        <p>Are you sure you want to cancel this order? This action cannot be undone.</p>
-        <div class="modal-actions">
-            <button type="button" class="rs-btn rs-btn-outline rs-btn-sm" data-dismiss-modal>
-                Keep Order
-            </button>
-            <form method="post" style="display:inline;">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="rs-btn rs-btn-danger rs-btn-sm">
-                    <i class="fa fa-times"></i> Yes, Cancel
-                </button>
-            </form>
         </div>
     </div>
-</div>
-
-@section Styles {
-    <link rel="stylesheet" href="~/css/room-service.css" />
-}
+</main>
 
 @section Scripts {
-    <script src="~/js/room-service.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('#order-filters input[type="checkbox"]');
+            
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', applyFilters);
+            });
+
+            function applyFilters() {
+                const showActive = document.querySelector('input[value="active"]').checked;
+                const showDelivered = document.querySelector('input[value="delivered"]').checked;
+                const showCancelled = document.querySelector('input[value="cancelled"]').checked;
+
+                const activeSection = document.querySelector('.order-section[data-type="active"]');
+                if (activeSection) {
+                    activeSection.style.display = showActive ? 'block' : 'none';
+                }
+
+                let historyVisibleCount = 0;
+                document.querySelectorAll('.order-history-card').forEach(card => {
+                    const type = card.dataset.type;
+                    if ((type === 'delivered' && showDelivered) || (type === 'cancelled' && showCancelled)) {
+                        card.style.display = 'flex';
+                        historyVisibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                const historySection = document.querySelector('.order-section:not([data-type="active"])');
+                if (historySection) {
+                    historySection.style.display = historyVisibleCount > 0 ? 'block' : 'none';
+                }
+                
+                const emptyState = document.getElementById('no-filtered-results');
+                if ((!activeSection || !showActive) && historyVisibleCount === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                }
+            }
+        });
+    </script>
 }
