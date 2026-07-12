@@ -153,7 +153,24 @@ namespace PhucNguyenResort.Services.Dashboard
                 {
                     var errBody = await response.Content.ReadAsStringAsync();
                     _logger.LogError("Gemini API Error for Forecast: Status {Status}, Body: {Body}", response.StatusCode, errBody);
-                    return null;
+                    
+                    if (response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable && model != "gemini-1.5-flash")
+                    {
+                        _logger.LogInformation("Đang thử lại với model gemini-1.5-flash do {Model} đang quá tải...", model);
+                        var fallbackApiUrl = string.Format(rawUrl, "gemini-1.5-flash", apiKey);
+                        response = await _httpClient.PostAsync(fallbackApiUrl, httpContent);
+                        
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            var fallbackErrBody = await response.Content.ReadAsStringAsync();
+                            _logger.LogError("Gemini API Fallback Error: Status {Status}, Body: {Body}", response.StatusCode, fallbackErrBody);
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
 
                 var responseBody = await response.Content.ReadAsStringAsync();
