@@ -2642,6 +2642,42 @@ namespace PhucNguyenResort.Web.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PhucNguyenResort.Models.MaintenanceRequest", b =>
+                {
+                    b.Property<int>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
+
+                    b.Property<string>("AssignedStaffName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RequestId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("MaintenanceRequests");
+                });
+
             modelBuilder.Entity("PhucNguyenResort.Models.MenuCategory", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -4045,6 +4081,10 @@ namespace PhucNguyenResort.Web.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomId"));
+
+                    b.Property<string>("AssignedStaffName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -6449,6 +6489,17 @@ namespace PhucNguyenResort.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("FoodOrder");
+                });
+
+            modelBuilder.Entity("PhucNguyenResort.Models.MaintenanceRequest", b =>
+                {
+                    b.HasOne("PhucNguyenResort.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("PhucNguyenResort.Models.MenuItem", b =>
