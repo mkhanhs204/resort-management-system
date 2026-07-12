@@ -237,9 +237,40 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 3. Receptionist (Front Desk) Dashboard
         [Authorize(Roles = "Receptionist")]
-        public IActionResult Receptionist()
+        public async Task<IActionResult> Receptionist()
         {
-            return View();
+            var today = DateTime.Today;
+
+            var todaysArrivals = await _context.Bookings
+                .CountAsync(b => b.CheckInDate.Date == today && (b.BookingStatus == BookingStatus.Reserved || b.BookingStatus == BookingStatus.Arrived || b.BookingStatus == BookingStatus.PendingPayment));
+
+            var activeStayGuests = await _context.Bookings
+                .CountAsync(b => b.BookingStatus == BookingStatus.CheckedIn);
+
+            var todaysDepartures = await _context.Bookings
+                .CountAsync(b => b.CheckOutDate.Date == today && b.BookingStatus == BookingStatus.CheckedIn);
+
+            var availableRooms = await _context.Rooms
+                .CountAsync(r => r.Status == RoomStatus.Available);
+
+            var recentBookings = await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(bd => bd.Room)
+                .OrderByDescending(b => b.BookingDate)
+                .Take(10)
+                .ToListAsync();
+
+            var model = new PhucNguyenResort.ViewModels.Dashboard.ReceptionistDashboardViewModel
+            {
+                TodaysArrivals = todaysArrivals,
+                ActiveStayGuests = activeStayGuests,
+                TodaysDepartures = todaysDepartures,
+                AvailableRooms = availableRooms,
+                RecentBookings = recentBookings
+            };
+
+            return View(model);
         }
 
         // 4. F&B Staff Dashboard
