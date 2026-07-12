@@ -100,6 +100,56 @@ public class ReviewController : Controller
         }
     }
 
+    [Authorize(Roles = "Customer")]
+    [HttpGet]
+    public async Task<IActionResult> Edit(int? bookingId, int? tourBookingId)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+
+        if (bookingId == null && tourBookingId == null)
+        {
+            TempData["ErrorMessage"] = "Không tìm thấy đánh giá.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        var review = await _reviewService.GetReviewForEditAsync(userId, bookingId, tourBookingId);
+        if (review == null)
+        {
+            TempData["ErrorMessage"] = "Không tìm thấy đánh giá của bạn.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        return View(review);
+    }
+
+    [Authorize(Roles = "Customer")]
+    [HttpPost]
+    public async Task<IActionResult> Edit(SubmitReviewVM model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        try
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _reviewService.UpdateReviewAsync(userId, model);
+
+            TempData["SuccessMessage"] = "Đã cập nhật đánh giá của bạn!";
+            return RedirectToAction(nameof(PublicList));
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+            return View(model);
+        }
+    }
+
     [Authorize(Roles = "Business Manager")]
     [HttpGet]
     public async Task<IActionResult> Manage(int? rating = null, string? serviceType = null)
@@ -136,5 +186,19 @@ public class ReviewController : Controller
         }
 
         return RedirectToAction(nameof(Manage));
+    }
+
+    [Authorize(Roles = "Business Manager")]
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var review = await _reviewService.GetReviewByIdAsync(id);
+        if (review == null)
+        {
+            TempData["ErrorMessage"] = "Không tìm thấy đánh giá.";
+            return RedirectToAction(nameof(Manage));
+        }
+
+        return View(review);
     }
 }

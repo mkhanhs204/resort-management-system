@@ -397,9 +397,9 @@ namespace PhucNguyenResort.Services.Tours
                 .OrderByDescending(tb => tb.TourBookingId)
                 .ToListAsync();
 
-            var userReviewedTourBookingIds = await _context.Reviews
+            var userReviews = await _context.Reviews
                 .Where(r => r.UserId == userId && r.TourBookingId != null)
-                .Select(r => r.TourBookingId!.Value)
+                .Select(r => new { r.TourBookingId, r.HasBeenEdited })
                 .ToListAsync();
 
             return bookings.Select(tb =>
@@ -437,7 +437,8 @@ namespace PhucNguyenResort.Services.Tours
                     PaymentMethod = paymentMethod,
                     CreatedAt = tb.CreatedAt,
                     CancellationReason = tb.CancellationReason,
-                    HasReviewed = userReviewedTourBookingIds.Contains(tb.TourBookingId)
+                    HasReviewed = userReviews.Any(r => r.TourBookingId == tb.TourBookingId),
+                    HasBeenEdited = userReviews.Any(r => r.TourBookingId == tb.TourBookingId && r.HasBeenEdited)
                 };
             }).ToList();
         }
