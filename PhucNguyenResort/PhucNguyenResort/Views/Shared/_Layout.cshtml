@@ -7,8 +7,8 @@
                      (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("AboutUs", StringComparison.OrdinalIgnoreCase)) ||
                      (currentController.Equals("CustomerTourBooking", StringComparison.OrdinalIgnoreCase) && (currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) || currentAction.Equals("Details", StringComparison.OrdinalIgnoreCase))) ||
                      (currentController.Equals("Review", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("PublicList", StringComparison.OrdinalIgnoreCase)) ||
-                     currentController.Equals("FoodOrders", StringComparison.OrdinalIgnoreCase) ||
-                     currentController.Equals("TableReservations", StringComparison.OrdinalIgnoreCase);
+                     (currentController.Equals("FoodOrders", StringComparison.OrdinalIgnoreCase) && !currentAction.Equals("MyOrders", StringComparison.OrdinalIgnoreCase)) ||
+                     (currentController.Equals("TableReservations", StringComparison.OrdinalIgnoreCase) && !currentAction.Equals("MyReservations", StringComparison.OrdinalIgnoreCase));
 
     string IsActive(string controller, string action = "")
     {
