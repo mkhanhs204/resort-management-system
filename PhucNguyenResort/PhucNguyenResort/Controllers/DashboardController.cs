@@ -41,7 +41,7 @@ namespace PhucNguyenResort.Web.Controllers
             PhucNguyenResort.Services.Kots.IKotService kotService,
             PhucNguyenResort.Data.ResortDbContext context,
             ITableReservationService tableReservationService,
-            NotificationService notificationService,
+            INotificationService notificationService,
             IDashboardReportService reportService,
             IForecastService forecastService)
         {
