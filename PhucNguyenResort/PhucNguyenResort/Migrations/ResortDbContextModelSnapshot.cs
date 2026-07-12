@@ -4101,6 +4101,10 @@ namespace PhucNguyenResort.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomId"));
 
+                    b.Property<string>("AssignedStaffName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 

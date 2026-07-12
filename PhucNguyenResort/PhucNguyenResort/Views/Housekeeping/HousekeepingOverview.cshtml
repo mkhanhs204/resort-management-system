@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Housekeeping Overview";
+    Layout = "_DashboardLayout";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-paint-brush mr-2" style="color: #6c757d;"></i> Housekeeping — Overview Dashboard
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Tổng quan hiệu suất công việc và thông báo vận hành trong ngày.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545;">
+            <h4 style="color: #dc3545;"><i class="fa fa-exclamation-triangle"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@ViewData["RoomsNeedCleaningCount"]</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Rooms Need Cleaning</p>
+            <small class="text-muted">Dirty / Post-checkout</small>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #ffc107;">
+            <h4 style="color: #ffc107;"><i class="fa fa-refresh fa-spin"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@ViewData["CurrentlyCleaningCount"]</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Currently Cleaning</p>
+            <small class="text-muted">In progress</small>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745;">
+            <h4 style="color: #28a745;"><i class="fa fa-check-circle"></i></h4>
+            <h3 class="mt-2" style="font-family: 'Lora', serif; font-weight: bold;">@ViewData["CleanedTodayCount"]</h3>
+            <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Cleaned Today</p>
+            <small class="text-muted">Ready for guests</small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-7 mb-4">
+        <div class="card-box h-100" style="border-left: 5px solid #007bff; padding: 20px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); border-radius: 4px;">
+            <h5 class="mb-3 font-weight-bold" style="font-family: 'Lora', serif;">
+                <i class="fa fa-bullhorn text-primary mr-2"></i> Lưu ý vận hành hôm nay
+            </h5>
+            <div class="list-group list-group-flush" style="font-family: 'Cabin', sans-serif;">
+                <div class="list-group-item px-0 py-3" style="border-bottom: 1px solid #eee;">
+                    <span class="badge badge-warning mb-2" style="padding: 5px 10px;">Lễ tân thông báo</span>
+                    <p class="mb-1 font-weight-bold text-dark" style="font-size: 15px;">Hôm nay có đoàn khách VIP 15 phòng check-out sớm lúc 10:00 AM.</p>
+                    <small class="text-muted">Yêu cầu tổ buồng phòng tập trung dọn gấp tầng 3 và tầng 4 ngay khi khách trả phòng để kịp chuẩn bị set-up đón đoàn tiếp theo.</small>
+                </div>
+                <div class="list-group-item px-0 py-3" style="border-bottom: none;">
+                    <span class="badge badge-danger mb-2" style="padding: 5px 10px;">Khẩn cấp</span>
+                    <p class="mb-1 font-weight-bold text-dark" style="font-size: 15px;">Kiểm tra kỹ hệ thống mini-bar tại các phòng Khu biệt thự Villa.</p>
+                    <small class="text-muted">Ghi nhận chính xác số lượng nước ngọt/rượu sử dụng để bàn giao dữ liệu cho bộ phận thu ngân tính tiền folio khi khách check-out.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mb-4">
+        <div class="card-box h-100 text-center d-flex flex-column justify-content-center" style="background: #fdfefe; border: 1px dashed #dfa974; padding: 30px; border-radius: 4px;">
+            <i class="fa fa-paint-brush fa-3x mb-3" style="color: #dfa974;"></i>
+            <h5 class="font-weight-bold mb-2" style="font-family: 'Lora', serif; color: #333;">Sẵn sàng làm việc?</h5>
+            <p class="text-muted mb-4" style="font-family: 'Cabin', sans-serif; font-size: 14px;">Hãy chuyển sang mục Hàng chờ dọn dẹp để xem danh sách phòng bẩn chi tiết và thực hiện cập nhật dọn dẹp hoặc báo hỏng.</p>
+            <div>
+                <a asp-controller="Housekeeping" asp-action="Details" class="btn btn-warning btn-lg shadow-sm font-weight-bold" style="font-family: 'Cabin', sans-serif; border-radius: 30px; padding: 12px 35px; background-color: #dfa974; border-color: #dfa974; color: #fff;">
+                    Vào hàng chờ dọn phòng <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
