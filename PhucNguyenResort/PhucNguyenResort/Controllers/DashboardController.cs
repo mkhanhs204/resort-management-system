@@ -115,8 +115,19 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 1. System Admin Dashboard
         [Authorize(Roles = "System Admin")]
-        public IActionResult Admin()
+        public async Task<IActionResult> Admin()
         {
+            ViewBag.TotalStaff = await _context.Users.CountAsync();
+            ViewBag.ActiveAccounts = await _context.Users.CountAsync(u => u.IsActive);
+            ViewBag.SystemRoles = await _context.Roles.CountAsync();
+            ViewBag.InactiveAccounts = await _context.Users.CountAsync(u => !u.IsActive || u.IsBlocked);
+            
+            ViewBag.RecentStaff = await _context.Users
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.UserId)
+                .Take(10)
+                .ToListAsync();
+
             return View();
         }
 
@@ -237,16 +248,49 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 3. Receptionist (Front Desk) Dashboard
         [Authorize(Roles = "Receptionist")]
-        public IActionResult Receptionist()
+        public async Task<IActionResult> Receptionist()
         {
-            return View();
+            var today = DateTime.Today;
+
+            var todaysArrivals = await _context.Bookings
+                .CountAsync(b => b.CheckInDate.Date == today && (b.BookingStatus == BookingStatus.Reserved || b.BookingStatus == BookingStatus.Arrived || b.BookingStatus == BookingStatus.PendingPayment));
+
+            var activeStayGuests = await _context.Bookings
+                .CountAsync(b => b.BookingStatus == BookingStatus.CheckedIn);
+
+            var todaysDepartures = await _context.Bookings
+                .CountAsync(b => b.CheckOutDate.Date == today && b.BookingStatus == BookingStatus.CheckedIn);
+
+            var availableRooms = await _context.Rooms
+                .CountAsync(r => r.Status == RoomStatus.Available);
+
+            var recentBookings = await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(bd => bd.Room)
+                .OrderByDescending(b => b.CreatedAt)
+                .Take(10)
+                .ToListAsync();
+
+            var model = new PhucNguyenResort.ViewModels.Dashboard.ReceptionistDashboardViewModel
+            {
+                TodaysArrivals = todaysArrivals,
+                ActiveStayGuests = activeStayGuests,
+                TodaysDepartures = todaysDepartures,
+                AvailableRooms = availableRooms,
+                RecentBookings = recentBookings
+            };
+
+            return View(model);
         }
 
         // 4. F&B Staff Dashboard
         [Authorize(Roles = "F&B Staff")]
-        public IActionResult FnB()
+        public async Task<IActionResult> FnB()
         {
-            return View();
+            var date = DateTime.Today;
+            var model = await _tableReservationService.GetFnBDashboardAsync(date);
+            return View(model);
         }
 
         [Authorize(Roles = "F&B Staff")]
