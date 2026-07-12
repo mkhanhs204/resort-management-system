@@ -23,13 +23,15 @@ namespace PhucNguyenResort.Tests.Controllers
             var mockFoodOrderService = new Mock<PhucNguyenResort.Services.FoodOrders.IFoodOrderService>();
             var mockKotService = new Mock<PhucNguyenResort.Services.Kots.IKotService>();
             var mockTableReservationService = new Mock<PhucNguyenResort.Services.TableReservations.ITableReservationService>();
+            var mockForecastService = new Mock<PhucNguyenResort.Services.Dashboard.IForecastService>();
             
             _controller = new DashboardController(
                 mockFoodOrderService.Object,
                 mockKotService.Object,
                 null!, // ResortDbContext
                 mockTableReservationService.Object,
-                _mockReportService.Object);
+                _mockReportService.Object,
+                mockForecastService.Object);
         }
 
         [Fact]

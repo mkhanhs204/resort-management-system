@@ -34,6 +34,7 @@ namespace PhucNguyenResort.Web.Controllers
         private readonly INotificationService _notificationService;
 
         private readonly IDashboardReportService _reportService;
+        private readonly IForecastService _forecastService;
 
         public DashboardController(
             PhucNguyenResort.Services.FoodOrders.IFoodOrderService foodOrderService,
@@ -41,7 +42,8 @@ namespace PhucNguyenResort.Web.Controllers
             PhucNguyenResort.Data.ResortDbContext context,
             ITableReservationService tableReservationService,
             INotificationService notificationService,
-            IDashboardReportService reportService)
+            IDashboardReportService reportService,
+            IForecastService forecastService)
         {
             _foodOrderService = foodOrderService;
             _kotService = kotService;
@@ -49,6 +51,7 @@ namespace PhucNguyenResort.Web.Controllers
             _tableReservationService = tableReservationService;
             _notificationService = notificationService;
             _reportService = reportService;
+            _forecastService = forecastService;
         }
 
         // Trang chính: Tự động chuyển hướng đến dashboard phù hợp với role của người dùng
@@ -153,6 +156,13 @@ namespace PhucNguyenResort.Web.Controllers
                 var report = await _reportService.GetFinancialReportAsync(m, y);
                 return View(report);
             }
+        }
+
+        [Authorize(Roles = "Business Manager")]
+        public async Task<IActionResult> Forecast()
+        {
+            var forecast = await _forecastService.GetForecastAsync();
+            return View(forecast);
         }
 
         [Authorize(Roles = "Business Manager")]
