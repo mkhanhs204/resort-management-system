@@ -453,9 +453,11 @@ public class FoodOrderService : IFoodOrderService
         };
     }
 
-    public async Task<List<FoodOrderDetailViewModel>> GetAllFoodOrdersAsync()
+    public async Task<List<FoodOrderDetailViewModel>> GetAllFoodOrdersAsync(
+        FoodOrderType? orderType = null,
+        FoodOrderStatus? status = null)
     {
-        var foodOrders = await _context.FoodOrders
+        var query = _context.FoodOrders
             .AsNoTracking()
             .Include(order => order.Booking)
                 .ThenInclude(booking => booking!.User)
@@ -467,6 +469,19 @@ public class FoodOrderService : IFoodOrderService
             .Include(order => order.FoodOrderItems)
                 .ThenInclude(orderItem => orderItem.MenuItem)
                     .ThenInclude(menuItem => menuItem!.Category)
+            .AsQueryable();
+
+        if (orderType.HasValue)
+        {
+            query = query.Where(order => order.OrderType == orderType.Value);
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(order => order.OrderStatus == status.Value);
+        }
+
+        var foodOrders = await query
             .OrderByDescending(order => order.OrderedAt)
             .ToListAsync();
 

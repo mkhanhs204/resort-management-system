@@ -11,7 +11,9 @@ public interface IFoodOrderService
     Task<FoodOrderCreateResult> CreateFoodOrderAsync(FoodOrderCreateRequest request, int currentUserId);
     Task<FoodOrderDetailViewModel?> GetFoodOrderDetailAsync(int foodOrderId);
     Task<FoodOrderDetailViewModel?> GetFoodOrderDetailAsync(int foodOrderId, int currentUserId);
-    Task<List<FoodOrderDetailViewModel>> GetAllFoodOrdersAsync();
+    Task<List<FoodOrderDetailViewModel>> GetAllFoodOrdersAsync(
+        Enums.FoodOrderType? orderType = null,
+        Enums.FoodOrderStatus? status = null);
     Task<List<FoodOrderDetailViewModel>> GetFoodOrdersForCustomerAsync(int currentUserId);
     Task<FoodOrderActionResult> CancelFoodOrderByCustomerAsync(int foodOrderId, int currentUserId);
 
