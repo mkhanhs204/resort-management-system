@@ -81,8 +81,8 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")">
                             <a href="#"><i class="fa fa-cogs"></i> Cài Đặt Hệ Thống</a>
                         </li>
-                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Backup" ? "active" : "")">
-                            <a href="#"><i class="fa fa-database"></i> Sao Lưu & Phục Hồi</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "DatabaseBackups" ? "active" : "")">
+                            <a asp-controller="DatabaseBackups" asp-action="Index"><i class="fa fa-database"></i> Sao Lưu & Phục Hồi</a>
                         </li>
                     }
                     @if (User.IsInRole("Business Manager"))

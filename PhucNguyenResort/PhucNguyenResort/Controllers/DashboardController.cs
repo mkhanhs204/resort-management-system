@@ -294,21 +294,27 @@ namespace PhucNguyenResort.Web.Controllers
         }
 
         [Authorize(Roles = "F&B Staff")]
-        public async Task<IActionResult> FoodOrders()
+        public async Task<IActionResult> FoodOrders(FoodOrderType? orderType, FoodOrderStatus? status)
         {
-            var orders = await _foodOrderService.GetAllFoodOrdersAsync();
+            var orders = await _foodOrderService.GetAllFoodOrdersAsync(orderType, status);
+            ViewBag.SelectedOrderType = orderType;
+            ViewBag.SelectedFoodOrderStatus = status;
             return View("~/Views/FoodOrders/FoodOrders.cshtml", orders);
         }
 
         [HttpPost]
         [Authorize(Roles = "F&B Staff")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateFoodOrderStatus(int foodOrderId, PhucNguyenResort.Enums.FoodOrderStatus newStatus)
+        public async Task<IActionResult> UpdateFoodOrderStatus(
+            int foodOrderId,
+            PhucNguyenResort.Enums.FoodOrderStatus newStatus,
+            FoodOrderType? orderType,
+            FoodOrderStatus? status)
         {
             var result = await _foodOrderService.UpdateOrderStatusAsync(foodOrderId, newStatus);
             if (result.Status == PhucNguyenResort.Services.FoodOrders.FoodOrderActionStatus.Success) TempData["SuccessMessage"] = "Food order status updated successfully.";
             else TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to update food order status.";
-            return RedirectToAction(nameof(FoodOrders));
+            return RedirectToAction(nameof(FoodOrders), new { orderType, status });
         }
 
         [Authorize(Roles = "F&B Staff,Business Manager")]
@@ -425,7 +431,10 @@ namespace PhucNguyenResort.Web.Controllers
 
         [HttpPost]
         [Authorize(Roles = "F&B Staff")]
-        public async Task<IActionResult> ChargeFoodOrderToRoom(int foodOrderId)
+        public async Task<IActionResult> ChargeFoodOrderToRoom(
+            int foodOrderId,
+            FoodOrderType? orderType,
+            FoodOrderStatus? status)
         {
             var result = await _foodOrderService.ChargeToRoomAsync(foodOrderId);
 
@@ -438,7 +447,7 @@ namespace PhucNguyenResort.Web.Controllers
                 TempData["ErrorMessage"] = result.ErrorMessage ?? "Failed to charge the food order.";
             }
 
-            return RedirectToAction(nameof(FoodOrders));
+            return RedirectToAction(nameof(FoodOrders), new { orderType, status });
         }
 
         // 5. Kitchen Staff Dashboard
