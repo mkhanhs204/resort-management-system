@@ -65,6 +65,15 @@ namespace PhucNguyenResort.Controllers
                 }
             }
 
+            if (schedule.GuideId.HasValue && schedule.TourDate.HasValue)
+            {
+                bool hasSchedule = await _scheduleService.HasScheduleOnDateAsync(schedule.GuideId.Value, schedule.TourDate.Value);
+                if (hasSchedule)
+                {
+                    ModelState.AddModelError("GuideId", "Hướng dẫn viên này đã có lịch trình vào ngày này. Mỗi hướng dẫn viên chỉ được nhận 1 tour/ngày.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 await _scheduleService.AddScheduleAsync(schedule);
@@ -107,6 +116,15 @@ namespace PhucNguyenResort.Controllers
                 if (tour != null && schedule.AvailableSlots > tour.MaxCapacity)
                 {
                     ModelState.AddModelError("AvailableSlots", $"Số chỗ trống không được vượt quá số lượng tối đa của tour ({tour.MaxCapacity} chỗ).");
+                }
+            }
+
+            if (schedule.GuideId.HasValue && schedule.TourDate.HasValue)
+            {
+                bool hasSchedule = await _scheduleService.HasScheduleOnDateAsync(schedule.GuideId.Value, schedule.TourDate.Value, schedule.ScheduleId);
+                if (hasSchedule)
+                {
+                    ModelState.AddModelError("GuideId", "Hướng dẫn viên này đã có lịch trình vào ngày này. Mỗi hướng dẫn viên chỉ được nhận 1 tour/ngày.");
                 }
             }
 
