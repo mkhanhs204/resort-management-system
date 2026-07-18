@@ -4,7 +4,7 @@
       "content": {
         "parts": [
           {
-            "text": "```json\n{\n  \"predictedTotalRevenue\": 15173049,\n  \"predictedRoomRevenue\": 7260975,\n  \"predictedFnBRevenue\": 6110603,\n  \"predictedTourRevenue\": 1801471,\n  \"predictedOccupancyRate\": 0.5423,\n  \"analysis\": \"Dữ liệu cho thấy doanh thu khách sạn bắt đầu tăng trưởng mạnh mẽ từ tháng 6 đến tháng 7 năm 2026, với doanh thu phòng và F&B là động lực chính. Doanh thu tour cũng có xu hướng tăng nhẹ. Mặc dù tỷ lệ lấp đầy tháng 7 có vẻ không nhất quán với tăng trưởng doanh thu, dự báo tháng 8/2026 tiếp tục xu hướng tăng trưởng doanh thu và tỷ lệ lấp đầy, phản ánh hiệu suất gần đây.\"\n}\n```"
+            "text": "```json\n{\n  \"predictedTotalRevenue\": 13999000,\n  \"predictedRoomRevenue\": 6420000,\n  \"predictedFnBRevenue\": 5754000,\n  \"predictedTourRevenue\": 1825000,\n  \"predictedOccupancyRate\": 0.8,\n  \"analysis\": \"Khách sạn cho thấy sự tăng trưởng doanh thu mạnh mẽ từ tháng 6 đến tháng 7 năm 2026, đặc biệt ở doanh thu phòng và F&B. Xu hướng tích cực này dự kiến sẽ tiếp tục trong tháng 8, một tháng cao điểm du lịch. Mặc dù tỷ lệ lấp đầy có sự biến động bất thường, doanh thu tổng thể vẫn cho thấy đà phát triển tốt.\"\n}\n```"
           }
         ],
         "role": "model"
@@ -15,17 +15,17 @@
   ],
   "usageMetadata": {
     "promptTokenCount": 593,
-    "candidatesTokenCount": 204,
-    "totalTokenCount": 5963,
+    "candidatesTokenCount": 181,
+    "totalTokenCount": 4586,
     "promptTokensDetails": [
       {
         "modality": "TEXT",
         "tokenCount": 593
       }
     ],
-    "thoughtsTokenCount": 5166,
+    "thoughtsTokenCount": 3812,
     "serviceTier": "standard"
   },
   "modelVersion": "gemini-2.5-flash",
-  "responseId": "L01TavqQLJru2roPtY-VwQg"
+  "responseId": "j2lTaqzaCIigvr0Pkc_XiQM"
 }
