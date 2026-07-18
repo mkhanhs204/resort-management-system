@@ -1,0 +1,117 @@
+﻿@model List<PhucNguyenResort.Web.Models.ViewModels.CleaningHistoryViewModel>
+@{
+    ViewData["Title"] = "Nhật Ký Dọn Phòng";
+    Layout = "_DashboardLayout";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-history mr-2" style="color: #6c757d;"></i> Nhật Ký Dọn Phòng
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Tra cứu, lọc dữ liệu công tác vệ sinh và bàn giao phòng sạch của resort.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4" style="font-family: 'Cabin', sans-serif;">
+    <div class="col-md-12 mb-2 mb-md-0">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-light text-muted"><i class="fa fa-search"></i></span>
+            </div>
+            <input type="text" id="searchHistoryInput" class="form-control" placeholder="Nhập số phòng hoặc tên nhân viên cần tìm... (Ví dụ: 101, An)">
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-box" style="border-left: 5px solid #28a745; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #333;">
+                    <i class="fa fa-file-text-o mr-2" style="color: #6c757d;"></i> Lịch sử công tác hoàn thành
+                </h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Mã đơn</th>
+                            <th>Số phòng</th>
+                            <th>Hạng phòng</th>
+                            <th>Nhân viên thực hiện</th>
+                            <th>Thời gian hoàn thành</th>
+                            <th>Thời lượng dọn</th>
+                            <th>Ghi chú chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr class="history-room-row" data-room="@item.RoomNumber" data-staff="@item.AssignedStaffName">
+                                    <td class="align-middle text-secondary font-weight-bold">#CP-@item.LogId</td>
+                                    <td class="align-middle font-weight-bold" style="color: #1a1a1a;">@item.RoomNumber</td>
+                                    <td class="align-middle">@item.RoomType</td>
+                                    <td class="align-middle">
+                                        <i class="fa fa-user-circle-o text-success mr-1"></i> @(string.IsNullOrEmpty(item.AssignedStaffName) ? "Ẩn danh" : item.AssignedStaffName)
+                                    </td>
+                                    <td class="align-middle text-muted">
+                                        <i class="fa fa-clock-o mr-1"></i> @item.CompletedAt.ToString("g")
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge badge-light border text-dark px-2 py-1">
+                                            <i class="fa fa-hourglass-half text-warning mr-1"></i> @item.Duration
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-dark">
+                                        <span class="badge badge-success px-2 py-1"><i class="fa fa-check"></i> Sạch sẽ</span>
+                                        <span class="ml-2 text-muted">@(string.IsNullOrEmpty(item.Notes) ? "Không có ghi chú" : item.Notes)</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-5">
+                                    <h5 class="mb-2" style="font-family: 'Lora', serif;"><i class="fa fa-folder-open-o fa-2x text-muted d-block mb-3"></i>Không tìm thấy dữ liệu nhật ký dọn phòng nào trong hệ thống.</h5>
+                                    <p class="mb-0">Dữ liệu sẽ xuất hiện sau khi nhân viên phòng hoàn thành thao tác dọn dẹp tại trang "Housekeeping Queue".</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#searchHistoryInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase().trim();
+
+                $(".history-room-row").each(function () {
+                    var room = $(this).data("room").toString().toLowerCase();
+                    var staff = $(this).data("staff").toString().toLowerCase();
+
+                    if (room.indexOf(value) > -1 || staff.indexOf(value) > -1) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

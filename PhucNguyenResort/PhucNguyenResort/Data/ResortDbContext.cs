@@ -38,9 +38,8 @@ public class ResortDbContext : DbContext
     public DbSet<Refund> Refunds => Set<Refund>();
     public DbSet<Notification> Notifications => Set<Notification>();
 
-    // ĐÃ ĐỒNG BỘ CÚ PHÁP CHUẨN VỚI CÁC BẢNG TRÊN
     public DbSet<MaintenanceRequest> MaintenanceRequests => Set<MaintenanceRequest>();
-
+    public DbSet<RoomCleaningLog> RoomCleaningLogs => Set<RoomCleaningLog>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

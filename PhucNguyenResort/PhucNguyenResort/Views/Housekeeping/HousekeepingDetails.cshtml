@@ -3,7 +3,8 @@
 @{
     ViewData["Title"] = "Housekeeping Queue";
     Layout = "_DashboardLayout";
-    var cleanedRoomsToday = ViewBag.CleanedRoomsToday as List<PhucNguyenResort.ViewModels.Housekeeping.DirtyRoomViewModel> ?? new List<PhucNguyenResort.ViewModels.Housekeeping.DirtyRoomViewModel>();
+    
+    string currentStaff = User.Identity?.Name ?? "Unknown Staff";
 }
 
 @if (ViewBag.LocalSuccessMessage != null)
@@ -53,7 +54,7 @@
     <div class="col-md-3 mb-2 mb-md-0">
         <select id="filterFloorSelect" class="form-control">
             <option value="">-- Tất cả các tầng --</option>
-            @foreach (var floor in Model.Select(m => m.FloorNumber).Union(cleanedRoomsToday.Select(c => c.FloorNumber)).Distinct().OrderBy(f => f))
+            @foreach (var floor in Model.Select(m => m.FloorNumber).Distinct().OrderBy(f => f))
             {
                 <option value="Tầng @floor">Tầng @floor</option>
             }
@@ -89,7 +90,7 @@
     </div>
 </div>
 
-<div class="row mb-5">
+<div class="row mb-4">
     <div class="col-lg-12">
         <div class="card-box" style="border-left: 5px solid #6c757d; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -116,6 +117,9 @@
                         {
                             foreach (var room in Model)
                             {
+                                bool isAssigned = !string.IsNullOrEmpty(room.AssignedStaffName);
+                                bool isMyJob = isAssigned && room.AssignedStaffName == currentStaff;
+
                                 <tr class="dirty-room-row" data-room-number="@room.RoomNumber" data-floor="Tầng @room.FloorNumber" data-status="@(room.Status == RoomStatus.CleaningInProgress ? "In Progress" : "Needs Cleaning")">
                                     <td class="align-middle font-weight-bold" style="font-size: 15px; color: #1a1a1a;">Room @room.RoomNumber</td>
                                     <td class="align-middle">@room.RoomType</td>
@@ -126,33 +130,25 @@
                                             <small class="text-muted"><i class="fa fa-sign-out mr-1"></i>Checkout: @room.LastCheckedOutTime.Value.ToString("g")</small>
                                         }
                                     </td>
+                                    
                                     <td class="align-middle">
                                         @if (room.Status == RoomStatus.CleaningInProgress)
                                         {
                                             <span class="badge badge-warning p-2 text-dark" style="font-size: 12px; background-color: #ffc107;">
-                                                <i class="fa fa-refresh fa-spin mr-1"></i> Cleaning In Progress
+                                                <i class="fa fa-refresh fa-spin mr-1"></i> Đang dọn (@(room.AssignedStaffName ?? "Ẩn danh"))
                                             </span>
                                         }
                                         else
                                         {
                                             <span class="badge badge-danger p-2" style="font-size: 12px;">
-                                                <i class="fa fa-clock-o mr-1"></i> Needs Cleaning
+                                                <i class="fa fa-clock-o mr-1"></i> Chờ tiếp nhận
                                             </span>
                                         }
                                     </td>
+                                    
                                     <td class="align-middle text-center">
                                         <div class="d-flex justify-content-center align-items-center">
-                                            @if (room.Status == RoomStatus.CleaningInProgress)
-                                            {
-                                                <form asp-controller="Housekeeping" asp-action="MarkCleaned" method="post" class="mr-2 mb-0">
-                                                    @Html.AntiForgeryToken()
-                                                    <input type="hidden" name="roomId" value="@room.RoomId" />
-                                                    <button type="submit" class="btn btn-sm btn-success font-weight-bold shadow-sm" style="padding: 6px 14px; min-width: 125px;">
-                                                        <i class="fa fa-check mr-1"></i> Mark Cleaned
-                                                    </button>
-                                                </form>
-                                            }
-                                            else
+                                            @if (!isAssigned)
                                             {
                                                 <form asp-controller="Housekeeping" asp-action="StartCleaning" method="post" class="mr-2 mb-0">
                                                     @Html.AntiForgeryToken()
@@ -161,46 +157,70 @@
                                                         <i class="fa fa-play mr-1"></i> Start Cleaning
                                                     </button>
                                                 </form>
-                                            }
 
-                                            <button type="button" class="btn btn-sm btn-outline-danger" style="padding: 6px 14px;"
-                                                    data-toggle="modal" data-target="#maintenanceModal-@room.RoomId">
-                                                <i class="fa fa-wrench mr-1"></i> Report Issue
-                                            </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" style="padding: 6px 14px;"
+                                                        data-toggle="modal" data-target="#maintenanceModal-@room.RoomId">
+                                                    <i class="fa fa-wrench mr-1"></i> Report Issue
+                                                </button>
+                                            }
+                                            else if (isMyJob)
+                                            {
+                                                <form asp-controller="Housekeeping" asp-action="MarkCleaned" method="post" class="mr-2 mb-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="roomId" value="@room.RoomId" />
+                                                    <button type="submit" class="btn btn-sm btn-success font-weight-bold shadow-sm" style="padding: 6px 14px; min-width: 125px;">
+                                                        <i class="fa fa-check mr-1"></i> Mark Cleaned
+                                                    </button>
+                                                </form>
+
+                                                <button type="button" class="btn btn-sm btn-outline-danger" style="padding: 6px 14px;"
+                                                        data-toggle="modal" data-target="#maintenanceModal-@room.RoomId">
+                                                    <i class="fa fa-wrench mr-1"></i> Report Issue
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-light font-weight-bold text-muted w-100" disabled style="background-color: #f8f9fa; border: 1px solid #e3e6f0; max-width: 270px; padding: 6px 14px;">
+                                                    <i class="fa fa-lock mr-1"></i> Đang dọn bởi @room.AssignedStaffName
+                                                </button>
+                                            }
                                         </div>
                                     </td>
                                 </tr>
 
-                                <div class="modal fade" id="maintenanceModal-@room.RoomId" tabindex="-1" role="dialog" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content" style="font-family: 'Cabin', sans-serif;">
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title font-weight-bold" style="font-family: 'Lora', serif;">
-                                                    <i class="fa fa-wrench mr-2"></i> Report Issue — Room @room.RoomNumber
-                                                </h5>
-                                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <form asp-controller="Housekeeping" asp-action="ReportMaintenance" method="post" class="mb-0">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="roomId" value="@room.RoomId" />
-                                                <div class="modal-body text-left">
-                                                    <p class="text-muted small">Hãy mô tả chi tiết sự cố hỏng hóc hoặc thiết bị lỗi tại phòng này để gửi lệnh sửa chữa đến tổ kỹ thuật Bảo trì.</p>
-                                                    <div class="form-group">
-                                                        <label class="font-weight-bold text-dark">Mô tả sự cố / Hỏng hóc:</label>
-                                                        <textarea name="description" class="form-control" rows="4" required 
-                                                                  placeholder="Ví dụ: Điều hòa chảy nước, vòi sen tắm gãy vòi, hỏng ổ cắm điện đầu giường..."></textarea>
+                                if (!isAssigned || isMyJob)
+                                {
+                                    <div class="modal fade" id="maintenanceModal-@room.RoomId" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content" style="font-family: 'Cabin', sans-serif;">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title font-weight-bold" style="font-family: 'Lora', serif;">
+                                                        <i class="fa fa-wrench mr-2"></i> Report Issue — Room @room.RoomNumber
+                                                    </h5>
+                                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <form asp-controller="Housekeeping" asp-action="ReportMaintenance" method="post" class="mb-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="roomId" value="@room.RoomId" />
+                                                    <div class="modal-body text-left">
+                                                        <p class="text-muted small">Hãy mô tả chi tiết sự cố hỏng hóc hoặc thiết bị lỗi tại phòng này để gửi lệnh sửa chữa đến tổ kỹ thuật Bảo trì.</p>
+                                                        <div class="form-group">
+                                                            <label class="font-weight-bold text-dark">Mô tả sự cố / Hỏng hóc:</label>
+                                                            <textarea name="description" class="form-control" rows="4" required 
+                                                                      placeholder="Ví dụ: Điều hòa chảy nước, vòi sen tắm gãy vòi, hỏng ổ cắm điện đầu giường..."></textarea>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                                                    <button type="submit" class="btn btn-danger font-weight-bold">Gửi yêu cầu bảo trì</button>
-                                                </div>
-                                            </form>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                        <button type="submit" class="btn btn-danger font-weight-bold">Gửi yêu cầu bảo trì</button>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                }
                             }
                         }
                         else
@@ -219,63 +239,9 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card-box" style="border-left: 5px solid #28a745; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-            <div class="mb-3">
-                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #28a745;">
-                    <i class="fa fa-history mr-2"></i> Phòng bạn đã hoàn thiện hôm nay (Thành tích ca làm việc)
-                </h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
-                    <thead>
-                        <tr class="bg-light">
-                            <th>Room Number</th>
-                            <th>Category</th>
-                            <th>Nhật ký công việc</th>
-                            <th>Trạng thái hiện tại</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (cleanedRoomsToday != null && cleanedRoomsToday.Any())
-                        {
-                            foreach (var room in cleanedRoomsToday)
-                            {
-                                // Class độc lập 'cleaned-room-row' giúp tránh bị ảnh hưởng bởi JS bộ lọc tìm kiếm
-                                <tr class="cleaned-room-row">
-                                    <td class="align-middle font-weight-bold" style="font-size: 15px; color: #28a745;">Room @room.RoomNumber</td>
-                                    <td class="align-middle">@room.RoomType</td>
-                                    <td class="align-middle text-muted">
-                                        <i class="fa fa-check-circle text-success mr-1"></i> Đã làm sạch & nghiệm thu hoàn tất bàn giao hệ thống.
-                                    </td>
-                                    <td class="align-middle">
-                                        <span class="badge badge-success p-2 text-white" style="font-size: 12px; background-color: #28a745;">
-                                            <i class="fa fa-star mr-1"></i> Sẵn sàng đón khách
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    Bạn chưa có thành tích hoàn thành phòng nào trong ca trực hôm nay. Cố lên nhé!
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // SỬA LỖI BỘ LỌC: Chỉ tác động bộ lọc tìm kiếm lên các dòng Chờ xử lý (.dirty-room-row)
             function filterRooms() {
                 var searchText = $("#searchRoomInput").val().toLowerCase().trim();
                 var selectedFloor = $("#filterFloorSelect").val();
