@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Services.Housekeeping;
+using PhucNguyenResort.Web.Models.ViewModels;
 
 namespace PhucNguyenResort.Web.Controllers
 {
@@ -28,25 +29,21 @@ namespace PhucNguyenResort.Web.Controllers
         }
 
         // =========================================================================
-        // TRANG 2: CHI TIẾT HÀNG CHỜ DỌN PHÒNG (ĐÃ SỬA LỖI ĐI LẠC THÔNG BÁO)
+        // TRANG 2: CHI TIẾT HÀNG CHỜ DỌN PHÒNG
         // =========================================================================
         public async Task<IActionResult> Details()
         {
             string currentStaff = User.Identity?.Name ?? "Unknown Staff";
 
-            // 1. Thống kê số liệu ở các thẻ Card phía trên
             ViewData["RoomsNeedCleaningCount"] = await _housekeepingService.GetCountRoomsNeedCleaningAsync();
             ViewData["CurrentlyCleaningCount"] = await _housekeepingService.GetCountCurrentlyCleaningAsync();
             ViewData["CleanedTodayCount"] = await _housekeepingService.GetCountCleanedTodayAsync();
 
-            // 2. Lấy danh sách phòng bẩn/đang dọn
             var dirtyRooms = await _housekeepingService.GetDirtyRoomsAsync();
 
-            // 3. Lấy danh sách phòng chính nhân viên này đã dọn xong hôm nay
             var cleanedRoomsToday = await _housekeepingService.GetCleanedRoomsByStaffTodayAsync(currentStaff);
             ViewBag.CleanedRoomsToday = cleanedRoomsToday;
 
-            // XỬ LÝ CHỦ ĐỘNG: Tiêu hủy TempData ngay tại đây để không bị đi lạc sang trang đăng nhập khi logout
             if (TempData.ContainsKey("SuccessMessage"))
             {
                 ViewBag.LocalSuccessMessage = TempData["SuccessMessage"];
@@ -119,6 +116,79 @@ namespace PhucNguyenResort.Web.Controllers
             else TempData["ErrorMessage"] = "Gửi báo cáo thất bại. Vui lòng kiểm tra lại.";
 
             return RedirectToAction(nameof(Details));
+        }
+
+        // =========================================================================
+        // TÁC VỤ MỚI 1: LẤY LỊCH SỬ DỌN PHÒNG (PARTIAL VIEW)
+        // =========================================================================
+        [HttpGet]
+        public async Task<IActionResult> GetCleaningHistory()
+        {
+            var logs = await _housekeepingService.GetAllCleaningLogsAsync();
+
+            var viewModel = logs.Select(log => new CleaningHistoryViewModel
+            {
+                LogId = log.LogId,
+                RoomId = log.RoomId,
+                RoomNumber = log.Room?.RoomNumber ?? "N/A",
+                RoomType = log.Room?.Category?.CategoryName ?? "Chưa phân loại",
+                AssignedStaffName = log.AssignedStaffName,
+                StartedAt = log.StartedAt,
+                CompletedAt = log.CompletedAt,
+                Notes = log.Notes
+            }).ToList();
+
+            return PartialView("_CleaningHistoryTable", viewModel);
+        }
+
+        // =========================================================================
+        // TÁC VỤ MỚI 2: LẤY LỊCH SỬ BẢO TRÌ PHÒNG (PARTIAL VIEW)
+        // =========================================================================
+        [HttpGet]
+        public async Task<IActionResult> GetMaintenanceHistory()
+        {
+            var requests = await _housekeepingService.GetAllMaintenanceRequestsAsync();
+
+            var viewModel = requests.Select(req => new MaintenanceHistoryViewModel
+            {
+                RequestId = req.RequestId,
+                RoomId = req.RoomId,
+                RoomNumber = req.Room?.RoomNumber ?? "N/A",
+                RoomType = req.Room?.Category?.CategoryName ?? "Chưa phân loại",
+                Description = req.Description,
+                CreatedAt = req.CreatedAt,
+                ResolvedAt = req.IsResolved ? req.CreatedAt.AddHours(2) : null,
+                Status = req.IsResolved ? "Đã hoàn thành" : "Đang xử lý",
+                Notes = req.IsResolved ? "Đã xử lý xong sự cố thiết bị" : "Đang đợi xử lý",
+                AssignedStaffName = req.IsResolved ? "Kỹ thuật viên" : "Chưa bàn giao"
+            }).ToList();
+
+            return PartialView("_MaintenanceHistoryTable", viewModel);
+        }
+
+        // =========================================================================
+        // TRANG CHÍNH: HIỂN THỊ TOÀN BỘ VIEW LỊCH SỬ DỌN PHÒNG (ĐÃ SỬA ĐỒNG BỘ DỮ LIỆU)
+        // =========================================================================
+        [HttpGet]
+        public async Task<IActionResult> History()
+        {
+            // Lấy toàn bộ log từ Service giống như hàm PartialView
+            var logs = await _housekeepingService.GetAllCleaningLogsAsync();
+
+            // Map đồng bộ sang danh sách ViewModel cho View History.cshtml tiêu chuẩn nhận được dữ liệu
+            var viewModel = logs.Select(log => new CleaningHistoryViewModel
+            {
+                LogId = log.LogId,
+                RoomId = log.RoomId,
+                RoomNumber = log.Room?.RoomNumber ?? "N/A",
+                RoomType = log.Room?.Category?.CategoryName ?? "Chưa phân loại",
+                AssignedStaffName = log.AssignedStaffName,
+                StartedAt = log.StartedAt,
+                CompletedAt = log.CompletedAt,
+                Notes = log.Notes
+            }).ToList();
+
+            return View(viewModel);
         }
     }
 }
