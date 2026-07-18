@@ -12,7 +12,6 @@ namespace PhucNguyenResort.ViewModels.Housekeeping
         public string DirtyReason { get; set; } = string.Empty;
         public DateTime? LastCheckedOutTime { get; set; }
 
-        // BỔ SUNG: Đồng bộ dữ liệu tên người dọn lên giao diện View
         public string? AssignedStaffName { get; set; }
     }
 }

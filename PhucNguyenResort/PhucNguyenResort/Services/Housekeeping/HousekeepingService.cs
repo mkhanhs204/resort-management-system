@@ -15,9 +15,6 @@ namespace PhucNguyenResort.Services.Housekeeping
             _context = context;
         }
 
-        // =========================================================================
-        // 1. NÂNG CẤP LẤY DANH SÁCH: Sửa lỗi lặp thông tin hiển thị tại cột Reason
-        // =========================================================================
         public async Task<List<DirtyRoomViewModel>> GetDirtyRoomsAsync()
         {
             var dirtyRoomsQuery = await _context.Rooms
@@ -35,8 +32,6 @@ namespace PhucNguyenResort.Services.Housekeeping
                     .OrderByDescending(b => b.CheckOutDate)
                     .FirstOrDefaultAsync();
 
-                // ĐÃ SỬA: Giữ nguyên lý do bẩn gốc của phòng, không đè chữ "Đang dọn bởi..." 
-                // để tránh trùng lặp thông tin với cột Trạng thái (Status Badge)
                 string reason = lastBooking != null ? "Khách vừa trả phòng (Check-out)" : "Lịch trình dọn dẹp định kỳ";
 
                 result.Add(new DirtyRoomViewModel
@@ -48,7 +43,6 @@ namespace PhucNguyenResort.Services.Housekeeping
                     Status = room.Status,
                     DirtyReason = reason,
                     LastCheckedOutTime = lastBooking?.CheckOutDate,
-                    // QUAN TRỌNG: Đẩy dữ liệu nhân viên từ DB lên ViewModel
                     AssignedStaffName = room.AssignedStaffName
                 });
             }
@@ -56,13 +50,8 @@ namespace PhucNguyenResort.Services.Housekeeping
             return result;
         }
 
-        // =========================================================================
-        // TÍCH HỢP MỚI: Lấy danh sách các phòng đã dọn xong trong ngày của nhân viên
-        // =========================================================================
         public async Task<List<DirtyRoomViewModel>> GetCleanedRoomsByStaffTodayAsync(string staffName)
         {
-            // Quét các phòng hiện tại đang ở trạng thái Sẵn sàng (Available)
-            // (Khi hệ thống nâng cấp bảng HousekeepingLog, hàm này sẽ chuyển sang query từ bảng Log)
             var cleanedRooms = await _context.Rooms
                 .Include(r => r.Category)
                 .Where(r => r.Status == RoomStatus.Available)
@@ -84,15 +73,11 @@ namespace PhucNguyenResort.Services.Housekeeping
             return result;
         }
 
-        // =========================================================================
-        // 2. NÂNG CẤP HOÀN THÀNH: Kiểm tra bảo mật gốc (Chỉ người nhận phòng mới được hoàn thành)
-        // =========================================================================
         public async Task<bool> UpdateCleaningStatusAsync(int roomId, string currentStaff)
         {
             var room = await _context.Rooms.FindAsync(roomId);
             if (room == null) return false;
 
-            // BẢO MẬT: Ngăn chặn hack request cố tình bấm nút phòng của người khác
             if (room.Status == RoomStatus.CleaningInProgress &&
                 !string.IsNullOrEmpty(room.AssignedStaffName) &&
                 !room.AssignedStaffName.Equals(currentStaff, StringComparison.OrdinalIgnoreCase))
@@ -100,29 +85,35 @@ namespace PhucNguyenResort.Services.Housekeeping
                 return false;
             }
 
+            var log = new RoomCleaningLog
+            {
+                RoomId = room.RoomId,
+                AssignedStaffName = !string.IsNullOrEmpty(room.AssignedStaffName) ? room.AssignedStaffName : currentStaff,
+                StartedAt = DateTime.Now.AddMinutes(-30),
+                CompletedAt = DateTime.Now,
+                Notes = "Đã hoàn thành dọn dẹp định kỳ đạt chuẩn 5 sao."
+            };
+            _context.RoomCleaningLogs.Add(log);
+
             room.Status = RoomStatus.Available;
-            room.AssignedStaffName = null; // Clear nhân viên sau khi phòng sạch sẽ trở lại
+            room.AssignedStaffName = null;
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        // Đổ bóng hàm cũ để tránh lỗi biên dịch hệ thống cũ
         public async Task<bool> UpdateCleaningStatusAsync(int roomId)
         {
             return await UpdateCleaningStatusAsync(roomId, "System");
         }
 
-        // =========================================================================
-        // 3. BÁO HỎNG PHÒNG (KÈM TẠO PHIẾU BẢO TRÌ)
-        // =========================================================================
         public async Task<bool> ReportMaintenanceAsync(int roomId, string description)
         {
             var room = await _context.Rooms.FindAsync(roomId);
             if (room == null) return false;
 
             room.Status = RoomStatus.Maintenance;
-            room.AssignedStaffName = null; // Huỷ gán vết dọn dẹp cũ khi phòng chuyển sang hỏng
+            room.AssignedStaffName = null;
 
             var maintenanceRequest = new MaintenanceRequest
             {
@@ -137,15 +128,11 @@ namespace PhucNguyenResort.Services.Housekeeping
             return true;
         }
 
-        // =========================================================================
-        // 4. HÀM MỚI NÂNG CẤP: Lưu vết tài khoản khi nhân viên ấn "Start Cleaning"
-        // =========================================================================
         public async Task<bool> UpdateRoomStatusWithStaffAsync(int roomId, RoomStatus status, string currentStaff)
         {
             var room = await _context.Rooms.FindAsync(roomId);
             if (room == null) return false;
 
-            // Chống xung đột: Nếu trong lúc mở danh sách có người khác đã nhấn Start trước rồi
             if (room.Status == RoomStatus.CleaningInProgress && room.AssignedStaffName != currentStaff)
             {
                 return false;
@@ -155,7 +142,7 @@ namespace PhucNguyenResort.Services.Housekeeping
 
             if (status == RoomStatus.CleaningInProgress)
             {
-                room.AssignedStaffName = currentStaff; // Đóng dấu chủ quyền phòng cho nhân viên này
+                room.AssignedStaffName = currentStaff;
             }
             else if (status == RoomStatus.Available)
             {
@@ -166,7 +153,6 @@ namespace PhucNguyenResort.Services.Housekeeping
             return true;
         }
 
-        // Giữ nguyên hàm cũ để không ảnh hưởng các hàm hệ thống khác
         public async Task<bool> UpdateRoomStatusAsync(int roomId, RoomStatus status)
         {
             var room = await _context.Rooms.FindAsync(roomId);
@@ -177,9 +163,6 @@ namespace PhucNguyenResort.Services.Housekeeping
             return true;
         }
 
-        // =========================================================================
-        // 5. CÁC HÀM THỐNG KÊ CARDS (KPI) CHO DASHBOARD
-        // =========================================================================
         public async Task<int> GetCountRoomsNeedCleaningAsync()
         {
             return await _context.Rooms.CountAsync(r => r.Status == RoomStatus.NeedsCleaning);
@@ -193,6 +176,22 @@ namespace PhucNguyenResort.Services.Housekeeping
         public async Task<int> GetCountCleanedTodayAsync()
         {
             return await _context.Rooms.CountAsync(r => r.Status == RoomStatus.Available);
+        }
+
+        public async Task<List<RoomCleaningLog>> GetAllCleaningLogsAsync()
+        {
+            return await _context.RoomCleaningLogs
+                .Include(l => l.Room)
+                .OrderByDescending(l => l.CompletedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<MaintenanceRequest>> GetAllMaintenanceRequestsAsync()
+        {
+            return await _context.MaintenanceRequests
+                .Include(r => r.Room)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
         }
     }
 }

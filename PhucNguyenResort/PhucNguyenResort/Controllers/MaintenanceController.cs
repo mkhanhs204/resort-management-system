@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Services.Maintenance;
 
-namespace PhucNguyenResort.Controllers
+namespace PhucNguyenResort.Web.Controllers
 {
-    [Authorize(Roles = "Maintenance Staff")]
+    [Authorize(Roles = "Maintenance Staff,System Admin")]
     public class MaintenanceController : Controller
     {
         private readonly IMaintenanceService _maintenanceService;
@@ -40,7 +40,6 @@ namespace PhucNguyenResort.Controllers
             var activeTasks = await _maintenanceService.GetMaintenanceTasksAsync();
 
             // 3. LẤY LỊCH SỬ/THÀNH TÍCH: Sự cố mà CHÍNH nhân viên kỹ thuật này đã sửa xong hôm nay
-            // Giả định Service của bạn đã có hàm tương tự hoặc bạn có thể filter/gọi từ service
             var resolvedTasksToday = await _maintenanceService.GetResolvedTasksByStaffTodayAsync(currentStaff);
             ViewBag.ResolvedTasksToday = resolvedTasksToday;
 
@@ -98,6 +97,41 @@ namespace PhucNguyenResort.Controllers
             TempData["SuccessMessage"] = "Đã xác nhận khắc phục xong sự cố thiết bị! Phòng đã được chuyển giao an toàn sang trạng thái chờ dọn dẹp.";
 
             return RedirectToAction(nameof(Details));
+        }
+
+        // =========================================================================
+        // TAB LỊCH SỬ 1: LẤY LỊCH SỬ SỬA CHỮA (PARTIAL VIEW)
+        // =========================================================================
+        [HttpGet]
+        public async Task<IActionResult> GetMaintenanceHistory()
+        {
+            // Trả về dữ liệu kiểu List<MaintenanceHistoryViewModel> đã map sẵn từ tầng Service
+            var viewModel = await _maintenanceService.GetAllMaintenanceHistoryRequestsAsync();
+            return PartialView("_MaintenanceHistoryTable", viewModel);
+        }
+
+        // =========================================================================
+        // TAB LỊCH SỬ MỚI 2: XEM NHANH LỊCH SỬ DỌN PHÒNG ĐỒNG BỘ (PARTIAL VIEW)
+        // =========================================================================
+        [HttpGet]
+        public async Task<IActionResult> GetCleaningHistory()
+        {
+            // Trả về dữ liệu kiểu List<CleaningHistoryViewModel> đã map sẵn từ tầng Service
+            var viewModel = await _maintenanceService.GetAllCleaningLogsForMaintenanceAsync();
+            return PartialView("_CleaningHistoryTable", viewModel);
+        }
+
+        // =========================================================================
+        // TRANG CHÍNH: HIỂN THỊ TOÀN BỘ VIEW LỊCH SỬ BẢO TRÌ (ĐÃ SỬA LỖI TRUYỀN DATA)
+        // =========================================================================
+        [HttpGet]
+        public async Task<IActionResult> History()
+        {
+            // Gọi tầng Service lấy toàn bộ danh sách lịch sử sửa chữa đã được map sẵn sang ViewModel
+            var viewModel = await _maintenanceService.GetAllMaintenanceHistoryRequestsAsync();
+
+            // Trả về View kèm data danh sách để file History.cshtml Render không bị lỗi trống model
+            return View(viewModel);
         }
     }
 }

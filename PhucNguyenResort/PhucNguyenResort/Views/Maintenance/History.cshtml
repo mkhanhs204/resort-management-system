@@ -1,0 +1,171 @@
+﻿@model List<PhucNguyenResort.Web.Models.ViewModels.MaintenanceHistoryViewModel>
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Nhật Ký Bảo Trì Kỹ Thuật";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
+                    <i class="fa fa-history mr-2" style="color: #6c757d;"></i> Nhật Ký Bảo Trì Kỹ Thuật
+                </h2>
+                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Hệ thống lưu trữ và tra cứu nâng cao các tác vụ xử lý sự cố kỹ thuật phòng nghỉ.</p>
+            </div>
+            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
+                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4" style="font-family: 'Cabin', sans-serif;">
+    <div class="col-md-8 mb-2 mb-md-0">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-light text-muted"><i class="fa fa-search"></i></span>
+            </div>
+            <input type="text" id="maintenanceSearch" class="form-control" placeholder="Tìm nhanh theo số phòng, hạng phòng, kỹ thuật viên hoặc nội dung sự cố...">
+        </div>
+    </div>
+    <div class="col-md-4">
+        <select id="statusFilter" class="form-control">
+            <option value="">-- Tất cả trạng thái đơn --</option>
+            <option value="Đã hoàn thành">Đã hoàn thành (Đã khắc phục)</option>
+            <option value="Đang xử lý">Đang tiến hành xử lý</option>
+        </select>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-box" style="border-left: 5px solid #dc3545; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #333;">
+                    <i class="fa fa-wrench mr-2" style="color: #6c757d;"></i> Danh sách tác vụ kỹ thuật phòng
+                </h5>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" id="maintenanceTable" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Mã Phiếu</th>
+                            <th>Số Phòng</th>
+                            <th>Hạng Phòng</th>
+                            <th style="min-width: 200px;">Nội Dung Sự Cố Ghi Nhận</th>
+                            <th>Ngày Tạo Đơn</th>
+                            <th>Ngày Sửa Xong</th>
+                            <th>Kỹ Thuật Phụ Trách</th>
+                            <th>Hiện Trạng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr id="emptyRow">
+                                <td colspan="8" class="text-center text-muted py-5">
+                                    <h5 class="mb-2" style="font-family: 'Lora', serif;"><i class="fa fa-times-circle-o fa-2x text-muted d-block mb-3"></i>Không tìm thấy lịch sử sửa chữa thiết bị nào từ trước tới nay.</h5>
+                                    <p class="mb-0">Hệ thống vận hành ổn định không ghi nhận lỗi kĩ thuật tồn đọng.</p>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr class="m-row" data-status="@item.Status">
+                                    <td class="align-middle text-secondary font-weight-bold">#MT-@item.RequestId</td>
+                                    <td class="align-middle font-weight-bold" style="color: #1a1a1a;">@item.RoomNumber</td>
+                                    <td class="align-middle">@item.RoomType</td>
+                                    <td class="align-middle text-dark text-wrap">@item.Description</td>
+                                    <td class="align-middle text-muted"><i class="fa fa-clock-o mr-1"></i>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="align-middle text-muted">
+                                        <i class="fa fa-calendar-check-o mr-1"></i>@(item.ResolvedAt.HasValue? item.ResolvedAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")
+                                    </td>
+                                    <td class="align-middle">
+                                        <i class="fa fa-user-circle-o text-primary mr-1"></i>@(string.IsNullOrEmpty(item.AssignedStaffName) ? "Chưa bàn giao" : item.AssignedStaffName)
+                                    </td>
+                                    <td class="align-middle">
+                                        @if (item.Status == "Đã hoàn thành")
+                                        {
+                                            <span class="badge badge-success px-2 py-1"><i class="fa fa-check-circle"></i> Đã khắc phục</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning text-white px-2 py-1" style="background-color: #ffc107;"><i class="fa fa-spinner fa-spin"></i> Đang tiến hành</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            <tr id="noMatchRow" style="display: none;">
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fa fa-search fa-lg mb-2"></i> Không có bản ghi nào khớp với điều kiện tìm kiếm.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 style-pagination-bar" style="border-top: 1px solid #eee; font-family: 'Cabin', sans-serif;">
+                <span class="text-muted small" id="rowCountSummary">
+                    Hiển thị <strong id="visibleCount">@(Model?.Count ?? 0)</strong> trong tổng số <strong>@(Model?.Count ?? 0)</strong> bản ghi lịch sử.
+                </span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#"><i class="fa fa-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="fa fa-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function filterMaintenanceTable() {
+                var searchText = $("#maintenanceSearch").val().toLowerCase().trim();
+                var selectedStatus = $("#statusFilter").val();
+
+                var totalRows = $(".m-row").length;
+                var visibleRows = 0;
+
+                if (totalRows === 0) return;
+
+                $(".m-row").each(function () {
+                    var rowContent = $(this).text().toLowerCase();
+                    var rowStatus = $(this).attr("data-status");
+
+                    var textMatch = searchText === "" || rowContent.indexOf(searchText) > -1;
+                    var statusMatch = selectedStatus === "" || rowStatus === selectedStatus;
+
+                    if (textMatch && statusMatch) {
+                        $(this).show();
+                        visibleRows++;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                $("#visibleCount").text(visibleRows);
+
+                if (visibleRows === 0) {
+                    $("#noMatchRow").show();
+                } else {
+                    $("#noMatchRow").hide();
+                }
+            }
+
+            $("#maintenanceSearch").on("keyup", filterMaintenanceTable);
+            $("#statusFilter").on("change", filterMaintenanceTable);
+        });
+    </script>
+}

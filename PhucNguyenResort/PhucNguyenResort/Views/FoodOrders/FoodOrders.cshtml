@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Quản lý Đơn Gọi Món";
     Layout = "_DashboardLayout";
+    FoodOrderType? selectedOrderType = ViewBag.SelectedOrderType is FoodOrderType viewOrderType ? viewOrderType : null;
+    FoodOrderStatus? selectedStatus = ViewBag.SelectedFoodOrderStatus is FoodOrderStatus viewStatus ? viewStatus : null;
+    var orderCount = Model?.Count() ?? 0;
 }
 
 @section Styles {
@@ -71,6 +74,68 @@
             justify-content: space-between;
             align-items: flex-end;
             margin-bottom: 32px;
+        }
+        .filter-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #fcf9f5;
+            border: 1px solid #f0ede9;
+            border-radius: 12px;
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #50453b;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #e5e2de;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: #805528;
+            color: #ffffff;
+            border-color: #805528;
+            text-decoration: none;
+        }
+        .filter-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-select {
+            min-width: 170px;
+            height: 38px;
+            border: 1px solid #d4c3b6;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1c1c1a;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            padding: 0 12px;
+        }
+        .filter-summary {
+            color: #827569;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
         }
         .btn-luxury {
             background-color: #dfa974;
@@ -215,6 +280,76 @@
         }
         
         <div class="luxury-card">
+            <div class="filter-panel">
+                <div>
+                    <div class="filter-tabs">
+                        <a asp-controller="Dashboard"
+                           asp-action="FoodOrders"
+                           asp-route-status="@selectedStatus"
+                           class="filter-tab @(!selectedOrderType.HasValue ? "active" : "")">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">receipt_long</span>
+                            Tất cả
+                        </a>
+                        <a asp-controller="Dashboard"
+                           asp-action="FoodOrders"
+                           asp-route-orderType="@FoodOrderType.RoomService"
+                           asp-route-status="@selectedStatus"
+                           class="filter-tab @(selectedOrderType == FoodOrderType.RoomService ? "active" : "")">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">room_service</span>
+                            Gọi lên phòng
+                        </a>
+                        <a asp-controller="Dashboard"
+                           asp-action="FoodOrders"
+                           asp-route-orderType="@FoodOrderType.TableService"
+                           asp-route-status="@selectedStatus"
+                           class="filter-tab @(selectedOrderType == FoodOrderType.TableService ? "active" : "")">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">table_restaurant</span>
+                            Gọi tại bàn
+                        </a>
+                    </div>
+                    <div class="filter-summary" style="margin-top: 8px;">
+                        Đang hiển thị @orderCount đơn
+                    </div>
+                </div>
+
+                <form asp-controller="Dashboard" asp-action="FoodOrders" method="get" class="filter-form">
+                    @if (selectedOrderType.HasValue)
+                    {
+                        <input type="hidden" name="orderType" value="@selectedOrderType.Value" />
+                    }
+                    <select name="status" class="filter-select" aria-label="Filter order status">
+                        @if (!selectedStatus.HasValue)
+                        {
+                            <option value="" selected>All Status</option>
+                        }
+                        else
+                        {
+                            <option value="">All Status</option>
+                        }
+
+                        @foreach (var statusOption in Enum.GetValues<FoodOrderStatus>())
+                        {
+                            if (selectedStatus == statusOption)
+                            {
+                                <option value="@statusOption" selected>@statusOption</option>
+                            }
+                            else
+                            {
+                                <option value="@statusOption">@statusOption</option>
+                            }
+                        }
+                    </select>
+                    <button type="submit" class="btn-luxury">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">filter_alt</span>
+                        Lọc
+                    </button>
+                    <a asp-controller="Dashboard" asp-action="FoodOrders" class="btn-secondary-luxury">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">restart_alt</span>
+                        Clear
+                    </a>
+                </form>
+            </div>
+
             <div class="table-responsive">
                 <table class="luxury-table">
                     <thead>
@@ -339,6 +474,14 @@
                                     <td class="text-right">
                                         <form asp-controller="Dashboard" asp-action="UpdateFoodOrderStatus" method="post" style="display: inline-block;">
                                             <input type="hidden" name="foodOrderId" value="@order.FoodOrderId" />
+                                            @if (selectedOrderType.HasValue)
+                                            {
+                                                <input type="hidden" name="orderType" value="@selectedOrderType.Value" />
+                                            }
+                                            @if (selectedStatus.HasValue)
+                                            {
+                                                <input type="hidden" name="status" value="@selectedStatus.Value" />
+                                            }
                                             @if (order.OrderStatus == FoodOrderStatus.Pending)
                                             {
                                                 <input type="hidden" name="newStatus" value="@FoodOrderStatus.Cooking" />
@@ -373,6 +516,14 @@
                                             <form asp-controller="Dashboard" asp-action="UpdateFoodOrderStatus" method="post" style="display: inline-block; margin-left: 4px;" onsubmit="return confirm('Hủy đơn hàng này?');">
                                                 <input type="hidden" name="foodOrderId" value="@order.FoodOrderId" />
                                                 <input type="hidden" name="newStatus" value="@FoodOrderStatus.Cancelled" />
+                                                @if (selectedOrderType.HasValue)
+                                                {
+                                                    <input type="hidden" name="orderType" value="@selectedOrderType.Value" />
+                                                }
+                                                @if (selectedStatus.HasValue)
+                                                {
+                                                    <input type="hidden" name="status" value="@selectedStatus.Value" />
+                                                }
                                                 <button type="submit" class="btn-luxury danger" title="Hủy đơn" style="padding: 8px;"><span class="material-symbols-outlined" style="font-size: 18px;">close</span></button>
                                             </form>
                                         }

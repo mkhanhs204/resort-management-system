@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
+using PhucNguyenResort.Services.DatabaseBackups;
 using PhucNguyenResort.Hubs;
 using PhucNguyenResort.Services.FoodOrders;
 using PhucNguyenResort.Services.MenuCategories;
@@ -79,6 +80,7 @@ builder.Services.AddDbContext<ResortDbContext>(options =>
 builder.Services.AddScoped<IMenuCategoryService, MenuCategoryService>();
 builder.Services.AddScoped<IRestaurantMenuService, RestaurantMenuService>();
 builder.Services.AddScoped<IFoodOrderService, FoodOrderService>();
+builder.Services.AddScoped<IDatabaseBackupService, DatabaseBackupService>();
 builder.Services.AddScoped<ITableReservationService, TableReservationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<PhucNguyenResort.Services.Dashboard.IDashboardReportService, PhucNguyenResort.Services.Dashboard.DashboardReportService>();

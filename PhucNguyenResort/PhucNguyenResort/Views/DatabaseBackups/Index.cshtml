@@ -1,0 +1,339 @@
+@model PhucNguyenResort.ViewModels.DatabaseBackups.DatabaseBackupIndexViewModel
+
+@{
+    ViewData["Title"] = "Sao lưu và Phục hồi";
+    Layout = "_DashboardLayout";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+            margin-bottom: 28px;
+        }
+
+        .backup-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid rgba(212, 195, 182, 0.35);
+            box-shadow: 0 18px 34px -12px rgba(30, 41, 59, 0.12);
+            padding: 24px;
+            margin-bottom: 24px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .backup-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .backup-meta {
+            color: #50453b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .backup-meta strong {
+            color: #1c1c1a;
+        }
+
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #633d11;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px 16px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-luxury {
+            background-color: #ffffff;
+            color: #805528;
+            border: 1px solid #dfa974;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 8px 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .btn-outline-luxury:hover {
+            background-color: #f6f3ef;
+            color: #633d11;
+            text-decoration: none;
+        }
+
+        .btn-danger-luxury {
+            background-color: #ffdad6;
+            color: #93000a;
+            border: 1px solid #ffb4ab;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 8px 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-danger-luxury:hover {
+            background-color: #ba1a1a;
+            color: #ffffff;
+        }
+
+        .restore-form {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .restore-confirm-input {
+            width: 130px;
+            height: 36px;
+            border: 1px solid #ffb4ab;
+            border-radius: 8px;
+            padding: 0 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+        }
+
+        .alert-luxury {
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .alert-luxury.success {
+            background: #e2f5ea;
+            color: #0b5c2d;
+        }
+
+        .alert-luxury.error {
+            background: #ffdad6;
+            color: #93000a;
+        }
+
+        .alert-luxury.warning {
+            background: #fff7e6;
+            color: #7a4b00;
+            border: 1px solid #f7d58a;
+        }
+
+        .backup-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .backup-table th {
+            background: #fcf9f5;
+            color: #805528;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0ede9;
+        }
+
+        .backup-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            vertical-align: middle;
+        }
+
+        .backup-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .file-name {
+            font-weight: 700;
+            color: #1c1c1a;
+            word-break: break-all;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 42px 16px;
+            color: #827569;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="page-title">
+            <span class="material-symbols-outlined" style="font-size: 38px;">database</span>
+            Sao lưu và Phục hồi
+        </h2>
+        <p class="page-subtitle">Quản lý file sao lưu dữ liệu SQL Server của hệ thống.</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert-luxury success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <div>@TempData["SuccessMessage"]</div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert-luxury error">
+        <span class="material-symbols-outlined">error</span>
+        <div>@TempData["ErrorMessage"]</div>
+    </div>
+}
+
+<div class="alert-luxury warning">
+    <span class="material-symbols-outlined">warning</span>
+    <div>
+        Phục hồi database sẽ ghi đè dữ liệu hiện tại bằng dữ liệu trong file backup đã chọn. Hãy tạo một bản backup mới trước khi restore nếu bạn cần giữ lại trạng thái hiện tại.
+    </div>
+</div>
+
+<div class="backup-card">
+    <div class="backup-toolbar">
+        <div class="backup-meta">
+            <div><strong>Database:</strong> @Model.DatabaseName</div>
+            <div><strong>Backup folder:</strong> @Model.BackupDirectory</div>
+        </div>
+
+        <form asp-action="CreateBackup" method="post" onsubmit="return confirm('Tạo bản sao lưu database hiện tại?');">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-luxury">
+                <span class="material-symbols-outlined">backup</span>
+                Tạo backup mới
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="backup-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-family: 'Playfair Display', serif; color: #805528; font-weight: 700; margin: 0;">
+            Danh sách file backup
+        </h5>
+        <span style="color: #827569; font-family: 'Inter', sans-serif; font-weight: 600;">
+            @Model.BackupFiles.Count file
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="backup-table">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Created At</th>
+                    <th>Last Modified</th>
+                    <th>Size</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.BackupFiles.Any())
+                {
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">folder_open</span>
+                                <div style="margin-top: 10px;">Chưa có file backup nào.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var file in Model.BackupFiles)
+                    {
+                        <tr>
+                            <td>
+                                <div class="file-name">@file.FileName</div>
+                            </td>
+                            <td>@file.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@file.LastModifiedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@file.SizeDisplay</td>
+                            <td class="text-right">
+                                <a asp-action="Download"
+                                   asp-route-fileName="@file.FileName"
+                                   class="btn-outline-luxury">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                                    Download
+                                </a>
+                                <form asp-action="RestoreBackup"
+                                      method="post"
+                                      class="restore-form"
+                                      onsubmit="return confirm('Restore database from this backup file? Current data will be overwritten.');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="fileName" value="@file.FileName" />
+                                    <input type="text"
+                                           name="confirmationText"
+                                           class="restore-confirm-input"
+                                           placeholder="Type RESTORE"
+                                           autocomplete="off" />
+                                    <button type="submit" class="btn-danger-luxury">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">restore</span>
+                                        Restore
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
