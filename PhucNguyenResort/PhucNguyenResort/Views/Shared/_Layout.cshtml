@@ -7,8 +7,8 @@
                      (currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("AboutUs", StringComparison.OrdinalIgnoreCase)) ||
                      (currentController.Equals("CustomerTourBooking", StringComparison.OrdinalIgnoreCase) && (currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) || currentAction.Equals("Details", StringComparison.OrdinalIgnoreCase))) ||
                      (currentController.Equals("Review", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("PublicList", StringComparison.OrdinalIgnoreCase)) ||
-                     currentController.Equals("FoodOrders", StringComparison.OrdinalIgnoreCase) ||
-                     currentController.Equals("TableReservations", StringComparison.OrdinalIgnoreCase);
+                     (currentController.Equals("FoodOrders", StringComparison.OrdinalIgnoreCase) && !currentAction.Equals("MyOrders", StringComparison.OrdinalIgnoreCase)) ||
+                     (currentController.Equals("TableReservations", StringComparison.OrdinalIgnoreCase) && !currentAction.Equals("MyReservations", StringComparison.OrdinalIgnoreCase));
 
     string IsActive(string controller, string action = "")
     {
@@ -263,6 +263,7 @@
                             <ul class="py-2">
                                 <li><a class="block px-4 py-2 text-on-surface hover:bg-surface-container hover:text-primary transition-colors" asp-controller="Profile" asp-action="Index">Hồ sơ cá nhân</a></li>
                                 <li><a class="block px-4 py-2 text-on-surface hover:bg-surface-container hover:text-primary transition-colors" asp-controller="TableReservations" asp-action="MyReservations">Lịch sử đặt bàn</a></li>
+                                <li><a class="block px-4 py-2 text-on-surface hover:bg-surface-container hover:text-primary transition-colors" asp-controller="FoodOrders" asp-action="MyOrders">Lịch sử đặt đồ ăn</a></li>
                                 <li><a class="block px-4 py-2 text-on-surface hover:bg-surface-container hover:text-primary transition-colors" asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
                                 <li><a class="block px-4 py-2 text-on-surface hover:bg-surface-container hover:text-primary transition-colors" asp-controller="CustomerTourBooking" asp-action="MyTourBookings">Lịch sử đặt tour</a></li>
                                 <li class="border-t border-outline-variant/20 mt-1 pt-1"><a class="block px-4 py-2 text-error hover:bg-error-container hover:text-on-error-container transition-colors" asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
@@ -314,6 +315,7 @@
                     <ul class="pl-4 space-y-2 border-l-2 border-primary/20">
                         <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="Profile" asp-action="Index">Hồ sơ cá nhân</a></li>
                         <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="TableReservations" asp-action="MyReservations">Lịch sử đặt bàn</a></li>
+                        <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="FoodOrders" asp-action="MyOrders">Lịch sử đặt đồ ăn</a></li>
                         <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="Bookings" asp-action="MyBookings">Lịch sử đặt phòng</a></li>
                         <li><a class="block font-label-sm text-on-surface hover:text-primary" asp-controller="CustomerTourBooking" asp-action="MyTourBookings">Lịch sử đặt tour</a></li>
                         <li><a class="block font-label-sm text-error hover:text-error" asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>

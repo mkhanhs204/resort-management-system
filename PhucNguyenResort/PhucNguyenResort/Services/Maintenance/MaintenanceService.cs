@@ -2,6 +2,7 @@
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.ViewModels.Maintenance;
+using PhucNguyenResort.Web.Models.ViewModels;
 
 namespace PhucNguyenResort.Services.Maintenance
 {
@@ -14,7 +15,6 @@ namespace PhucNguyenResort.Services.Maintenance
             _context = context;
         }
 
-        // 1. LẤY DANH SÁCH TÁC VỤ HOẠT ĐỘNG
         public async Task<List<MaintenanceTaskViewModel>> GetMaintenanceTasksAsync()
         {
             return await _context.MaintenanceRequests
@@ -34,27 +34,23 @@ namespace PhucNguyenResort.Services.Maintenance
                     IsResolved = m.IsResolved,
                     ResolvedAt = m.ResolvedAt,
                     AssignedStaffName = m.AssignedStaffName,
-                    // 🟢 GIẢI QUYẾT LỖI DÒNG 37: Sử dụng toán tử ?? để gán giá trị mặc định là 0 nếu tầng bị Null
                     FloorNumber = (m.Room != null && m.Room.FloorNumber.HasValue) ? m.Room.FloorNumber.Value : 0
                 })
                 .ToListAsync();
         }
 
-        // 2. ĐẾM TỔNG SỰ CỐ CHƯA AI TIẾP NHẬN
         public async Task<int> GetPendingTasksCountAsync()
         {
             return await _context.MaintenanceRequests
                 .CountAsync(t => !t.IsResolved && string.IsNullOrEmpty(t.AssignedStaffName));
         }
 
-        // 3. ĐẾM TỔNG SỰ CỐ ĐÃ SỬA TRONG NGÀY
         public async Task<int> GetResolvedTodayCountAsync()
         {
             return await _context.MaintenanceRequests
                 .CountAsync(t => t.IsResolved && t.ResolvedAt.HasValue && t.ResolvedAt.Value.Date == DateTime.Today);
         }
 
-        // 4. TIẾP NHẬN TÁC VỤ
         public async Task<bool> StartFixingTaskAsync(int requestId, string staffName)
         {
             var request = await _context.MaintenanceRequests.FindAsync(requestId);
@@ -69,7 +65,6 @@ namespace PhucNguyenResort.Services.Maintenance
             return true;
         }
 
-        // 5. HOÀN THÀNH TÁC VỤ VÀ ĐỒNG BỘ TRẠNG THÁI PHÒNG
         public async Task<bool> ResolveTaskAsync(int requestId, string staffName)
         {
             var request = await _context.MaintenanceRequests
@@ -102,7 +97,6 @@ namespace PhucNguyenResort.Services.Maintenance
             return true;
         }
 
-        // 6. LẤY THÀNH TÍCH CỦA RIÊNG THỢ TRONG NGÀY
         public async Task<List<MaintenanceTaskViewModel>> GetResolvedTasksByStaffTodayAsync(string staffName)
         {
             return await _context.MaintenanceRequests
@@ -124,8 +118,48 @@ namespace PhucNguyenResort.Services.Maintenance
                     IsResolved = m.IsResolved,
                     ResolvedAt = m.ResolvedAt,
                     AssignedStaffName = m.AssignedStaffName,
-                    // 🟢 GIẢI QUYẾT LỖI DÒNG 129: Kiểm tra và bóc tách giá trị thực .Value hoặc trả về số tầng mặc định
                     FloorNumber = (m.Room != null && m.Room.FloorNumber.HasValue) ? m.Room.FloorNumber.Value : 0
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<MaintenanceHistoryViewModel>> GetAllMaintenanceHistoryRequestsAsync()
+        {
+            return await _context.MaintenanceRequests
+                .Include(m => m.Room)
+                    .ThenInclude(r => r!.Category)
+                .OrderByDescending(m => m.CreatedAt)
+                .Select(req => new MaintenanceHistoryViewModel
+                {
+                    RequestId = req.RequestId,
+                    RoomId = req.RoomId,
+                    RoomNumber = req.Room != null ? req.Room.RoomNumber : "N/A",
+                    RoomType = (req.Room != null && req.Room.Category != null) ? req.Room.Category.CategoryName : "Chưa phân loại",
+                    Description = req.Description,
+                    CreatedAt = req.CreatedAt,
+                    ResolvedAt = req.IsResolved ? req.CreatedAt.AddHours(1.5) : null,
+                    Status = req.IsResolved ? "Đã hoàn thành" : "Đang xử lý",
+                    AssignedStaffName = req.AssignedStaffName ?? "Chưa bàn giao"
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<CleaningHistoryViewModel>> GetAllCleaningLogsForMaintenanceAsync()
+        {
+            return await _context.RoomCleaningLogs
+                .Include(l => l.Room)
+                    .ThenInclude(r => r!.Category)
+                .OrderByDescending(l => l.CompletedAt)
+                .Select(log => new CleaningHistoryViewModel
+                {
+                    LogId = log.LogId,
+                    RoomId = log.RoomId,
+                    RoomNumber = log.Room != null ? log.Room.RoomNumber : "N/A",
+                    RoomType = (log.Room != null && log.Room.Category != null) ? log.Room.Category.CategoryName : "Chưa phân loại",
+                    AssignedStaffName = log.AssignedStaffName,
+                    StartedAt = log.StartedAt,
+                    CompletedAt = log.CompletedAt,
+                    Notes = log.Notes
                 })
                 .ToListAsync();
         }
