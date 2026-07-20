@@ -162,18 +162,21 @@
                                     <span class="status-badge hidden"><span class="material-symbols-outlined" style="font-size: 16px; margin-right: 4px;">visibility_off</span> Đã ẩn</span>
                                 }
                             </td>
-                            <td class="text-center">
+                            <td class="text-center" style="white-space: nowrap;">
+                                <a href="@Url.Action("Details", "Review", new { id = item.ReviewId })" class="btn-outline-luxury" style="margin-right: 4px; padding: 6px 12px; font-size: 13px;" title="Xem chi tiết">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">info</span> Chi tiết
+                                </a>
                                 <form asp-action="ToggleVisibility" method="post" style="display:inline;">
                                     <input type="hidden" name="reviewId" value="@item.ReviewId" />
                                     @if (item.IsVisible)
                                     {
-                                        <button type="submit" class="btn-outline-luxury" style="color: #ba1a1a; border-color: #ba1a1a;" title="Ẩn đánh giá này">
+                                        <button type="submit" class="btn-outline-luxury" style="color: #ba1a1a; border-color: #ba1a1a; padding: 6px 12px; font-size: 13px;" title="Ẩn đánh giá này">
                                             <span class="material-symbols-outlined" style="font-size: 18px;">visibility_off</span> Ẩn
                                         </button>
                                     }
                                     else
                                     {
-                                        <button type="submit" class="btn-luxury" title="Hiển thị đánh giá này">
+                                        <button type="submit" class="btn-luxury" style="padding: 6px 12px; font-size: 13px;" title="Hiển thị đánh giá này">
                                             <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span> Hiện
                                         </button>
                                     }

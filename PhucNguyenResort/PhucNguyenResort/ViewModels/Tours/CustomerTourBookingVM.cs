@@ -184,6 +184,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public DateTime CreatedAt { get; set; }
         public string? CancellationReason { get; set; }
         public bool HasReviewed { get; set; }
+        public bool HasBeenEdited { get; set; }
     }
 
     /// <summary>

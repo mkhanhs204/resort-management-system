@@ -18,6 +18,7 @@ public class Review
     public string? Comment { get; set; }
     public bool IsVisible { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public bool HasBeenEdited { get; set; } = false;
 
     public User? User { get; set; }
     public Tour? Tour { get; set; }

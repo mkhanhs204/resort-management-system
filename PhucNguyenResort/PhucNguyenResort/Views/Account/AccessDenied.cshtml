@@ -1,9 +1,56 @@
-﻿@{
-    ViewData["Title"] = "Không có quyền truy cập";
+@{
+    ViewData["Title"] = "Không có quyền truy cập | Phúc Nguyên Resort";
 }
 
-<div class="container mt-5">
-    <div class="alert alert-danger">
-        Bạn không có quyền truy cập vào trang này.
+@section Styles {
+    <style>
+        .luxury-blur-bg {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-shadow {
+            box-shadow: 0 24px 40px rgba(30, 41, 59, 0.06);
+        }
+    </style>
+}
+
+<div class="flex items-center justify-center relative py-section-gap-md overflow-hidden min-h-[85vh]">
+    <!-- Background Imagery -->
+    <div class="absolute inset-0 z-0">
+        <div class="w-full h-full bg-cover bg-center opacity-40 scale-105 transform transition-transform duration-[10s] login-bg-image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAuYBt8CIxzN8hqDekIfwBi1dMK536pQGApkEKzWXvsIILQtM0GLC98QJUJMtSjO0MIJ-X9egJaLWVpS52dnEhUSKtWb5m66IW5ySz2sG9D_F_oev5S-t1qD0Yi9zdfst42M9-GkuwjxfjQ3jTcnRqOHFdKXo3i0dhbtJ2Lfid-EyR5jK_N8cEeCWVgCBgXCarYwM65JbRx9vYm_fVedFp3QCaNqiy-A62TLp7t6WKQvyI8MX6jaGK-ff9rjxF5LXLIF4y8RhCQv0GL')">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
+    </div>
+
+    <!-- Card Container -->
+    <div class="relative z-10 w-full max-w-[480px] px-margin-mobile md:px-0">
+        <div class="bg-surface-container-lowest border border-outline/10 rounded-xl custom-shadow p-8 md:p-12 luxury-blur-bg">
+            <div class="text-center">
+                <span class="material-symbols-outlined text-[64px] text-error mb-4">gpp_bad</span>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface mb-4">Truy Cập Bị Từ Chối</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mb-8">Bạn không có quyền hạn cần thiết để truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là sự nhầm lẫn.</p>
+                
+                <a asp-controller="Home" asp-action="Index" class="inline-flex items-center justify-center w-full h-14 bg-primary-container text-on-primary-container rounded-lg font-label-lg text-[16px] shadow-sm hover:opacity-90 active:scale-[0.98] transition-all">
+                    Quay Về Trang Chủ
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            const bg = document.querySelector('.login-bg-image');
+            if (bg) {
+                const x = (e.clientX / window.innerWidth) - 0.5;
+                const y = (e.clientY / window.innerHeight) - 0.5;
+                bg.style.transform = `scale(1.05) translate(${x * 20}px, ${y * 20}px)`;
+            }
+        });
+    </script>
+}

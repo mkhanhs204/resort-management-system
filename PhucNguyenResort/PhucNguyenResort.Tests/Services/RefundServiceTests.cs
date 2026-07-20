@@ -41,7 +41,7 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockEmailSender = new Mock<IEmailSender>();
-                var service = new RefundService(context, mockEmailSender.Object);
+                var service = new RefundService(context, mockEmailSender.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 // Act
                 var result = await service.ProcessRefundAsync(5);
@@ -65,7 +65,7 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockEmailSender = new Mock<IEmailSender>();
-                var service = new RefundService(context, mockEmailSender.Object);
+                var service = new RefundService(context, mockEmailSender.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 // Act
                 var result = await service.ProcessRefundAsync(999);
@@ -97,7 +97,7 @@ namespace PhucNguyenResort.Tests.Services
             using (var context = new ResortDbContext(options))
             {
                 var mockEmailSender = new Mock<IEmailSender>();
-                var service = new RefundService(context, mockEmailSender.Object);
+                var service = new RefundService(context, mockEmailSender.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 // Act
                 var result = await service.ProcessRefundAsync(6);

@@ -39,11 +39,53 @@
 <div class="d-flex justify-content-between align-items-end mb-4">
     <div>
         <h2 class="page-title">@ViewData["Title"]</h2>
-        <p class="page-subtitle">Quản lý và cấp quyền cho nhân viên</p>
+        <p class="page-subtitle" style="margin-bottom: 0;">Quản lý và cấp quyền cho nhân viên</p>
     </div>
     <a asp-action="Create" class="btn-luxury">
         <span class="material-symbols-outlined">person_add</span> Tạo Tài Khoản Mới
     </a>
+</div>
+
+<div class="luxury-card mb-4" style="background: #ffffff; border-radius: 16px; box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08); border: 1px solid rgba(212, 195, 182, 0.3); padding: 24px;">
+    <form asp-action="Index" method="get">
+        <div class="row align-items-end">
+            <div class="col-md-3 mb-3 mb-md-0">
+                <label style="font-size: 13px; font-weight: 600; color: #827569; margin-bottom: 8px; display: block;">Tìm theo tên/email</label>
+                <div class="input-group-luxury" style="display: flex; align-items: center; background: #f6f3ef; border-radius: 8px; padding: 2px 12px; border: 1px solid transparent;">
+                    <span class="material-symbols-outlined" style="color: #827569; font-size: 20px;">search</span>
+                    <input type="text" name="name" value="@ViewBag.CurrentName" style="border: none; background: transparent; outline: none; padding: 6px; width: 100%;" placeholder="Nhập tên..." />
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <label style="font-size: 13px; font-weight: 600; color: #827569; margin-bottom: 8px; display: block;">Vai trò</label>
+                <div class="input-group-luxury" style="display: flex; align-items: center; background: #f6f3ef; border-radius: 8px; padding: 2px 12px; border: 1px solid transparent;">
+                    <span class="material-symbols-outlined" style="color: #827569; font-size: 20px;">badge</span>
+                    <select name="roleId" asp-items="@ViewBag.RoleId" style="border: none; background: transparent; outline: none; padding: 6px; width: 100%;">
+                        <option value="">Tất cả vai trò</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <label style="font-size: 13px; font-weight: 600; color: #827569; margin-bottom: 8px; display: block;">Trạng thái</label>
+                <div class="input-group-luxury" style="display: flex; align-items: center; background: #f6f3ef; border-radius: 8px; padding: 2px 12px; border: 1px solid transparent;">
+                    <span class="material-symbols-outlined" style="color: #827569; font-size: 20px;">filter_list</span>
+                    <select name="status" style="border: none; background: transparent; outline: none; padding: 6px; width: 100%;">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="verified" selected="@(ViewBag.CurrentStatus == "verified")">Đang hoạt động</option>
+                        <option value="blocked" selected="@(ViewBag.CurrentStatus == "blocked")">Bị khóa</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3 d-flex" style="gap: 12px;">
+                <button type="submit" class="btn-luxury" style="padding: 6px 20px; height: 36px; display: flex; align-items: center; font-size: 14px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">filter_alt</span> Lọc
+                </button>
+                <a asp-action="Index" class="btn-luxury" style="padding: 6px 20px; height: 36px; background-color: transparent; border: 1px solid #d4c3b6; color: #50453b; display: flex; align-items: center; font-size: 14px; text-decoration: none;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">restart_alt</span> Xóa
+                </a>
+            </div>
+        </div>
+    </form>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -70,7 +112,7 @@
                 <th>Họ và Tên</th>
                 <th>Email</th>
                 <th>Số Điện Thoại</th>
-                <th>Vai Trò (Role)</th>
+                <th>Vai Trò</th>
                 <th>Trạng Thái</th>
                 <th style="text-align: right;">Thao Tác</th>
             </tr>
@@ -86,18 +128,18 @@
                         <span class="role-badge">@item.Role?.RoleName</span>
                     </td>
                     <td>
-                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                            @if (item.IsActive)
+                        <div style="display: flex; align-items: center;">
+                            @if (item.IsBlocked)
                             {
-                                <span class="status-badge verified">Verified</span>
+                                <span class="status-badge blocked" style="margin-top: 0;">Bị khóa</span>
+                            }
+                            else if (item.IsActive)
+                            {
+                                <span class="status-badge verified">Đang hoạt động</span>
                             }
                             else
                             {
-                                <span class="status-badge unverified">Unverified</span>
-                            }
-                            @if (item.IsBlocked)
-                            {
-                                <span class="status-badge blocked">Blocked</span>
+                                <span class="status-badge unverified">Chưa xác thực</span>
                             }
                         </div>
                     </td>
@@ -128,3 +170,35 @@
         </tbody>
     </table>
 </div>
+
+@if (ViewBag.TotalPages > 1)
+{
+    var currentRole = Context.Request.Query["roleId"].ToString();
+    <div class="mt-4 d-flex justify-content-center">
+        <nav>
+            <ul class="pagination" style="gap: 5px;">
+                <li class="page-item @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link" style="border-radius: 8px; color: #805528; border-color: #d4c3b6;" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, name = ViewBag.CurrentName, roleId = currentRole, status = ViewBag.CurrentStatus })">Trước</a>
+                </li>
+                
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    if (i == 1 || i == ViewBag.TotalPages || (i >= ViewBag.CurrentPage - 2 && i <= ViewBag.CurrentPage + 2))
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" style="border-radius: 8px; @(i == ViewBag.CurrentPage ? "background-color: #dfa974; border-color: #dfa974; color: white;" : "color: #805528; border-color: #d4c3b6;")" href="@Url.Action("Index", new { page = i, name = ViewBag.CurrentName, roleId = currentRole, status = ViewBag.CurrentStatus })">@i</a>
+                        </li>
+                    }
+                    else if (i == ViewBag.CurrentPage - 3 || i == ViewBag.CurrentPage + 3)
+                    {
+                        <li class="page-item disabled"><span class="page-link" style="border-radius: 8px; color: #805528; border-color: #d4c3b6;">...</span></li>
+                    }
+                }
+                
+                <li class="page-item @(ViewBag.CurrentPage >= ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" style="border-radius: 8px; color: #805528; border-color: #d4c3b6;" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, name = ViewBag.CurrentName, roleId = currentRole, status = ViewBag.CurrentStatus })">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}

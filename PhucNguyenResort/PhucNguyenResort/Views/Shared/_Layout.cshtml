@@ -200,7 +200,10 @@
     <!-- TopNavBar -->
     <header class="@(hasBanner ? "fixed top-0 w-full z-50 bg-surface backdrop-blur-md border-b border-outline-variant/10 shadow-sm transition-all duration-300 text-white header-transparent" : "sticky top-0 w-full z-50 bg-surface backdrop-blur-md border-b border-outline-variant/10 shadow-sm transition-all duration-300 text-on-surface")" id="main-header" data-has-banner="@hasBanner.ToString().ToLower()">
         <nav class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto transition-all duration-300 gap-8" id="main-nav">
-            <a asp-controller="Home" asp-action="Index" class="font-headline-md text-headline-md font-bold text-on-surface hover:text-primary transition-colors whitespace-nowrap mr-8 brand-text">Phúc Nguyên Resort</a>
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[32px]">spa</span>
+                <a asp-controller="Home" asp-action="Index" class="font-headline-md text-headline-md font-bold text-on-surface hover:text-primary transition-colors whitespace-nowrap mr-8 brand-text">Phúc Nguyên Resort</a>
+            </div>
             
             <!-- Desktop Nav -->
             <ul class="hidden xl:flex items-center space-x-4 flex-1 justify-center">
@@ -341,64 +344,96 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-surface-container-low border-t border-outline-variant/20 w-full py-section-gap-md">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop max-w-container-max mx-auto">
-            <div class="space-y-6">
-                <div class="font-headline-sm text-headline-sm text-primary font-bold">Phúc Nguyên Resort</div>
-                <p class="font-body-md text-on-surface-variant/80">
-                    Nơi sự tĩnh lặng lên ngôi. Trải nghiệm kỳ nghỉ xa hoa tại một trong những điểm đến đẹp nhất Việt Nam.
-                </p>
-                <div class="flex space-x-4">
-                    <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
-                        <span class="material-symbols-outlined !text-[20px]">public</span>
-                    </a>
-                    <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
-                        <span class="material-symbols-outlined !text-[20px]">photo_camera</span>
-                    </a>
-                    <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
-                        <span class="material-symbols-outlined !text-[20px]">play_circle</span>
-                    </a>
+    <footer class="bg-surface-container-low border-t border-outline-variant/20 w-full pt-section-gap-md pb-8">
+        <div class="px-margin-desktop max-w-container-max mx-auto">
+            
+
+            <!-- Main Footer Content -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-y-10 lg:gap-x-8 mb-12">
+                
+                <!-- Brand & Description (Col span 4) -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-[32px]">spa</span>
+                        <span class="font-headline-sm text-headline-sm text-primary font-bold tracking-wide">Phúc Nguyên Resort</span>
+                    </div>
+                    <p class="font-body-md text-on-surface-variant/80 leading-relaxed pr-4">
+                        Nơi sự tĩnh lặng lên ngôi. Trải nghiệm kỳ nghỉ xa hoa tại một trong những điểm đến nghỉ dưỡng sinh thái hàng đầu Việt Nam. Khám phá vẻ đẹp thiên nhiên hùng vĩ và dịch vụ đẳng cấp quốc tế.
+                    </p>
+                    <div class="flex space-x-3 pt-2">
+                        <a class="w-10 h-10 rounded-full bg-surface border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm" href="#" title="Facebook">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a class="w-10 h-10 rounded-full bg-surface border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm" href="#" title="Instagram">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a class="w-10 h-10 rounded-full bg-surface border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm" href="#" title="YouTube">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links (Col span 2) -->
+                <div class="lg:col-span-2">
+                    <h4 class="font-label-lg text-label-lg text-on-surface mb-6 uppercase tracking-widest border-b border-primary/20 pb-2 inline-block">Liên Kết</h4>
+                    <ul class="space-y-4">
+                        <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2" asp-controller="Home" asp-action="Index"><span class="material-symbols-outlined text-[14px]">chevron_right</span> Trang Chủ</a></li>
+                        <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2" asp-controller="Home" asp-action="SearchRooms"><span class="material-symbols-outlined text-[14px]">chevron_right</span> Phòng Ngủ</a></li>
+                        <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2" asp-controller="CustomerTourBooking" asp-action="Index"><span class="material-symbols-outlined text-[14px]">chevron_right</span> Đặt Tour</a></li>
+                        <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2" asp-controller="Home" asp-action="AboutUs"><span class="material-symbols-outlined text-[14px]">chevron_right</span> Về Chúng Tôi</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services (Col span 2) -->
+                <div class="lg:col-span-2">
+                    <h4 class="font-label-lg text-label-lg text-on-surface mb-6 uppercase tracking-widest border-b border-primary/20 pb-2 inline-block">Dịch Vụ</h4>
+                    <ul class="space-y-4">
+                        <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2" asp-controller="TableReservations" asp-action="Search"><span class="material-symbols-outlined text-[14px]">chevron_right</span> Đặt Bàn Tiệc</a></li>
+                        <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2" asp-controller="FoodOrders" asp-action="RoomService"><span class="material-symbols-outlined text-[14px]">chevron_right</span> Gọi Đồ Ăn</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info (Col span 4) -->
+                <div class="lg:col-span-4">
+                    <h4 class="font-label-lg text-label-lg text-on-surface mb-6 uppercase tracking-widest border-b border-primary/20 pb-2 inline-block">Liên Hệ</h4>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="material-symbols-outlined text-[18px] text-primary">location_on</span>
+                            </div>
+                            <div>
+                                <div class="font-label-sm font-bold text-on-surface">Địa chỉ</div>
+                                <div class="font-body-md text-on-surface-variant/80 text-[14px]">123 Đường Sinh Thái, Vườn Quốc Gia, Tỉnh Hòa Bình, Việt Nam</div>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="material-symbols-outlined text-[18px] text-primary">phone</span>
+                            </div>
+                            <div>
+                                <div class="font-label-sm font-bold text-on-surface">Điện thoại</div>
+                                <a href="tel:+84123456789" class="font-body-md text-on-surface-variant/80 text-[14px] hover:text-primary transition-colors">+84 123 456 789</a>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="material-symbols-outlined text-[18px] text-primary">mail</span>
+                            </div>
+                            <div>
+                                <div class="font-label-sm font-bold text-on-surface">Email</div>
+                                <a href="mailto:info@phucnguyenresort.com" class="font-body-md text-on-surface-variant/80 text-[14px] hover:text-primary transition-colors">info@phucnguyenresort.com</a>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            
-            <div>
-                <h4 class="font-label-lg text-label-lg text-on-surface mb-8 uppercase tracking-widest">Liên Kết</h4>
-                <ul class="space-y-4">
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" asp-controller="Home" asp-action="SearchRooms">Phòng Ngủ</a></li>
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" asp-controller="CustomerTourBooking" asp-action="Index">Tour</a></li>
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a></li>
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" asp-controller="Home" asp-action="Contact">Liên Hệ</a></li>
-                </ul>
-            </div>
-            
-            <div>
-                <h4 class="font-label-lg text-label-lg text-on-surface mb-8 uppercase tracking-widest">Hỗ Trợ</h4>
-                <ul class="space-y-4">
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" href="#">FAQ</a></li>
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" href="#">Chính Sách Hủy Phòng</a></li>
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" href="#">Vận Chuyển Sân Bay</a></li>
-                    <li><a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors" href="#">Membership</a></li>
-                </ul>
-            </div>
-            
-            <div>
-                <h4 class="font-label-lg text-label-lg text-on-surface mb-8 uppercase tracking-widest">Nhận Thông Tin</h4>
-                <p class="font-body-md text-on-surface-variant/80 mb-6">Đăng ký để nhận ưu đãi bí mật và tin tức từ chúng tôi.</p>
-                <div class="flex">
-                    <input class="flex-1 bg-surface-container px-4 py-3 rounded-l-lg border-none focus:ring-1 focus:ring-primary text-body-md outline-none" placeholder="Email của bạn" type="email"/>
-                    <button class="bg-primary text-white px-4 rounded-r-lg hover:bg-primary/90 transition-colors">
-                        <span class="material-symbols-outlined">chevron_right</span>
-                    </button>
+
+            <!-- Bottom Bar: Copyright & Policies -->
+            <div class="border-t border-outline-variant/20 pt-6 mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="font-body-md text-[13px] text-on-surface-variant/70 text-center md:text-left">
+                    &copy; @DateTime.Now.Year Phúc Nguyên Resort. Tất cả quyền được bảo lưu. <br class="hidden md:block lg:hidden" />Thiết kế bởi Nhóm G1 - SE2023.
                 </div>
-            </div>
-        </div>
-        
-        <div class="max-w-container-max mx-auto px-margin-desktop mt-20 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <span class="font-label-sm text-label-sm text-on-surface-variant/60">&copy; @DateTime.Now.Year Phúc Nguyên Resort. All Rights Reserved.</span>
-            <div class="flex space-x-6">
-                <span class="font-label-sm text-label-sm text-on-surface-variant/60 hover:text-primary cursor-pointer">English</span>
-                <span class="font-label-sm text-label-sm text-on-surface-variant/60 hover:text-primary cursor-pointer">Tiếng Việt</span>
+               
             </div>
         </div>
     </footer>

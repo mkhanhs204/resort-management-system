@@ -115,17 +115,32 @@ namespace PhucNguyenResort.Web.Controllers
 
         // 1. System Admin Dashboard
         [Authorize(Roles = "System Admin")]
-        public async Task<IActionResult> Admin()
+        public async Task<IActionResult> Admin(int page = 1)
         {
-            ViewBag.TotalStaff = await _context.Users.CountAsync();
+            int totalStaffCount = await _context.Users.CountAsync();
+            ViewBag.TotalStaff = totalStaffCount;
             ViewBag.ActiveAccounts = await _context.Users.CountAsync(u => u.IsActive);
             ViewBag.SystemRoles = await _context.Roles.CountAsync();
             ViewBag.InactiveAccounts = await _context.Users.CountAsync(u => !u.IsActive || u.IsBlocked);
             
-            ViewBag.RecentStaff = await _context.Users
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+            var recentStaffQuery = _context.Users.Where(u => u.CreatedAt >= sevenDaysAgo);
+            int totalRecentItems = await recentStaffQuery.CountAsync();
+
+            int pageSize = 10;
+            int totalPages = (int)Math.Ceiling((double)totalRecentItems / pageSize);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            ViewBag.RecentStaff = await recentStaffQuery
                 .Include(u => u.Role)
-                .OrderByDescending(u => u.UserId)
-                .Take(10)
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return View();

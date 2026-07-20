@@ -1,110 +1,242 @@
-﻿@model List<PhucNguyenResort.ViewModels.Maintenance.MaintenanceTaskViewModel>
+@model List<PhucNguyenResort.ViewModels.Maintenance.MaintenanceTaskViewModel>
 @{
-    ViewData["Title"] = "Maintenance Requests";
+    ViewData["Title"] = "Yêu Cầu Bảo Trì";
     Layout = "_DashboardLayout";
     string currentStaff = User.Identity?.Name ?? "Unknown Staff";
 }
 
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528;
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef;
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .luxury-table thead th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td { border-bottom: none; }
+        .luxury-table tbody tr:hover { background-color: #fcf9f5; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-luxury {
+            background-color: #dfa974;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 16px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+        .btn-luxury.success {
+            background-color: #28a745;
+        }
+        .btn-luxury.success:hover {
+            background-color: #218838;
+        }
+        .btn-luxury.disabled {
+            background-color: #f0ede9;
+            color: #827569;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .luxury-badge.danger { background-color: #ffdad6; color: #ba1a1a; }
+        .luxury-badge.warning { background-color: #ffefd6; color: #805528; }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .luxury-alert.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-alert.error { background-color: #ffdad6; color: #93000a; }
+        
+        .stat-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            height: 100%;
+        }
+        .stat-card.danger { border-top: 4px solid #dc3545; }
+        .stat-card.success { border-top: 4px solid #28a745; }
+        .stat-icon { font-size: 40px; margin-bottom: 12px; }
+        .stat-icon.danger { color: #dc3545; }
+        .stat-icon.success { color: #28a745; }
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+        .stat-value.danger { color: #dc3545; }
+        .stat-value.success { color: #28a745; }
+        .stat-title {
+            color: #50453b;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            Yêu Cầu Bảo Trì
+        </h2>
+        <p class="page-subtitle">Danh sách sự cố trang thiết bị phòng đang chờ đội kỹ thuật hỗ trợ xử lý.</p>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+    </div>
+</div>
+
 @if (ViewBag.LocalSuccessMessage != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert" style="font-family: 'Cabin', sans-serif;">
-        <i class="fa fa-check-circle mr-2"></i> @ViewBag.LocalSuccessMessage
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+    <div class="luxury-alert success alert-dismissible fade show" role="alert" id="alert-success">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <div>@ViewBag.LocalSuccessMessage</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
         </button>
     </div>
 }
 @if (ViewBag.LocalErrorMessage != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="font-family: 'Cabin', sans-serif;">
-        <i class="fa fa-exclamation-circle mr-2"></i> @ViewBag.LocalErrorMessage
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+    <div class="luxury-alert error alert-dismissible fade show" role="alert" id="alert-error">
+        <span class="material-symbols-outlined fill">error</span>
+        <div>@ViewBag.LocalErrorMessage</div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; margin-left: auto; color: inherit; cursor: pointer;">
+            <span class="material-symbols-outlined">close</span>
         </button>
     </div>
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-wrench mr-2" style="color: #6c757d;"></i> Maintenance — Maintenance Requests
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Danh sách các sự cố trang thiết bị phòng đang chờ đội kỹ thuật hỗ trợ xử lý.</p>
+
+<div class="luxury-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Sự Cố</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div style="position: relative;">
+                <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #827569; font-size: 20px;">search</span>
+                <input type="text" id="searchRoomInput" class="form-control" placeholder="Tìm số phòng..." style="width: 200px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px 8px 40px; font-family: 'Inter', sans-serif;" />
             </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row mb-4" style="font-family: 'Cabin', sans-serif;">
-    <div class="col-md-5 mb-2 mb-md-0">
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text bg-light text-muted"><i class="fa fa-search"></i></span>
-            </div>
-            <input type="text" id="searchRoomInput" class="form-control" placeholder="Nhập số phòng cần tìm kiếm...">
-        </div>
-    </div>
-    <div class="col-md-3 mb-2 mb-md-0">
-        <select id="filterFloorSelect" class="form-control">
-            <option value="">-- Tất cả các tầng --</option>
-            @foreach (var floor in Model.Select(m => m.FloorNumber).Distinct().OrderBy(f => f))
-            {
-                <option value="Tầng @floor">Tầng @floor</option>
-            }
-        </select>
-    </div>
-    <div class="col-md-4">
-        <select id="filterStatusSelect" class="form-control">
-            <option value="">-- Tất cả trạng thái sự cố --</option>
-            <option value="Pending">Pending Fix (Chờ tiếp nhận)</option>
-            <option value="Fixing">Fixing (Đang sửa chữa)</option>
-        </select>
-    </div>
-</div>
+            <select id="filterFloorSelect" class="form-control" style="width: 160px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font-family: 'Inter', sans-serif;">
+                <option value="">Tất cả các tầng</option>
+                @foreach (var floor in Model.Select(m => m.FloorNumber).Distinct().OrderBy(f => f))
+                {
+                    <option value="Tầng @floor">Tầng @floor</option>
+                }
+            </select>
 
-<div class="row mb-4">
-    <div class="col-lg-6 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #dc3545; padding: 20px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 6px;">
-            <i class="fa fa-exclamation-triangle fa-lg text-danger mb-2"></i>
-            <h3 class="font-weight-bold" style="font-family: 'Lora', serif; color: #dc3545; margin-bottom: 2px;">@ViewData["PendingTasksCount"]</h3>
-            <h6 class="text-muted font-weight-bold mb-0" style="font-family: 'Cabin', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Sự cố chưa xử lý</h6>
+            <select id="filterStatusSelect" class="form-control" style="width: 200px; background-color: #f6f3ef; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font-family: 'Inter', sans-serif;">
+                <option value="">Tất cả trạng thái</option>
+                <option value="Pending">Chờ tiếp nhận</option>
+                <option value="Fixing">Đang xử lý</option>
+            </select>
         </div>
     </div>
 
-    <div class="col-lg-6 col-md-6 mb-3">
-        <div class="card-box text-center h-100" style="border-top: 4px solid #28a745; padding: 20px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 6px;">
-            <i class="fa fa-check-circle fa-lg text-success mb-2"></i>
-            <h3 class="font-weight-bold" style="font-family: 'Lora', serif; color: #28a745; margin-bottom: 2px;">@ViewData["ResolvedTodayCount"]</h3>
-            <h6 class="text-muted font-weight-bold mb-0" style="font-family: 'Cabin', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Đã khắc phục hôm nay</h6>
-        </div>
-    </div>
-</div>
-
-<div class="card-box mb-4" style="border-left: 5px solid #dc3545; background: #fff; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 6px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #333;">
-            <i class="fa fa-list mr-2" style="color: #6c757d;"></i> Yêu cầu xử lý sự cố thiết bị phòng
-        </h5>
-        <span class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 13px;">
-            Tiếp nhận tác vụ trước khi sửa và bấm hoàn thành sau khi kiểm tra thiết bị thực tế.
-        </span>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="maintenance-table">
             <thead>
-                <tr class="bg-light text-dark" style="font-weight: 600;">
-                    <th>Room Number</th>
-                    <th>Category</th>
-                    <th>Issue Description</th>
-                    <th>Reported Time</th>
-                    <th>Current Status</th>
-                    <th class="text-center" style="width: 200px;">Action</th>
+                <tr>
+                    <th>Số Phòng</th>
+                    <th>Hạng Phòng</th>
+                    <th>Mô Tả Sự Cố</th>
+                    <th>Thời Gian Báo</th>
+                    <th>Trạng Thái</th>
+                    <th style="text-align: center;">Thao Tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -113,51 +245,54 @@
                     foreach (var task in Model)
                     {
                         <tr class="active-task-row" data-room-number="@task.RoomNumber" data-floor="Tầng @task.FloorNumber" data-status="@(string.IsNullOrEmpty(task.AssignedStaffName) ? "Pending" : "Fixing")">
-                            <td class="align-middle font-weight-bold" style="font-size: 15px; color: #1a1a1a;">Room @task.RoomNumber</td>
-                            <td class="align-middle">@task.RoomType</td>
-                            <td class="align-middle text-dark">@task.Description</td>
-                            <td class="align-middle text-muted" style="font-size: 13px;">
-                                <i class="fa fa-clock-o mr-1"></i> @task.CreatedAt.ToString("g")
+                            <td><strong style="color: #1c1c1a; font-weight: 600;">Phòng @task.RoomNumber</strong></td>
+                            <td style="color: #50453b;">@task.RoomType</td>
+                            <td style="color: #1c1c1a;">@task.Description</td>
+                            <td style="color: #827569; font-size: 13px;">
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                                    @task.CreatedAt.ToString("g")
+                                </div>
                             </td>
-                            <td class="align-middle">
+                            <td>
                                 @if (string.IsNullOrEmpty(task.AssignedStaffName))
                                 {
-                                    <span class="badge badge-danger p-2 font-weight-bold" style="font-size: 11px; background-color: #dc3545; color: white; border-radius: 4px;">
-                                        <i class="fa fa-exclamation-triangle mr-1"></i> Pending Fix
+                                    <span class="luxury-badge danger">
+                                        <span class="material-symbols-outlined fill" style="font-size: 14px;">warning</span> Chờ xử lý
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-warning p-2 font-weight-bold text-dark" style="font-size: 11px; background-color: #ffc107; border-radius: 4px;">
-                                        <i class="fa fa-wrench mr-1 fa-spin"></i> Fixing (@task.AssignedStaffName)
+                                    <span class="luxury-badge warning">
+                                        <span class="material-symbols-outlined fill" style="font-size: 14px;">build</span> Đang xử lý (@task.AssignedStaffName)
                                     </span>
                                 }
                             </td>
-                            <td class="align-middle text-center">
+                            <td style="text-align: center;">
                                 @if (string.IsNullOrEmpty(task.AssignedStaffName))
                                 {
-                                    <form asp-controller="Maintenance" asp-action="StartFixing" method="post" class="mb-0">
+                                    <form asp-controller="Maintenance" asp-action="StartFixing" method="post" class="mb-0" style="display: inline-block;">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="requestId" value="@task.RequestId" />
-                                        <button type="submit" class="btn btn-sm btn-warning font-weight-bold text-dark shadow-sm" style="padding: 7px 15px; border-radius: 4px; min-width: 145px; background-color: #ffc107; border-color: #ffc107;">
-                                            <i class="fa fa-play mr-1"></i> Tiếp nhận tác vụ
+                                        <button type="submit" class="btn-luxury" style="min-width: 140px;">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span> Tiếp nhận
                                         </button>
                                     </form>
                                 }
                                 else if (task.AssignedStaffName == currentStaff)
                                 {
-                                    <form asp-controller="Maintenance" asp-action="ResolveTask" method="post" class="mb-0">
+                                    <form asp-controller="Maintenance" asp-action="ResolveTask" method="post" class="mb-0" style="display: inline-block;">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="requestId" value="@task.RequestId" />
-                                        <button type="submit" class="btn btn-sm btn-success font-weight-bold shadow-sm" style="padding: 7px 15px; border-radius: 4px; min-width: 145px; background-color: #28a745; border-color: #28a745;">
-                                            <i class="fa fa-check mr-1"></i> Mark Resolved
+                                        <button type="submit" class="btn-luxury success" style="min-width: 140px;">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">check</span> Đã xử lý xong
                                         </button>
                                     </form>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-sm btn-light font-weight-bold text-muted" disabled style="padding: 7px 15px; border-radius: 4px; min-width: 145px; background-color: #f8f9fa;">
-                                        <i class="fa fa-lock mr-1"></i> Đang sửa bởi người khác
+                                    <button class="btn-luxury disabled" disabled style="min-width: 140px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">lock</span> Đang khóa
                                     </button>
                                 }
                             </td>
@@ -167,11 +302,12 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-5" style="background: #fafafa;">
-                            <h5 class="mb-2" style="font-family: 'Lora', serif; font-weight: bold; color: #555;">
-                                <i class="fa fa-heartbeat fa-2x text-success d-block mb-3"></i>Không có sự cố nào cần bảo trì!
-                            </h5>
-                            <p class="mb-0" style="font-size: 14px;">Tất cả trang thiết bị tại resort đều đang vận hành ổn định và an toàn.</p>
+                        <td colspan="6" style="text-align: center; padding: 60px 20px; color: #827569;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 56px; color: #28a745;">favorite</span>
+                                <div style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #1c1c1a;">Không có sự cố nào cần bảo trì!</div>
+                                <div>Tất cả trang thiết bị tại resort đều đang vận hành ổn định và an toàn.</div>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -183,6 +319,28 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // Auto dismiss alerts
+            setTimeout(function () {
+                var alerts = document.querySelectorAll('#alert-success, #alert-error');
+                alerts.forEach(function (el) {
+                    if (el) {
+                        el.style.transition = "opacity 0.5s ease";
+                        el.style.opacity = "0";
+                        setTimeout(() => el.remove(), 500);
+                    }
+                });
+            }, 4000);
+            
+            document.querySelectorAll('.luxury-alert .close').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    var alert = this.closest('.luxury-alert');
+                    alert.style.transition = "opacity 0.3s ease";
+                    alert.style.opacity = "0";
+                    setTimeout(() => alert.remove(), 300);
+                });
+            });
+
+            // Filtering
             function filterMaintenanceTasks() {
                 var searchText = $("#searchRoomInput").val().toLowerCase().trim();
                 var selectedFloor = $("#filterFloorSelect").val();

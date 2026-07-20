@@ -327,7 +327,7 @@
                     <th>Yêu Cầu Thêm</th>
                     @if (canManageReservationStatus)
                     {
-                        <th style="text-align: right;">Thao Tác</th>
+                        <th style="text-align: center;">Thao Tác</th>
                     }
                 </tr>
             </thead>
@@ -406,7 +406,7 @@
                                     <span class="luxury-badge red"><span class="material-symbols-outlined" style="font-size: 14px;">cancel</span> Đã hủy</span>
                                 }
                             </td>
-                            <td style="min-width: 200px;">
+                            <td style="min-width: 140px;">
                                 @if (!reservation.BookingId.HasValue)
                                 {
                                     <span class="luxury-badge" style="background-color: #f6f3ef;">Khách vãng lai</span>
@@ -447,7 +447,7 @@
                             </td>
                             @if (canManageReservationStatus)
                             {
-                                <td style="text-align: right; min-width: 260px;">
+                                <td style="text-align: right; min-width: 150px;">
                                     <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px;">
                                         @if (reservation.CanConfirm)
                                         {
@@ -519,7 +519,7 @@
                                         }
                                         @if (!reservation.CanConfirm && !reservation.CanSeat && !reservation.CanComplete && !reservation.CanMarkNoShow && !reservation.CanCancel && reservation.Status != TableReservationStatus.Seated)
                                         {
-                                            <span style="color: #b9aba0; font-size: 13px; font-style: italic;">Không</span>
+                                            <span style="color: #b9aba0; font-size: 13px; font-style: italic; text-align: left;">Không</span>
                                         }
                                     </div>
                                 </td>

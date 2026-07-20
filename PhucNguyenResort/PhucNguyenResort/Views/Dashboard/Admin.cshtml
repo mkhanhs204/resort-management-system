@@ -170,19 +170,18 @@
                                     <span class="role-badge">@user.Role?.RoleName</span>
                                 </td>
                                 <td>
-                                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                                        @if (user.IsActive)
+                                    <div style="display: flex; align-items: center;">
+                                        @if (user.IsBlocked)
                                         {
-                                            <span class="status-badge verified">Verified</span>
+                                            <span class="status-badge blocked" style="margin-top: 0;">Bị khóa</span>
+                                        }
+                                        else if (user.IsActive)
+                                        {
+                                            <span class="status-badge verified">Đang hoạt động</span>
                                         }
                                         else
                                         {
-                                            <span class="status-badge unverified">Unverified</span>
-                                        }
-                                        
-                                        @if (user.IsBlocked)
-                                        {
-                                            <span class="status-badge blocked">Blocked</span>
+                                            <span class="status-badge unverified">Chưa xác thực</span>
                                         }
                                     </div>
                                 </td>
@@ -200,5 +199,36 @@
                 </tbody>
             </table>
         </div>
+        
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="mt-4 d-flex justify-content-center">
+                <nav>
+                    <ul class="pagination" style="gap: 5px;">
+                        <li class="page-item @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
+                            <a class="page-link" style="border-radius: 8px; color: #805528; border-color: #d4c3b6;" asp-controller="Dashboard" asp-action="Admin" asp-route-page="@(ViewBag.CurrentPage - 1)">Trước</a>
+                        </li>
+                        
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            if (i == 1 || i == ViewBag.TotalPages || (i >= ViewBag.CurrentPage - 2 && i <= ViewBag.CurrentPage + 2))
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link" style="border-radius: 8px; @(i == ViewBag.CurrentPage ? "background-color: #dfa974; border-color: #dfa974; color: white;" : "color: #805528; border-color: #d4c3b6;")" asp-controller="Dashboard" asp-action="Admin" asp-route-page="@i">@i</a>
+                                </li>
+                            }
+                            else if (i == ViewBag.CurrentPage - 3 || i == ViewBag.CurrentPage + 3)
+                            {
+                                <li class="page-item disabled"><span class="page-link" style="border-radius: 8px; color: #805528; border-color: #d4c3b6;">...</span></li>
+                            }
+                        }
+                        
+                        <li class="page-item @(ViewBag.CurrentPage >= ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" style="border-radius: 8px; color: #805528; border-color: #d4c3b6;" asp-controller="Dashboard" asp-action="Admin" asp-route-page="@(ViewBag.CurrentPage + 1)">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     </div>
 </div>

@@ -1,97 +1,199 @@
-﻿@model List<PhucNguyenResort.Web.Models.ViewModels.CleaningHistoryViewModel>
+@model List<PhucNguyenResort.Web.Models.ViewModels.CleaningHistoryViewModel>
 @{
     ViewData["Title"] = "Nhật Ký Dọn Phòng";
     Layout = "_DashboardLayout";
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-history mr-2" style="color: #6c757d;"></i> Nhật Ký Dọn Phòng
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Tra cứu, lọc dữ liệu công tác vệ sinh và bàn giao phòng sạch của resort.</p>
-            </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef; /* surface-container-low */
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .luxury-table thead th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td { border-bottom: none; }
+        .luxury-table tbody tr:hover { background-color: #fcf9f5; }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .luxury-badge.green { background-color: #e2f5ea; color: #0b5c2d; border: 1px solid #c2ebd5; }
+        .luxury-badge.light { background-color: #ffffff; color: #1c1c1a; border: 1px solid #d4c3b6; }
+        
+        .form-control-luxury {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'Inter', sans-serif;
+            color: #1c1c1a;
+            width: 100%;
+        }
+        .form-control-luxury:focus {
+            border-color: #805528;
+            box-shadow: 0 0 0 2px rgba(128, 85, 40, 0.2);
+            background-color: #ffffff;
+            outline: none;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            <span class="material-symbols-outlined" style="font-size: 36px; color: #805528; margin-right: 8px;">history</span> 
+            Nhật Ký Dọn Phòng
+        </h2>
+        <div class="page-subtitle">Tra cứu, lọc dữ liệu công tác vệ sinh và bàn giao phòng sạch của resort.</div>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
     </div>
 </div>
 
-<div class="row mb-4" style="font-family: 'Cabin', sans-serif;">
-    <div class="col-md-12 mb-2 mb-md-0">
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text bg-light text-muted"><i class="fa fa-search"></i></span>
+<div class="luxury-card">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-12 mb-2 mb-md-0">
+            <div style="display: flex; align-items: center; gap: 10px; background-color: #f6f3ef; border-radius: 8px; padding: 0 16px;">
+                <span class="material-symbols-outlined" style="color: #827569;">search</span>
+                <input type="text" id="searchHistoryInput" style="border: none; background: transparent; padding: 12px 0; width: 100%; outline: none; font-family: 'Inter', sans-serif; color: #1c1c1a;" placeholder="Nhập số phòng hoặc tên nhân viên cần tìm... (Ví dụ: 101, An)">
             </div>
-            <input type="text" id="searchHistoryInput" class="form-control" placeholder="Nhập số phòng hoặc tên nhân viên cần tìm... (Ví dụ: 101, An)">
         </div>
     </div>
-</div>
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="card-box" style="border-left: 5px solid #28a745; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #333;">
-                    <i class="fa fa-file-text-o mr-2" style="color: #6c757d;"></i> Lịch sử công tác hoàn thành
-                </h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
-                    <thead>
-                        <tr class="bg-light">
-                            <th>Mã đơn</th>
-                            <th>Số phòng</th>
-                            <th>Hạng phòng</th>
-                            <th>Nhân viên thực hiện</th>
-                            <th>Thời gian hoàn thành</th>
-                            <th>Thời lượng dọn</th>
-                            <th>Ghi chú chi tiết</th>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #1c1c1a; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined" style="color: #0b5c2d;">description</span> Lịch sử công tác hoàn thành
+        </h5>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="luxury-table">
+            <thead>
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Số Phòng</th>
+                    <th>Hạng Phòng</th>
+                    <th>Nhân Viên Thực Hiện</th>
+                    <th>Thời Gian Hoàn Thành</th>
+                    <th>Thời Lượng Dọn</th>
+                    <th>Ghi Chú Chi Tiết</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr class="history-room-row" data-room="@item.RoomNumber" data-staff="@item.AssignedStaffName">
+                            <td style="color: #827569; font-weight: 600;">#CP-@item.LogId</td>
+                            <td><strong style="color: #1c1c1a; font-size: 15px;">Phòng @item.RoomNumber</strong></td>
+                            <td>@item.RoomType</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 6px; color: #1c1c1a; font-weight: 500;">
+                                    <span class="material-symbols-outlined" style="color: #0b5c2d; font-size: 20px;">account_circle</span>
+                                    @(string.IsNullOrEmpty(item.AssignedStaffName) ? "Ẩn danh" : item.AssignedStaffName)
+                                </div>
+                            </td>
+                            <td style="color: #50453b;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">schedule</span>
+                                    @item.CompletedAt.ToString("g")
+                                </div>
+                            </td>
+                            <td>
+                                <span class="luxury-badge light">
+                                    <span class="material-symbols-outlined" style="color: #dfa974; font-size: 16px;">hourglass_bottom</span> 
+                                    @item.Duration
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="luxury-badge green">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Sạch sẽ
+                                    </span>
+                                    <span style="color: #827569; font-size: 13px;">
+                                        @(string.IsNullOrEmpty(item.Notes) ? "Không có ghi chú" : item.Notes)
+                                    </span>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var item in Model)
-                            {
-                                <tr class="history-room-row" data-room="@item.RoomNumber" data-staff="@item.AssignedStaffName">
-                                    <td class="align-middle text-secondary font-weight-bold">#CP-@item.LogId</td>
-                                    <td class="align-middle font-weight-bold" style="color: #1a1a1a;">@item.RoomNumber</td>
-                                    <td class="align-middle">@item.RoomType</td>
-                                    <td class="align-middle">
-                                        <i class="fa fa-user-circle-o text-success mr-1"></i> @(string.IsNullOrEmpty(item.AssignedStaffName) ? "Ẩn danh" : item.AssignedStaffName)
-                                    </td>
-                                    <td class="align-middle text-muted">
-                                        <i class="fa fa-clock-o mr-1"></i> @item.CompletedAt.ToString("g")
-                                    </td>
-                                    <td class="align-middle">
-                                        <span class="badge badge-light border text-dark px-2 py-1">
-                                            <i class="fa fa-hourglass-half text-warning mr-1"></i> @item.Duration
-                                        </span>
-                                    </td>
-                                    <td class="align-middle text-dark">
-                                        <span class="badge badge-success px-2 py-1"><i class="fa fa-check"></i> Sạch sẽ</span>
-                                        <span class="ml-2 text-muted">@(string.IsNullOrEmpty(item.Notes) ? "Không có ghi chú" : item.Notes)</span>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-5">
-                                    <h5 class="mb-2" style="font-family: 'Lora', serif;"><i class="fa fa-folder-open-o fa-2x text-muted d-block mb-3"></i>Không tìm thấy dữ liệu nhật ký dọn phòng nào trong hệ thống.</h5>
-                                    <p class="mb-0">Dữ liệu sẽ xuất hiện sau khi nhân viên phòng hoàn thành thao tác dọn dẹp tại trang "Housekeeping Queue".</p>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 60px 20px; color: #827569;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #a4b5ce; margin-bottom: 16px; display: block;">folder_open</span>
+                            <h5 style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a; margin-bottom: 8px;">Không tìm thấy dữ liệu nhật ký dọn phòng nào trong hệ thống.</h5>
+                            <p style="font-size: 15px; margin: 0;">Dữ liệu sẽ xuất hiện sau khi nhân viên phòng hoàn thành thao tác dọn dẹp tại trang "Hàng Chờ Làm Vệ Sinh".</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 

@@ -22,9 +22,46 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: StaffAccounts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? name, int? roleId, string? status, int page = 1)
         {
-            var users = await _userService.GetAllUsersAsync();
+            var query = _context.Users.Include(u => u.Role).AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(u => u.FullName.Contains(name) || u.Email.Contains(name));
+            }
+
+            if (roleId.HasValue && roleId > 0)
+            {
+                query = query.Where(u => u.RoleId == roleId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(status))
+            {
+                if (status == "verified") query = query.Where(u => u.IsActive && !u.IsBlocked);
+                else if (status == "unverified") query = query.Where(u => !u.IsActive);
+                else if (status == "blocked") query = query.Where(u => u.IsBlocked);
+            }
+
+            int totalItems = await query.CountAsync();
+            int pageSize = 10;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            var users = await query
+                .OrderByDescending(u => u.UserId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            await PopulateRolesDropDownList(roleId);
+            ViewBag.CurrentName = name;
+            ViewBag.CurrentStatus = status;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
             return View(users);
         }
 
