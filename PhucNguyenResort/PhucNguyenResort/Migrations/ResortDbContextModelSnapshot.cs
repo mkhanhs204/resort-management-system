@@ -2650,13 +2650,9 @@ namespace PhucNguyenResort.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
 
-<<<<<<< HEAD
-=======
                     b.Property<string>("AssignedStaffName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
->>>>>>> main
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 

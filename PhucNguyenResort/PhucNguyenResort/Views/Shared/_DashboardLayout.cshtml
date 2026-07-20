@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
 
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="~/css/elegant-icons.css" type="text/css">
@@ -27,9 +30,12 @@
     <div id="wrapper">
         <nav id="sidebar">
             <div class="sidebar-header">
-                <a href="/" style="text-decoration: none; display: block;">
-                    <h3>PhucNguyen</h3>
-                    <span style="color: #aaa; font-size: 13px; display: block; margin-top: 3px; font-weight: normal; letter-spacing: 0.5px;">Resort Management</span>
+                <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="color: #dfa974; font-size: 32px; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;">spa</span>
+                    <div>
+                        <h3 style="margin-bottom: 0; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 20px; color: #dfa974; letter-spacing: 0.5px; text-transform: none;">Phúc Nguyên</h3>
+                        <span style="color: #aaa; font-size: 12px; display: block; margin-top: 2px; font-weight: normal; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Resort Management</span>
+                    </div>
                 </a>
             </div>
 
@@ -56,15 +62,15 @@
                 <li class="@(isOverviewActive ? "active" : "")">
                     @if (User.IsInRole("Maintenance Staff"))
                     {
-                        <a asp-controller="Maintenance" asp-action="Overview"><i class="fa fa-dashboard"></i> Overview</a>
+                        <a asp-controller="Maintenance" asp-action="Overview"><i class="fa fa-dashboard"></i> Tổng Quan</a>
                     }
                     else if (User.IsInRole("Housekeeping Staff"))
                     {
-                        <a asp-controller="Housekeeping" asp-action="Overview"><i class="fa fa-dashboard"></i> Overview</a>
+                        <a asp-controller="Housekeeping" asp-action="Overview"><i class="fa fa-dashboard"></i> Tổng Quan</a>
                     }
                     else
                     {
-                        <a href="/Dashboard"><i class="fa fa-dashboard"></i> Overview</a>
+                        <a href="/Dashboard"><i class="fa fa-dashboard"></i> Tổng Quan</a>
                     }
                 </li>
 
@@ -78,12 +84,6 @@
                         <li class="@(currentController == "StaffAccounts" ? "active" : "")">
                             <a asp-controller="StaffAccounts" asp-action="Index"><i class="fa fa-users"></i> Tài Khoản Nhân Viên</a>
                         </li>
-                        <li class="@(currentController == "Roles" ? "active" : "")">
-                            <a href="#"><i class="fa fa-shield"></i> Vai Trò Hệ Thống</a>
-                        </li>
-                        <li class="@(currentController == "Settings" ? "active" : "")">
-                            <a href="#"><i class="fa fa-cogs"></i> Cài Đặt Hệ Thống</a>
-                        </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "DatabaseBackups" ? "active" : "")">
                             <a asp-controller="DatabaseBackups" asp-action="Index"><i class="fa fa-database"></i> Sao Lưu & Phục Hồi</a>
                         </li>
@@ -91,7 +91,7 @@
                     @if (User.IsInRole("Business Manager"))
                     {
                         <li class="@(currentAction == "FinancialReport" ? "active" : "")">
-                            <a asp-controller="Dashboard" asp-action="FinancialReport"><i class="fa fa-bar-chart"></i> Business Reports</a>
+                            <a asp-controller="Dashboard" asp-action="FinancialReport"><i class="fa fa-bar-chart"></i> Báo Cáo Kinh Doanh</a>
                         </li>
                         <li class="@(currentAction == "Forecast" ? "active" : "")">
                             <a asp-controller="Dashboard" asp-action="Forecast"><i class="fa fa-line-chart"></i> Dự Báo AI</a>
@@ -116,7 +116,7 @@
                             <a asp-controller="Reception" asp-action="Index"><i class="fa fa-calendar-check-o"></i> Quản Lý Đặt Phòng</a>
                         </li>
                     }
-                    @if (User.IsInRole("Receptionist") || User.IsInRole("Housekeeping Staff") || User.IsInRole("Business Manager"))
+                    @if (User.IsInRole("Receptionist") || User.IsInRole("Business Manager"))
                     {
                         <li class="@(currentController == "Rooms" ? "active" : "")">
                             <a asp-controller="Rooms" asp-action="Index"><i class="fa fa-bed"></i> Quản Lý Phòng</a>
@@ -131,12 +131,12 @@
                     @if (User.IsInRole("Housekeeping Staff"))
                     {
                         <li class="@(currentController == "Housekeeping" && currentAction == "Details" ? "active" : "")">
-                            <a asp-controller="Housekeeping" asp-action="Details"><i class="fa fa-paint-brush"></i> Housekeeping Queue</a>
+                            <a asp-controller="Housekeeping" asp-action="Details"><i class="fa fa-paint-brush"></i> Hàng Chờ Dọn Phòng</a>
                         </li>
                     }
 
                     <!-- 🟢 SỬA ICON TẠI ĐÂY: Đồng bộ icon lịch sử sang fa-history cho Font Awesome -->
-                    @if (User.IsInRole("Housekeeping Staff") || User.IsInRole("Business Manager"))
+                    @if (User.IsInRole("Housekeeping Staff") )
                     {
                         <li class="@(currentController == "Housekeeping" && currentAction == "History" ? "active" : "")">
                             <a asp-controller="Housekeeping" asp-action="History"><i class="fa fa-history"></i> Nhật Ký Dọn Phòng</a>
@@ -144,7 +144,7 @@
                     }
                 }
 
-                @if (User.IsInRole("Maintenance Staff") || User.IsInRole("Business Manager"))
+                @if (User.IsInRole("Maintenance Staff"))
                 {
                     <li>
                         <p>BẢO TRÌ</p>
@@ -152,7 +152,7 @@
                     @if (User.IsInRole("Maintenance Staff"))
                     {
                         <li class="@(currentController == "Maintenance" && currentAction == "Details" ? "active" : "")">
-                            <a asp-controller="Maintenance" asp-action="Details"><i class="fa fa-wrench"></i> Maintenance Requests</a>
+                            <a asp-controller="Maintenance" asp-action="Details"><i class="fa fa-wrench"></i> Yêu Cầu Bảo Trì</a>
                         </li>
                     }
 
@@ -161,12 +161,12 @@
                     </li>
                 }
 
-                @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
+                @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff"))
                 {
                     <li>
                         <p>NHÀ HÀNG & ẨM THỰC</p>
                     </li>
-                    @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff"))
+                    @if (User.IsInRole("Business Manager"))
                     {
                         <li class="@(currentController == "MenuCategories" ? "active" : "")">
                             <a asp-controller="MenuCategories" asp-action="Index"><i class="fa fa-list"></i> Danh Mục Món Ăn</a>
@@ -177,20 +177,17 @@
                         <li class="@(currentController == "Tables" ? "active" : "")">
                             <a asp-controller="Tables" asp-action="Index"><i class="fa fa-table"></i> Quản Lý Bàn Ăn</a>
                         </li>
+                    }
+                    @if (User.IsInRole("Business Manager") || User.IsInRole("F&B Staff"))
+                    {
                         <li class="@(currentAction == "TableReservations" ? "active" : "")">
                             <a asp-controller="Dashboard" asp-action="TableReservations"><i class="fa fa-calendar-check-o"></i> Quản Lý Đặt Bàn</a>
                         </li>
                     }
-                    @if (User.IsInRole("F&B Staff") || User.IsInRole("Kitchen Staff"))
+                    @if (User.IsInRole("F&B Staff"))
                     {
                         <li class="@(currentAction == "FoodOrders" ? "active" : "")">
                             <a asp-controller="Dashboard" asp-action="FoodOrders"><i class="fa fa-cutlery"></i> Đơn Gọi Món</a>
-                        </li>
-                    }
-                    @if (User.IsInRole("Kitchen Staff"))
-                    {
-                        <li class="@(currentController == "Inventory" ? "active" : "")">
-                            <a href="#"><i class="fa fa-archive"></i> Kho Bếp</a>
                         </li>
                     }
                 }

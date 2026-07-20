@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.Services.Housekeeping;
@@ -25,7 +25,8 @@ namespace PhucNguyenResort.Web.Controllers
             ViewData["CurrentlyCleaningCount"] = await _housekeepingService.GetCountCurrentlyCleaningAsync();
             ViewData["CleanedTodayCount"] = await _housekeepingService.GetCountCleanedTodayAsync();
 
-            return View("HousekeepingOverview");
+            var dirtyRooms = await _housekeepingService.GetDirtyRoomsAsync();
+            return View("HousekeepingOverview", dirtyRooms);
         }
 
         // =========================================================================

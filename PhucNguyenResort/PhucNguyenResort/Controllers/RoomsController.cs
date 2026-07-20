@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PhucNguyenResort.Controllers
 {
-    [Authorize(Roles = "Business Manager, Receptionist, Housekeeping Staff")]
+    [Authorize(Roles = "Business Manager, Receptionist")]
     public class RoomsController : Controller
     {
         private readonly IRoomService _roomService;

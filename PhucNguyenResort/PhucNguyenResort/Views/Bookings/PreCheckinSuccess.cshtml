@@ -1,21 +1,17 @@
 @model PhucNguyenResort.Models.Booking
 
 @{
-    ViewData["Title"] = "Khai Báo Thành Công - Phuc Nguyen Resort";
+    ViewData["Title"] = "Khai Báo Thành Công | Phúc Nguyên Resort";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/booking-precheckin-success.css" />
-}
-
-<div class="success-container">
-    <div class="container">
-        <div class="success-card">
-            <div class="success-icon">
-                <i class="fa fa-check"></i>
+<div class="pt-32 pb-section-gap-lg min-h-screen bg-background flex items-center justify-center">
+    <div class="max-w-[600px] w-full px-margin-mobile md:px-0">
+        <div class="bg-surface-container-lowest border border-outline-variant/20 p-8 md:p-12 rounded-2xl luxury-shadow text-center">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <span class="material-symbols-outlined text-[40px]">check_circle</span>
             </div>
-            <h2>Khai Báo Thành Công!</h2>
-            <p>Thông tin lưu trú của quý khách đã được ghi nhận và mã hóa bảo mật trên hệ thống. Lễ tân sẽ xác thực nhanh khi quý khách đến làm thủ tục check-in.</p>
+            <h2 class="font-display-md text-display-md text-on-surface mb-4">Khai Báo Thành Công!</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">Thông tin lưu trú của quý khách đã được ghi nhận và mã hóa bảo mật trên hệ thống. Lễ tân sẽ xác thực nhanh khi quý khách đến làm thủ tục check-in.</p>
 
             @{
                 var groupedRooms = Model.BookingDetails
@@ -26,27 +22,31 @@
                 var assignedRooms = Model.BookingDetails.Where(bd => bd.Room != null).Select(bd => bd.Room.RoomNumber).ToList();
                 string roomNumberDisplay = assignedRooms.Any() ? string.Join(", ", assignedRooms) : "Chưa xếp phòng";
             }
-            <div class="booking-details-box">
-                <h5>Chi Tiết Đặt Phòng #@Model.BookingId</h5>
-                <div class="details-row">
-                    <span>Loại phòng</span>
-                    <span>@categoryNameDisplay</span>
-                </div>
-                <div class="details-row">
-                    <span>Số phòng</span>
-                    <span>@roomNumberDisplay</span>
-                </div>
-                <div class="details-row">
-                    <span>Ngày Check-in</span>
-                    <span>@Model.CheckInDate.ToString("dd/MM/yyyy")</span>
-                </div>
-                <div class="details-row">
-                    <span>Ngày Check-out</span>
-                    <span>@Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+            <div class="bg-surface-container p-6 rounded-xl text-left mb-8">
+                <h5 class="font-headline-sm text-headline-sm text-on-surface mb-4 border-b border-outline-variant/20 pb-4">Chi Tiết Đặt Phòng #@Model.BookingId</h5>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-lg">Loại phòng</span>
+                        <span class="text-on-surface font-body-md font-medium text-right">@categoryNameDisplay</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-lg">Số phòng</span>
+                        <span class="text-on-surface font-body-md font-medium text-right">@roomNumberDisplay</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-lg">Ngày Check-in</span>
+                        <span class="text-on-surface font-body-md font-medium text-right">@Model.CheckInDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-lg">Ngày Check-out</span>
+                        <span class="text-on-surface font-body-md font-medium text-right">@Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                    </div>
                 </div>
             </div>
 
-            <a asp-controller="Home" asp-action="Index" class="btn-home">Quay Lại Trang Chủ</a>
+            <a asp-controller="Home" asp-action="Index" class="inline-flex justify-center items-center w-full h-14 bg-primary-container text-on-primary-container rounded-lg font-label-lg text-[16px] shadow-sm hover:opacity-90 active:scale-[0.98] transition-all">
+                Quay Lại Trang Chủ
+            </a>
         </div>
     </div>
 </div>
