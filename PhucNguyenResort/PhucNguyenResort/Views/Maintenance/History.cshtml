@@ -1,134 +1,246 @@
-﻿@model List<PhucNguyenResort.Web.Models.ViewModels.MaintenanceHistoryViewModel>
+@model List<PhucNguyenResort.Web.Models.ViewModels.MaintenanceHistoryViewModel>
 @{
     Layout = "_DashboardLayout";
     ViewData["Title"] = "Nhật Ký Bảo Trì Kỹ Thuật";
 }
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <div>
-                <h2 style="font-family: 'Lora', serif; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">
-                    <i class="fa fa-history mr-2" style="color: #6c757d;"></i> Nhật Ký Bảo Trì Kỹ Thuật
-                </h2>
-                <p class="text-muted mb-0" style="font-family: 'Cabin', sans-serif;">Hệ thống lưu trữ và tra cứu nâng cao các tác vụ xử lý sự cố kỹ thuật phòng nghỉ.</p>
-            </div>
-            <div class="text-muted" style="font-family: 'Cabin', sans-serif; font-size: 14px;">
-                <i class="fa fa-calendar mr-2"></i> @DateTime.Now.ToString("dd MMMM, yyyy")
-            </div>
-        </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528;
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b;
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .luxury-table thead th {
+            background-color: #f6f3ef;
+            color: #50453b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border: none;
+        }
+        .luxury-table thead th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .luxury-table thead th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        .luxury-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ede9;
+            color: #1c1c1a;
+            font-size: 14px;
+        }
+        .luxury-table tbody tr:last-child td { border-bottom: none; }
+        .luxury-table tbody tr:hover { background-color: #fcf9f5; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .luxury-badge.success { background-color: #e2f5ea; color: #0b5c2d; }
+        .luxury-badge.warning { background-color: #ffefd6; color: #805528; }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .form-control-luxury {
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'Inter', sans-serif;
+            color: #1c1c1a;
+            width: 100%;
+        }
+        .form-control-luxury:focus {
+            border-color: #805528;
+            box-shadow: 0 0 0 2px rgba(128, 85, 40, 0.2);
+            background-color: #ffffff;
+            outline: none;
+        }
+    </style>
+}
+
+<div class="header-container">
+    <div>
+        <h2 class="page-title">
+            <span class="material-symbols-outlined" style="font-size: 36px; color: #805528; margin-right: 8px;">history</span>
+            Nhật Ký Bảo Trì Kỹ Thuật
+        </h2>
+        <p class="page-subtitle">Hệ thống lưu trữ và tra cứu lịch sử xử lý sự cố thiết bị tại phòng nghỉ.</p>
+    </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
     </div>
 </div>
 
-<div class="row mb-4" style="font-family: 'Cabin', sans-serif;">
-    <div class="col-md-8 mb-2 mb-md-0">
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text bg-light text-muted"><i class="fa fa-search"></i></span>
+<div class="luxury-card">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8 mb-2 mb-md-0">
+            <div style="display: flex; align-items: center; gap: 10px; background-color: #f6f3ef; border-radius: 8px; padding: 0 16px;">
+                <span class="material-symbols-outlined" style="color: #827569;">search</span>
+                <input type="text" id="maintenanceSearch" style="border: none; background: transparent; padding: 10px 0; width: 100%; outline: none; font-family: 'Inter', sans-serif; color: #1c1c1a;" placeholder="Tìm số phòng, hạng phòng, kỹ thuật viên hoặc nội dung sự cố...">
             </div>
-            <input type="text" id="maintenanceSearch" class="form-control" placeholder="Tìm nhanh theo số phòng, hạng phòng, kỹ thuật viên hoặc nội dung sự cố...">
+        </div>
+        <div class="col-md-4">
+            <select id="statusFilter" class="form-control-luxury">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Đã hoàn thành">Đã hoàn thành (Đã khắc phục)</option>
+                <option value="Đang xử lý">Đang tiến hành xử lý</option>
+            </select>
         </div>
     </div>
-    <div class="col-md-4">
-        <select id="statusFilter" class="form-control">
-            <option value="">-- Tất cả trạng thái đơn --</option>
-            <option value="Đã hoàn thành">Đã hoàn thành (Đã khắc phục)</option>
-            <option value="Đang xử lý">Đang tiến hành xử lý</option>
-        </select>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #1c1c1a; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined" style="color: #805528;">handyman</span> Lịch sử sửa chữa thiết bị
+        </h5>
     </div>
-</div>
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="card-box" style="border-left: 5px solid #dc3545; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 style="font-family: 'Lora', serif; font-weight: bold; margin: 0; color: #333;">
-                    <i class="fa fa-wrench mr-2" style="color: #6c757d;"></i> Danh sách tác vụ kỹ thuật phòng
-                </h5>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover" id="maintenanceTable" style="font-family: 'Cabin', sans-serif; vertical-align: middle;">
-                    <thead>
-                        <tr class="bg-light">
-                            <th>Mã Phiếu</th>
-                            <th>Số Phòng</th>
-                            <th>Hạng Phòng</th>
-                            <th style="min-width: 200px;">Nội Dung Sự Cố Ghi Nhận</th>
-                            <th>Ngày Tạo Đơn</th>
-                            <th>Ngày Sửa Xong</th>
-                            <th>Kỹ Thuật Phụ Trách</th>
-                            <th>Hiện Trạng</th>
+    <div style="overflow-x: auto;">
+        <table class="luxury-table" id="maintenanceTable">
+            <thead>
+                <tr>
+                    <th>Mã Phiếu</th>
+                    <th>Số Phòng</th>
+                    <th>Hạng Phòng</th>
+                    <th style="min-width: 250px;">Nội Dung Ghi Nhận</th>
+                    <th>Thời Gian</th>
+                    <th>Kỹ Thuật Viên</th>
+                    <th style="text-align: right;">Trạng Thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr id="emptyRow">
+                        <td colspan="7" style="text-align: center; padding: 60px 20px; color: #827569;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #a4b5ce; margin-bottom: 16px; display: block;">assignment</span>
+                            <h5 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #1c1c1a; margin-bottom: 8px;">Không tìm thấy lịch sử sửa chữa</h5>
+                            <p style="font-size: 15px; margin: 0;">Hệ thống chưa ghi nhận lỗi kỹ thuật nào từ trước đến nay.</p>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr class="m-row" data-status="@item.Status">
+                            <td style="color: #827569; font-weight: 500;">#MT-@item.RequestId</td>
+                            <td><strong style="color: #1c1c1a; font-size: 15px;">@item.RoomNumber</strong></td>
+                            <td>@item.RoomType</td>
+                            <td style="color: #1c1c1a;">@item.Description</td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">
+                                    <span style="color: #827569; display: flex; align-items: center; gap: 4px;">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">add_circle</span> @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                    <span style="color: #0b5c2d; display: flex; align-items: center; gap: 4px;">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span> @(item.ResolvedAt.HasValue ? item.ResolvedAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 6px; color: #50453b;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">account_circle</span>
+                                    @(string.IsNullOrEmpty(item.AssignedStaffName) ? "Chưa bàn giao" : item.AssignedStaffName)
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                @if (item.Status == "Đã hoàn thành")
+                                {
+                                    <span class="luxury-badge success">
+                                        <span class="material-symbols-outlined fill" style="font-size: 14px;">check_circle</span> Đã khắc phục
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="luxury-badge warning">
+                                        <span class="material-symbols-outlined fill" style="font-size: 14px;">sync</span> Đang xử lý
+                                    </span>
+                                }
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model == null || !Model.Any())
-                        {
-                            <tr id="emptyRow">
-                                <td colspan="8" class="text-center text-muted py-5">
-                                    <h5 class="mb-2" style="font-family: 'Lora', serif;"><i class="fa fa-times-circle-o fa-2x text-muted d-block mb-3"></i>Không tìm thấy lịch sử sửa chữa thiết bị nào từ trước tới nay.</h5>
-                                    <p class="mb-0">Hệ thống vận hành ổn định không ghi nhận lỗi kĩ thuật tồn đọng.</p>
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            foreach (var item in Model)
-                            {
-                                <tr class="m-row" data-status="@item.Status">
-                                    <td class="align-middle text-secondary font-weight-bold">#MT-@item.RequestId</td>
-                                    <td class="align-middle font-weight-bold" style="color: #1a1a1a;">@item.RoomNumber</td>
-                                    <td class="align-middle">@item.RoomType</td>
-                                    <td class="align-middle text-dark text-wrap">@item.Description</td>
-                                    <td class="align-middle text-muted"><i class="fa fa-clock-o mr-1"></i>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td class="align-middle text-muted">
-                                        <i class="fa fa-calendar-check-o mr-1"></i>@(item.ResolvedAt.HasValue? item.ResolvedAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")
-                                    </td>
-                                    <td class="align-middle">
-                                        <i class="fa fa-user-circle-o text-primary mr-1"></i>@(string.IsNullOrEmpty(item.AssignedStaffName) ? "Chưa bàn giao" : item.AssignedStaffName)
-                                    </td>
-                                    <td class="align-middle">
-                                        @if (item.Status == "Đã hoàn thành")
-                                        {
-                                            <span class="badge badge-success px-2 py-1"><i class="fa fa-check-circle"></i> Đã khắc phục</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge badge-warning text-white px-2 py-1" style="background-color: #ffc107;"><i class="fa fa-spinner fa-spin"></i> Đang tiến hành</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                            <tr id="noMatchRow" style="display: none;">
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    <i class="fa fa-search fa-lg mb-2"></i> Không có bản ghi nào khớp với điều kiện tìm kiếm.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    <tr id="noMatchRow" style="display: none;">
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #827569;">
+                            <i class="material-symbols-outlined" style="font-size: 32px; display: block; margin-bottom: 8px;">search_off</i>
+                            Không có bản ghi nào khớp với điều kiện tìm kiếm.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 style-pagination-bar" style="border-top: 1px solid #eee; font-family: 'Cabin', sans-serif;">
-                <span class="text-muted small" id="rowCountSummary">
-                    Hiển thị <strong id="visibleCount">@(Model?.Count ?? 0)</strong> trong tổng số <strong>@(Model?.Count ?? 0)</strong> bản ghi lịch sử.
-                </span>
-                <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#"><i class="fa fa-chevron-left"></i></a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="fa fa-chevron-right"></i></a></li>
-                    </ul>
-                </nav>
-            </div>
-
-        </div>
+    <div class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top: 1px solid #f0ede9; font-family: 'Inter', sans-serif;">
+        <span style="color: #50453b; font-size: 14px;" id="rowCountSummary">
+            Hiển thị <strong style="color: #1c1c1a;" id="visibleCount">@(Model?.Count ?? 0)</strong> trong tổng số <strong style="color: #1c1c1a;">@(Model?.Count ?? 0)</strong> bản ghi
+        </span>
+        <nav>
+            <ul class="pagination pagination-sm mb-0" style="gap: 4px;">
+                <li class="page-item disabled"><a class="page-link" href="#" style="border-radius: 6px; color: #827569; border: 1px solid #e5e2de;"><i class="material-symbols-outlined" style="font-size: 16px;">chevron_left</i></a></li>
+                <li class="page-item active"><a class="page-link" href="#" style="border-radius: 6px; background-color: #805528; border-color: #805528; color: #fff;">1</a></li>
+                <li class="page-item"><a class="page-link" href="#" style="border-radius: 6px; color: #805528; border: 1px solid #e5e2de;">2</a></li>
+                <li class="page-item"><a class="page-link" href="#" style="border-radius: 6px; color: #827569; border: 1px solid #e5e2de;"><i class="material-symbols-outlined" style="font-size: 16px;">chevron_right</i></a></li>
+            </ul>
+        </nav>
     </div>
 </div>
 
 @section Scripts {
+    <style>
+        .pagination .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+        }
+        .pagination .page-item.active .page-link {
+            z-index: 3;
+        }
+    </style>
     <script>
         $(document).ready(function () {
             function filterMaintenanceTable() {

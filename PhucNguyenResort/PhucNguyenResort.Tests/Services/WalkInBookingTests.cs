@@ -47,7 +47,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -112,7 +112,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -160,7 +160,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -205,7 +205,7 @@ namespace PhucNguyenResort.Tests.Services
 
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -274,7 +274,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -320,7 +320,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -378,7 +378,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -419,7 +419,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -472,7 +472,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {
@@ -508,7 +508,7 @@ namespace PhucNguyenResort.Tests.Services
                 var mockGuestService = new Mock<IBookingGuestService>();
                 var mockEmailSender = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object);
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
                 var model = new WalkInBookingViewModel
                 {

@@ -185,9 +185,27 @@
                             {
                                 <button class="px-6 py-1.5 border border-outline text-outline rounded-lg font-label-md cursor-not-allowed">Đã hủy</button>
                             }
-                            else if (isCompleted && !item.HasReviewed)
+                            else if (isCompleted)
                             {
-                                <a asp-controller="Review" asp-action="Submit" asp-route-tourBookingId="@item.TourBookingId" class="px-5 py-1.5 border border-primary text-primary rounded-lg font-label-md hover:bg-primary/5 transition-all flex items-center justify-center">Đánh giá ngay</a>
+                                if (!item.HasReviewed)
+                                {
+                                    <a asp-controller="Review" asp-action="Submit" asp-route-tourBookingId="@item.TourBookingId" class="px-5 py-1.5 border border-primary text-primary rounded-lg font-label-md hover:bg-primary/5 transition-all flex items-center justify-center">Đánh giá ngay</a>
+                                }
+                                else
+                                {
+                                    if (item.HasBeenEdited)
+                                    {
+                                        <span class="px-5 py-1.5 border border-outline-variant text-outline-variant rounded-lg font-label-md flex items-center justify-center gap-1 cursor-not-allowed" title="Đánh giá đã được chỉnh sửa 1 lần">
+                                            <span class="material-symbols-outlined text-[18px]">done_all</span> Đã đánh giá
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Review" asp-action="Edit" asp-route-tourBookingId="@item.TourBookingId" class="px-5 py-1.5 border border-primary text-primary rounded-lg font-label-md hover:bg-primary/5 transition-all flex items-center justify-center gap-1">
+                                            <span class="material-symbols-outlined text-[18px]">edit</span> Sửa đánh giá
+                                        </a>
+                                    }
+                                }
                             }
                             else if (!isCompleted && !isCancelled)
                             {

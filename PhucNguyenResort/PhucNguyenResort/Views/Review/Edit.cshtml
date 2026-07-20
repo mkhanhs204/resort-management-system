@@ -43,9 +43,9 @@
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container text-primary mb-4 luxury-shadow">
             <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">reviews</span>
         </div>
-        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-3">Đánh Giá Dịch Vụ</h1>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-3">Sửa Đánh Giá</h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto">
-            Cảm ơn bạn đã lựa chọn Phúc Nguyên Resort. Phản hồi của bạn giúp chúng tôi không ngừng hoàn thiện và nâng cao chất lượng phục vụ.
+            Cập nhật phản hồi của bạn để giúp chúng tôi không ngừng hoàn thiện và nâng cao chất lượng phục vụ.
         </p>
     </div>
 
@@ -60,10 +60,10 @@
             </div>
         }
 
-        <form asp-action="Submit" method="post" class="space-y-8">
+        <form asp-action="Edit" method="post" class="space-y-8">
             <!-- Hidden Inputs -->
             <input type="hidden" asp-for="BookingId" />
-            <input type="hidden" asp-for="TourId" />
+            <input type="hidden" asp-for="TourBookingId" />
 
             <!-- Rating Stars Section -->
             <div class="text-center border-b border-outline-variant/20 pb-8">
@@ -102,8 +102,8 @@
             <!-- Submit Button -->
             <div class="pt-4">
                 <button type="submit" class="w-full bg-primary text-on-primary py-4 rounded-xl font-label-lg text-label-lg uppercase tracking-widest luxury-shadow hover:scale-[1.02] hover:bg-on-primary-fixed-variant transition-all flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">send</span>
-                    Gửi Đánh Giá
+                    <span class="material-symbols-outlined">save</span>
+                    Lưu Thay Đổi
                 </button>
             </div>
             

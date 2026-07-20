@@ -12,5 +12,6 @@ namespace PhucNguyenResort.Services.Tours
         Task UpdateScheduleAsync(TourSchedule schedule);
         Task DeleteScheduleAsync(int scheduleId);
         bool ScheduleExists(int scheduleId);
+        Task<bool> HasScheduleOnDateAsync(int guideId, System.DateTime date, int? excludeScheduleId = null);
     }
 }

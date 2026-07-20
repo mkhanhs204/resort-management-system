@@ -27,7 +27,7 @@ namespace PhucNguyenResort.Tests.Services
             var context = GetDbContext();
             var mockEmailSender = new Mock<IEmailSender>();
             var mockEnv = new Mock<IWebHostEnvironment>();
-            var service = new ReceptionService(context, null!, mockEmailSender.Object, mockEnv.Object);
+            var service = new ReceptionService(context, null!, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
             var user = new User { UserId = 2, FullName = "Test User" };
             if (!context.Users.Any(u => u.UserId == 2)) context.Users.Add(user);
 
@@ -57,7 +57,7 @@ namespace PhucNguyenResort.Tests.Services
             var context = GetDbContext();
             var mockEmailSender = new Mock<IEmailSender>();
             var mockEnv = new Mock<IWebHostEnvironment>();
-            var service = new ReceptionService(context, null!, mockEmailSender.Object, mockEnv.Object);
+            var service = new ReceptionService(context, null!, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
             var user = new User { UserId = 1, FullName = "Test User" };
             if (!context.Users.Any(u => u.UserId == 1)) context.Users.Add(user);
 
@@ -603,7 +603,7 @@ namespace PhucNguyenResort.Tests.Services
             var context = GetDbContext();
             var mockEmailSender = new Mock<IEmailSender>();
             var mockEnv = new Mock<IWebHostEnvironment>();
-            var service = new ReceptionService(context, null!, mockEmailSender.Object, mockEnv.Object);
+            var service = new ReceptionService(context, null!, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
             var user = new User { UserId = 1, FullName = "Test User" };
             if (!context.Users.Any(u => u.UserId == 1)) context.Users.Add(user);
 

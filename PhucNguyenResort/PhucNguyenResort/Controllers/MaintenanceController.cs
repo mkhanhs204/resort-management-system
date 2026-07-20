@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhucNguyenResort.Services.Maintenance;
 
@@ -22,7 +22,8 @@ namespace PhucNguyenResort.Web.Controllers
             ViewData["PendingTasksCount"] = await _maintenanceService.GetPendingTasksCountAsync();
             ViewData["ResolvedTodayCount"] = await _maintenanceService.GetResolvedTodayCountAsync();
 
-            return View("MaintenanceOverview");
+            var activeTasks = await _maintenanceService.GetMaintenanceTasksAsync();
+            return View("MaintenanceOverview", activeTasks);
         }
 
         // =========================================================================

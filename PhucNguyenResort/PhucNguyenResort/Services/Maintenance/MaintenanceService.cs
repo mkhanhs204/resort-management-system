@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PhucNguyenResort.Data;
 using PhucNguyenResort.Enums;
 using PhucNguyenResort.ViewModels.Maintenance;
@@ -17,6 +17,8 @@ namespace PhucNguyenResort.Services.Maintenance
 
         public async Task<List<MaintenanceTaskViewModel>> GetMaintenanceTasksAsync()
         {
+            await SyncMaintenanceRequestsAsync();
+
             return await _context.MaintenanceRequests
                 .Include(m => m.Room)
                     .ThenInclude(r => r!.Category)
@@ -41,6 +43,8 @@ namespace PhucNguyenResort.Services.Maintenance
 
         public async Task<int> GetPendingTasksCountAsync()
         {
+            await SyncMaintenanceRequestsAsync();
+
             return await _context.MaintenanceRequests
                 .CountAsync(t => !t.IsResolved && string.IsNullOrEmpty(t.AssignedStaffName));
         }
@@ -162,6 +166,38 @@ namespace PhucNguyenResort.Services.Maintenance
                     Notes = log.Notes
                 })
                 .ToListAsync();
+        }
+
+        private async Task SyncMaintenanceRequestsAsync()
+        {
+            var maintenanceRooms = await _context.Rooms
+                .Where(r => r.Status == RoomStatus.Maintenance)
+                .ToListAsync();
+
+            bool hasChanges = false;
+            foreach (var room in maintenanceRooms)
+            {
+                var existingRequest = await _context.MaintenanceRequests
+                    .FirstOrDefaultAsync(m => m.RoomId == room.RoomId && !m.IsResolved);
+                
+                if (existingRequest == null)
+                {
+                    var newRequest = new Models.MaintenanceRequest
+                    {
+                        RoomId = room.RoomId,
+                        Description = "Báo hỏng từ danh sách phòng",
+                        CreatedAt = DateTime.Now,
+                        IsResolved = false
+                    };
+                    _context.MaintenanceRequests.Add(newRequest);
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

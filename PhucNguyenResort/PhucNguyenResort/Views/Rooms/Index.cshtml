@@ -289,7 +289,10 @@
                     <th>Loại Phòng</th>
                     <th>Tầng</th>
                     <th>Trạng Thái</th>
-                    <th style="text-align: right;">Thao Tác</th>
+                    @if (!User.IsInRole("Receptionist"))
+                    {
+                        <th style="text-align: right;">Thao Tác</th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -339,29 +342,32 @@
                                     <span class="material-symbols-outlined" style="font-size: 14px;">@iconName</span> @item.Status
                                 </span>
                             </td>
-                            <td style="text-align: right; white-space: nowrap;">
-                                <div style="display: flex; justify-content: flex-end; gap: 4px;">
-                                    <a asp-action="Details" asp-route-id="@item.RoomId" class="action-btn" title="Xem chi tiết">
-                                        <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.RoomId" class="action-btn" title="Sửa">
-                                        <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
-                                    </a>
-                                    @if (User.IsInRole("Business Manager"))
-                                    {
-                                        <a asp-action="Delete" asp-route-id="@item.RoomId" class="action-btn delete" title="Xóa">
-                                            <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                            @if (!User.IsInRole("Receptionist"))
+                            {
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <div style="display: flex; justify-content: flex-end; gap: 4px;">
+                                        <a asp-action="Details" asp-route-id="@item.RoomId" class="action-btn" title="Xem chi tiết">
+                                            <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
                                         </a>
-                                    }
-                                </div>
-                            </td>
+                                        <a asp-action="Edit" asp-route-id="@item.RoomId" class="action-btn" title="Sửa">
+                                            <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+                                        </a>
+                                        @if (User.IsInRole("Business Manager"))
+                                        {
+                                            <a asp-action="Delete" asp-route-id="@item.RoomId" class="action-btn delete" title="Xóa">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            }
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: #827569;">
+                        <td colspan="@(User.IsInRole("Receptionist") ? 4 : 5)" style="text-align: center; padding: 40px; color: #827569;">
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                                 <span class="material-symbols-outlined" style="font-size: 48px; color: #d4c3b6;">bed</span>
                                 <div>Không có phòng nào.</div>

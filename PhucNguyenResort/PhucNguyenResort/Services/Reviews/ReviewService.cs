@@ -195,4 +195,46 @@ public class ReviewService : IReviewService
         
         return true;
     }
+
+    public async Task<SubmitReviewVM?> GetReviewForEditAsync(int userId, int? bookingId, int? tourBookingId)
+    {
+        var review = await _context.Reviews
+            .FirstOrDefaultAsync(r => r.UserId == userId && 
+                                    ((bookingId.HasValue && r.BookingId == bookingId.Value) || 
+                                     (tourBookingId.HasValue && r.TourBookingId == tourBookingId.Value)));
+        
+        if (review == null || review.HasBeenEdited) return null;
+
+        return new SubmitReviewVM
+        {
+            Rating = review.Rating,
+            Comment = review.Comment,
+            BookingId = review.BookingId,
+            TourBookingId = review.TourBookingId
+        };
+    }
+
+    public async Task<bool> UpdateReviewAsync(int userId, SubmitReviewVM model)
+    {
+        if (model.Rating == null || model.Rating < 1 || model.Rating > 5)
+            throw new InvalidOperationException("REV-001: Rating must be between 1 and 5");
+
+        var review = await _context.Reviews
+            .FirstOrDefaultAsync(r => r.UserId == userId && 
+                                    ((model.BookingId.HasValue && r.BookingId == model.BookingId.Value) || 
+                                     (model.TourBookingId.HasValue && r.TourBookingId == model.TourBookingId.Value)));
+        
+        if (review == null)
+            throw new InvalidOperationException("REV-005: Review not found");
+
+        if (review.HasBeenEdited)
+            throw new InvalidOperationException("REV-006: Đánh giá này đã được chỉnh sửa 1 lần và không thể chỉnh sửa thêm.");
+
+        review.Rating = model.Rating;
+        review.Comment = model.Comment;
+        review.HasBeenEdited = true;
+        
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

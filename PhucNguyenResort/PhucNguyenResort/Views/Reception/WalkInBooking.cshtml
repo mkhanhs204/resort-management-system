@@ -6,309 +6,494 @@
     Layout = "_DashboardLayout";
 }
 
-<link rel="stylesheet" href="~/css/checkin-premium.css" asp-append-version="true" />
-<style>
-    .room-checkbox-card {
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 12px 16px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        background: #fff;
-    }
-    .room-checkbox-card:hover {
-        border-color: #d97706;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    .room-checkbox-card.selected {
-        background: #fffbeb;
-        border-color: #d97706;
-    }
-    #roomsContainer::-webkit-scrollbar {
-        width: 6px;
-    }
-    #roomsContainer::-webkit-scrollbar-track {
-        background: #f8fafc;
-        border-radius: 4px;
-    }
-    #roomsContainer::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-    }
-    #roomsContainer::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-    }
-</style>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #805528; /* primary */
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            color: #50453b; /* on-surface-variant */
+            font-size: 16px;
+        }
+        .luxury-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 24px 40px -8px rgba(30, 41, 59, 0.08);
+            border: 1px solid rgba(212, 195, 182, 0.3);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .luxury-card-header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f0ede9;
+            padding-bottom: 15px;
+        }
+        .luxury-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1c1c1a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .btn-luxury {
+            background-color: #dfa974; /* primary-container */
+            color: #633d11; /* on-primary-container */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury:hover {
+            background-color: #805528;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 85, 40, 0.2);
+            text-decoration: none;
+        }
+        .btn-luxury-outline {
+            background-color: transparent;
+            color: #805528;
+            border: 1px solid #805528;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-luxury-outline:hover {
+            background-color: #f6f3ef;
+            text-decoration: none;
+            color: #805528;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+            font-family: 'Inter', sans-serif;
+        }
+        .luxury-label {
+            font-weight: 600;
+            color: #50453b;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .luxury-input, .luxury-select {
+            width: 100%;
+            background-color: #f6f3ef;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #1c1c1a;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .luxury-input:focus, .luxury-select:focus {
+            outline: none;
+            border-color: #805528;
+            background-color: #ffffff;
+        }
+        .luxury-badge {
+            background-color: #f0ede9;
+            color: #50453b;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        
+        /* Custom Checkbox */
+        .room-checkbox-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+        .room-checkbox-card:hover {
+            border-color: #dfa974;
+            box-shadow: 0 4px 12px -2px rgba(128, 85, 40, 0.1);
+        }
+        .room-checkbox-card.selected {
+            background: #fcf9f5;
+            border-color: #805528;
+        }
+        #roomsContainer::-webkit-scrollbar {
+            width: 6px;
+        }
+        #roomsContainer::-webkit-scrollbar-track {
+            background: #f6f3ef;
+            border-radius: 4px;
+        }
+        #roomsContainer::-webkit-scrollbar-thumb {
+            background: #d4c3b6;
+            border-radius: 4px;
+        }
+        #roomsContainer::-webkit-scrollbar-thumb:hover {
+            background: #a89481;
+        }
 
-<div class="container-fluid checkin-container py-4">
-    <div class="checkin-header-section d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-        <div>
-            <span class="checkin-badge">Lễ Tân / Front Desk Operations</span>
-            <h1 class="checkin-title">Tạo Đơn Đặt Phòng Tại Quầy</h1>
-        </div>
-        <a asp-action="Index" class="btn-premium-back shadow-sm">
-            <i class="fas fa-arrow-left fa-sm mr-2"></i> Quay lại danh sách
-        </a>
+        .guest-card {
+            border-radius: 12px;
+            border: 1px solid #f0ede9;
+            background: #fafafa;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .primary-guest {
+            border-left: 4px solid #805528;
+        }
+        .secondary-guest {
+            border-left: 4px solid #d4c3b6;
+        }
+
+        .payment-summary {
+            background-color: #fcf9f5;
+            border-radius: 12px;
+            border: 1px solid #f0ede9;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #50453b;
+        }
+        .payment-row strong {
+            color: #1c1c1a;
+        }
+        .payment-divider {
+            border-top: 1px dashed #d4c3b6;
+            margin: 16px 0;
+        }
+        .payment-total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #805528;
+        }
+        
+        .luxury-alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            background-color: #ffdad6;
+            color: #93000a;
+        }
+    </style>
+}
+
+<div class="header-container mt-4">
+    <div>
+        <div class="page-subtitle mb-1">Lễ Tân / Front Desk Operations</div>
+        <h1 class="page-title">Tạo Đơn Đặt Phòng Tại Quầy</h1>
     </div>
+    <div style="font-family: 'Inter', sans-serif; color: #50453b; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+    </div>
+</div>
 
-    <form asp-action="WalkInBooking" method="post" id="walkInForm">
-        <div asp-validation-summary="All" class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: #fef2f2; color: #991b1b;"></div>
+<form asp-action="WalkInBooking" method="post" id="walkInForm">
+    <div asp-validation-summary="All" class="luxury-alert" style="display: @(ViewData.ModelState.IsValid ? "none" : "flex");"></div>
 
-        <div class="row">
-            <!-- Left: Client Info & Room Selection -->
-            <div class="col-lg-8">
-                <!-- Card 1: Customer Details -->
-                <div class="premium-card mb-4">
-                    <div class="premium-card-header">
-                        <h5 class="premium-card-title">
-                            <i class="fas fa-user-check mr-2"></i> 1. Thông Tin Khách Hàng
-                        </h5>
-                    </div>
-                    <div class="premium-card-body">
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label asp-for="PhoneNumber" class="label-premium">Số Điện Thoại <span class="text-danger">*</span></label>
-                                <input type="text" asp-for="PhoneNumber" class="form-control-premium" placeholder="Nhập SĐT khách hàng..." id="txtPhone" required />
-                                <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label asp-for="CustomerName" class="label-premium">Họ và Tên <span class="text-danger">*</span></label>
-                                <input type="text" asp-for="CustomerName" class="form-control-premium" placeholder="NGUYEN VAN A" id="txtName" required />
-                                <span asp-validation-for="CustomerName" class="text-danger small mt-1 d-block"></span>
-                            </div>
+    <div class="row">
+        <!-- Left: Client Info & Room Selection -->
+        <div class="col-lg-8">
+            <!-- Card 1: Customer Details -->
+            <div class="luxury-card mb-4">
+                <div class="luxury-card-header">
+                    <h5 class="luxury-card-title">
+                        <span class="material-symbols-outlined">person</span> 1. Thông Tin Khách Hàng
+                    </h5>
+                </div>
+                <div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="PhoneNumber" class="luxury-label">Số Điện Thoại <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="PhoneNumber" class="luxury-input" placeholder="Nhập SĐT khách hàng..." id="txtPhone" required />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-12 mb-0">
-                                <label asp-for="Email" class="label-premium">Địa Chỉ Email (Optional)</label>
-                                <input type="email" asp-for="Email" class="form-control-premium" placeholder="customer@gmail.com" id="txtEmail" />
-                                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
-                                <small class="text-muted mt-1 d-block">Nếu để trống, hệ thống sẽ tự động tạo Email tạm dựa trên SĐT.</small>
-                            </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="CustomerName" class="luxury-label">Họ và Tên <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="CustomerName" class="luxury-input" placeholder="NGUYEN VAN A" id="txtName" required />
+                            <span asp-validation-for="CustomerName" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="form-group col-md-12 mb-0">
+                            <label asp-for="Email" class="luxury-label">Địa Chỉ Email (Optional)</label>
+                            <input type="email" asp-for="Email" class="luxury-input" placeholder="customer@gmail.com" id="txtEmail" />
+                            <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                            <small class="text-muted mt-1 d-block">Nếu để trống, hệ thống sẽ tự động tạo Email tạm dựa trên SĐT.</small>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Card 2: Staying Details & Room Selection -->
-                <div class="premium-card mb-4">
-                    <div class="premium-card-header">
-                        <h5 class="premium-card-title">
-                            <i class="fas fa-bed mr-2"></i> 2. Thời Gian & Chọn Phòng Vật Lý
-                        </h5>
+            <!-- Card 2: Staying Details & Room Selection -->
+            <div class="luxury-card mb-4">
+                <div class="luxury-card-header">
+                    <h5 class="luxury-card-title">
+                        <span class="material-symbols-outlined">bed</span> 2. Thời Gian & Chọn Phòng Vật Lý
+                    </h5>
+                </div>
+                <div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="CheckInDate" class="luxury-label">Ngày Nhận Phòng (Check-in)</label>
+                            <input type="date" asp-for="CheckInDate" class="luxury-input" id="dtCheckIn" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="CheckInDate" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="CheckOutDate" class="luxury-label">Ngày Trả Phòng (Check-out)</label>
+                            <input type="date" asp-for="CheckOutDate" class="luxury-input" id="dtCheckOut" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="CheckOutDate" class="text-danger small mt-1 d-block"></span>
+                        </div>
                     </div>
-                    <div class="premium-card-body">
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label asp-for="CheckInDate" class="label-premium">Ngày Nhận Phòng (Check-in)</label>
-                                <input type="date" asp-for="CheckInDate" class="form-control-premium" id="dtCheckIn" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                                <span asp-validation-for="CheckInDate" class="text-danger small mt-1 d-block"></span>
+
+                    <div class="form-row mt-2">
+                        <div class="form-group col-md-6">
+                            <label asp-for="NumberOfAdults" class="luxury-label">Số Người Lớn</label>
+                            <input type="number" asp-for="NumberOfAdults" class="luxury-input" min="1" max="20" id="numAdults" />
+                            <span asp-validation-for="NumberOfAdults" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="NumberOfChildren" class="luxury-label">Số Trẻ Em</label>
+                            <input type="number" asp-for="NumberOfChildren" class="luxury-input" min="0" max="10" id="numChildren" />
+                            <span asp-validation-for="NumberOfChildren" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="luxury-label mb-2">Chọn Phòng Trống Khả Dụng <span class="text-danger">*</span></label>
+                        
+                        <!-- Search & Filter Controls -->
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center mb-3 p-3" style="background-color: #fcf9f5; border-radius: 12px; border: 1px solid #f0ede9; gap: 10px;">
+                            <div class="input-group" style="flex: 1; max-width: 300px;">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white border-right-0" style="color: #50453b; border-color: #f0ede9;"><span class="material-symbols-outlined" style="font-size: 18px;">search</span></span>
+                                </div>
+                                <input type="text" id="searchRoomNum" class="form-control border-left-0" placeholder="Tìm số phòng (ví dụ: 101)..." style="font-size: 14px; border-color: #f0ede9; height: 38px;" />
                             </div>
-                            <div class="form-group col-md-6">
-                                <label asp-for="CheckOutDate" class="label-premium">Ngày Trả Phòng (Check-out)</label>
-                                <input type="date" asp-for="CheckOutDate" class="form-control-premium" id="dtCheckOut" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
-                                <span asp-validation-for="CheckOutDate" class="text-danger small mt-1 d-block"></span>
+                            <div class="d-flex align-items-center" style="gap: 8px;">
+                                <span class="material-symbols-outlined" style="color: #50453b; font-size: 18px;">filter_list</span>
+                                <select id="filterCategory" class="luxury-select" style="font-size: 14px; width: auto; font-weight: 500; padding: 6px 12px; height: 38px;">
+                                    <option value="">Tất cả loại phòng</option>
+                                </select>
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label asp-for="NumberOfAdults" class="label-premium">Số Người Lớn</label>
-                                <input type="number" asp-for="NumberOfAdults" class="form-control-premium" min="1" max="20" id="numAdults" />
-                                <span asp-validation-for="NumberOfAdults" class="text-danger small mt-1 d-block"></span>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label asp-for="NumberOfChildren" class="label-premium">Số Trẻ Em</label>
-                                <input type="number" asp-for="NumberOfChildren" class="form-control-premium" min="0" max="10" id="numChildren" />
-                                <span asp-validation-for="NumberOfChildren" class="text-danger small mt-1 d-block"></span>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="label-premium mb-2">Chọn Phòng Trống Khả Dụng <span class="text-danger">*</span></label>
-                            
-                            <!-- Search & Filter Controls -->
-                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center mb-3 p-2 bg-light" style="border-radius: 10px; border: 1px solid #e2e8f0; gap: 10px;">
-                                <div class="input-group input-group-sm" style="flex: 1; max-width: 300px;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-right-0 text-muted"><i class="fas fa-search"></i></span>
-                                    </div>
-                                    <input type="text" id="searchRoomNum" class="form-control border-left-0" placeholder="Tìm số phòng (ví dụ: 101)..." style="font-size: 0.85rem;" />
-                                </div>
-                                <div class="d-flex align-items-center" style="gap: 5px;">
-                                    <i class="fas fa-filter text-muted mr-1" style="font-size: 0.85rem;"></i>
-                                    <select id="filterCategory" class="custom-select custom-select-sm" style="font-size: 0.85rem; width: auto; font-weight: 500;">
-                                        <option value="">Tất cả loại phòng</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div id="roomsContainer" class="row" style="max-height: 380px; overflow-y: auto; margin-right: -15px; margin-left: -15px; padding-right: 5px; padding-left: 5px;">
-                                @if (ViewBag.AvailableRooms != null && ((IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms).Any())
+                        <div id="roomsContainer" class="row" style="max-height: 400px; overflow-y: auto; margin-right: -10px; margin-left: -10px; padding-right: 5px; padding-left: 5px;">
+                            @if (ViewBag.AvailableRooms != null && ((IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms).Any())
+                            {
+                                @foreach (var room in (IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms)
                                 {
-                                    @foreach (var room in (IEnumerable<PhucNguyenResort.Models.Room>)ViewBag.AvailableRooms)
-                                    {
-                                        <div class="col-md-6">
-                                            <div class="room-checkbox-card" data-room-id="@room.RoomId" data-price="@room.Category?.PricePerNight" data-room-number="@room.RoomNumber" data-category-name="@room.Category?.CategoryName">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">Phòng @room.RoomNumber</div>
-                                                        <span class="badge badge-light border text-muted">@room.Category?.CategoryName</span>
-                                                        <div class="text-muted small mt-1" style="font-size: 0.8rem;">
-                                                            <i class="fas fa-users mr-1"></i> Tối đa: @room.Category?.MaxAdults người lớn, @room.Category?.MaxChildren trẻ em
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-right">
-                                                        <span class="text-gold font-weight-bold">@room.Category?.PricePerNight?.ToString("N0") VNĐ</span><br />
-                                                        <span class="text-muted small">/ đêm</span>
+                                    <div class="col-md-6 px-2">
+                                        <div class="room-checkbox-card" data-room-id="@room.RoomId" data-price="@room.Category?.PricePerNight" data-room-number="@room.RoomNumber" data-category-name="@room.Category?.CategoryName">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div style="font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: #1c1c1a; margin-bottom: 4px;">Phòng @room.RoomNumber</div>
+                                                    <span class="luxury-badge">@room.Category?.CategoryName</span>
+                                                    <div style="color: #50453b; font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px;">
+                                                        <span class="material-symbols-outlined" style="font-size: 16px;">group</span> Tối đa: @room.Category?.MaxAdults NL, @room.Category?.MaxChildren TE
                                                     </div>
                                                 </div>
-                                                <input type="checkbox" name="SelectedRoomIds" value="@room.RoomId" class="d-none" id="chkRoom-@room.RoomId" />
+                                                <div class="text-right">
+                                                    <div style="color: #805528; font-weight: 700; font-size: 16px;">@room.Category?.PricePerNight?.ToString("N0") ₫</div>
+                                                    <div style="color: #827569; font-size: 12px;">/ đêm</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
-                                }
-                                else
-                                {
-                                    <div class="col-12">
-                                        <div class="alert alert-warning border-0 p-3">
-                                            <i class="fas fa-exclamation-triangle mr-2"></i> Không có phòng trống nào khả dụng cho khoảng thời gian này.
+                                            <input type="checkbox" name="SelectedRoomIds" value="@room.RoomId" class="d-none" id="chkRoom-@room.RoomId" />
                                         </div>
                                     </div>
                                 }
-                            </div>
-                            <span asp-validation-for="SelectedRoomIds" class="text-danger small d-block mt-2"></span>
+                            }
+                            else
+                            {
+                                <div class="col-12 px-2">
+                                    <div class="alert alert-warning border-0 p-3" style="background-color: #fff8e1; color: #f57f17; border-radius: 12px;">
+                                        <span class="material-symbols-outlined mr-2" style="vertical-align: middle;">warning</span> Không có phòng trống nào khả dụng cho khoảng thời gian này.
+                                    </div>
+                                </div>
+                            }
                         </div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Identification Info (Visible only when Check-in immediately is enabled) -->
-                <div class="premium-card mb-4" id="sectionGuests">
-                    <div class="premium-card-header">
-                        <h5 class="premium-card-title">
-                            <i class="fas fa-id-card mr-2"></i> 3. Khai Báo Tạm Trú (Nhận Phòng Ngay)
-                        </h5>
-                    </div>
-                    <div class="premium-card-body">
-                        <div class="premium-guest-card primary-guest p-4" style="border-radius: 12px; border-left: 4px solid var(--accent-color); background: #fafafa;">
-                            <h6 class="font-weight-bold text-dark mb-3"><span class="badge badge-warning text-dark mr-2">1</span> Thông tin người đặt chính (Khách chính)</h6>
-                            <input type="hidden" name="Guests[0].IsPrimaryBooker" value="true" />
-                            
-                            <div class="form-row">
-                                <div class="form-group col-md-8">
-                                    <label class="label-premium">Họ và Tên Khách Chính</label>
-                                    <input type="text" name="Guests[0].FullName" class="form-control-premium" placeholder="NGUYEN VAN A" id="txtPrimaryGuestName" />
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label class="label-premium">Giới Tính</label>
-                                    <select name="Guests[0].Gender" class="form-control-premium">
-                                        <option value="">-- Chọn --</option>
-                                        <option value="Male">Nam</option>
-                                        <option value="Female">Nữ</option>
-                                        <option value="Other">Khác</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
-                                    <label class="label-premium">Ngày Sinh</label>
-                                    <input type="date" name="Guests[0].DateOfBirth" class="form-control-premium" />
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label class="label-premium">Số CCCD / Hộ Chiếu <span class="text-danger">*</span></label>
-                                    <input type="text" name="Guests[0].PassportNumber" class="form-control-premium" placeholder="Mã định danh" />
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label class="label-premium">Quốc Tịch <span class="text-danger">*</span></label>
-                                    <input type="text" name="Guests[0].Nationality" class="form-control-premium" placeholder="Vietnam" value="Vietnam" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Secondary Guests Fields Container -->
-                        <div id="secondaryGuestsContainer" class="mt-3"></div>
-
-                        <div class="pdpd-alert-premium mt-4" role="alert">
-                            <div class="d-flex">
-                                <i class="fas fa-shield-alt mr-3 mt-1" style="font-size: 1.25rem;"></i>
-                                <div class="form-check m-0">
-                                    <input type="checkbox" asp-for="PdpdConsentChecked" class="form-check-input mt-1" id="chkPdpd" />
-                                    <label class="form-check-label font-weight-bold text-dark" for="chkPdpd">
-                                        Cam kết tuân thủ PDPD: Tôi xác nhận đã đối chiếu giấy tờ tùy thân của khách lưu trú và khách hàng đồng ý cung cấp thông tin cho mục đích khai báo tạm trú.
-                                    </label>
-                                </div>
-                            </div>
-                            <span asp-validation-for="PdpdConsentChecked" class="text-danger small d-block mt-2"></span>
-                        </div>
+                        <span asp-validation-for="SelectedRoomIds" class="text-danger small d-block mt-2"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Payments & Operations -->
-            <div class="col-lg-4">
-                <div class="premium-card position-sticky" style="top: 20px;">
-                    <div class="premium-card-header">
-                        <h5 class="premium-card-title">
-                            <i class="fas fa-dollar-sign mr-2"></i> Thanh Toán & Xử Lý
-                        </h5>
+            <!-- Card 3: Identification Info (Visible only when Check-in immediately is enabled) -->
+            <div class="luxury-card mb-4" id="sectionGuests">
+                <div class="luxury-card-header">
+                    <h5 class="luxury-card-title">
+                        <span class="material-symbols-outlined">id_card</span> 3. Khai Báo Tạm Trú (Nhận Phòng Ngay)
+                    </h5>
+                </div>
+                <div>
+                    <div class="guest-card primary-guest">
+                        <h6 style="font-weight: 600; color: #1c1c1a; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <span class="luxury-badge" style="background: #805528; color: #fff;">1</span> Thông tin người đặt chính
+                        </h6>
+                        <input type="hidden" name="Guests[0].IsPrimaryBooker" value="true" />
+                        
+                        <div class="form-row">
+                            <div class="form-group col-md-8">
+                                <label class="luxury-label">Họ và Tên Khách Chính</label>
+                                <input type="text" name="Guests[0].FullName" class="luxury-input" placeholder="NGUYEN VAN A" id="txtPrimaryGuestName" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="luxury-label">Giới Tính</label>
+                                <select name="Guests[0].Gender" class="luxury-select">
+                                    <option value="">-- Chọn --</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                    <option value="Other">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row mt-2">
+                            <div class="form-group col-md-4">
+                                <label class="luxury-label">Ngày Sinh</label>
+                                <input type="date" name="Guests[0].DateOfBirth" class="luxury-input" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="luxury-label">Số CCCD / Hộ Chiếu <span class="text-danger">*</span></label>
+                                <input type="text" name="Guests[0].PassportNumber" class="luxury-input" placeholder="Mã định danh" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="luxury-label">Quốc Tịch <span class="text-danger">*</span></label>
+                                <input type="text" name="Guests[0].Nationality" class="luxury-input" placeholder="Vietnam" value="Vietnam" />
+                            </div>
+                        </div>
                     </div>
-                    <div class="premium-card-body">
-                        <div class="form-group">
-                            <div class="custom-control custom-switch custom-switch-premium">
-                                <input type="checkbox" asp-for="InstantCheckIn" class="custom-control-input" id="chkInstantCheckIn" />
-                                <label class="custom-control-label font-weight-bold text-dark" for="chkInstantCheckIn">
-                                    Làm thủ tục Check-in ngay
+
+                    <!-- Secondary Guests Fields Container -->
+                    <div id="secondaryGuestsContainer" class="mt-3"></div>
+
+                    <div class="mt-4 p-3" style="background-color: #f6f3ef; border-radius: 12px; border: 1px solid #d4c3b6;">
+                        <div class="d-flex align-items-start gap-3">
+                            <span class="material-symbols-outlined" style="color: #805528; font-size: 24px;">shield_locked</span>
+                            <div class="form-check m-0">
+                                <input type="checkbox" asp-for="PdpdConsentChecked" class="form-check-input mt-1" id="chkPdpd" style="width: 16px; height: 16px;" />
+                                <label class="form-check-label" for="chkPdpd" style="font-weight: 500; color: #1c1c1a; font-family: 'Inter', sans-serif; font-size: 14px; margin-left: 4px;">
+                                    Cam kết tuân thủ PDPD: Tôi xác nhận đã đối chiếu giấy tờ tùy thân của khách lưu trú và khách hàng đồng ý cung cấp thông tin cho mục đích khai báo tạm trú.
                                 </label>
                             </div>
-                            <small class="text-muted d-block mt-1">Khi bật tùy chọn này, Booking sẽ chuyển sang trạng thái Checked-in và các phòng vật lý sẽ đổi thành màu đỏ (Occupied).</small>
                         </div>
-
-                        <hr style="border-top: 1px solid #f1f5f9;" />
-
-                        <div class="form-group">
-                            <label asp-for="PaymentMethod" class="label-premium">Phương Thức Thanh Toán</label>
-                            <select asp-for="PaymentMethod" class="form-control-premium" id="selPaymentMethod">
-                                <option value="Cash">Tiền Mặt (Cash)</option>
-                                <option value="POS">Quẹt Thẻ (POS)</option>
-                                <option value="BankTransfer">Chuyển Khoản Ngân Hàng</option>
-                            </select>
-                            <span asp-validation-for="PaymentMethod" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label asp-for="PaidAmount" class="label-premium">Số Tiền Thực Nhận (VNĐ)</label>
-                            <input type="number" asp-for="PaidAmount" class="form-control-premium font-weight-bold text-success" style="font-size: 1.15rem;" id="txtPaidAmount" />
-                            <span asp-validation-for="PaidAmount" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="payment-summary-box p-3 mb-4" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted small">Thời gian thuê:</span>
-                                <span class="font-weight-bold text-dark small" id="lblNights">1 đêm</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted small">Tổng tiền phòng:</span>
-                                <span class="font-weight-bold text-dark small" id="lblRoomTotal">0 VNĐ</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted small">Tiền cọc tối thiểu (40%):</span>
-                                <span class="font-weight-bold text-danger small" id="lblMinDeposit">0 VNĐ</span>
-                            </div>
-                            <hr class="my-2" style="border-top: 1px dashed #cbd5e1;" />
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold text-dark" style="font-size: 0.95rem;">Tổng tiền phải thanh toán:</span>
-                                <span class="text-gold font-weight-bold" style="font-size: 1.15rem;" id="lblGrandTotal">0 VNĐ</span>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn-submit-premium-main shadow w-100">
-                            <i class="fas fa-check-circle mr-2"></i> Hoàn Tất Đặt Phòng
-                        </button>
+                        <span asp-validation-for="PdpdConsentChecked" class="text-danger small d-block mt-2"></span>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
-</div>
+
+        <!-- Right Column: Payments & Operations -->
+        <div class="col-lg-4">
+            <div class="luxury-card position-sticky" style="top: 20px;">
+                <div class="luxury-card-header">
+                    <h5 class="luxury-card-title">
+                        <span class="material-symbols-outlined">payments</span> Thanh Toán & Xử Lý
+                    </h5>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch" style="padding-left: 2.5rem;">
+                            <input type="checkbox" asp-for="InstantCheckIn" class="custom-control-input" id="chkInstantCheckIn" />
+                            <label class="custom-control-label" for="chkInstantCheckIn" style="font-weight: 600; color: #1c1c1a; font-size: 15px; cursor: pointer; padding-top: 2px;">
+                                Làm thủ tục Check-in ngay
+                            </label>
+                        </div>
+                        <small class="text-muted d-block mt-2" style="font-size: 13px;">Khi bật tùy chọn này, Booking sẽ chuyển sang trạng thái Checked-in và các phòng vật lý sẽ đổi thành màu đỏ (Occupied).</small>
+                    </div>
+
+                    <hr style="border-top: 1px solid #f0ede9; margin: 24px 0;" />
+
+                    <div class="form-group">
+                        <label asp-for="PaymentMethod" class="luxury-label">Phương Thức Thanh Toán</label>
+                        <select asp-for="PaymentMethod" class="luxury-select" id="selPaymentMethod">
+                            <option value="Cash">Tiền Mặt (Cash)</option>
+                            <option value="POS">Quẹt Thẻ (POS)</option>
+                            <option value="BankTransfer">Chuyển Khoản Ngân Hàng</option>
+                        </select>
+                        <span asp-validation-for="PaymentMethod" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label asp-for="PaidAmount" class="luxury-label">Số Tiền Thực Nhận (VNĐ)</label>
+                        <input type="number" asp-for="PaidAmount" class="luxury-input" style="font-size: 18px; font-weight: 700; color: #0b5c2d;" id="txtPaidAmount" />
+                        <span asp-validation-for="PaidAmount" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="payment-summary mt-4">
+                        <div class="payment-row">
+                            <span>Thời gian thuê:</span>
+                            <strong id="lblNights">1 đêm</strong>
+                        </div>
+                        <div class="payment-row">
+                            <span>Tổng tiền phòng:</span>
+                            <strong id="lblRoomTotal">0 ₫</strong>
+                        </div>
+                        <div class="payment-row">
+                            <span>Tiền cọc tối thiểu (40%):</span>
+                            <strong style="color: #ba1a1a;" id="lblMinDeposit">0 ₫</strong>
+                        </div>
+                        <div class="payment-divider"></div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span style="font-weight: 600; color: #1c1c1a;">Cần thanh toán:</span>
+                            <span class="payment-total" id="lblGrandTotal">0 ₫</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-luxury w-100" style="font-size: 16px; padding: 14px;">
+                        <span class="material-symbols-outlined">check_circle</span> Hoàn Tất Đặt Phòng
+                    </button>
+                    
+                    <a asp-action="Index" class="btn-luxury-outline w-100 mt-3" style="justify-content: center;">
+                        Hủy bỏ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -364,17 +549,19 @@
 
                 for (var i = 1; i < totalCapacity; i++) {
                     var guestHtml = `
-                        <div class="premium-guest-card p-4 mt-3" style="border-radius: 12px; border-left: 4px solid #94a3b8; background: #fafafa;">
-                            <h6 class="font-weight-bold text-dark mb-3"><span class="badge badge-secondary mr-2">${i + 1}</span> Khách đi cùng #${i}</h6>
+                        <div class="guest-card secondary-guest mt-3">
+                            <h6 style="font-weight: 600; color: #50453b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                <span class="luxury-badge">${i + 1}</span> Khách đi cùng #${i}
+                            </h6>
                             <input type="hidden" name="Guests[${i}].IsPrimaryBooker" value="false" />
                             <div class="form-row">
                                 <div class="form-group col-md-8">
-                                    <label class="label-premium">Họ và Tên Khách</label>
-                                    <input type="text" name="Guests[${i}].FullName" class="form-control-premium" placeholder="NGUYEN VAN B" />
+                                    <label class="luxury-label">Họ và Tên Khách</label>
+                                    <input type="text" name="Guests[${i}].FullName" class="luxury-input" placeholder="NGUYEN VAN B" />
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label class="label-premium">Giới Tính</label>
-                                    <select name="Guests[${i}].Gender" class="form-control-premium">
+                                    <label class="luxury-label">Giới Tính</label>
+                                    <select name="Guests[${i}].Gender" class="luxury-select">
                                         <option value="">-- Chọn --</option>
                                         <option value="Male">Nam</option>
                                         <option value="Female">Nữ</option>
@@ -382,18 +569,18 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-row">
+                            <div class="form-row mt-2">
                                 <div class="form-group col-md-4">
-                                    <label class="label-premium">Ngày Sinh</label>
-                                    <input type="date" name="Guests[${i}].DateOfBirth" class="form-control-premium" />
+                                    <label class="luxury-label">Ngày Sinh</label>
+                                    <input type="date" name="Guests[${i}].DateOfBirth" class="luxury-input" />
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label class="label-premium">Số CCCD / Hộ Chiếu</label>
-                                    <input type="text" name="Guests[${i}].PassportNumber" class="form-control-premium" placeholder="Mã định danh" />
+                                    <label class="luxury-label">Số CCCD / Hộ Chiếu</label>
+                                    <input type="text" name="Guests[${i}].PassportNumber" class="luxury-input" placeholder="Mã định danh" />
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label class="label-premium">Quốc Tịch</label>
-                                    <input type="text" name="Guests[${i}].Nationality" class="form-control-premium" placeholder="Vietnam" value="Vietnam" />
+                                    <label class="luxury-label">Quốc Tịch</label>
+                                    <input type="text" name="Guests[${i}].Nationality" class="luxury-input" placeholder="Vietnam" value="Vietnam" />
                                 </div>
                             </div>
                         </div>`;
@@ -423,19 +610,19 @@
                                 $.each(data, function (idx, room) {
                                     var priceFormatted = new Intl.NumberFormat('vi-VN').format(room.price);
                                     var roomCard = `
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 px-2">
                                             <div class="room-checkbox-card" data-room-id="${room.roomId}" data-price="${room.price}" data-room-number="${room.roomNumber}" data-category-name="${room.categoryName}">
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                     <div>
-                                                         <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">Phòng ${room.roomNumber}</div>
-                                                         <span class="badge badge-light border text-muted">${room.categoryName}</span>
-                                                         <div class="text-muted small mt-1" style="font-size: 0.8rem;">
-                                                             <i class="fas fa-users mr-1"></i> Tối đa: ${room.maxAdults} người lớn, ${room.maxChildren} trẻ em
-                                                         </div>
-                                                     </div>
+                                                    <div>
+                                                        <div style="font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: #1c1c1a; margin-bottom: 4px;">Phòng ${room.roomNumber}</div>
+                                                        <span class="luxury-badge">${room.categoryName}</span>
+                                                        <div style="color: #50453b; font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px;">
+                                                            <span class="material-symbols-outlined" style="font-size: 16px;">group</span> Tối đa: ${room.maxAdults} NL, ${room.maxChildren} TE
+                                                        </div>
+                                                    </div>
                                                     <div class="text-right">
-                                                        <span class="text-gold font-weight-bold">${priceFormatted} VNĐ</span><br />
-                                                        <span class="text-muted small">/ đêm</span>
+                                                        <div style="color: #805528; font-weight: 700; font-size: 16px;">${priceFormatted} ₫</div>
+                                                        <div style="color: #827569; font-size: 12px;">/ đêm</div>
                                                     </div>
                                                 </div>
                                                 <input type="checkbox" name="SelectedRoomIds" value="${room.roomId}" class="d-none" id="chkRoom-${room.roomId}" />
@@ -445,9 +632,9 @@
                                 });
                             } else {
                                 container.append(`
-                                    <div class="col-12">
-                                        <div class="alert alert-warning border-0 p-3">
-                                            <i class="fas fa-exclamation-triangle mr-2"></i> Không có phòng trống nào khả dụng cho khoảng thời gian này.
+                                    <div class="col-12 px-2">
+                                        <div class="alert alert-warning border-0 p-3" style="background-color: #fff8e1; color: #f57f17; border-radius: 12px;">
+                                            <span class="material-symbols-outlined mr-2" style="vertical-align: middle;">warning</span> Không có phòng trống nào khả dụng cho khoảng thời gian này.
                                         </div>
                                     </div>`);
                             }
@@ -477,12 +664,12 @@
                     total += price * nights;
                 });
 
-                var totalFormatted = new Intl.NumberFormat('vi-VN').format(total) + " VNĐ";
+                var totalFormatted = new Intl.NumberFormat('vi-VN').format(total) + " ₫";
                 $('#lblRoomTotal').text(totalFormatted);
                 $('#lblGrandTotal').text(totalFormatted);
 
                 var minDeposit = total * 0.4;
-                var minDepositFormatted = new Intl.NumberFormat('vi-VN').format(minDeposit) + " VNĐ";
+                var minDepositFormatted = new Intl.NumberFormat('vi-VN').format(minDeposit) + " ₫";
                 $('#lblMinDeposit').text(minDepositFormatted);
 
                 $('#txtPaidAmount').val(minDeposit);

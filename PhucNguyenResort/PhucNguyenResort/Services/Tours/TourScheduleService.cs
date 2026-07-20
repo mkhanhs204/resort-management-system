@@ -60,5 +60,18 @@ namespace PhucNguyenResort.Services.Tours
         {
             return _context.TourSchedules.Any(e => e.ScheduleId == scheduleId);
         }
+
+        public async Task<bool> HasScheduleOnDateAsync(int guideId, System.DateTime date, int? excludeScheduleId = null)
+        {
+            var query = _context.TourSchedules
+                .Where(ts => ts.GuideId == guideId && ts.TourDate.HasValue && ts.TourDate.Value.Date == date.Date);
+
+            if (excludeScheduleId.HasValue)
+            {
+                query = query.Where(ts => ts.ScheduleId != excludeScheduleId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
     }
 }
