@@ -4,7 +4,7 @@
       "content": {
         "parts": [
           {
-            "text": "```json\n{\n  \"predictedTotalRevenue\": 13999000,\n  \"predictedRoomRevenue\": 6420000,\n  \"predictedFnBRevenue\": 5754000,\n  \"predictedTourRevenue\": 1825000,\n  \"predictedOccupancyRate\": 0.8,\n  \"analysis\": \"Khách sạn cho thấy sự tăng trưởng doanh thu mạnh mẽ từ tháng 6 đến tháng 7 năm 2026, đặc biệt ở doanh thu phòng và F&B. Xu hướng tích cực này dự kiến sẽ tiếp tục trong tháng 8, một tháng cao điểm du lịch. Mặc dù tỷ lệ lấp đầy có sự biến động bất thường, doanh thu tổng thể vẫn cho thấy đà phát triển tốt.\"\n}\n```"
+            "text": "{\n  \"predictedTotalRevenue\": 56170000,\n  \"predictedRoomRevenue\": 19050000,\n  \"predictedFnBRevenue\": 14970000,\n  \"predictedTourRevenue\": 22150000,\n  \"predictedOccupancyRate\": 1.0,\n  \"analysis\": \"Dữ liệu cho thấy khách sạn bắt đầu có doanh thu từ tháng 6/2026 và tăng trưởng mạnh mẽ trong tháng 7/2026. Xu hướng tăng trưởng này dự kiến sẽ tiếp tục trong tháng 8/2026. Tuy nhiên, tỷ lệ lấp đầy rất thấp và không nhất quán với doanh thu tăng, cho thấy có thể có vấn đề về dữ liệu hoặc mô hình kinh doanh đặc thù.\"\n}"
           }
         ],
         "role": "model"
@@ -14,18 +14,18 @@
     }
   ],
   "usageMetadata": {
-    "promptTokenCount": 593,
-    "candidatesTokenCount": 181,
-    "totalTokenCount": 4586,
+    "promptTokenCount": 595,
+    "candidatesTokenCount": 185,
+    "totalTokenCount": 3644,
     "promptTokensDetails": [
       {
         "modality": "TEXT",
-        "tokenCount": 593
+        "tokenCount": 595
       }
     ],
-    "thoughtsTokenCount": 3812,
+    "thoughtsTokenCount": 2864,
     "serviceTier": "standard"
   },
   "modelVersion": "gemini-2.5-flash",
-  "responseId": "j2lTaqzaCIigvr0Pkc_XiQM"
+  "responseId": "KE5barOANeKIosUP4OCk6A0"
 }
