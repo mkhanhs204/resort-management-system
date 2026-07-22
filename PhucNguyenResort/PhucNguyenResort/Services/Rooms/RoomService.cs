@@ -66,5 +66,14 @@ namespace PhucNguyenResort.Services.Rooms
         {
             return _context.Rooms.Any(e => e.RoomId == roomId);
         }
+
+        public async Task<bool> HasRelatedDataAsync(int roomId)
+        {
+            var hasBookings = await _context.BookingDetails.AnyAsync(b => b.RoomId == roomId);
+            var hasCleaningLogs = await _context.RoomCleaningLogs.AnyAsync(c => c.RoomId == roomId);
+            var hasMaintenance = await _context.MaintenanceRequests.AnyAsync(m => m.RoomId == roomId);
+
+            return hasBookings || hasCleaningLogs || hasMaintenance;
+        }
     }
 }

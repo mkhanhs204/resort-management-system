@@ -201,13 +201,34 @@ namespace PhucNguyenResort.Controllers
         [Authorize(Roles = "Business Manager")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var room = await _roomService.GetRoomByIdAsync(id);
-            if (room != null)
+            try
             {
-                await _roomService.DeleteRoomAsync(id);
+                var room = await _roomService.GetRoomByIdAsync(id);
+                if (room != null)
+                {
+                    if (room.Status != PhucNguyenResort.Enums.RoomStatus.Available)
+                    {
+                        TempData["ErrorMessage"] = "Không thể xóa phòng này vì phòng không ở trạng thái trống (Available).";
+                        return RedirectToAction(nameof(Delete), new { id = id });
+                    }
+
+                    bool hasRelatedData = await _roomService.HasRelatedDataAsync(id);
+                    if (hasRelatedData)
+                    {
+                        TempData["ErrorMessage"] = "Không thể xóa phòng này vì đã có dữ liệu đặt phòng hoặc lịch sử sử dụng liên kết.";
+                        return RedirectToAction(nameof(Delete), new { id = id });
+                    }
+                    
+                    await _roomService.DeleteRoomAsync(id);
+                }
+                
+                return RedirectToAction(nameof(Index));
             }
-            
-            return RedirectToAction(nameof(Index));
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa phòng này vì đã có dữ liệu đặt phòng hoặc lịch sử sử dụng liên kết.";
+                return RedirectToAction(nameof(Delete), new { id = id });
+            }
         }
     }
 }

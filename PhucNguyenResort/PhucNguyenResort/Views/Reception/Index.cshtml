@@ -347,7 +347,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div style="display: flex; align-items: center; gap: 12px;">
             <span style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1c1c1a;">Danh Sách Đặt Phòng</span>
-            <span class="luxury-badge blue">@(Model?.Count() ?? 0)</span>
+            <span class="luxury-badge blue">@(ViewBag.TotalItems ?? 0)</span>
         </div>
     </div>
     
@@ -500,6 +500,46 @@
             </tbody>
         </table>
     </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0ede9;">
+            <div style="color: #827569; font-size: 14px;">
+                Hiển thị trang @ViewBag.CurrentPage / @ViewBag.TotalPages (@ViewBag.TotalItems đặt phòng)
+            </div>
+            <div style="display: flex; gap: 8px;">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, searchString = ViewBag.CurrentSearch, statusFilter = ViewBag.CurrentStatus, dateFilter = ViewBag.CurrentDate })" class="btn-luxury outline" style="padding: 8px 16px; font-size: 14px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span> Trước
+                    </a>
+                }
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    if (i == ViewBag.CurrentPage)
+                    {
+                        <span class="btn-luxury" style="padding: 8px 16px; font-size: 14px;">@i</span>
+                    }
+                    else if (i == 1 || i == ViewBag.TotalPages || (i >= ViewBag.CurrentPage - 2 && i <= ViewBag.CurrentPage + 2))
+                    {
+                        <a href="@Url.Action("Index", new { page = i, searchString = ViewBag.CurrentSearch, statusFilter = ViewBag.CurrentStatus, dateFilter = ViewBag.CurrentDate })" class="btn-luxury outline" style="padding: 8px 16px; font-size: 14px;">@i</a>
+                    }
+                    else if (i == ViewBag.CurrentPage - 3 || i == ViewBag.CurrentPage + 3)
+                    {
+                        <span style="padding: 8px 12px; color: #827569;">...</span>
+                    }
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, searchString = ViewBag.CurrentSearch, statusFilter = ViewBag.CurrentStatus, dateFilter = ViewBag.CurrentDate })" class="btn-luxury outline" style="padding: 8px 16px; font-size: 14px;">
+                        Sau <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+                    </a>
+                }
+            </div>
+        </div>
+    }
 </div>
 
 @section Scripts {

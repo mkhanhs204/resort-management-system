@@ -272,13 +272,21 @@ namespace PhucNguyenResort.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var roomCategory = await _roomCategoryService.GetByIdAsync(id);
-            if (roomCategory != null)
+            try
             {
-                await _roomCategoryService.DeleteAsync(id);
+                var roomCategory = await _roomCategoryService.GetByIdAsync(id);
+                if (roomCategory != null)
+                {
+                    await _roomCategoryService.DeleteAsync(id);
+                }
+                
+                return RedirectToAction(nameof(Index));
             }
-            
-            return RedirectToAction(nameof(Index));
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa hạng phòng này vì đang có phòng hoặc đơn đặt phòng liên kết.";
+                return RedirectToAction(nameof(Delete), new { id = id });
+            }
         }
     }
 }

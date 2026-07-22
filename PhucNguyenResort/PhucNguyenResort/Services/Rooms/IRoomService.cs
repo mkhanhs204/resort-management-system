@@ -13,5 +13,6 @@ namespace PhucNguyenResort.Services.Rooms
         Task UpdateRoomAsync(Room room);
         Task DeleteRoomAsync(int roomId);
         bool RoomExists(int roomId);
+        Task<bool> HasRelatedDataAsync(int roomId);
     }
 }
