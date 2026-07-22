@@ -22,16 +22,24 @@ namespace PhucNguyenResort.Controllers
         }
 
         // GET: /Reception/Index
-        public async Task<IActionResult> Index(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter, bool clearFilter = false)
+        public async Task<IActionResult> Index(string? searchString, BookingStatus? statusFilter, DateTime? dateFilter, bool clearFilter = false, int page = 1)
         {
             if (clearFilter) return RedirectToAction(nameof(Index));
 
-            if (Request.Query.Count == 0) dateFilter = DateTime.Today;
+            if (Request.Query.Count == 0 && !Request.Query.ContainsKey("page")) dateFilter = DateTime.Today;
 
             var bookings = await _receptionService.GetBookingsAsync(searchString, statusFilter, dateFilter);
 
+            int pageSize = 10;
+            var totalItems = bookings.Count();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            page = page < 1 ? 1 : page;
+            page = page > totalPages && totalPages > 0 ? totalPages : page;
+
+            var pagedBookings = bookings.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
             var tokens = new Dictionary<int, string>();
-            foreach (var b in bookings)
+            foreach (var b in pagedBookings)
             {
                 tokens[b.BookingId] = GeneratePreCheckinToken(b);
             }
@@ -39,8 +47,11 @@ namespace PhucNguyenResort.Controllers
             ViewBag.CurrentSearch = searchString;
             ViewBag.CurrentStatus = statusFilter;
             ViewBag.CurrentDate = dateFilter?.ToString("yyyy-MM-dd");
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
 
-            return View(bookings);
+            return View(pagedBookings);
         }
 
         // GET: /Reception/CheckIn/{id}

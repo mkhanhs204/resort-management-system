@@ -136,6 +136,17 @@
     </div>
 </div>
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert-luxury" style="background-color: #fff0f0; border-color: #ffcdd2;">
+        <span class="material-symbols-outlined" style="color: #d32f2f;">error</span>
+        <div class="alert-luxury-content">
+            <h4 style="color: #d32f2f;">Không thể xóa</h4>
+            <p style="color: #d32f2f;">@TempData["ErrorMessage"]</p>
+        </div>
+    </div>
+}
+
 <div class="alert-luxury">
     <span class="material-symbols-outlined">warning</span>
     <div class="alert-luxury-content">
