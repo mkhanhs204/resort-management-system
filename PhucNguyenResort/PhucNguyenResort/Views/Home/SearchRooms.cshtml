@@ -28,7 +28,8 @@
     <!-- Sticky Search Bar -->
     <section class="sticky top-[64px] z-40 bg-surface shadow-sm border-b border-outline-variant/10">
         <div class="max-w-container-max mx-auto px-margin-desktop py-4">
-            <form asp-controller="Home" asp-action="SearchRooms" method="get" class="flex flex-wrap md:flex-nowrap items-center gap-6">
+            <form id="searchForm" asp-controller="Home" asp-action="SearchRooms" method="get" class="flex flex-wrap md:flex-nowrap items-center gap-6">
+                <input type="hidden" name="sortOrder" id="sortOrderInput" value="@(ViewBag.SortOrder ?? "asc")" />
                 @{
                     string isoCheckIn = "";
                     string isoCheckOut = "";
@@ -114,7 +115,22 @@
             <div class="lg:w-2/3 flex flex-col gap-8">
                 <div class="flex justify-between items-end mb-4">
                     <h2 class="font-headline-sm text-headline-sm text-on-surface">Kết quả tìm kiếm (@(Model?.Count() ?? 0) phòng)</h2>
-                    <div class="text-on-surface-variant font-label-lg text-label-lg border-b border-outline-variant/50 cursor-pointer hover:text-primary">Sắp xếp: Giá thấp đến cao</div>
+                    <div class="relative group">
+                        <div class="flex items-center text-on-surface-variant font-label-lg text-label-lg border-b border-outline-variant/50 cursor-pointer hover:text-primary pb-1">
+                            Sắp xếp: @(ViewBag.SortOrder == "desc" ? "Giá cao đến thấp" : "Giá thấp đến cao")
+                            <span class="material-symbols-outlined ml-1 text-[18px]">expand_more</span>
+                        </div>
+                        
+                        <!-- Dropdown -->
+                        <div class="absolute right-0 mt-2 w-48 bg-surface border border-outline-variant/20 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <a href="javascript:void(0)" onclick="applySort('asc')" class="block px-4 py-3 text-label-md hover:bg-surface-container-low transition-colors @(ViewBag.SortOrder != "desc" ? "text-primary font-bold bg-primary/5" : "text-on-surface")">
+                                Giá thấp đến cao
+                            </a>
+                            <a href="javascript:void(0)" onclick="applySort('desc')" class="block px-4 py-3 text-label-md hover:bg-surface-container-low transition-colors @(ViewBag.SortOrder == "desc" ? "text-primary font-bold bg-primary/5" : "text-on-surface")">
+                                Giá cao đến thấp
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 
                 @if (Model != null && Model.Any())
@@ -286,6 +302,27 @@
                 }
             }
         });
+
+        function applySort(order) {
+            var searchForm = document.getElementById('searchForm');
+            if (searchForm) {
+                var sortInput = document.getElementById('sortOrderInput');
+                if (!sortInput) {
+                    sortInput = document.createElement('input');
+                    sortInput.type = 'hidden';
+                    sortInput.name = 'sortOrder';
+                    sortInput.id = 'sortOrderInput';
+                    searchForm.appendChild(sortInput);
+                }
+                sortInput.value = order;
+                searchForm.submit();
+            } else {
+                // fallback if form is missing
+                var currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('sortOrder', order);
+                window.location.href = currentUrl.toString();
+            }
+        }
 
         // Cart State
         let cart = [];

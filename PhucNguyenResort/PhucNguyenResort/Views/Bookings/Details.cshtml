@@ -238,15 +238,31 @@
                         </div>
                     }
 
-                    @if (validFoodOrders != null && validFoodOrders.Any())
+                    @if (validFoodOrders != null && validFoodOrders.Any(fo => fo.OrderType == PhucNguyenResort.Enums.FoodOrderType.RoomService))
                     {
                         <div class="border-t border-outline-variant/10 pt-4 mt-2">
-                            <p class="text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Ăn Uống (Ghi nợ phòng):</p>
+                            <p class="text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Ăn Uống (Gọi món lên phòng):</p>
                             <div class="space-y-2">
-                                @foreach (var fo in validFoodOrders)
+                                @foreach (var fo in validFoodOrders.Where(fo => fo.OrderType == PhucNguyenResort.Enums.FoodOrderType.RoomService))
                                 {
                                     <div class="flex justify-between text-body-md">
                                         <span class="text-on-surface-variant">- Gọi món (Mã #@fo.FoodOrderId.ToString("D4"))</span>
+                                        <span class="font-medium text-on-surface">@((fo.TotalAmount ?? 0).ToString("N0")) VNĐ</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (validFoodOrders != null && validFoodOrders.Any(fo => fo.OrderType == PhucNguyenResort.Enums.FoodOrderType.TableService))
+                    {
+                        <div class="border-t border-outline-variant/10 pt-4 mt-2">
+                            <p class="text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Ăn Uống (Tiền ăn tại bàn):</p>
+                            <div class="space-y-2">
+                                @foreach (var fo in validFoodOrders.Where(fo => fo.OrderType == PhucNguyenResort.Enums.FoodOrderType.TableService))
+                                {
+                                    <div class="flex justify-between text-body-md">
+                                        <span class="text-on-surface-variant">- Tiền ăn tại bàn (Mã #@fo.FoodOrderId.ToString("D4"))</span>
                                         <span class="font-medium text-on-surface">@((fo.TotalAmount ?? 0).ToString("N0")) VNĐ</span>
                                     </div>
                                 }
@@ -353,13 +369,13 @@
                     <div id="cancel-form-area" class="hidden mt-4 p-6 border border-error/30 rounded-xl bg-error/5">
                         <h4 class="font-headline-sm text-error mb-4">Xác nhận hủy phòng</h4>
                         <form asp-action="Cancel" asp-route-id="@Model.BookingId" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt phòng này? Thao tác này không thể hoàn tác.');">
-                            <div class="mb-4">
-                                <label class="block text-label-sm font-bold text-on-surface mb-2">Lý do hủy phòng (Tùy chọn)</label>
-                                <textarea name="reason" class="w-full p-3 rounded-lg border border-outline-variant focus:border-error focus:ring focus:ring-error/20 bg-surface-container-lowest" rows="2" placeholder="Ví dụ: Thay đổi lịch trình..."></textarea>
-                            </div>
-                            
                             @if (isRefundable)
                             {
+                                <div class="mb-4">
+                                    <label class="block text-label-sm font-bold text-on-surface mb-2">Lý do hủy phòng (Tùy chọn)</label>
+                                    <textarea name="reason" class="w-full p-3 rounded-lg border border-outline-variant focus:border-error focus:ring focus:ring-error/20 bg-surface-container-lowest" rows="2" placeholder="Ví dụ: Thay đổi lịch trình..."></textarea>
+                                </div>
+                                
                                 <div class="mb-4">
                                     <label class="block text-label-sm font-bold text-on-surface mb-2">Thông tin tài khoản nhận hoàn tiền <span class="text-error">*</span></label>
                                     <p class="text-[13px] text-on-surface-variant mb-2">Vui lòng cung cấp: Số tài khoản - Ngân hàng - Chủ tài khoản để bộ phận kế toán xử lý hoàn cọc.</p>

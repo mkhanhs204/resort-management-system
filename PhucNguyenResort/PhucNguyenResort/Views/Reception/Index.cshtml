@@ -320,13 +320,24 @@
                     <option value="">-- Tất cả trạng thái --</option>
                     @foreach (PhucNguyenResort.Enums.BookingStatus status in Enum.GetValues(typeof(PhucNguyenResort.Enums.BookingStatus)))
                     {
+                        var statusName = status switch {
+                            PhucNguyenResort.Enums.BookingStatus.Reserved => "Đã đặt",
+                            PhucNguyenResort.Enums.BookingStatus.Arrived => "Đã đến (Chờ phòng)",
+                            PhucNguyenResort.Enums.BookingStatus.CheckedIn => "Đang lưu trú",
+                            PhucNguyenResort.Enums.BookingStatus.CheckedOut => "Đã trả phòng",
+                            PhucNguyenResort.Enums.BookingStatus.Cancelled => "Đã hủy",
+                            PhucNguyenResort.Enums.BookingStatus.NoShow => "Không đến",
+                            PhucNguyenResort.Enums.BookingStatus.PendingPayment => "Chờ thanh toán",
+                            _ => status.ToString()
+                        };
+
                         if (ViewBag.CurrentStatus != null && (PhucNguyenResort.Enums.BookingStatus)ViewBag.CurrentStatus == status)
                         {
-                            <option value="@status" selected="selected">@status</option>
+                            <option value="@status" selected="selected">@statusName</option>
                         }
                         else
                         {
-                            <option value="@status">@status</option>
+                            <option value="@status">@statusName</option>
                         }
                     }
                 </select>
@@ -418,11 +429,13 @@
                                     };
                                     var statusText = item.BookingStatus switch
                                     {
-                                        PhucNguyenResort.Enums.BookingStatus.Reserved => "Reserved",
-                                        PhucNguyenResort.Enums.BookingStatus.CheckedIn => "Checked-in",
-                                        PhucNguyenResort.Enums.BookingStatus.CheckedOut => "Checked-out",
-                                        PhucNguyenResort.Enums.BookingStatus.Cancelled => "Cancelled",
-                                        PhucNguyenResort.Enums.BookingStatus.NoShow => "No-show",
+                                        PhucNguyenResort.Enums.BookingStatus.Reserved => "Đã đặt",
+                                        PhucNguyenResort.Enums.BookingStatus.Arrived => "Đã đến (Chờ phòng)",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedIn => "Đang lưu trú",
+                                        PhucNguyenResort.Enums.BookingStatus.CheckedOut => "Đã trả phòng",
+                                        PhucNguyenResort.Enums.BookingStatus.Cancelled => "Đã hủy",
+                                        PhucNguyenResort.Enums.BookingStatus.NoShow => "Không đến",
+                                        PhucNguyenResort.Enums.BookingStatus.PendingPayment => "Chờ thanh toán",
                                         _ => item.BookingStatus.ToString()
                                     };
                                     var iconName = item.BookingStatus switch

@@ -58,7 +58,7 @@ namespace PhucNguyenResort.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int adultsCount = 2, int childrenCount = 0, int roomCount = 1, int? preselectId = null, int? preselectQty = null)
+        public async Task<IActionResult> SearchRooms(string checkIn, string checkOut, int adultsCount = 2, int childrenCount = 0, int roomCount = 1, int? preselectId = null, int? preselectQty = null, string sortOrder = "asc")
         {
             bool isFiltered = !string.IsNullOrEmpty(checkIn) && !string.IsNullOrEmpty(checkOut);
             IEnumerable<RoomCategory> availableCategories;
@@ -67,12 +67,19 @@ namespace PhucNguyenResort.Controllers
             {
                 availableCategories = await _homeService.GetRoomCategoriesForHomeAsync();
                 
+                // Sort by default
+                if (sortOrder == "desc")
+                    availableCategories = availableCategories.OrderByDescending(r => r.PricePerNight);
+                else
+                    availableCategories = availableCategories.OrderBy(r => r.PricePerNight);
+
                 ViewBag.CheckIn = "";
                 ViewBag.CheckOut = "";
                 ViewBag.AdultsCount = adultsCount;
                 ViewBag.ChildrenCount = childrenCount;
                 ViewBag.RoomCount = roomCount;
                 ViewBag.IsFiltered = false;
+                ViewBag.SortOrder = sortOrder;
                 ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();
 
                 return View(availableCategories);
@@ -103,12 +110,19 @@ namespace PhucNguyenResort.Controllers
 
             availableCategories = await _homeService.SearchAvailableCategoriesAsync(checkInDate, checkOutDate, adultsCount, childrenCount, roomCount);
 
+            // Sort
+            if (sortOrder == "desc")
+                availableCategories = availableCategories.OrderByDescending(r => r.PricePerNight);
+            else
+                availableCategories = availableCategories.OrderBy(r => r.PricePerNight);
+
             ViewBag.CheckIn = checkInDate.ToString("dd/MM/yyyy");
             ViewBag.CheckOut = checkOutDate.ToString("dd/MM/yyyy");
             ViewBag.AdultsCount = adultsCount;
             ViewBag.ChildrenCount = childrenCount;
             ViewBag.RoomCount = roomCount;
             ViewBag.IsFiltered = true;
+            ViewBag.SortOrder = sortOrder;
             ViewBag.PreselectId = preselectId;
             ViewBag.PreselectQty = preselectQty;
             ViewBag.Reviews = await _reviewService.GetPublicReviewsAsync();

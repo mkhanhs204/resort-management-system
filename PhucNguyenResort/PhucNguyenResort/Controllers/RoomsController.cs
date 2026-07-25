@@ -100,16 +100,24 @@ namespace PhucNguyenResort.Controllers
         {
             if (ModelState.IsValid)
             {
-                var room = new Room
+                var allRooms = await _roomService.GetAllRoomsAsync();
+                if (allRooms.Any(r => string.Equals(r.RoomNumber, model.RoomNumber, StringComparison.OrdinalIgnoreCase)))
                 {
-                    RoomNumber = model.RoomNumber,
-                    CategoryId = model.CategoryId,
-                    FloorNumber = model.FloorNumber,
-                    Status = RoomStatus.Available // Default status
-                };
+                    ModelState.AddModelError("RoomNumber", "Số phòng này đã tồn tại trong hệ thống.");
+                }
+                else
+                {
+                    var room = new Room
+                    {
+                        RoomNumber = model.RoomNumber,
+                        CategoryId = model.CategoryId,
+                        FloorNumber = model.FloorNumber,
+                        Status = RoomStatus.Available // Default status
+                    };
 
-                await _roomService.AddRoomAsync(room);
-                return RedirectToAction(nameof(Index));
+                    await _roomService.AddRoomAsync(room);
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             var categories = await _roomCategoryService.GetAllAsync();
@@ -157,19 +165,27 @@ namespace PhucNguyenResort.Controllers
 
             if (ModelState.IsValid)
             {
-                var room = await _roomService.GetRoomByIdAsync(id);
-                if (room == null)
+                var allRooms = await _roomService.GetAllRoomsAsync();
+                if (allRooms.Any(r => string.Equals(r.RoomNumber, model.RoomNumber, StringComparison.OrdinalIgnoreCase) && r.RoomId != id))
                 {
-                    return NotFound();
+                    ModelState.AddModelError("RoomNumber", "Số phòng này đã tồn tại trong hệ thống.");
                 }
+                else
+                {
+                    var room = await _roomService.GetRoomByIdAsync(id);
+                    if (room == null)
+                    {
+                        return NotFound();
+                    }
 
-                room.RoomNumber = model.RoomNumber;
-                room.CategoryId = model.CategoryId;
-                room.FloorNumber = model.FloorNumber;
-                room.Status = model.Status;
+                    room.RoomNumber = model.RoomNumber;
+                    room.CategoryId = model.CategoryId;
+                    room.FloorNumber = model.FloorNumber;
+                    room.Status = model.Status;
 
-                await _roomService.UpdateRoomAsync(room);
-                return RedirectToAction(nameof(Index));
+                    await _roomService.UpdateRoomAsync(room);
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             var categories = await _roomCategoryService.GetAllAsync();
