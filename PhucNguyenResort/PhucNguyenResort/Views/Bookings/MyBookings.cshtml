@@ -160,6 +160,16 @@
                                     statusText = "Đã đặt";
                                     statusBadgeClass = "bg-blue-50 text-blue-700 border-blue-100";
                                     break;
+                                case BookingStatus.Arrived:
+                                    statusClass = "Reserved"; // Nhóm chung vào tab Sắp diễn ra
+                                    statusText = "Đã đến (Chờ phòng)";
+                                    statusBadgeClass = "bg-cyan-50 text-cyan-700 border-cyan-100";
+                                    break;
+                                case BookingStatus.PendingPayment:
+                                    statusClass = "Reserved"; // Nhóm chung vào tab Sắp diễn ra
+                                    statusText = "Chờ thanh toán";
+                                    statusBadgeClass = "bg-orange-50 text-orange-700 border-orange-100";
+                                    break;
                                 case BookingStatus.CheckedIn:
                                     statusClass = "CheckedIn";
                                     statusText = "Đang lưu trú";

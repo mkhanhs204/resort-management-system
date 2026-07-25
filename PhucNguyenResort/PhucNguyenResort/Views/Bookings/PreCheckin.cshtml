@@ -120,22 +120,7 @@
                                 <span asp-validation-for="Guests[i].PassportNumber" class="text-error text-sm"></span>
                             </div>
                             
-                            @if (isPrimary)
-                            {
-                                <!-- Upload Area for primary guest -->
-                                <div class="md:col-span-2 mt-4">
-                                    <label class="text-label-lg text-on-surface-variant block mb-2">Tải Lên Giấy Tờ Tùy Thân</label>
-                                    <div class="border-2 border-dashed border-outline-variant/50 rounded-xl p-8 text-center bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer group">
-                                        <input type="file" id="upload-1" class="hidden" accept="image/png, image/jpeg" />
-                                        <label for="upload-1" class="cursor-pointer">
-                                            <span class="material-symbols-outlined text-4xl text-primary mb-2">cloud_upload</span>
-                                            <p class="text-body-md text-on-surface-variant">Kéo thả hoặc <span class="text-primary font-bold">Bấm để tải lên</span></p>
-                                            <p class="text-label-sm text-outline mt-1">Hỗ trợ PNG, JPG, tối đa 10MB</p>
-                                        </label>
-                                    </div>
-                                </div>
-                            }
-                            else
+                            @if (!isPrimary)
                             {
                                 <p class="md:col-span-2 text-label-sm text-outline italic">Vui lòng điền đầy đủ thông tin bắt buộc tương tự như khách chính.</p>
                             }
@@ -182,16 +167,5 @@
             }
         }
 
-        // Simple file input visual feedback
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', function() {
-                const label = this.nextElementSibling;
-                if (this.files && this.files[0]) {
-                    label.querySelector('p').innerHTML = `<span class="text-primary font-bold">Đã tải lên:</span> ${this.files[0].name}`;
-                    label.querySelector('.material-symbols-outlined').innerHTML = 'check_circle';
-                    label.querySelector('.material-symbols-outlined').classList.add('text-green-600');
-                }
-            });
-        });
     </script>
 }

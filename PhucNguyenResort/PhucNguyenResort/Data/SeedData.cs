@@ -68,11 +68,11 @@ public static class SeedData
         );
 
         modelBuilder.Entity<RoomCategory>().HasData(
-            new RoomCategory { CategoryId = 1, CategoryName = @"Deluxe Ocean View", Description = @"Phòng cao cấp hướng biển", MaxAdults = 2, MaxChildren = 1, PricePerNight = 1200000m, ImageUrl = @"/img/room/room-1.jpg" },
-            new RoomCategory { CategoryId = 2, CategoryName = @"Premium Garden View", Description = @"Phòng view vườn yên tĩnh", MaxAdults = 2, MaxChildren = 1, PricePerNight = 1000000m, ImageUrl = @"/img/room/room-2.jpg" },
-            new RoomCategory { CategoryId = 3, CategoryName = @"Family Suite", Description = @"Suite rộng rãi cho gia đình", MaxAdults = 4, MaxChildren = 2, PricePerNight = 2500000m, ImageUrl = @"/img/room/room-3.jpg" },
-            new RoomCategory { CategoryId = 4, CategoryName = @"Presidential Villa", Description = @"Biệt thự siêu cấp sang trọng", MaxAdults = 6, MaxChildren = 4, PricePerNight = 8000000m, ImageUrl = @"/img/room/room-4.jpg" },
-            new RoomCategory { CategoryId = 5, CategoryName = @"Honeymoon Villa", Description = @"Biệt thự lãng mạn cho cặp đôi", MaxAdults = 2, MaxChildren = 0, PricePerNight = 3500000m, ImageUrl = @"/images/rooms/category-08.jpg" }
+            new RoomCategory { CategoryId = 1, CategoryName = @"Phòng Deluxe Hướng Biển", Description = @"Tận hưởng không gian sang trọng với ban công riêng biệt hướng ra đại dương xanh mát, trang bị bồn tắm nằm cao cấp và giường ngủ êm ái chuẩn 5 sao.", MaxAdults = 2, MaxChildren = 1, PricePerNight = 1200000m, ImageUrl = @"/img/room/room-1.jpg" },
+            new RoomCategory { CategoryId = 2, CategoryName = @"Phòng Premium Hướng Vườn", Description = @"Không gian nghỉ dưỡng yên bình giữa khu vườn nhiệt đới xanh tươi, trang bị nội thất gỗ tự nhiên, phù hợp cho những ai tìm kiếm sự tĩnh lặng và thư giãn tuyệt đối.", MaxAdults = 2, MaxChildren = 1, PricePerNight = 1000000m, ImageUrl = @"/img/room/room-2.jpg" },
+            new RoomCategory { CategoryId = 3, CategoryName = @"Phòng Suite Gia Đình", Description = @"Thiết kế rộng rãi với 2 phòng ngủ riêng biệt và khu vực phòng khách chung, ban công lớn, lý tưởng cho những kỳ nghỉ gắn kết yêu thương của cả gia đình.", MaxAdults = 4, MaxChildren = 2, PricePerNight = 2500000m, ImageUrl = @"/img/room/room-3.jpg" },
+            new RoomCategory { CategoryId = 4, CategoryName = @"Biệt Thự Tổng Thống", Description = @"Tuyệt tác nghỉ dưỡng diện tích khủng với hồ bơi vô cực riêng, quản gia phục vụ 24/7, phòng khách xa hoa và tiện nghi đẳng cấp bậc nhất dành cho giới thượng lưu.", MaxAdults = 6, MaxChildren = 4, PricePerNight = 8000000m, ImageUrl = @"/img/room/room-4.jpg" },
+            new RoomCategory { CategoryId = 5, CategoryName = @"Biệt Thự Trăng Mật", Description = @"Chốn hẹn hò lãng mạn cho các cặp uyên ương với không gian hoàn toàn riêng tư, hồ bơi cá nhân nhỏ, setup hoa hồng, nến và dịch vụ chăm sóc tại phòng mang đến kỉ niệm khó quên.", MaxAdults = 2, MaxChildren = 0, PricePerNight = 3500000m, ImageUrl = @"/images/rooms/category-08.jpg" }
         );
 
         modelBuilder.Entity<Room>().HasData(
@@ -80,26 +80,36 @@ public static class SeedData
             new Room { RoomId = 2, RoomNumber = @"102", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Occupied },
             new Room { RoomId = 3, RoomNumber = @"103", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Available },
             new Room { RoomId = 4, RoomNumber = @"104", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Available },
+            new Room { RoomId = 21, RoomNumber = @"105", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Available },
+            new Room { RoomId = 22, RoomNumber = @"106", CategoryId = 1, FloorNumber = 1, Status = RoomStatus.Available },
 
             new Room { RoomId = 5, RoomNumber = @"201", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Available },
             new Room { RoomId = 6, RoomNumber = @"202", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Maintenance },
             new Room { RoomId = 7, RoomNumber = @"203", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Available },
             new Room { RoomId = 8, RoomNumber = @"204", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Occupied },
+            new Room { RoomId = 23, RoomNumber = @"205", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Available },
+            new Room { RoomId = 24, RoomNumber = @"206", CategoryId = 2, FloorNumber = 2, Status = RoomStatus.Available },
 
             new Room { RoomId = 9, RoomNumber = @"301", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
             new Room { RoomId = 10, RoomNumber = @"302", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
             new Room { RoomId = 11, RoomNumber = @"303", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.NeedsCleaning },
             new Room { RoomId = 12, RoomNumber = @"304", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
+            new Room { RoomId = 25, RoomNumber = @"305", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
+            new Room { RoomId = 26, RoomNumber = @"306", CategoryId = 3, FloorNumber = 3, Status = RoomStatus.Available },
 
             new Room { RoomId = 13, RoomNumber = @"401", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
             new Room { RoomId = 14, RoomNumber = @"402", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Occupied },
             new Room { RoomId = 15, RoomNumber = @"403", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
             new Room { RoomId = 16, RoomNumber = @"404", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
+            new Room { RoomId = 27, RoomNumber = @"405", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
+            new Room { RoomId = 28, RoomNumber = @"406", CategoryId = 4, FloorNumber = 4, Status = RoomStatus.Available },
 
             new Room { RoomId = 17, RoomNumber = @"501", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available },
             new Room { RoomId = 18, RoomNumber = @"502", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available },
             new Room { RoomId = 19, RoomNumber = @"503", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available },
-            new Room { RoomId = 20, RoomNumber = @"504", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.NeedsCleaning }
+            new Room { RoomId = 20, RoomNumber = @"504", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.NeedsCleaning },
+            new Room { RoomId = 29, RoomNumber = @"505", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available },
+            new Room { RoomId = 30, RoomNumber = @"506", CategoryId = 5, FloorNumber = 5, Status = RoomStatus.Available }
         );
 
         modelBuilder.Entity<Booking>().HasData(
@@ -171,73 +181,164 @@ public static class SeedData
             new BookingDetail { BookingDetailId = 20, BookingId = 20, RoomCategoryId = 5, RoomId = 20, Price = 3500000m }
         );
 
+        // ===== 10 DANH MỤC MÓN ĂN (Tiếng Việt) =====
         modelBuilder.Entity<MenuCategory>().HasData(
-            new MenuCategory { CategoryId = 1, CategoryName = @"Breakfast" },
-            new MenuCategory { CategoryId = 2, CategoryName = @"Appetizer" },
-            new MenuCategory { CategoryId = 3, CategoryName = @"Soup" },
-            new MenuCategory { CategoryId = 4, CategoryName = @"Salad" },
-            new MenuCategory { CategoryId = 5, CategoryName = @"Seafood" },
-            new MenuCategory { CategoryId = 6, CategoryName = @"Vietnamese Food" },
-            new MenuCategory { CategoryId = 7, CategoryName = @"Western Food" },
-            new MenuCategory { CategoryId = 8, CategoryName = @"Vegetarian" },
-            new MenuCategory { CategoryId = 9, CategoryName = @"Dessert" },
-            new MenuCategory { CategoryId = 10, CategoryName = @"Coffee" },
-            new MenuCategory { CategoryId = 11, CategoryName = @"Tea" },
-            new MenuCategory { CategoryId = 12, CategoryName = @"Juice" },
-            new MenuCategory { CategoryId = 13, CategoryName = @"Cocktail" },
-            new MenuCategory { CategoryId = 14, CategoryName = @"Mocktail" },
-            new MenuCategory { CategoryId = 15, CategoryName = @"Kids Meal" },
-            new MenuCategory { CategoryId = 16, CategoryName = @"Room Service Set" },
-            new MenuCategory { CategoryId = 17, CategoryName = @"BBQ" },
-            new MenuCategory { CategoryId = 18, CategoryName = @"Noodle" },
-            new MenuCategory { CategoryId = 19, CategoryName = @"Rice Dish" },
-            new MenuCategory { CategoryId = 20, CategoryName = @"Special Combo" }
+            new MenuCategory { CategoryId = 1, CategoryName = @"Khai Vị" },
+            new MenuCategory { CategoryId = 2, CategoryName = @"Hải Sản" },
+            new MenuCategory { CategoryId = 3, CategoryName = @"Món Việt" },
+            new MenuCategory { CategoryId = 4, CategoryName = @"Món Âu" },
+            new MenuCategory { CategoryId = 5, CategoryName = @"Lẩu & Nướng" },
+            new MenuCategory { CategoryId = 6, CategoryName = @"Cơm & Bún & Phở" },
+            new MenuCategory { CategoryId = 7, CategoryName = @"Món Chay" },
+            new MenuCategory { CategoryId = 8, CategoryName = @"Tráng Miệng" },
+            new MenuCategory { CategoryId = 9, CategoryName = @"Đồ Uống" },
+            new MenuCategory { CategoryId = 10, CategoryName = @"Món Trẻ Em" }
         );
 
+        // ===== 100 MÓN ĂN (10 món / danh mục, Tiếng Việt) =====
         modelBuilder.Entity<MenuItem>().HasData(
-            new MenuItem { MenuItemId = 1, CategoryId = 1, ItemName = @"Pho Bo", Description = @"Pho Bo prepared by resort kitchen.", Price = 85000.00m, ImageUrl = @"/images/menu/item-01.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 2, CategoryId = 2, ItemName = @"Bun Cha", Description = @"Bun Cha prepared by resort kitchen.", Price = 110000.00m, ImageUrl = @"/images/menu/item-02.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 3, CategoryId = 3, ItemName = @"Spring Rolls", Description = @"Spring Rolls prepared by resort kitchen.", Price = 135000.00m, ImageUrl = @"/images/menu/item-03.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 4, CategoryId = 4, ItemName = @"Seafood Soup", Description = @"Seafood Soup prepared by resort kitchen.", Price = 160000.00m, ImageUrl = @"/images/menu/item-04.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 5, CategoryId = 5, ItemName = @"Caesar Salad", Description = @"Caesar Salad prepared by resort kitchen.", Price = 185000.00m, ImageUrl = @"/images/menu/item-05.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 6, CategoryId = 6, ItemName = @"Grilled Prawns", Description = @"Grilled Prawns prepared by resort kitchen.", Price = 210000.00m, ImageUrl = @"/images/menu/item-06.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 7, CategoryId = 7, ItemName = @"Beef Steak", Description = @"Beef Steak prepared by resort kitchen.", Price = 235000.00m, ImageUrl = @"/images/menu/item-07.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 8, CategoryId = 8, ItemName = @"Vegetable Curry", Description = @"Vegetable Curry prepared by resort kitchen.", Price = 260000.00m, ImageUrl = @"/images/menu/item-08.jpg", IsAvailable = false },
-            new MenuItem { MenuItemId = 9, CategoryId = 9, ItemName = @"Chocolate Cake", Description = @"Chocolate Cake prepared by resort kitchen.", Price = 285000.00m, ImageUrl = @"/images/menu/item-09.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 10, CategoryId = 10, ItemName = @"Vietnamese Coffee", Description = @"Vietnamese Coffee prepared by resort kitchen.", Price = 310000.00m, ImageUrl = @"/images/menu/item-10.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 11, CategoryId = 11, ItemName = @"Lotus Tea", Description = @"Lotus Tea prepared by resort kitchen.", Price = 335000.00m, ImageUrl = @"/images/menu/item-11.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 12, CategoryId = 12, ItemName = @"Mango Juice", Description = @"Mango Juice prepared by resort kitchen.", Price = 360000.00m, ImageUrl = @"/images/menu/item-12.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 13, CategoryId = 13, ItemName = @"Sunset Cocktail", Description = @"Sunset Cocktail prepared by resort kitchen.", Price = 385000.00m, ImageUrl = @"/images/menu/item-13.jpg", IsAvailable = false },
-            new MenuItem { MenuItemId = 14, CategoryId = 14, ItemName = @"Blue Lagoon Mocktail", Description = @"Blue Lagoon Mocktail prepared by resort kitchen.", Price = 410000.00m, ImageUrl = @"/images/menu/item-14.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 15, CategoryId = 15, ItemName = @"Kids Pasta", Description = @"Kids Pasta prepared by resort kitchen.", Price = 435000.00m, ImageUrl = @"/images/menu/item-15.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 16, CategoryId = 16, ItemName = @"Club Sandwich", Description = @"Club Sandwich prepared by resort kitchen.", Price = 460000.00m, ImageUrl = @"/images/menu/item-16.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 17, CategoryId = 17, ItemName = @"BBQ Platter", Description = @"BBQ Platter prepared by resort kitchen.", Price = 485000.00m, ImageUrl = @"/images/menu/item-17.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 18, CategoryId = 18, ItemName = @"Seafood Noodle", Description = @"Seafood Noodle prepared by resort kitchen.", Price = 510000.00m, ImageUrl = @"/images/menu/item-18.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 19, CategoryId = 19, ItemName = @"Chicken Fried Rice", Description = @"Chicken Fried Rice prepared by resort kitchen.", Price = 535000.00m, ImageUrl = @"/images/menu/item-19.jpg", IsAvailable = true },
-            new MenuItem { MenuItemId = 20, CategoryId = 20, ItemName = @"Resort Combo", Description = @"Resort Combo prepared by resort kitchen.", Price = 560000.00m, ImageUrl = @"/images/menu/item-20.jpg", IsAvailable = true }
+            // --- 1. Khai Vị ---
+            new MenuItem { MenuItemId = 1, CategoryId = 1, ItemName = @"Gỏi Cuốn Tôm Thịt", Description = @"Cuốn bánh tráng tươi với tôm, thịt heo, bún và rau sống, chấm tương đậu phộng.", Price = 75000m, ImageUrl = @"/images/menu/item-01.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 2, CategoryId = 1, ItemName = @"Chả Giò Chiên Giòn", Description = @"Chả giò nhân thịt heo, nấm mèo, miến chiên vàng giòn, ăn kèm nước mắm chua ngọt.", Price = 85000m, ImageUrl = @"/images/menu/item-02.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 3, CategoryId = 1, ItemName = @"Bánh Xèo Miền Tây", Description = @"Bánh xèo giòn nhân tôm, thịt, giá đỗ, ăn kèm rau sống và nước chấm.", Price = 95000m, ImageUrl = @"/images/menu/item-03.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 4, CategoryId = 1, ItemName = @"Gỏi Ngó Sen Tôm Thịt", Description = @"Gỏi ngó sen trộn tôm và thịt ba chỉ, rắc đậu phộng rang và hành phi.", Price = 90000m, ImageUrl = @"/images/menu/item-04.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 5, CategoryId = 1, ItemName = @"Bánh Khọt Vũng Tàu", Description = @"Bánh khọt nhân tôm tươi, ăn kèm rau sống và nước mắm pha.", Price = 80000m, ImageUrl = @"/images/menu/item-05.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 6, CategoryId = 1, ItemName = @"Súp Bào Ngư Vi Cá", Description = @"Súp bào ngư nấu với vi cá, nấm đông cô, thơm ngon bổ dưỡng.", Price = 185000m, ImageUrl = @"/images/menu/item-06.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 7, CategoryId = 1, ItemName = @"Salad Trộn Kiểu Resort", Description = @"Rau xà lách, cà chua bi, bơ, trứng luộc trộn sốt mè rang.", Price = 75000m, ImageUrl = @"/images/menu/item-07.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 8, CategoryId = 1, ItemName = @"Tôm Chiên Bơ Tỏi", Description = @"Tôm sú chiên bơ tỏi thơm lừng, dọn kèm bánh mì nướng.", Price = 130000m, ImageUrl = @"/images/menu/item-08.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 9, CategoryId = 1, ItemName = @"Mực Chiên Giòn", Description = @"Mực ống tẩm bột chiên giòn, ăn kèm sốt mayonnaise và tương ớt.", Price = 120000m, ImageUrl = @"/images/menu/item-09.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 10, CategoryId = 1, ItemName = @"Nấm Xào Bơ Tỏi", Description = @"Nấm đùi gà và nấm kim châm xào bơ tỏi, rắc hành lá.", Price = 85000m, ImageUrl = @"/images/menu/item-10.jpg", IsAvailable = true },
+
+            // --- 2. Hải Sản ---
+            new MenuItem { MenuItemId = 11, CategoryId = 2, ItemName = @"Tôm Hùm Nướng Phô Mai", Description = @"Tôm hùm tươi nướng phô mai, dọn kèm khoai tây nghiền và salad.", Price = 850000m, ImageUrl = @"/images/menu/item-11.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 12, CategoryId = 2, ItemName = @"Cua Rang Me", Description = @"Cua biển rang me chua ngọt đậm đà, thơm lừng.", Price = 450000m, ImageUrl = @"/images/menu/item-12.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 13, CategoryId = 2, ItemName = @"Ghẹ Hấp Bia", Description = @"Ghẹ tươi hấp bia, giữ nguyên vị ngọt tự nhiên, chấm muối tiêu chanh.", Price = 380000m, ImageUrl = @"/images/menu/item-13.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 14, CategoryId = 2, ItemName = @"Mực Nướng Sa Tế", Description = @"Mực ống nướng sa tế cay nồng, ăn kèm rau răm và đồ chua.", Price = 220000m, ImageUrl = @"/images/menu/item-14.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 15, CategoryId = 2, ItemName = @"Sò Điệp Nướng Mỡ Hành", Description = @"Sò điệp tươi nướng mỡ hành và đậu phộng giã nhỏ.", Price = 195000m, ImageUrl = @"/images/menu/item-15.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 16, CategoryId = 2, ItemName = @"Cá Chẽm Hấp Hồng Kông", Description = @"Cá chẽm biển hấp xì dầu kiểu Hồng Kông, thịt cá thơm mềm.", Price = 350000m, ImageUrl = @"/images/menu/item-16.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 17, CategoryId = 2, ItemName = @"Tôm Sú Nướng Muối Ớt", Description = @"Tôm sú nướng than hoa, phết muối ớt cay nhẹ.", Price = 280000m, ImageUrl = @"/images/menu/item-17.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 18, CategoryId = 2, ItemName = @"Ốc Hương Rang Bơ", Description = @"Ốc hương rang bơ tỏi thơm phức, vị béo ngậy.", Price = 250000m, ImageUrl = @"/images/menu/item-18.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 19, CategoryId = 2, ItemName = @"Bạch Tuộc Nướng Xiên", Description = @"Bạch tuộc baby nướng xiên que, phết sốt teriyaki.", Price = 180000m, ImageUrl = @"/images/menu/item-19.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 20, CategoryId = 2, ItemName = @"Hàu Nướng Phô Mai", Description = @"Hàu sữa Phú Quốc nướng phô mai, béo ngậy thơm lừng.", Price = 220000m, ImageUrl = @"/images/menu/item-20.jpg", IsAvailable = true },
+
+            // --- 3. Món Việt ---
+            new MenuItem { MenuItemId = 21, CategoryId = 3, ItemName = @"Cá Kho Tộ", Description = @"Cá lóc kho tộ đất với nước màu dừa, tiêu và hành lá.", Price = 150000m, ImageUrl = @"/images/menu/item-21.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 22, CategoryId = 3, ItemName = @"Thịt Kho Tàu", Description = @"Thịt ba chỉ kho nước dừa với trứng vịt, vị mặn ngọt đậm đà.", Price = 130000m, ImageUrl = @"/images/menu/item-22.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 23, CategoryId = 3, ItemName = @"Canh Chua Cá Lóc", Description = @"Canh chua miền Tây nấu với cá lóc, me, thơm, đậu bắp.", Price = 120000m, ImageUrl = @"/images/menu/item-23.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 24, CategoryId = 3, ItemName = @"Gà Kho Gừng", Description = @"Đùi gà ta kho gừng tươi, nước mắm thắng đường thơm lừng.", Price = 140000m, ImageUrl = @"/images/menu/item-24.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 25, CategoryId = 3, ItemName = @"Rau Muống Xào Tỏi", Description = @"Rau muống xào tỏi phi thơm, giòn ngọt tự nhiên.", Price = 65000m, ImageUrl = @"/images/menu/item-25.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 26, CategoryId = 3, ItemName = @"Đậu Hũ Sốt Cà Chua", Description = @"Đậu hũ chiên vàng sốt cà chua với thịt bằm và hành lá.", Price = 75000m, ImageUrl = @"/images/menu/item-26.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 27, CategoryId = 3, ItemName = @"Sườn Non Rim Mặn", Description = @"Sườn heo non rim nước mắm, tỏi ớt, caramel nhẹ.", Price = 160000m, ImageUrl = @"/images/menu/item-27.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 28, CategoryId = 3, ItemName = @"Bò Lúc Lắc", Description = @"Thịt bò Úc xào lúc lắc với ớt chuông, hành tây, ăn kèm cơm trắng.", Price = 195000m, ImageUrl = @"/images/menu/item-28.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 29, CategoryId = 3, ItemName = @"Tôm Rim Nước Cốt Dừa", Description = @"Tôm sú rim nước cốt dừa béo ngậy, hành lá và tiêu xanh.", Price = 175000m, ImageUrl = @"/images/menu/item-29.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 30, CategoryId = 3, ItemName = @"Gà Nướng Lá Chanh", Description = @"Gà ta nướng lá chanh thơm nức, ăn kèm muối tiêu chanh.", Price = 185000m, ImageUrl = @"/images/menu/item-30.jpg", IsAvailable = true },
+
+            // --- 4. Món Âu ---
+            new MenuItem { MenuItemId = 31, CategoryId = 4, ItemName = @"Bò Bít Tết Sốt Tiêu Đen", Description = @"Thịt bò Úc áp chảo tái vừa, rưới sốt tiêu đen, kèm khoai tây chiên.", Price = 285000m, ImageUrl = @"/images/menu/item-31.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 32, CategoryId = 4, ItemName = @"Cá Hồi Áp Chảo", Description = @"Cá hồi Na Uy áp chảo giòn da, dọn kèm rau củ hấp và sốt chanh dây.", Price = 320000m, ImageUrl = @"/images/menu/item-32.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 33, CategoryId = 4, ItemName = @"Mì Ý Sốt Bò Bằm", Description = @"Spaghetti sốt Bolognese với thịt bò bằm, cà chua và phô mai Parmesan.", Price = 165000m, ImageUrl = @"/images/menu/item-33.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 34, CategoryId = 4, ItemName = @"Mì Ý Sốt Kem Nấm", Description = @"Fettuccine sốt kem trắng với nấm rừng và phô mai.", Price = 175000m, ImageUrl = @"/images/menu/item-34.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 35, CategoryId = 4, ItemName = @"Pizza Hải Sản", Description = @"Pizza đế mỏng với tôm, mực, phô mai Mozzarella và sốt cà chua.", Price = 220000m, ImageUrl = @"/images/menu/item-35.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 36, CategoryId = 4, ItemName = @"Sườn Cừu Nướng Rosemary", Description = @"Sườn cừu New Zealand nướng hương thảo, kèm khoai tây nghiền.", Price = 395000m, ImageUrl = @"/images/menu/item-36.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 37, CategoryId = 4, ItemName = @"Súp Kem Nấm Truffle", Description = @"Súp kem nấm với dầu truffle đen, bánh mì nướng giòn.", Price = 135000m, ImageUrl = @"/images/menu/item-37.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 38, CategoryId = 4, ItemName = @"Hamburger Bò Phô Mai", Description = @"Hamburger bò Úc nướng than, phô mai Cheddar, rau xà lách, cà chua.", Price = 185000m, ImageUrl = @"/images/menu/item-38.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 39, CategoryId = 4, ItemName = @"Gà Nướng Sốt BBQ", Description = @"Đùi gà nướng sốt BBQ mật ong, kèm bắp nướng và coleslaw.", Price = 195000m, ImageUrl = @"/images/menu/item-39.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 40, CategoryId = 4, ItemName = @"Salad Caesar Gà Nướng", Description = @"Salad Caesar truyền thống với gà nướng thái lát, bánh mì giòn, phô mai.", Price = 145000m, ImageUrl = @"/images/menu/item-40.jpg", IsAvailable = true },
+
+            // --- 5. Lẩu & Nướng ---
+            new MenuItem { MenuItemId = 41, CategoryId = 5, ItemName = @"Lẩu Thái Tom Yum Hải Sản", Description = @"Lẩu Tom Yum chua cay với tôm, mực, cá, nấm và rau tươi (2-3 người).", Price = 450000m, ImageUrl = @"/images/menu/item-41.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 42, CategoryId = 5, ItemName = @"Lẩu Bò Nhúng Dấm", Description = @"Lẩu dấm với thịt bò tái, rau sống, bún và mắm nêm (2-3 người).", Price = 380000m, ImageUrl = @"/images/menu/item-42.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 43, CategoryId = 5, ItemName = @"Lẩu Gà Lá É", Description = @"Lẩu gà ta nấu lá é thơm đặc trưng Phú Quốc (2-3 người).", Price = 350000m, ImageUrl = @"/images/menu/item-43.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 44, CategoryId = 5, ItemName = @"Lẩu Cá Kèo Lá Giang", Description = @"Lẩu cá kèo nấu lá giang chua thanh, mùi thơm đặc trưng (2-3 người).", Price = 320000m, ImageUrl = @"/images/menu/item-44.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 45, CategoryId = 5, ItemName = @"Bò Nướng Lá Lốt", Description = @"Thịt bò bằm cuốn lá lốt nướng than hoa thơm lừng.", Price = 145000m, ImageUrl = @"/images/menu/item-45.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 46, CategoryId = 5, ItemName = @"Sườn Heo Nướng Mật Ong", Description = @"Sườn heo ướp mật ong nướng than, thơm ngọt đậm vị.", Price = 195000m, ImageUrl = @"/images/menu/item-46.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 47, CategoryId = 5, ItemName = @"Gà Nướng Ngũ Vị", Description = @"Gà ta nướng ngũ vị hương, da giòn thịt mềm.", Price = 220000m, ImageUrl = @"/images/menu/item-47.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 48, CategoryId = 5, ItemName = @"Combo Nướng Hải Sản", Description = @"Tôm, mực, sò điệp, cá nướng than hoa phục vụ 2-4 người.", Price = 550000m, ImageUrl = @"/images/menu/item-48.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 49, CategoryId = 5, ItemName = @"Bê Thui Cầu Mống", Description = @"Bê thui đặc sản, ăn kèm rau sống, bánh tráng và mắm nêm.", Price = 280000m, ImageUrl = @"/images/menu/item-49.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 50, CategoryId = 5, ItemName = @"Lẩu Nấm Chay", Description = @"Lẩu nấm thập cẩm với đậu hũ, rau củ tươi, nước dùng chay (2-3 người).", Price = 280000m, ImageUrl = @"/images/menu/item-50.jpg", IsAvailable = true },
+
+            // --- 6. Cơm & Bún & Phở ---
+            new MenuItem { MenuItemId = 51, CategoryId = 6, ItemName = @"Phở Bò Tái Nạm", Description = @"Phở bò truyền thống với nước dùng hầm xương 12 tiếng, thịt bò tái và nạm.", Price = 95000m, ImageUrl = @"/images/menu/item-51.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 52, CategoryId = 6, ItemName = @"Bún Bò Huế", Description = @"Bún bò Huế cay nồng với giò heo, huyết và chả cua.", Price = 105000m, ImageUrl = @"/images/menu/item-52.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 53, CategoryId = 6, ItemName = @"Bún Chả Hà Nội", Description = @"Bún chả nướng than hoa ăn kèm nước mắm pha, rau sống và nem cua bể.", Price = 110000m, ImageUrl = @"/images/menu/item-53.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 54, CategoryId = 6, ItemName = @"Cơm Tấm Sườn Bì Chả", Description = @"Cơm tấm với sườn nướng, bì, chả trứng và nước mắm pha.", Price = 95000m, ImageUrl = @"/images/menu/item-54.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 55, CategoryId = 6, ItemName = @"Cơm Chiên Dương Châu", Description = @"Cơm chiên với tôm, lạp xưởng, trứng, đậu Hà Lan và cà rốt.", Price = 105000m, ImageUrl = @"/images/menu/item-55.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 56, CategoryId = 6, ItemName = @"Cơm Gà Hội An", Description = @"Cơm nghệ vàng ươm ăn kèm gà xé phay, rau sống và canh.", Price = 110000m, ImageUrl = @"/images/menu/item-56.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 57, CategoryId = 6, ItemName = @"Hủ Tiếu Nam Vang", Description = @"Hủ tiếu nước trong với tôm, thịt bằm, gan và trứng cút.", Price = 90000m, ImageUrl = @"/images/menu/item-57.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 58, CategoryId = 6, ItemName = @"Mì Quảng Đà Nẵng", Description = @"Mì Quảng với tôm, thịt heo, trứng cút và bánh tráng nướng.", Price = 100000m, ImageUrl = @"/images/menu/item-58.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 59, CategoryId = 6, ItemName = @"Bún Riêu Cua", Description = @"Bún riêu cua đồng với chả cua, đậu hũ chiên, cà chua.", Price = 95000m, ImageUrl = @"/images/menu/item-59.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 60, CategoryId = 6, ItemName = @"Cơm Niêu Cá Kho Tộ", Description = @"Cơm niêu đất nóng hổi ăn kèm cá kho tộ và canh rau.", Price = 135000m, ImageUrl = @"/images/menu/item-60.jpg", IsAvailable = true },
+
+            // --- 7. Món Chay ---
+            new MenuItem { MenuItemId = 61, CategoryId = 7, ItemName = @"Cơm Chiên Chay Thập Cẩm", Description = @"Cơm chiên với đậu hũ, nấm, bắp, cà rốt và đậu que.", Price = 85000m, ImageUrl = @"/images/menu/item-61.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 62, CategoryId = 7, ItemName = @"Phở Chay Nấm", Description = @"Phở chay nước dùng rau củ với nấm đông cô, đậu hũ và rau thơm.", Price = 80000m, ImageUrl = @"/images/menu/item-62.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 63, CategoryId = 7, ItemName = @"Bún Chay Huế", Description = @"Bún chay kiểu Huế với nước dùng sả, nấm và chả chay.", Price = 85000m, ImageUrl = @"/images/menu/item-63.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 64, CategoryId = 7, ItemName = @"Đậu Hũ Chiên Sả Ớt", Description = @"Đậu hũ chiên giòn xào sả ớt, thơm cay hấp dẫn.", Price = 70000m, ImageUrl = @"/images/menu/item-64.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 65, CategoryId = 7, ItemName = @"Nấm Xào Rau Củ", Description = @"Nấm đùi gà, nấm bào ngư xào với bông cải, cà rốt.", Price = 75000m, ImageUrl = @"/images/menu/item-65.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 66, CategoryId = 7, ItemName = @"Canh Bí Đỏ Nấu Chay", Description = @"Canh bí đỏ nấu nước dùng chay với đậu hũ non và rau ngót.", Price = 65000m, ImageUrl = @"/images/menu/item-66.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 67, CategoryId = 7, ItemName = @"Gỏi Cuốn Chay", Description = @"Cuốn bánh tráng với đậu hũ chiên, bún, rau sống và nấm.", Price = 65000m, ImageUrl = @"/images/menu/item-67.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 68, CategoryId = 7, ItemName = @"Mì Xào Chay", Description = @"Mì trứng xào với rau cải, nấm và đậu hũ chiên.", Price = 80000m, ImageUrl = @"/images/menu/item-68.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 69, CategoryId = 7, ItemName = @"Cà Ri Chay Rau Củ", Description = @"Cà ri nước cốt dừa với khoai tây, cà rốt, đậu que và đậu hũ.", Price = 90000m, ImageUrl = @"/images/menu/item-69.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 70, CategoryId = 7, ItemName = @"Cơm Cuộn Rong Biển Chay", Description = @"Cơm cuộn kiểu Nhật với bơ, dưa leo, cà rốt và đậu hũ.", Price = 95000m, ImageUrl = @"/images/menu/item-70.jpg", IsAvailable = true },
+
+            // --- 8. Tráng Miệng ---
+            new MenuItem { MenuItemId = 71, CategoryId = 8, ItemName = @"Chè Khúc Bạch", Description = @"Chè khúc bạch mát lạnh với nhãn, vải và nước đường hoa nhài.", Price = 55000m, ImageUrl = @"/images/menu/item-71.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 72, CategoryId = 8, ItemName = @"Bánh Flan Caramel", Description = @"Bánh flan mềm mịn với caramel đắng nhẹ và kem tươi.", Price = 50000m, ImageUrl = @"/images/menu/item-72.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 73, CategoryId = 8, ItemName = @"Kem Dừa Tươi", Description = @"Kem dừa tươi Phú Quốc phục vụ trong trái dừa non.", Price = 75000m, ImageUrl = @"/images/menu/item-73.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 74, CategoryId = 8, ItemName = @"Bánh Chocolate Lava", Description = @"Bánh chocolate nóng nhân chảy, ăn kèm kem vanilla.", Price = 95000m, ImageUrl = @"/images/menu/item-74.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 75, CategoryId = 8, ItemName = @"Trái Cây Tươi Theo Mùa", Description = @"Đĩa trái cây tươi theo mùa: xoài, thanh long, dưa hấu, đu đủ.", Price = 85000m, ImageUrl = @"/images/menu/item-75.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 76, CategoryId = 8, ItemName = @"Chè Thái Sầu Riêng", Description = @"Chè Thái với sầu riêng, mít, dừa non và nước cốt dừa.", Price = 65000m, ImageUrl = @"/images/menu/item-76.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 77, CategoryId = 8, ItemName = @"Tiramisu Cà Phê Việt", Description = @"Tiramisu biến tấu với cà phê phin Việt Nam đậm đà.", Price = 90000m, ImageUrl = @"/images/menu/item-77.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 78, CategoryId = 8, ItemName = @"Sữa Chua Dầm Trái Cây", Description = @"Sữa chua dầm với xoài, dâu, việt quất và granola.", Price = 60000m, ImageUrl = @"/images/menu/item-78.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 79, CategoryId = 8, ItemName = @"Bánh Chuối Nướng", Description = @"Bánh chuối nướng nước cốt dừa, mặt vàng ruộm, thơm béo.", Price = 55000m, ImageUrl = @"/images/menu/item-79.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 80, CategoryId = 8, ItemName = @"Panna Cotta Xoài", Description = @"Panna Cotta kem sữa với coulis xoài tươi Phú Quốc.", Price = 75000m, ImageUrl = @"/images/menu/item-80.jpg", IsAvailable = true },
+
+            // --- 9. Đồ Uống ---
+            new MenuItem { MenuItemId = 81, CategoryId = 9, ItemName = @"Cà Phê Sữa Đá", Description = @"Cà phê phin truyền thống Việt Nam pha với sữa đặc, đá viên.", Price = 45000m, ImageUrl = @"/images/menu/item-81.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 82, CategoryId = 9, ItemName = @"Cà Phê Đen Đá", Description = @"Cà phê đen đá đậm đà, nguyên chất không đường.", Price = 40000m, ImageUrl = @"/images/menu/item-82.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 83, CategoryId = 9, ItemName = @"Trà Sen Phúc Nguyên", Description = @"Trà sen đặc biệt ướp hương sen tự nhiên, thưởng thức nóng hoặc đá.", Price = 55000m, ImageUrl = @"/images/menu/item-83.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 84, CategoryId = 9, ItemName = @"Sinh Tố Xoài", Description = @"Sinh tố xoài Phú Quốc tươi nguyên, ngọt thanh mát lạnh.", Price = 65000m, ImageUrl = @"/images/menu/item-84.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 85, CategoryId = 9, ItemName = @"Nước Dừa Tươi", Description = @"Nước dừa tươi xiêm lạnh mát, phục vụ nguyên trái.", Price = 50000m, ImageUrl = @"/images/menu/item-85.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 86, CategoryId = 9, ItemName = @"Nước Ép Cam Tươi", Description = @"Nước ép cam tươi 100%, không đường, giàu vitamin C.", Price = 55000m, ImageUrl = @"/images/menu/item-86.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 87, CategoryId = 9, ItemName = @"Trà Đào Cam Sả", Description = @"Trà đào cam sả mát lạnh, thơm hương trái cây tự nhiên.", Price = 60000m, ImageUrl = @"/images/menu/item-87.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 88, CategoryId = 9, ItemName = @"Mojito Việt Nam", Description = @"Mocktail Mojito biến tấu với chanh, bạc hà, soda và đường mía.", Price = 75000m, ImageUrl = @"/images/menu/item-88.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 89, CategoryId = 9, ItemName = @"Bia Tươi Resort", Description = @"Bia tươi craft brewing tại resort, vị nhẹ thanh mát.", Price = 65000m, ImageUrl = @"/images/menu/item-89.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 90, CategoryId = 9, ItemName = @"Cocktail Hoàng Hôn", Description = @"Cocktail đặc biệt với rượu rum, nước cam, grenadine và đá xay.", Price = 120000m, ImageUrl = @"/images/menu/item-90.jpg", IsAvailable = true },
+
+            // --- 10. Món Trẻ Em ---
+            new MenuItem { MenuItemId = 91, CategoryId = 10, ItemName = @"Mì Ý Bò Bằm Cho Bé", Description = @"Spaghetti sốt cà chua thịt bò bằm, phần nhỏ phù hợp trẻ em.", Price = 75000m, ImageUrl = @"/images/menu/item-91.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 92, CategoryId = 10, ItemName = @"Cơm Chiên Trứng", Description = @"Cơm chiên trứng đơn giản, bổ dưỡng, phù hợp khẩu vị trẻ nhỏ.", Price = 65000m, ImageUrl = @"/images/menu/item-92.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 93, CategoryId = 10, ItemName = @"Gà Viên Chiên Giòn", Description = @"Gà viên tẩm bột chiên giòn, ăn kèm sốt cà chua.", Price = 70000m, ImageUrl = @"/images/menu/item-93.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 94, CategoryId = 10, ItemName = @"Khoai Tây Chiên Phô Mai", Description = @"Khoai tây chiên giòn rắc phô mai Parmesan thơm lừng.", Price = 60000m, ImageUrl = @"/images/menu/item-94.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 95, CategoryId = 10, ItemName = @"Sandwich Gà Cho Bé", Description = @"Bánh mì sandwich nhân gà xé, rau xà lách và sốt mayonnaise.", Price = 65000m, ImageUrl = @"/images/menu/item-95.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 96, CategoryId = 10, ItemName = @"Súp Bí Đỏ Kem Sữa", Description = @"Súp bí đỏ nấu kem sữa mịn màng, bổ dưỡng cho trẻ.", Price = 55000m, ImageUrl = @"/images/menu/item-96.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 97, CategoryId = 10, ItemName = @"Pancake Mật Ong", Description = @"Bánh pancake mềm xốp phết bơ và mật ong, kèm trái cây tươi.", Price = 70000m, ImageUrl = @"/images/menu/item-97.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 98, CategoryId = 10, ItemName = @"Cháo Gà Hạt Sen", Description = @"Cháo gà hạt sen nấu nhừ, bổ dưỡng và dễ tiêu hóa.", Price = 60000m, ImageUrl = @"/images/menu/item-98.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 99, CategoryId = 10, ItemName = @"Sinh Tố Chuối Sữa", Description = @"Sinh tố chuối sữa mát lạnh, bổ sung năng lượng cho bé.", Price = 45000m, ImageUrl = @"/images/menu/item-99.jpg", IsAvailable = true },
+            new MenuItem { MenuItemId = 100, CategoryId = 10, ItemName = @"Kem Ba Vị Cho Bé", Description = @"Kem ba vị vanilla, chocolate, dâu phục vụ trong ly nhỏ.", Price = 55000m, ImageUrl = @"/images/menu/item-100.jpg", IsAvailable = true }
         );
 
         modelBuilder.Entity<DiningTable>().HasData(
-            new DiningTable { TableId = 1, TableNumber = @"T01", TableName = @"Garden View Table", ImageUrl = @"/images/tables/table-01.jpg", Description = @"A relaxed garden-side table for small groups who prefer a quiet dining experience.", Area = @"Garden", TableType = @"Standard", LocationNote = @"Near tropical garden walkway", Capacity = 4, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 1 },
-            new DiningTable { TableId = 2, TableNumber = @"T02", TableName = @"Poolside Family Table", ImageUrl = @"/images/tables/table-02.jpg", Description = @"Spacious poolside seating suitable for family meals and casual resort dining.", Area = @"Poolside", TableType = @"Family", LocationNote = @"Close to pool deck", Capacity = 6, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 2 },
-            new DiningTable { TableId = 3, TableNumber = @"T03", TableName = @"Indoor Group Table", ImageUrl = @"/images/tables/table-03.jpg", Description = @"Comfortable indoor table for larger groups with easy access to restaurant service.", Area = @"Indoor", TableType = @"Group", LocationNote = @"Main dining hall", Capacity = 8, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 3 },
-            new DiningTable { TableId = 4, TableNumber = @"T04", TableName = @"Private Dining Table", ImageUrl = @"/images/tables/table-04.jpg", Description = @"Private dining setup for celebrations, meetings, or premium group dinners.", Area = @"Private Room", TableType = @"VIP", LocationNote = @"Private room section", Capacity = 10, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 4 },
-            new DiningTable { TableId = 5, TableNumber = @"T05", TableName = @"Couple Window Table", ImageUrl = @"/images/tables/table-05.jpg", Description = @"An intimate two-seat table with a bright window-side atmosphere.", Area = @"Indoor", TableType = @"Couple", LocationNote = @"Near window", Capacity = 2, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 5 },
-            new DiningTable { TableId = 6, TableNumber = @"T06", TableName = @"Terrace Table", ImageUrl = @"/images/tables/table-06.jpg", Description = @"Open-air terrace table with a comfortable resort dining setting.", Area = @"Outdoor", TableType = @"Standard", LocationNote = @"Covered terrace", Capacity = 4, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 6 },
-            new DiningTable { TableId = 7, TableNumber = @"T07", TableName = @"Garden Family Table", ImageUrl = @"/images/tables/table-07.jpg", Description = @"Family-friendly garden table with a calm outdoor view.", Area = @"Garden", TableType = @"Family", LocationNote = @"Garden corner", Capacity = 6, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 7 },
-            new DiningTable { TableId = 8, TableNumber = @"T08", TableName = @"Banquet Prep Table", ImageUrl = @"/images/tables/table-08.jpg", Description = @"Large table used for group dining and banquet preparation.", Area = @"Indoor", TableType = @"Group", LocationNote = @"Banquet zone", Capacity = 8, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 8 },
-            new DiningTable { TableId = 9, TableNumber = @"T09", TableName = @"VIP Garden Pavilion", ImageUrl = @"/images/tables/table-09.jpg", Description = @"Premium garden pavilion table for private resort dining experiences.", Area = @"Garden", TableType = @"VIP", LocationNote = @"Garden pavilion", Capacity = 10, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 9 },
-            new DiningTable { TableId = 10, TableNumber = @"T10", TableName = @"Quiet Couple Booth", ImageUrl = @"/images/tables/table-10.jpg", Description = @"Cozy booth seating for two guests who prefer privacy.", Area = @"Indoor", TableType = @"Booth", LocationNote = @"Quiet corner", Capacity = 2, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 10 },
-            new DiningTable { TableId = 11, TableNumber = @"T11", TableName = @"Window Booth Table", ImageUrl = @"/images/tables/table-11.jpg", Description = @"Comfortable booth table with window-side seating.", Area = @"Indoor", TableType = @"Booth", LocationNote = @"Window line", Capacity = 4, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 11 },
-            new DiningTable { TableId = 12, TableNumber = @"T12", TableName = @"Service Hold Table", ImageUrl = @"/images/tables/table-12.jpg", Description = @"Reserved operational table used by staff during peak service periods.", Area = @"Indoor", TableType = @"Staff Hold", LocationNote = @"Near service station", Capacity = 6, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 12 },
-            new DiningTable { TableId = 13, TableNumber = @"T13", TableName = @"Outdoor Group Table", ImageUrl = @"/images/tables/table-13.jpg", Description = @"Large outdoor table for group meals and casual gatherings.", Area = @"Outdoor", TableType = @"Group", LocationNote = @"Open-air dining zone", Capacity = 8, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 13 },
-            new DiningTable { TableId = 14, TableNumber = @"T14", TableName = @"Private Family Table", ImageUrl = @"/images/tables/table-14.jpg", Description = @"Large private table suitable for families or small celebrations.", Area = @"Private Room", TableType = @"Family", LocationNote = @"Private dining room", Capacity = 10, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 14 },
-            new DiningTable { TableId = 15, TableNumber = @"T15", TableName = @"Balcony Couple Table", ImageUrl = @"/images/tables/table-15.jpg", Description = @"Small balcony table for two with a relaxed resort atmosphere.", Area = @"Outdoor", TableType = @"Couple", LocationNote = @"Balcony side", Capacity = 2, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 15 },
-            new DiningTable { TableId = 16, TableNumber = @"T16", TableName = @"Setup Buffer Table", ImageUrl = @"/images/tables/table-16.jpg", Description = @"Operational buffer table kept out of online reservations.", Area = @"Indoor", TableType = @"Staff Hold", LocationNote = @"Back dining area", Capacity = 4, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 16 },
-            new DiningTable { TableId = 17, TableNumber = @"T17", TableName = @"Poolside Booth", ImageUrl = @"/images/tables/table-17.jpg", Description = @"Semi-private booth near the poolside restaurant area.", Area = @"Poolside", TableType = @"Booth", LocationNote = @"Poolside lounge", Capacity = 6, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 17 },
-            new DiningTable { TableId = 18, TableNumber = @"T18", TableName = @"Garden Group Table", ImageUrl = @"/images/tables/table-18.jpg", Description = @"Garden-facing table for group dining with a more open layout.", Area = @"Garden", TableType = @"Group", LocationNote = @"Near garden fountain", Capacity = 8, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 18 },
-            new DiningTable { TableId = 19, TableNumber = @"T19", TableName = @"Premium Celebration Table", ImageUrl = @"/images/tables/table-19.jpg", Description = @"Premium large table for birthdays, anniversaries, and special resort meals.", Area = @"Private Room", TableType = @"VIP", LocationNote = @"Celebration setup area", Capacity = 10, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 19 },
-            new DiningTable { TableId = 20, TableNumber = @"T20", TableName = @"Couple Backup Table", ImageUrl = @"/images/tables/table-20.jpg", Description = @"Backup two-seat table used when the restaurant needs extra flexibility.", Area = @"Indoor", TableType = @"Couple", LocationNote = @"Flexible seating area", Capacity = 2, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 20 }
+            new DiningTable { TableId = 1, TableNumber = @"T01", TableName = @"Bàn Hướng Sân Vườn", ImageUrl = @"/images/tables/table-01.jpg", Description = @"Bàn ăn thư giãn cạnh sân vườn, thích hợp cho nhóm nhỏ thích không gian yên tĩnh.", Area = @"Sân Vườn", TableType = @"Tiêu Chuẩn", LocationNote = @"Gần lối đi sân vườn nhiệt đới", Capacity = 4, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 1 },
+            new DiningTable { TableId = 2, TableNumber = @"T02", TableName = @"Bàn Gia Đình Cạnh Hồ Bơi", ImageUrl = @"/images/tables/table-02.jpg", Description = @"Chỗ ngồi rộng rãi cạnh hồ bơi, phù hợp cho bữa ăn gia đình và thư giãn tại resort.", Area = @"Hồ Bơi", TableType = @"Gia Đình", LocationNote = @"Gần khu vực hồ bơi", Capacity = 6, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 2 },
+            new DiningTable { TableId = 3, TableNumber = @"T03", TableName = @"Bàn Nhóm Trong Nhà", ImageUrl = @"/images/tables/table-03.jpg", Description = @"Bàn ăn thoải mái trong nhà dành cho nhóm đông người, dễ dàng tiếp cận quầy phục vụ.", Area = @"Trong Nhà", TableType = @"Khách Đoàn", LocationNote = @"Sảnh ăn chính", Capacity = 8, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 3 },
+            new DiningTable { TableId = 4, TableNumber = @"T04", TableName = @"Bàn Ăn Phòng Riêng", ImageUrl = @"/images/tables/table-04.jpg", Description = @"Không gian phòng riêng dành cho các buổi tiệc kỷ niệm, gặp mặt hoặc ăn tối cao cấp.", Area = @"Phòng VIP", TableType = @"VIP", LocationNote = @"Khu vực phòng VIP", Capacity = 10, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 4 },
+            new DiningTable { TableId = 5, TableNumber = @"T05", TableName = @"Bàn Đôi Cạnh Cửa Sổ", ImageUrl = @"/images/tables/table-05.jpg", Description = @"Bàn ăn lãng mạn dành cho 2 người với không gian sáng sủa cạnh cửa sổ.", Area = @"Trong Nhà", TableType = @"Cặp Đôi", LocationNote = @"Cạnh cửa sổ", Capacity = 2, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 5 },
+            new DiningTable { TableId = 6, TableNumber = @"T06", TableName = @"Bàn Ngoài Hiên", ImageUrl = @"/images/tables/table-06.jpg", Description = @"Bàn ăn không gian mở ngoài hiên với tầm nhìn thoáng đãng và dễ chịu.", Area = @"Ngoài Trời", TableType = @"Tiêu Chuẩn", LocationNote = @"Khu vực hiên có mái che", Capacity = 4, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 6 },
+            new DiningTable { TableId = 7, TableNumber = @"T07", TableName = @"Bàn Gia Đình Ngoài Vườn", ImageUrl = @"/images/tables/table-07.jpg", Description = @"Bàn ăn dành cho gia đình với khung cảnh sân vườn êm đềm.", Area = @"Sân Vườn", TableType = @"Gia Đình", LocationNote = @"Góc sân vườn", Capacity = 6, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 7 },
+            new DiningTable { TableId = 8, TableNumber = @"T08", TableName = @"Bàn Tiệc Lớn", ImageUrl = @"/images/tables/table-08.jpg", Description = @"Bàn kích thước lớn được sử dụng cho khách đoàn và chuẩn bị tiệc lớn.", Area = @"Trong Nhà", TableType = @"Khách Đoàn", LocationNote = @"Khu vực tiệc lớn", Capacity = 8, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 8 },
+            new DiningTable { TableId = 9, TableNumber = @"T09", TableName = @"Chòi VIP Ngoài Vườn", ImageUrl = @"/images/tables/table-09.jpg", Description = @"Khu vực chòi cao cấp ngoài vườn mang đến trải nghiệm ăn uống riêng tư, đẳng cấp.", Area = @"Sân Vườn", TableType = @"VIP", LocationNote = @"Chòi sân vườn", Capacity = 10, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 9 },
+            new DiningTable { TableId = 10, TableNumber = @"T10", TableName = @"Khu Vực Riêng Cho Cặp Đôi", ImageUrl = @"/images/tables/table-10.jpg", Description = @"Khu vực ghế sofa êm ái dành cho 2 người thích sự yên tĩnh và riêng tư.", Area = @"Trong Nhà", TableType = @"Sofa Góc", LocationNote = @"Góc yên tĩnh", Capacity = 2, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 10 },
+            new DiningTable { TableId = 11, TableNumber = @"T11", TableName = @"Bàn Sofa Cạnh Cửa Sổ", ImageUrl = @"/images/tables/table-11.jpg", Description = @"Ghế ngồi sofa thoải mái sát cạnh cửa sổ ngắm cảnh.", Area = @"Trong Nhà", TableType = @"Sofa Góc", LocationNote = @"Dọc cửa sổ", Capacity = 4, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 11 },
+            new DiningTable { TableId = 12, TableNumber = @"T12", TableName = @"Bàn Dự Phòng (Nhân Viên)", ImageUrl = @"/images/tables/table-12.jpg", Description = @"Bàn dự phòng dành riêng cho nhân viên vận hành trong giờ cao điểm.", Area = @"Trong Nhà", TableType = @"Nội Bộ", LocationNote = @"Gần trạm phục vụ", Capacity = 6, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 12 },
+            new DiningTable { TableId = 13, TableNumber = @"T13", TableName = @"Bàn Nhóm Ngoài Trời", ImageUrl = @"/images/tables/table-13.jpg", Description = @"Bàn ăn ngoài trời cỡ lớn cho các buổi họp mặt và dùng bữa nhóm.", Area = @"Ngoài Trời", TableType = @"Khách Đoàn", LocationNote = @"Khu ăn uống ngoài trời", Capacity = 8, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 13 },
+            new DiningTable { TableId = 14, TableNumber = @"T14", TableName = @"Bàn Gia Đình Khu Riêng Tư", ImageUrl = @"/images/tables/table-14.jpg", Description = @"Bàn riêng tư rộng rãi phù hợp cho gia đình hoặc các dịp kỷ niệm nhỏ.", Area = @"Phòng VIP", TableType = @"Gia Đình", LocationNote = @"Phòng ăn riêng tư", Capacity = 10, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 14 },
+            new DiningTable { TableId = 15, TableNumber = @"T15", TableName = @"Bàn Đôi Ngoài Ban Công", ImageUrl = @"/images/tables/table-15.jpg", Description = @"Bàn nhỏ nhắn ngoài ban công dành cho 2 người với không khí nghỉ dưỡng mát mẻ.", Area = @"Ngoài Trời", TableType = @"Cặp Đôi", LocationNote = @"Khu vực ban công", Capacity = 2, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 15 },
+            new DiningTable { TableId = 16, TableNumber = @"T16", TableName = @"Bàn Dự Phòng Hệ Thống", ImageUrl = @"/images/tables/table-16.jpg", Description = @"Bàn dự phòng dùng cho mục đích điều hành, không nhận đặt bàn online.", Area = @"Trong Nhà", TableType = @"Nội Bộ", LocationNote = @"Khu vực ăn uống phía sau", Capacity = 4, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 16 },
+            new DiningTable { TableId = 17, TableNumber = @"T17", TableName = @"Bàn Sofa Cạnh Hồ Bơi", ImageUrl = @"/images/tables/table-17.jpg", Description = @"Khu vực ghế sofa bán không gian riêng gần khu nhà hàng hồ bơi.", Area = @"Hồ Bơi", TableType = @"Sofa Góc", LocationNote = @"Sảnh chờ hồ bơi", Capacity = 6, Status = DiningTableStatus.Available, IsReservable = true, DisplayOrder = 17 },
+            new DiningTable { TableId = 18, TableNumber = @"T18", TableName = @"Bàn Nhóm Ngoài Vườn", ImageUrl = @"/images/tables/table-18.jpg", Description = @"Bàn ăn hướng ra sân vườn cho nhóm đông người với bố cục mở thoáng mát.", Area = @"Sân Vườn", TableType = @"Khách Đoàn", LocationNote = @"Gần đài phun nước sân vườn", Capacity = 8, Status = DiningTableStatus.Occupied, IsReservable = true, DisplayOrder = 18 },
+            new DiningTable { TableId = 19, TableNumber = @"T19", TableName = @"Bàn Tiệc Kỷ Niệm Premium", ImageUrl = @"/images/tables/table-19.jpg", Description = @"Bàn cao cấp cỡ lớn thích hợp cho sinh nhật, lễ kỷ niệm và tiệc tại resort.", Area = @"Phòng VIP", TableType = @"VIP", LocationNote = @"Khu vực setup lễ kỷ niệm", Capacity = 10, Status = DiningTableStatus.Reserved, IsReservable = true, DisplayOrder = 19 },
+            new DiningTable { TableId = 20, TableNumber = @"T20", TableName = @"Bàn Đôi Dự Phòng", ImageUrl = @"/images/tables/table-20.jpg", Description = @"Bàn 2 chỗ linh hoạt để dự phòng khi nhà hàng quá tải.", Area = @"Trong Nhà", TableType = @"Cặp Đôi", LocationNote = @"Khu vực ghế ngồi linh hoạt", Capacity = 2, Status = DiningTableStatus.Maintenance, IsReservable = false, DisplayOrder = 20 }
         );
 
         modelBuilder.Entity<TableReservation>().HasData(
@@ -333,36 +434,16 @@ public static class SeedData
         );
 
         modelBuilder.Entity<Tour>().HasData(
-            new Tour { TourId = 1, TourName = @"Island Hopping", Description = @"Island Hopping experience for resort guests.", Price = 425000.00m, MaxCapacity = 10, DurationHours = 3, Location = @"Phu Quoc Area 1", ImageUrl = @"/images/tours/tour-01.jpg" },
-            new Tour { TourId = 2, TourName = @"Snorkeling Coral Reef", Description = @"Snorkeling Coral Reef experience for resort guests.", Price = 500000.00m, MaxCapacity = 12, DurationHours = 4, Location = @"Phu Quoc Area 2", ImageUrl = @"/images/tours/tour-02.jpg" },
-            new Tour { TourId = 3, TourName = @"Sunset Fishing", Description = @"Sunset Fishing experience for resort guests.", Price = 575000.00m, MaxCapacity = 14, DurationHours = 5, Location = @"Phu Quoc Area 3", ImageUrl = @"/images/tours/tour-03.jpg" },
-            new Tour { TourId = 4, TourName = @"Pearl Farm Visit", Description = @"Pearl Farm Visit experience for resort guests.", Price = 650000.00m, MaxCapacity = 16, DurationHours = 6, Location = @"Phu Quoc Area 4", ImageUrl = @"/images/tours/tour-04.jpg" },
-            new Tour { TourId = 5, TourName = @"Forest Trekking", Description = @"Forest Trekking experience for resort guests.", Price = 725000.00m, MaxCapacity = 18, DurationHours = 7, Location = @"Phu Quoc Area 5", ImageUrl = @"/images/tours/tour-05.jpg" },
-            new Tour { TourId = 6, TourName = @"Night Market Food Tour", Description = @"Night Market Food Tour experience for resort guests.", Price = 800000.00m, MaxCapacity = 20, DurationHours = 8, Location = @"Phu Quoc Area 6", ImageUrl = @"/images/tours/tour-06.jpg" },
-            new Tour { TourId = 7, TourName = @"Kayak Lagoon", Description = @"Kayak Lagoon experience for resort guests.", Price = 875000.00m, MaxCapacity = 22, DurationHours = 2, Location = @"Phu Quoc Area 7", ImageUrl = @"/images/tours/tour-07.jpg" },
-            new Tour { TourId = 8, TourName = @"Luxury Yacht Trip", Description = @"Luxury Yacht Trip experience for resort guests.", Price = 950000.00m, MaxCapacity = 8, DurationHours = 3, Location = @"Phu Quoc Area 8", ImageUrl = @"/images/tours/tour-08.jpg" },
-            new Tour { TourId = 9, TourName = @"Historical Prison Tour", Description = @"Historical Prison Tour experience for resort guests.", Price = 1025000.00m, MaxCapacity = 10, DurationHours = 4, Location = @"Phu Quoc Area 9", ImageUrl = @"/images/tours/tour-09.jpg" },
-            new Tour { TourId = 10, TourName = @"Pepper Farm Tour", Description = @"Pepper Farm Tour experience for resort guests.", Price = 1100000.00m, MaxCapacity = 12, DurationHours = 5, Location = @"Phu Quoc Area 10", ImageUrl = @"/images/tours/tour-10.jpg" },
-            new Tour { TourId = 11, TourName = @"Cable Car Adventure", Description = @"Cable Car Adventure experience for resort guests.", Price = 1175000.00m, MaxCapacity = 14, DurationHours = 6, Location = @"Phu Quoc Area 11", ImageUrl = @"/images/tours/tour-11.jpg" },
-            new Tour { TourId = 12, TourName = @"Diving Beginner", Description = @"Diving Beginner experience for resort guests.", Price = 1250000.00m, MaxCapacity = 16, DurationHours = 7, Location = @"Phu Quoc Area 12", ImageUrl = @"/images/tours/tour-12.jpg" },
-            new Tour { TourId = 13, TourName = @"Diving Advanced", Description = @"Diving Advanced experience for resort guests.", Price = 1325000.00m, MaxCapacity = 18, DurationHours = 8, Location = @"Phu Quoc Area 13", ImageUrl = @"/images/tours/tour-13.jpg" },
-            new Tour { TourId = 14, TourName = @"Private Beach Picnic", Description = @"Private Beach Picnic experience for resort guests.", Price = 1400000.00m, MaxCapacity = 20, DurationHours = 2, Location = @"Phu Quoc Area 14", ImageUrl = @"/images/tours/tour-14.jpg" },
-            new Tour { TourId = 15, TourName = @"Photography Tour", Description = @"Photography Tour experience for resort guests.", Price = 1475000.00m, MaxCapacity = 22, DurationHours = 3, Location = @"Phu Quoc Area 15", ImageUrl = @"/images/tours/tour-15.jpg" },
-            new Tour { TourId = 16, TourName = @"Wellness Retreat", Description = @"Wellness Retreat experience for resort guests.", Price = 1550000.00m, MaxCapacity = 8, DurationHours = 4, Location = @"Phu Quoc Area 16", ImageUrl = @"/images/tours/tour-16.jpg" },
-            new Tour { TourId = 17, TourName = @"Cooking Class Tour", Description = @"Cooking Class Tour experience for resort guests.", Price = 1625000.00m, MaxCapacity = 10, DurationHours = 5, Location = @"Phu Quoc Area 17", ImageUrl = @"/images/tours/tour-17.jpg" },
-            new Tour { TourId = 18, TourName = @"Cycling Countryside", Description = @"Cycling Countryside experience for resort guests.", Price = 1700000.00m, MaxCapacity = 12, DurationHours = 6, Location = @"Phu Quoc Area 18", ImageUrl = @"/images/tours/tour-18.jpg" },
-            new Tour { TourId = 19, TourName = @"Bird Watching", Description = @"Bird Watching experience for resort guests.", Price = 1775000.00m, MaxCapacity = 14, DurationHours = 7, Location = @"Phu Quoc Area 19", ImageUrl = @"/images/tours/tour-19.jpg" },
-            new Tour { TourId = 20, TourName = @"Family Discovery", Description = @"Family Discovery experience for resort guests.", Price = 1850000.00m, MaxCapacity = 16, DurationHours = 8, Location = @"Phu Quoc Area 20", ImageUrl = @"/images/tours/tour-20.jpg" },
-            new Tour { TourId = 21, TourName = @"Scuba Diving Master", Description = @"Scuba Diving Master experience for resort guests.", Price = 1925000.00m, MaxCapacity = 18, DurationHours = 9, Location = @"Phu Quoc Area 21", ImageUrl = @"/images/tours/tour-21.jpg" },
-            new Tour { TourId = 22, TourName = @"Traditional Village Tour", Description = @"Traditional Village Tour experience for resort guests.", Price = 2000000.00m, MaxCapacity = 20, DurationHours = 4, Location = @"Phu Quoc Area 22", ImageUrl = @"/images/tours/tour-22.jpg" },
-            new Tour { TourId = 23, TourName = @"Sunrise Yoga on Beach", Description = @"Sunrise Yoga on Beach experience for resort guests.", Price = 2075000.00m, MaxCapacity = 22, DurationHours = 2, Location = @"Phu Quoc Area 23", ImageUrl = @"/images/tours/tour-23.jpg" },
-            new Tour { TourId = 24, TourName = @"Seafood BBQ Night", Description = @"Seafood BBQ Night experience for resort guests.", Price = 2150000.00m, MaxCapacity = 8, DurationHours = 3, Location = @"Phu Quoc Area 24", ImageUrl = @"/images/tours/tour-24.jpg" },
-            new Tour { TourId = 25, TourName = @"Jungle Safari", Description = @"Jungle Safari experience for resort guests.", Price = 2225000.00m, MaxCapacity = 10, DurationHours = 4, Location = @"Phu Quoc Area 25", ImageUrl = @"/images/tours/tour-25.jpg" },
-            new Tour { TourId = 26, TourName = @"Star Gazing Tour", Description = @"Star Gazing Tour experience for resort guests.", Price = 2300000.00m, MaxCapacity = 12, DurationHours = 5, Location = @"Phu Quoc Area 26", ImageUrl = @"/images/tours/tour-26.jpg" },
-            new Tour { TourId = 27, TourName = @"Local Craft Workshop", Description = @"Local Craft Workshop experience for resort guests.", Price = 2375000.00m, MaxCapacity = 14, DurationHours = 6, Location = @"Phu Quoc Area 27", ImageUrl = @"/images/tours/tour-27.jpg" },
-            new Tour { TourId = 28, TourName = @"Wine Tasting Experience", Description = @"Wine Tasting Experience for resort guests.", Price = 2450000.00m, MaxCapacity = 16, DurationHours = 7, Location = @"Phu Quoc Area 28", ImageUrl = @"/images/tours/tour-28.jpg" },
-            new Tour { TourId = 29, TourName = @"Waterfall Hiking", Description = @"Waterfall Hiking experience for resort guests.", Price = 2525000.00m, MaxCapacity = 18, DurationHours = 8, Location = @"Phu Quoc Area 29", ImageUrl = @"/images/tours/tour-29.jpg" },
-            new Tour { TourId = 30, TourName = @"Island Cycling Tour", Description = @"Island Cycling Tour experience for resort guests.", Price = 2600000.00m, MaxCapacity = 20, DurationHours = 2, Location = @"Phu Quoc Area 30", ImageUrl = @"/images/tours/tour-30.jpg" }
+            new Tour { TourId = 1, TourName = @"Tour Bà Nà Hills", Description = @"Khám phá chốn bồng lai tiên cảnh Bà Nà Hills với Cầu Vàng nổi tiếng.", Price = 1250000.00m, MaxCapacity = 25, DurationHours = 8, Location = @"Bà Nà", ImageUrl = @"/images/tours/tour-01.jpg" },
+            new Tour { TourId = 2, TourName = @"Bán Đảo Sơn Trà - Chùa Linh Ứng", Description = @"Tham quan Chùa Linh Ứng và ngắm cảnh từ bán đảo Sơn Trà.", Price = 450000.00m, MaxCapacity = 15, DurationHours = 4, Location = @"Sơn Trà", ImageUrl = @"/images/tours/tour-02.jpg" },
+            new Tour { TourId = 3, TourName = @"Phố Cổ Hội An - Rừng Dừa Bảy Mẫu", Description = @"Trải nghiệm đi thúng tại Rừng Dừa và dạo đêm phố cổ Hội An.", Price = 750000.00m, MaxCapacity = 20, DurationHours = 7, Location = @"Hội An", ImageUrl = @"/images/tours/tour-03.jpg" },
+            new Tour { TourId = 4, TourName = @"Du Thuyền Sông Hàn", Description = @"Ngắm thành phố Đà Nẵng lung linh về đêm từ du thuyền trên sông Hàn.", Price = 250000.00m, MaxCapacity = 50, DurationHours = 2, Location = @"Sông Hàn", ImageUrl = @"/images/tours/tour-04.jpg" },
+            new Tour { TourId = 5, TourName = @"Công Viên Châu Á - Asia Park", Description = @"Vui chơi không giới hạn tại công viên giải trí Asia Park.", Price = 350000.00m, MaxCapacity = 100, DurationHours = 5, Location = @"Hải Châu", ImageUrl = @"/images/tours/tour-05.jpg" },
+            new Tour { TourId = 6, TourName = @"Suối Khoáng Nóng Núi Thần Tài", Description = @"Thư giãn tắm bùn và tắm khoáng nóng tại Núi Thần Tài.", Price = 850000.00m, MaxCapacity = 30, DurationHours = 6, Location = @"Hòa Phú", ImageUrl = @"/images/tours/tour-06.jpg" },
+            new Tour { TourId = 7, TourName = @"Khám Phá Cù Lao Chàm", Description = @"Đi cano cao tốc ra đảo, lặn ngắm san hô tại Cù Lao Chàm.", Price = 650000.00m, MaxCapacity = 20, DurationHours = 7, Location = @"Cù Lao Chàm", ImageUrl = @"/images/tours/tour-07.jpg" },
+            new Tour { TourId = 8, TourName = @"Làng Đá Mỹ Nghệ Non Nước", Description = @"Tham quan danh thắng Ngũ Hành Sơn và làng đá mỹ nghệ Non Nước.", Price = 300000.00m, MaxCapacity = 25, DurationHours = 3, Location = @"Ngũ Hành Sơn", ImageUrl = @"/images/tours/tour-08.jpg" },
+            new Tour { TourId = 9, TourName = @"Đèo Hải Vân - Vịnh Lăng Cô", Description = @"Chinh phục đệ nhất hùng quan Đèo Hải Vân và tắm biển Vịnh Lăng Cô.", Price = 950000.00m, MaxCapacity = 15, DurationHours = 8, Location = @"Hải Vân", ImageUrl = @"/images/tours/tour-09.jpg" },
+            new Tour { TourId = 10, TourName = @"Trượt Thác Hòa Phú Thành", Description = @"Trải nghiệm trượt thác phao mạo hiểm vô cùng kỳ thú.", Price = 550000.00m, MaxCapacity = 30, DurationHours = 6, Location = @"Hòa Phú Thành", ImageUrl = @"/images/tours/tour-10.jpg" }
         );
 
         modelBuilder.Entity<TourSchedule>().HasData(
@@ -376,26 +457,26 @@ public static class SeedData
             new TourSchedule { ScheduleId = 8, TourId = 8, TourDate = new DateTime(2026, 7, 18, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 13, GuideId = 7 },
             new TourSchedule { ScheduleId = 9, TourId = 9, TourDate = new DateTime(2026, 7, 19, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 14, GuideId = 7 },
             new TourSchedule { ScheduleId = 10, TourId = 10, TourDate = new DateTime(2026, 7, 20, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 5, GuideId = 7 },
-            new TourSchedule { ScheduleId = 11, TourId = 11, TourDate = new DateTime(2026, 7, 21, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 6, GuideId = 7 },
-            new TourSchedule { ScheduleId = 12, TourId = 12, TourDate = new DateTime(2026, 7, 22, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 7, GuideId = 7 },
-            new TourSchedule { ScheduleId = 13, TourId = 13, TourDate = new DateTime(2026, 7, 23, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 8, GuideId = 7 },
-            new TourSchedule { ScheduleId = 14, TourId = 14, TourDate = new DateTime(2026, 7, 24, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 9, GuideId = 7 },
-            new TourSchedule { ScheduleId = 15, TourId = 15, TourDate = new DateTime(2026, 7, 25, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 16, TourId = 16, TourDate = new DateTime(2026, 7, 26, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 11, GuideId = 7 },
-            new TourSchedule { ScheduleId = 17, TourId = 17, TourDate = new DateTime(2026, 7, 27, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 12, GuideId = 7 },
-            new TourSchedule { ScheduleId = 18, TourId = 18, TourDate = new DateTime(2026, 7, 28, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 13, GuideId = 7 },
-            new TourSchedule { ScheduleId = 19, TourId = 19, TourDate = new DateTime(2026, 7, 29, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 14, GuideId = 7 },
-            new TourSchedule { ScheduleId = 20, TourId = 20, TourDate = new DateTime(2026, 7, 30, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 5, GuideId = 7 },
-            new TourSchedule { ScheduleId = 21, TourId = 21, TourDate = new DateTime(2026, 7, 11, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 22, TourId = 22, TourDate = new DateTime(2026, 7, 12, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 23, TourId = 23, TourDate = new DateTime(2026, 7, 13, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 24, TourId = 24, TourDate = new DateTime(2026, 7, 14, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 25, TourId = 25, TourDate = new DateTime(2026, 7, 15, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 26, TourId = 26, TourDate = new DateTime(2026, 7, 16, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 27, TourId = 27, TourDate = new DateTime(2026, 7, 17, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 28, TourId = 28, TourDate = new DateTime(2026, 7, 18, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 29, TourId = 29, TourDate = new DateTime(2026, 7, 19, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
-            new TourSchedule { ScheduleId = 30, TourId = 30, TourDate = new DateTime(2026, 7, 20, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 }
+            new TourSchedule { ScheduleId = 11, TourId = 1, TourDate = new DateTime(2026, 7, 21, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 6, GuideId = 7 },
+            new TourSchedule { ScheduleId = 12, TourId = 2, TourDate = new DateTime(2026, 7, 22, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 7, GuideId = 7 },
+            new TourSchedule { ScheduleId = 13, TourId = 3, TourDate = new DateTime(2026, 7, 23, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 8, GuideId = 7 },
+            new TourSchedule { ScheduleId = 14, TourId = 4, TourDate = new DateTime(2026, 7, 24, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 9, GuideId = 7 },
+            new TourSchedule { ScheduleId = 15, TourId = 5, TourDate = new DateTime(2026, 7, 25, 0, 0, 0), StartTime = new TimeSpan(10, 30, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 16, TourId = 6, TourDate = new DateTime(2026, 7, 26, 0, 0, 0), StartTime = new TimeSpan(11, 0, 0), AvailableSlots = 11, GuideId = 7 },
+            new TourSchedule { ScheduleId = 17, TourId = 7, TourDate = new DateTime(2026, 7, 27, 0, 0, 0), StartTime = new TimeSpan(12, 30, 0), AvailableSlots = 12, GuideId = 7 },
+            new TourSchedule { ScheduleId = 18, TourId = 8, TourDate = new DateTime(2026, 7, 28, 0, 0, 0), StartTime = new TimeSpan(7, 0, 0), AvailableSlots = 13, GuideId = 7 },
+            new TourSchedule { ScheduleId = 19, TourId = 9, TourDate = new DateTime(2026, 7, 29, 0, 0, 0), StartTime = new TimeSpan(8, 30, 0), AvailableSlots = 14, GuideId = 7 },
+            new TourSchedule { ScheduleId = 20, TourId = 10, TourDate = new DateTime(2026, 7, 30, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 5, GuideId = 7 },
+            new TourSchedule { ScheduleId = 21, TourId = 1, TourDate = new DateTime(2026, 7, 11, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 22, TourId = 2, TourDate = new DateTime(2026, 7, 12, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 23, TourId = 3, TourDate = new DateTime(2026, 7, 13, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 24, TourId = 4, TourDate = new DateTime(2026, 7, 14, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 25, TourId = 5, TourDate = new DateTime(2026, 7, 15, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 26, TourId = 6, TourDate = new DateTime(2026, 7, 16, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 27, TourId = 7, TourDate = new DateTime(2026, 7, 17, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 28, TourId = 8, TourDate = new DateTime(2026, 7, 18, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 29, TourId = 9, TourDate = new DateTime(2026, 7, 19, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 },
+            new TourSchedule { ScheduleId = 30, TourId = 10, TourDate = new DateTime(2026, 7, 20, 0, 0, 0), StartTime = new TimeSpan(9, 0, 0), AvailableSlots = 10, GuideId = 7 }
         );
 
         modelBuilder.Entity<TourBooking>().HasData(
