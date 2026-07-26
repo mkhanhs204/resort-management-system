@@ -397,7 +397,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="luxury-label">Số CCCD / Hộ Chiếu <span class="text-danger">*</span></label>
-                                <input type="text" name="Guests[0].PassportNumber" class="luxury-input" placeholder="Mã định danh" />
+                                <input type="text" name="Guests[0].PassportNumber" class="luxury-input" placeholder="CCCD: 12 số | Hộ chiếu: P1234567" pattern="^(\d{12}|[A-Z]\d{7})$" title="Số CCCD gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa + 7 chữ số" />
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="luxury-label">Quốc Tịch <span class="text-danger">*</span></label>
@@ -576,7 +576,7 @@
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="luxury-label">Số CCCD / Hộ Chiếu</label>
-                                    <input type="text" name="Guests[${i}].PassportNumber" class="luxury-input" placeholder="Mã định danh" />
+                                    <input type="text" name="Guests[${i}].PassportNumber" class="luxury-input" placeholder="CCCD: 12 số | Hộ chiếu: P1234567" pattern="^(\d{12}|[A-Z]\d{7})$" title="Số CCCD gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa + 7 chữ số" />
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="luxury-label">Quốc Tịch</label>
