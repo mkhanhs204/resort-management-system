@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PhucNguyenResort.ViewModels.Users
 {
@@ -30,6 +30,7 @@ namespace PhucNguyenResort.ViewModels.Users
         public string? Nationality { get; set; }
 
         [Display(Name = "Số hộ chiếu/CMND")]
+        [RegularExpression(@"^(\d{12}|[A-Z]\d{7})$", ErrorMessage = "Số CCCD phải gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa và 7 chữ số (VD: P1234567).")]
         public string? PassportNumberString { get; set; } // Dùng để hiển thị chuỗi sau khi giải mã từ byte[]
 
         [StringLength(255)]

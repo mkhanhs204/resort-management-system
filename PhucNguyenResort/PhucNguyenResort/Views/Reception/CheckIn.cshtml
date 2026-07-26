@@ -156,12 +156,12 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <label asp-for="Guests[i].DateOfBirth" class="label-luxury">Ngày Sinh</label>
-                                            <input type="date" asp-for="Guests[i].DateOfBirth" class="form-control-luxury" />
+                                            <input type="date" asp-for="Guests[i].DateOfBirth" class="form-control-luxury" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
                                             <span asp-validation-for="Guests[i].DateOfBirth" class="text-danger small mt-1 d-block"></span>
                                         </div>
                                         <div class="col-md-4 mt-3 mt-md-0">
                                             <label asp-for="Guests[i].PassportNumber" class="label-luxury">Số CCCD / Hộ Chiếu</label>
-                                            <input type="text" asp-for="Guests[i].PassportNumber" class="form-control-luxury" placeholder="Số định danh" />
+                                            <input type="text" asp-for="Guests[i].PassportNumber" class="form-control-luxury" placeholder="CCCD: 12 số | Hộ chiếu: P1234567" pattern="^(\d{12}|[A-Z]\d{7})$" title="Số CCCD gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa + 7 chữ số" />
                                             <span asp-validation-for="Guests[i].PassportNumber" class="text-danger small mt-1 d-block"></span>
                                         </div>
                                         <div class="col-md-4 mt-3 mt-md-0">

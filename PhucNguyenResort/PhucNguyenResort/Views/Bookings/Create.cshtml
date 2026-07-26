@@ -218,13 +218,13 @@
                         
                         <div class="space-y-1">
                             <label class="text-label-sm text-on-surface-variant">Số CCCD/Hộ chiếu <span class="text-error">*</span></label>
-                            <input type="text" asp-for="PrimaryGuestPassportNumber" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container text-on-surface" placeholder="Số định danh cá nhân" />
+                            <input type="text" asp-for="PrimaryGuestPassportNumber" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container text-on-surface" placeholder="CCCD: 12 số | Hộ chiếu: P1234567" pattern="^(\d{12}|[A-Z]\d{7})$" title="Số CCCD gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa + 7 chữ số" />
                             <span asp-validation-for="PrimaryGuestPassportNumber" class="text-error text-[12px]"></span>
                         </div>
 
                         <div class="space-y-1">
                             <label class="text-label-sm text-on-surface-variant">Ngày sinh <span class="text-error">*</span></label>
-                            <input type="date" asp-for="PrimaryGuestDateOfBirth" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container text-on-surface" />
+                            <input type="date" asp-for="PrimaryGuestDateOfBirth" class="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg p-3 text-body-md focus:ring-1 focus:ring-primary-container text-on-surface" max="@DateTime.Today.AddYears(-18).ToString("yyyy-MM-dd")" />
                             <span asp-validation-for="PrimaryGuestDateOfBirth" class="text-error text-[12px]"></span>
                         </div>
 

@@ -141,7 +141,7 @@
             <section class="bg-surface luxury-shadow border border-outline-variant/30 rounded-xl p-stack-lg">
                 <h3 class="font-headline-sm text-headline-sm mb-stack-lg flex items-center gap-2 text-on-surface">
                     <span class="material-symbols-outlined text-primary">person_add</span>
-                    Thông tin khách lưu trú chính
+                    Thông tin người đại diện
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
                     <div class="flex flex-col gap-2">
@@ -163,7 +163,7 @@
                     </div>
                     <div class="flex flex-col gap-2">
                         <label asp-for="PrimaryGuestPassportNumber" class="font-label-lg text-on-surface"></label>
-                        <input asp-for="PrimaryGuestPassportNumber" class="input-inset border border-outline-variant rounded-lg px-4 py-3" placeholder="Nhập số giấy tờ" />
+                        <input asp-for="PrimaryGuestPassportNumber" class="input-inset border border-outline-variant rounded-lg px-4 py-3" placeholder="CCCD: 12 số | Hộ chiếu: P1234567" pattern="^(\d{12}|[A-Z]\d{7})$" title="Số CCCD gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa + 7 chữ số" />
                         <span asp-validation-for="PrimaryGuestPassportNumber" class="text-error text-sm"></span>
                     </div>
                     <div class="col-span-1 md:col-span-2 flex flex-col gap-2">

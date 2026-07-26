@@ -236,7 +236,7 @@
             <div class="mt-3">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div>
-                        <h4 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px;">Hòa Lạc</h4>
+                        <h4 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #1c1c1a; margin-bottom: 4px;">Đà Nẵng</h4>
                         <p style="color: #827569; font-size: 14px; font-weight: 500; margin-bottom: 0;">Hôm nay</p>
                     </div>
                     <span id="current-weather-icon" class="material-symbols-outlined" style="font-size: 40px; color: #f59e0b; font-variation-settings: 'FILL' 1;">light_mode</span>
@@ -273,9 +273,9 @@
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Tọa độ Hòa Lạc
-            const lat = 21.0116; 
-            const lon = 105.5283;
+            // Tọa độ Đà Nẵng
+            const lat = 16.0544; 
+            const lon = 108.2022;
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max&timezone=Asia%2FBangkok&forecast_days=4`;
 
             function getWeatherInfo(code) {
