@@ -23,6 +23,8 @@ namespace PhucNguyenResort.Tests.Controllers
             var mockFoodOrderService = new Mock<PhucNguyenResort.Services.FoodOrders.IFoodOrderService>();
             var mockKotService = new Mock<PhucNguyenResort.Services.Kots.IKotService>();
             var mockTableReservationService = new Mock<PhucNguyenResort.Services.TableReservations.ITableReservationService>();
+            var mockNotificationService = new Mock<PhucNguyenResort.Services.Notifications.INotificationService>();
+            var mockHousekeepingService = new Mock<PhucNguyenResort.Services.Housekeeping.IHousekeepingService>();
             var mockForecastService = new Mock<PhucNguyenResort.Services.Dashboard.IForecastService>();
             
             _controller = new DashboardController(
@@ -30,6 +32,8 @@ namespace PhucNguyenResort.Tests.Controllers
                 mockKotService.Object,
                 null!, // ResortDbContext
                 mockTableReservationService.Object,
+                mockNotificationService.Object,
+                mockHousekeepingService.Object,
                 _mockReportService.Object,
                 mockForecastService.Object);
         }
@@ -64,7 +68,7 @@ namespace PhucNguyenResort.Tests.Controllers
             var result1 = await _controller.FinancialReport(13, 2026);
             Assert.IsType<BadRequestObjectResult>(result1);
 
-            var result2 = await _controller.FinancialReport(0, 2026);
+            var result2 = await _controller.FinancialReport(-1, 2026);
             Assert.IsType<BadRequestObjectResult>(result2);
 
             // Invalid year

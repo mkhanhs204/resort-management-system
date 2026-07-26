@@ -337,5 +337,64 @@ namespace PhucNguyenResort.Tests.Services
                 Assert.Equal("Danh sách gán phòng trống.", result.ErrorMessage);
             }
         }
+
+        [Fact]
+        public async Task REC_TC_007_ProcessCheckInAsync_NeedsCleaningRoom_ReturnsFalse()
+        {
+            // Arrange
+            var options = CreateNewContextOptions();
+            int testBookingId = 5;
+            int testRoomId = 105;
+
+            using (var context = new ResortDbContext(options))
+            {
+                context.Rooms.Add(new Room { RoomId = testRoomId, RoomNumber = "105", CategoryId = 1, Status = RoomStatus.NeedsCleaning });
+                var user = new User { UserId = 1, FullName = "Test User", Email = "test@example.com" };
+                context.Users.Add(user);
+                var booking = new Booking
+                {
+                    UserId = 1,
+                    User = user,
+                    BookingId = testBookingId,
+                    BookingStatus = BookingStatus.Reserved
+                };
+                booking.BookingDetails.Add(new BookingDetail { BookingDetailId = 501, RoomCategoryId = 1, BookingId = testBookingId });
+                context.Bookings.Add(booking);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ResortDbContext(options))
+            {
+                var mockGuestService = new Mock<IBookingGuestService>();
+                var mockEmailSender = new Mock<IEmailSender>();
+                var mockEnv = new Mock<IWebHostEnvironment>();
+                var service = new ReceptionService(context, mockGuestService.Object, mockEmailSender.Object, mockEnv.Object, new Moq.Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
+
+                var viewModel = new PreCheckinViewModel
+                {
+                    BookingId = testBookingId,
+                    Guests = new List<BookingGuestDto>
+                    {
+                        new BookingGuestDto { FullName = "Nguyen Van A", PassportNumber = "0123456789" }
+                    },
+                    RoomAssignments = new List<BookingDetailAssignmentViewModel>
+                    {
+                        new BookingDetailAssignmentViewModel
+                        {
+                            BookingDetailId = 501,
+                            RoomCategoryId = 1,
+                            SelectedRoomId = testRoomId
+                        }
+                    }
+                };
+
+                // Act
+                var result = await service.ProcessCheckInAsync(viewModel);
+
+                // Assert
+                Assert.False(result.Success);
+                Assert.Contains("đang cần dọn dẹp hoặc đang được dọn dẹp", result.ErrorMessage);
+            }
+        }
     }
 }

@@ -1,0 +1,27 @@
+| \# | Message code | Message Type | Context | Content |
+| :- | :----------- | :----------- | :------ | :------ |
+| 1  | MSG01        | In line      | No search results | *There is not any search result* / *Không có kết quả tìm kiếm.* |
+| 2  | MSG02        | In line      | Validation error | *The field is required.* / *Exceed max length.* |
+| 3  | MSG03        | Toast        | Check-in success | *Thực hiện Check-in thành công cho Booking #{BookingId}!* |
+| 4  | MSG04        | Toast        | Check-out success | *Thực hiện Check-out thành công cho Booking #{BookingId}!* |
+| 5  | MSG05        | Toast        | Walk-in booking success | *Đặt phòng tại quầy thành công cho Booking #{BookingId}!* |
+| 6  | MSG06        | Alert/In line| Check-in/out error | *Đơn đặt phòng này không ở trạng thái có thể Check-in hoặc Giao phòng.* / *Không tìm thấy thông tin đặt phòng hoặc đơn đặt phòng không ở trạng thái có thể Check-out.* |
+| 7  | MSG07        | Toast        | Booking cancel success | *Đã hủy đặt phòng thành công. Bạn sẽ được hoàn lại {Amount} VNĐ.* / *(Không hoàn cọc do hủy dưới 48 giờ).* |
+| 8  | MSG08        | Toast        | Pre-Checkin success | *Khai báo thông tin tạm trú thành công!* |
+| 9  | MSG09        | Toast        | Tour booking success | *Đặt tour thành công! Chi phí đã được ghi nợ vào phòng.* |
+| 10 | MSG10        | Toast        | Tour schedule error | *Không thể xóa lịch trình này vì đã có khách hàng đặt tour (có vé).* |
+| 11 | MSG11        | Alert        | Tour full error | *Lịch trình này đã hết chỗ.* |
+| 12 | MSG12        | Toast        | Table added/deleted | *Thêm/Xóa/Cập nhật bàn thành công.* |
+| 13 | MSG13        | Alert        | Table delete error | *Không thể xóa bàn này vì đang có đặt bàn hoạt động.* |
+| 14 | MSG14        | Toast        | Room status updated | *Cập nhật trạng thái thành công! Phòng đã sạch sẽ và đưa vào danh sách thành tích của bạn.* |
+| 15 | MSG15        | Toast        | Maintenance success | *Báo cáo sự cố thành công! Phòng đã được chuyển sang trạng thái Bảo trì.* |
+| 16 | MSG16        | Alert        | Task conflict error | *Không thể cập nhật. Bạn không có quyền hoàn thành phòng do người khác đang dọn!* |
+| 17 | MSG17        | Toast        | Review submitted | *Cảm ơn bạn đã gửi đánh giá!* |
+| 18 | MSG18        | Alert        | Review error | *Bạn chỉ có thể đánh giá sau khi đã hoàn thành dịch vụ hoặc bạn đã đánh giá dịch vụ này rồi.* |
+| 19 | MSG19        | Toast        | Profile updated | *Cập nhật hồ sơ thông tin thành công!* |
+| 20 | MSG20        | Toast        | Account verified | *Xác thực tài khoản thành công! Vui lòng đăng nhập.* |
+| 21 | MSG21        | Alert        | Account locked | *Tài khoản của bạn đã bị khóa bởi quản trị viên.* |
+| 22 | MSG22        | Alert        | Google Login Error | *Đăng nhập bằng Google thất bại.* / *Tài khoản của bạn đăng nhập qua Google, không thể đổi mật khẩu.* |
+| 23 | MSG23        | Toast        | Payment success | *Thanh toán thành công!* |
+| 24 | MSG24        | Alert        | Payment failure | *Thanh toán không thành công. Mã lỗi: {ErrorCode}* |
+| 25 | MSG25        | Toast        | Backup/Restore | *Backup/Restore created successfully: {FileName}* |

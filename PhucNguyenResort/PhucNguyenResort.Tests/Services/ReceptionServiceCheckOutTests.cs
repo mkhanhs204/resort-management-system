@@ -84,7 +84,7 @@ namespace PhucNguyenResort.Tests.Services
         private class TestableReceptionService : ReceptionService
         {
             private readonly DateTime _mockNow;
-            public TestableReceptionService(ResortDbContext context, DateTime mockNow) : base(context, null!, new Mock<IEmailSender>().Object, new Mock<IWebHostEnvironment>().Object)
+            public TestableReceptionService(ResortDbContext context, DateTime mockNow) : base(context, null!, new Mock<IEmailSender>().Object, new Mock<IWebHostEnvironment>().Object, new Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object)
             {
                 _mockNow = mockNow;
             }
