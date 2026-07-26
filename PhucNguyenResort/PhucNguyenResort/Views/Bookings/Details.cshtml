@@ -303,7 +303,15 @@
                     <p class="text-label-sm text-on-surface-variant mb-2">Trạng Thái Thanh Toán</p>
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-secondary">credit_score</span>
-                        @if (Model.BookingStatus == BookingStatus.CheckedOut || (Model.DepositAmount > 0 && Model.DepositAmount >= grandTotal))
+                        @if (Model.BookingStatus == BookingStatus.PendingPayment)
+                        {
+                            <span class="font-body-md font-bold text-amber-600">Chờ Thanh Toán</span>
+                        }
+                        else if (Model.BookingStatus == BookingStatus.Cancelled && (Model.DepositAmount == null || Model.DepositAmount == 0))
+                        {
+                            <span class="font-body-md font-bold text-error">Chưa Thanh Toán (Đã Hủy)</span>
+                        }
+                        else if (Model.BookingStatus == BookingStatus.CheckedOut || (Model.DepositAmount > 0 && Model.DepositAmount >= grandTotal))
                         {
                             <span class="font-body-md font-bold text-on-surface">Đã Thanh Toán Toàn Bộ</span>
                         }
@@ -312,7 +320,7 @@
                             <span class="font-body-md font-bold text-on-surface">Đã Thanh Toán Cọc (@(Model.DepositAmount?.ToString("N0") ?? "0") VNĐ)</span>
                         }
                     </div>
-                    @if (Model.BookingStatus != BookingStatus.CheckedOut && (Model.DepositAmount == null || Model.DepositAmount < grandTotal))
+                    @if (Model.BookingStatus != BookingStatus.CheckedOut && Model.BookingStatus != BookingStatus.Cancelled && Model.BookingStatus != BookingStatus.PendingPayment && (Model.DepositAmount == null || Model.DepositAmount < grandTotal))
                     {
                         <div class="mt-2 text-label-sm text-error">
                             Số tiền còn lại: @((grandTotal - (Model.DepositAmount ?? 0)).ToString("N0")) VNĐ (Thanh toán tại quầy)
