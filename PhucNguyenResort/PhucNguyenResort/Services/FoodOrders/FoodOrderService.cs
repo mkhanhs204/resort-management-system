@@ -729,6 +729,7 @@ public class FoodOrderService : IFoodOrderService
         foodOrder.ChargedAt = DateTime.Now;
 
         folio.TotalFoodCharges += foodOrder.TotalAmount ?? 0;
+        folio.TotalAmount += foodOrder.TotalAmount ?? 0;
 
         var transaction = new FolioTransaction
         {
