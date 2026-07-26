@@ -154,7 +154,7 @@
                     
                     <div class="flex flex-col gap-2 mb-8">
                         <label asp-for="PassportNumberString" class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Số Hộ Chiếu / CCCD</label>
-                        <input asp-for="PassportNumberString" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md w-full" placeholder="Nhập số hộ chiếu hoặc CMND" />
+                        <input asp-for="PassportNumberString" class="bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 form-input-focus transition-soft font-body-md w-full" placeholder="CCCD: 12 số | Hộ chiếu: P1234567" pattern="^(\d{12}|[A-Z]\d{7})$" title="Số CCCD gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa + 7 chữ số" />
                         <span asp-validation-for="PassportNumberString" class="text-error text-sm"></span>
                     </div>
 

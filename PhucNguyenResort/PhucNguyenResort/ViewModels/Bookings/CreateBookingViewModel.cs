@@ -44,7 +44,7 @@ namespace PhucNguyenResort.ViewModels.Bookings
         public GenderType? PrimaryGuestGender { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập số CCCD/Hộ chiếu.")]
-        [RegularExpression(@"^[a-zA-Z0-9]{8,20}$", ErrorMessage = "Số CCCD/Hộ chiếu phải là ký tự chữ hoặc số, độ dài từ 8 đến 20 ký tự.")]
+        [RegularExpression(@"^(\d{12}|[A-Z]\d{7})$", ErrorMessage = "Số CCCD phải gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa và 7 chữ số (VD: P1234567).")]
         [Display(Name = "Số CCCD/Hộ chiếu")]
         public string PrimaryGuestPassportNumber { get; set; } = string.Empty;
 

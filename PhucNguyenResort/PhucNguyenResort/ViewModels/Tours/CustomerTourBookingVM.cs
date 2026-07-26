@@ -120,6 +120,7 @@ namespace PhucNguyenResort.ViewModels.Tours
         public PhucNguyenResort.Enums.GenderType? PrimaryGuestGender { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập số CCCD/Hộ chiếu.")]
+        [RegularExpression(@"^(\d{12}|[A-Z]\d{7})$", ErrorMessage = "Số CCCD phải gồm 12 chữ số hoặc Hộ chiếu gồm 1 chữ cái in hoa và 7 chữ số (VD: P1234567).")]
         [Display(Name = "Số CCCD/Hộ chiếu")]
         public string PrimaryGuestPassportNumber { get; set; } = string.Empty;
 
