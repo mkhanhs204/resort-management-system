@@ -36,8 +36,8 @@ namespace PhucNguyenResort.Services.Bookings
                     {
                         var context = scope.ServiceProvider.GetRequiredService<ResortDbContext>();
 
-                        // Expiry window: 20 minutes (VNPAY payment session is usually 15 minutes)
-                        var cutoffTime = DateTime.Now.AddMinutes(-20);
+                        // Expiry window: 2 minutes (Phù hợp cho lúc Demo)
+                        var cutoffTime = DateTime.Now.AddMinutes(-2);
 
                         var expiredBookings = await context.Bookings
                             .Include(b => b.TourBookings)
@@ -50,6 +50,7 @@ namespace PhucNguyenResort.Services.Bookings
                             foreach (var booking in expiredBookings)
                             {
                                 booking.BookingStatus = BookingStatus.Cancelled;
+                                booking.DepositAmount = 0; // Đơn chưa thanh toán mà bị hủy thì tiền cọc thực tế = 0
                                 _logger.LogInformation("Booking ID {BookingId} (created at {CreatedAt}) expired and was automatically cancelled.", booking.BookingId, booking.CreatedAt);
 
                                 // Cancel associated tour bookings and restore slots
@@ -81,8 +82,8 @@ namespace PhucNguyenResort.Services.Bookings
                     _logger.LogError(ex, "An error occurred while running Pending Booking Cleanup Job.");
                 }
 
-                // Run once every 5 minutes
-                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                // Run once every 2 minutes (Phù hợp cho lúc Demo)
+                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
             }
 
             _logger.LogInformation("Pending Booking Cleanup Background Job is stopping.");
