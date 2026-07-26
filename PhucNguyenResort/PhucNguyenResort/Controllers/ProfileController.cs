@@ -97,6 +97,11 @@ namespace PhucNguyenResort.Controllers
                 return Forbid();
             }
 
+            if (model.DateOfBirth.HasValue && model.DateOfBirth.Value > DateTime.Today)
+            {
+                ModelState.AddModelError(nameof(model.DateOfBirth), "Ngày sinh không được ở tương lai.");
+            }
+
             if (!ModelState.IsValid)
             {
                 model.CheckedInBookings = await GetCheckedInBookingsAsync(currentUserId);

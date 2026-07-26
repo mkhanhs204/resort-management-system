@@ -393,7 +393,7 @@
                         <div class="form-row mt-2">
                             <div class="form-group col-md-4">
                                 <label class="luxury-label">Ngày Sinh</label>
-                                <input type="date" name="Guests[0].DateOfBirth" class="luxury-input" />
+                                <input type="date" name="Guests[0].DateOfBirth" class="luxury-input" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="luxury-label">Số CCCD / Hộ Chiếu <span class="text-danger">*</span></label>
@@ -572,7 +572,7 @@
                             <div class="form-row mt-2">
                                 <div class="form-group col-md-4">
                                     <label class="luxury-label">Ngày Sinh</label>
-                                    <input type="date" name="Guests[${i}].DateOfBirth" class="luxury-input" />
+                                    <input type="date" name="Guests[${i}].DateOfBirth" class="luxury-input" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="luxury-label">Số CCCD / Hộ Chiếu</label>

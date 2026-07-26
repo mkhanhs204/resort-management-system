@@ -87,11 +87,46 @@ namespace PhucNguyenResort.Controllers
                     if (string.IsNullOrWhiteSpace(guest.FullName))
                         ModelState.AddModelError($"Guests[{i}].FullName", "Họ tên người đặt chính không được để trống.");
                     if (guest.DateOfBirth == null)
+                    {
                         ModelState.AddModelError($"Guests[{i}].DateOfBirth", "Ngày sinh người đặt chính không được để trống.");
+                    }
+                    else if (guest.DateOfBirth > DateTime.Today)
+                    {
+                        ModelState.AddModelError($"Guests[{i}].DateOfBirth", "Ngày sinh người đặt chính không được ở tương lai.");
+                    }
                     if (string.IsNullOrWhiteSpace(guest.PassportNumber))
                         ModelState.AddModelError($"Guests[{i}].PassportNumber", "Số CCCD/Hộ chiếu người đặt chính không được để trống.");
                     if (string.IsNullOrWhiteSpace(guest.Nationality))
                         ModelState.AddModelError($"Guests[{i}].Nationality", "Quốc tịch người đặt chính không được để trống.");
+                }
+                else
+                {
+                    bool hasAnyField = !string.IsNullOrWhiteSpace(guest.FullName) 
+                                       || !string.IsNullOrWhiteSpace(guest.PassportNumber) 
+                                       || guest.DateOfBirth != null;
+                    if (hasAnyField)
+                    {
+                        if (string.IsNullOrWhiteSpace(guest.FullName))
+                        {
+                            ModelState.AddModelError($"Guests[{i}].FullName", $"Họ tên khách thứ {i + 1} không được để trống.");
+                        }
+                        if (guest.DateOfBirth == null)
+                        {
+                            ModelState.AddModelError($"Guests[{i}].DateOfBirth", $"Ngày sinh khách thứ {i + 1} không được để trống.");
+                        }
+                        else if (guest.DateOfBirth > DateTime.Today)
+                        {
+                            ModelState.AddModelError($"Guests[{i}].DateOfBirth", $"Ngày sinh khách thứ {i + 1} không được ở tương lai.");
+                        }
+                        if (guest.Gender == null)
+                        {
+                            ModelState.AddModelError($"Guests[{i}].Gender", $"Vui lòng chọn giới tính khách thứ {i + 1}.");
+                        }
+                        if (string.IsNullOrWhiteSpace(guest.Nationality))
+                        {
+                            ModelState.AddModelError($"Guests[{i}].Nationality", $"Quốc tịch khách thứ {i + 1} không được để trống.");
+                        }
+                    }
                 }
             }
 
@@ -249,6 +284,10 @@ namespace PhucNguyenResort.Controllers
                             {
                                 ModelState.AddModelError($"Guests[{i}].DateOfBirth", "Ngày sinh người đặt chính không được để trống.");
                             }
+                            else if (guest.DateOfBirth > DateTime.Today)
+                            {
+                                ModelState.AddModelError($"Guests[{i}].DateOfBirth", "Ngày sinh người đặt chính không được ở tương lai.");
+                            }
                             if (guest.Gender == null)
                             {
                                 ModelState.AddModelError($"Guests[{i}].Gender", "Vui lòng chọn giới tính người đặt chính.");
@@ -276,6 +315,10 @@ namespace PhucNguyenResort.Controllers
                                 if (guest.DateOfBirth == null)
                                 {
                                     ModelState.AddModelError($"Guests[{i}].DateOfBirth", $"Ngày sinh khách thứ {i + 1} không được để trống.");
+                                }
+                                else if (guest.DateOfBirth > DateTime.Today)
+                                {
+                                    ModelState.AddModelError($"Guests[{i}].DateOfBirth", $"Ngày sinh khách thứ {i + 1} không được ở tương lai.");
                                 }
                                 if (guest.Gender == null)
                                 {

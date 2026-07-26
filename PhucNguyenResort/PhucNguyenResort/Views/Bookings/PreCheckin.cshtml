@@ -106,7 +106,7 @@
                             
                             <div class="space-y-1">
                                 <label class="text-label-lg text-on-surface-variant">Ngày Sinh</label>
-                                <input asp-for="Guests[i].DateOfBirth" type="date" class="w-full bg-surface-container-low border-outline-variant/50 rounded-lg p-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none" />
+                                <input asp-for="Guests[i].DateOfBirth" type="date" class="w-full bg-surface-container-low border-outline-variant/50 rounded-lg p-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
                             </div>
                             
                             <div class="space-y-1">
