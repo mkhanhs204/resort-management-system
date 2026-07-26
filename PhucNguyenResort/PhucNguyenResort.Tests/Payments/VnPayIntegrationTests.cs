@@ -65,7 +65,12 @@ namespace PhucNguyenResort.Tests.Payments
 
             var mockEmail = new Mock<IEmailSender>();
             var mockEnv = new Mock<IWebHostEnvironment>();
-            var controller = new PaymentController(mockService.Object, context, mockEmail.Object, mockEnv.Object);
+            var controller = new PaymentController(
+                mockService.Object, 
+                context, 
+                mockEmail.Object, 
+                mockEnv.Object, 
+                new Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext()
@@ -124,7 +129,12 @@ namespace PhucNguyenResort.Tests.Payments
             {
                 var mockEmail = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var controller = new PaymentController(mockService.Object, context, mockEmail.Object, mockEnv.Object);
+                var controller = new PaymentController(
+                    mockService.Object, 
+                    context, 
+                    mockEmail.Object, 
+                    mockEnv.Object, 
+                    new Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
                 controller.ControllerContext = new ControllerContext
                 {
                     HttpContext = new DefaultHttpContext()
@@ -190,7 +200,12 @@ namespace PhucNguyenResort.Tests.Payments
             {
                 var mockEmail = new Mock<IEmailSender>();
                 var mockEnv = new Mock<IWebHostEnvironment>();
-                var controller = new PaymentController(mockService.Object, context, mockEmail.Object, mockEnv.Object);
+                var controller = new PaymentController(
+                    mockService.Object, 
+                    context, 
+                    mockEmail.Object, 
+                    mockEnv.Object, 
+                    new Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
                 
                 var httpContext = new DefaultHttpContext();
                 var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
@@ -202,7 +217,7 @@ namespace PhucNguyenResort.Tests.Payments
                 };
 
                 // Act
-                var result = controller.VNPayReturn() as RedirectToActionResult;
+                var result = await controller.VNPayReturn() as RedirectToActionResult;
 
                 // Assert
                 Assert.NotNull(result);

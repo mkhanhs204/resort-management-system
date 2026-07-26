@@ -1,0 +1,22 @@
+DANH SÁCH 20 BÀN ĂN CỦA NHÀ HÀNG
+
+1. Bàn Hướng Sân Vườn
+2. Bàn Gia Đình Cạnh Hồ Bơi
+3. Bàn Nhóm Trong Nhà
+4. Bàn Ăn Phòng Riêng
+5. Bàn Đôi Cạnh Cửa Sổ
+6. Bàn Ngoài Hiên
+7. Bàn Gia Đình Ngoài Vườn
+8. Bàn Tiệc Lớn
+9. Chòi VIP Ngoài Vườn
+10. Khu Vực Riêng Cho Cặp Đôi
+11. Bàn Sofa Cạnh Cửa Sổ
+12. Bàn Dự Phòng (Nhân Viên)
+13. Bàn Nhóm Ngoài Trời
+14. Bàn Gia Đình Khu Riêng Tư
+15. Bàn Đôi Ngoài Ban Công
+16. Bàn Dự Phòng Hệ Thống
+17. Bàn Sofa Cạnh Hồ Bơi
+18. Bàn Nhóm Ngoài Vườn
+19. Bàn Tiệc Kỷ Niệm Premium
+20. Bàn Đôi Dự Phòng

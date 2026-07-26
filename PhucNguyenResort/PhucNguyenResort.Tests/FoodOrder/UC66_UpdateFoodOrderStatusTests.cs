@@ -33,7 +33,7 @@ namespace PhucNguyenResort.Tests.FoodOrder
                 .Options;
 
             _dbContext = new ResortDbContext(options);
-            _foodOrderService = new FoodOrderService(_dbContext, new Mock<IEmailSender>().Object);
+            _foodOrderService = new FoodOrderService(_dbContext, new Mock<IEmailSender>().Object, new Mock<PhucNguyenResort.Services.Notifications.INotificationService>().Object);
 
             SeedDataAsync().Wait();
         }

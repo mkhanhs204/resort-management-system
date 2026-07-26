@@ -59,6 +59,7 @@ namespace PhucNguyenResort.Tests.Integration
             context.FoodOrders.Add(new PhucNguyenResort.Models.FoodOrder { FoodOrderId = 2, IsChargedToRoom = true, IsPaidAtRestaurant = false, TotalAmount = 500000, ChargedAt = new DateTime(2026, 7, 2) });
             
             // FX-010: Tour Revenue (Direct payment)
+            context.TourBookings.Add(new TourBooking { TourBookingId = 1, BookingStatus = TourBookingStatus.Confirmed });
             context.Payments.Add(new Payment { PaymentId = 1, TourBookingId = 1, Amount = 150000, PaymentStatus = PaymentStatus.Success, PaidAt = new DateTime(2026, 7, 3) });
 
             await context.SaveChangesAsync();

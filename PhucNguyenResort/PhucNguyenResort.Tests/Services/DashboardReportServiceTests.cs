@@ -97,16 +97,20 @@ namespace PhucNguyenResort.Tests.Services
         public async Task GetOccupancyDataAsync_OccupancyRateCannotExceed100Percent()
         {
             var context = GetDbContext();
-            // Seed 5 rooms
+            // Seed 5 rooms in database
             for (int i = 1; i <= 5; i++)
             {
                 context.Rooms.Add(new Room { RoomId = i, Status = RoomStatus.Occupied });
+            }
+            // Seed 6 bookings (1 more than total rooms to test exceeding logic) spanning the whole month
+            for (int i = 1; i <= 6; i++)
+            {
                 context.Bookings.Add(new Booking 
                 { 
                     BookingId = i, 
                     BookingStatus = BookingStatus.CheckedIn, 
                     CheckInDate = new DateTime(2026, 7, 1), 
-                    CheckOutDate = new DateTime(2026, 7, 5),
+                    CheckOutDate = new DateTime(2026, 8, 1),
                     BookingDetails = new List<BookingDetail> { new BookingDetail { BookingId = i, RoomId = i } }
                 });
             }
@@ -166,6 +170,7 @@ namespace PhucNguyenResort.Tests.Services
         {
             var context = GetDbContext();
             context.FolioTransactions.Add(new FolioTransaction { TransactionType = FolioTransactionType.TourCharge, Amount = 300000, CreatedAt = new DateTime(2026, 7, 3) });
+            context.TourBookings.Add(new TourBooking { TourBookingId = 1, BookingStatus = TourBookingStatus.Confirmed });
             context.Payments.Add(new Payment { TourBookingId = 1, Amount = 150000, PaymentStatus = PaymentStatus.Success, PaidAt = new DateTime(2026, 7, 3) });
             await context.SaveChangesAsync();
 
@@ -183,6 +188,7 @@ namespace PhucNguyenResort.Tests.Services
             context.FolioTransactions.Add(new FolioTransaction { TransactionType = FolioTransactionType.FoodCharge, Amount = 500000, CreatedAt = new DateTime(2026, 7, 2) });
             context.FoodOrders.Add(new PhucNguyenResort.Models.FoodOrder { IsPaidAtRestaurant = true, IsChargedToRoom = false, TotalAmount = 200000, PaidAt = new DateTime(2026, 7, 2) });
             context.FolioTransactions.Add(new FolioTransaction { TransactionType = FolioTransactionType.TourCharge, Amount = 300000, CreatedAt = new DateTime(2026, 7, 3) });
+            context.TourBookings.Add(new TourBooking { TourBookingId = 1, BookingStatus = TourBookingStatus.Confirmed });
             context.Payments.Add(new Payment { TourBookingId = 1, Amount = 150000, PaymentStatus = PaymentStatus.Success, PaidAt = new DateTime(2026, 7, 3) });
             await context.SaveChangesAsync();
 

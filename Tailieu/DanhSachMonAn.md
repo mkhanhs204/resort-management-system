@@ -1,0 +1,213 @@
+﻿# DANH SACH 100 MON AN THUC DON
+
+## DANH MUC: Khai Vị
+- **Gỏi Cuốn Tôm Thịt** (75,000 VND)
+  - *Mo ta:* Cuốn bánh tráng tươi với tôm, thịt heo, bún và rau sống, chấm tương đậu phộng.
+- **Chả Giò Chiên Giòn** (85,000 VND)
+  - *Mo ta:* Chả giò nhân thịt heo, nấm mèo, miến chiên vàng giòn, ăn kèm nước mắm chua ngọt.
+- **Bánh Xèo Miền Tây** (95,000 VND)
+  - *Mo ta:* Bánh xèo giòn nhân tôm, thịt, giá đỗ, ăn kèm rau sống và nước chấm.
+- **Gỏi Ngó Sen Tôm Thịt** (90,000 VND)
+  - *Mo ta:* Gỏi ngó sen trộn tôm và thịt ba chỉ, rắc đậu phộng rang và hành phi.
+- **Bánh Khọt Vũng Tàu** (80,000 VND)
+  - *Mo ta:* Bánh khọt nhân tôm tươi, ăn kèm rau sống và nước mắm pha.
+- **Súp Bào Ngư Vi Cá** (185,000 VND)
+  - *Mo ta:* Súp bào ngư nấu với vi cá, nấm đông cô, thơm ngon bổ dưỡng.
+- **Salad Trộn Kiểu Resort** (75,000 VND)
+  - *Mo ta:* Rau xà lách, cà chua bi, bơ, trứng luộc trộn sốt mè rang.
+- **Tôm Chiên Bơ Tỏi** (130,000 VND)
+  - *Mo ta:* Tôm sú chiên bơ tỏi thơm lừng, dọn kèm bánh mì nướng.
+- **Mực Chiên Giòn** (120,000 VND)
+  - *Mo ta:* Mực ống tẩm bột chiên giòn, ăn kèm sốt mayonnaise và tương ớt.
+- **Nấm Xào Bơ Tỏi** (85,000 VND)
+  - *Mo ta:* Nấm đùi gà và nấm kim châm xào bơ tỏi, rắc hành lá.
+## DANH MUC: Hải Sản
+- **Tôm Hùm Nướng Phô Mai** (850,000 VND)
+  - *Mo ta:* Tôm hùm tươi nướng phô mai, dọn kèm khoai tây nghiền và salad.
+- **Cua Rang Me** (450,000 VND)
+  - *Mo ta:* Cua biển rang me chua ngọt đậm đà, thơm lừng.
+- **Ghẹ Hấp Bia** (380,000 VND)
+  - *Mo ta:* Ghẹ tươi hấp bia, giữ nguyên vị ngọt tự nhiên, chấm muối tiêu chanh.
+- **Mực Nướng Sa Tế** (220,000 VND)
+  - *Mo ta:* Mực ống nướng sa tế cay nồng, ăn kèm rau răm và đồ chua.
+- **Sò Điệp Nướng Mỡ Hành** (195,000 VND)
+  - *Mo ta:* Sò điệp tươi nướng mỡ hành và đậu phộng giã nhỏ.
+- **Cá Chẽm Hấp Hồng Kông** (350,000 VND)
+  - *Mo ta:* Cá chẽm biển hấp xì dầu kiểu Hồng Kông, thịt cá thơm mềm.
+- **Tôm Sú Nướng Muối Ớt** (280,000 VND)
+  - *Mo ta:* Tôm sú nướng than hoa, phết muối ớt cay nhẹ.
+- **Ốc Hương Rang Bơ** (250,000 VND)
+  - *Mo ta:* Ốc hương rang bơ tỏi thơm phức, vị béo ngậy.
+- **Bạch Tuộc Nướng Xiên** (180,000 VND)
+  - *Mo ta:* Bạch tuộc baby nướng xiên que, phết sốt teriyaki.
+- **Hàu Nướng Phô Mai** (220,000 VND)
+  - *Mo ta:* Hàu sữa Phú Quốc nướng phô mai, béo ngậy thơm lừng.
+## DANH MUC: Món Việt
+- **Cá Kho Tộ** (150,000 VND)
+  - *Mo ta:* Cá lóc kho tộ đất với nước màu dừa, tiêu và hành lá.
+- **Thịt Kho Tàu** (130,000 VND)
+  - *Mo ta:* Thịt ba chỉ kho nước dừa với trứng vịt, vị mặn ngọt đậm đà.
+- **Canh Chua Cá Lóc** (120,000 VND)
+  - *Mo ta:* Canh chua miền Tây nấu với cá lóc, me, thơm, đậu bắp.
+- **Gà Kho Gừng** (140,000 VND)
+  - *Mo ta:* Đùi gà ta kho gừng tươi, nước mắm thắng đường thơm lừng.
+- **Rau Muống Xào Tỏi** (65,000 VND)
+  - *Mo ta:* Rau muống xào tỏi phi thơm, giòn ngọt tự nhiên.
+- **Đậu Hũ Sốt Cà Chua** (75,000 VND)
+  - *Mo ta:* Đậu hũ chiên vàng sốt cà chua với thịt bằm và hành lá.
+- **Sườn Non Rim Mặn** (160,000 VND)
+  - *Mo ta:* Sườn heo non rim nước mắm, tỏi ớt, caramel nhẹ.
+- **Bò Lúc Lắc** (195,000 VND)
+  - *Mo ta:* Thịt bò Úc xào lúc lắc với ớt chuông, hành tây, ăn kèm cơm trắng.
+- **Tôm Rim Nước Cốt Dừa** (175,000 VND)
+  - *Mo ta:* Tôm sú rim nước cốt dừa béo ngậy, hành lá và tiêu xanh.
+- **Gà Nướng Lá Chanh** (185,000 VND)
+  - *Mo ta:* Gà ta nướng lá chanh thơm nức, ăn kèm muối tiêu chanh.
+## DANH MUC: Món Âu
+- **Bò Bít Tết Sốt Tiêu Đen** (285,000 VND)
+  - *Mo ta:* Thịt bò Úc áp chảo tái vừa, rưới sốt tiêu đen, kèm khoai tây chiên.
+- **Cá Hồi Áp Chảo** (320,000 VND)
+  - *Mo ta:* Cá hồi Na Uy áp chảo giòn da, dọn kèm rau củ hấp và sốt chanh dây.
+- **Mì Ý Sốt Bò Bằm** (165,000 VND)
+  - *Mo ta:* Spaghetti sốt Bolognese với thịt bò bằm, cà chua và phô mai Parmesan.
+- **Mì Ý Sốt Kem Nấm** (175,000 VND)
+  - *Mo ta:* Fettuccine sốt kem trắng với nấm rừng và phô mai.
+- **Pizza Hải Sản** (220,000 VND)
+  - *Mo ta:* Pizza đế mỏng với tôm, mực, phô mai Mozzarella và sốt cà chua.
+- **Sườn Cừu Nướng Rosemary** (395,000 VND)
+  - *Mo ta:* Sườn cừu New Zealand nướng hương thảo, kèm khoai tây nghiền.
+- **Súp Kem Nấm Truffle** (135,000 VND)
+  - *Mo ta:* Súp kem nấm với dầu truffle đen, bánh mì nướng giòn.
+- **Hamburger Bò Phô Mai** (185,000 VND)
+  - *Mo ta:* Hamburger bò Úc nướng than, phô mai Cheddar, rau xà lách, cà chua.
+- **Gà Nướng Sốt BBQ** (195,000 VND)
+  - *Mo ta:* Đùi gà nướng sốt BBQ mật ong, kèm bắp nướng và coleslaw.
+- **Salad Caesar Gà Nướng** (145,000 VND)
+  - *Mo ta:* Salad Caesar truyền thống với gà nướng thái lát, bánh mì giòn, phô mai.
+## DANH MUC: Lẩu & Nướng
+- **Lẩu Thái Tom Yum Hải Sản** (450,000 VND)
+  - *Mo ta:* Lẩu Tom Yum chua cay với tôm, mực, cá, nấm và rau tươi (2-3 người).
+- **Lẩu Bò Nhúng Dấm** (380,000 VND)
+  - *Mo ta:* Lẩu dấm với thịt bò tái, rau sống, bún và mắm nêm (2-3 người).
+- **Lẩu Gà Lá É** (350,000 VND)
+  - *Mo ta:* Lẩu gà ta nấu lá é thơm đặc trưng Phú Quốc (2-3 người).
+- **Lẩu Cá Kèo Lá Giang** (320,000 VND)
+  - *Mo ta:* Lẩu cá kèo nấu lá giang chua thanh, mùi thơm đặc trưng (2-3 người).
+- **Bò Nướng Lá Lốt** (145,000 VND)
+  - *Mo ta:* Thịt bò bằm cuốn lá lốt nướng than hoa thơm lừng.
+- **Sườn Heo Nướng Mật Ong** (195,000 VND)
+  - *Mo ta:* Sườn heo ướp mật ong nướng than, thơm ngọt đậm vị.
+- **Gà Nướng Ngũ Vị** (220,000 VND)
+  - *Mo ta:* Gà ta nướng ngũ vị hương, da giòn thịt mềm.
+- **Combo Nướng Hải Sản** (550,000 VND)
+  - *Mo ta:* Tôm, mực, sò điệp, cá nướng than hoa phục vụ 2-4 người.
+- **Bê Thui Cầu Mống** (280,000 VND)
+  - *Mo ta:* Bê thui đặc sản, ăn kèm rau sống, bánh tráng và mắm nêm.
+- **Lẩu Nấm Chay** (280,000 VND)
+  - *Mo ta:* Lẩu nấm thập cẩm với đậu hũ, rau củ tươi, nước dùng chay (2-3 người).
+## DANH MUC: Cơm & Bún & Phở
+- **Phở Bò Tái Nạm** (95,000 VND)
+  - *Mo ta:* Phở bò truyền thống với nước dùng hầm xương 12 tiếng, thịt bò tái và nạm.
+- **Bún Bò Huế** (105,000 VND)
+  - *Mo ta:* Bún bò Huế cay nồng với giò heo, huyết và chả cua.
+- **Bún Chả Hà Nội** (110,000 VND)
+  - *Mo ta:* Bún chả nướng than hoa ăn kèm nước mắm pha, rau sống và nem cua bể.
+- **Cơm Tấm Sườn Bì Chả** (95,000 VND)
+  - *Mo ta:* Cơm tấm với sườn nướng, bì, chả trứng và nước mắm pha.
+- **Cơm Chiên Dương Châu** (105,000 VND)
+  - *Mo ta:* Cơm chiên với tôm, lạp xưởng, trứng, đậu Hà Lan và cà rốt.
+- **Cơm Gà Hội An** (110,000 VND)
+  - *Mo ta:* Cơm nghệ vàng ươm ăn kèm gà xé phay, rau sống và canh.
+- **Hủ Tiếu Nam Vang** (90,000 VND)
+  - *Mo ta:* Hủ tiếu nước trong với tôm, thịt bằm, gan và trứng cút.
+- **Mì Quảng Đà Nẵng** (100,000 VND)
+  - *Mo ta:* Mì Quảng với tôm, thịt heo, trứng cút và bánh tráng nướng.
+- **Bún Riêu Cua** (95,000 VND)
+  - *Mo ta:* Bún riêu cua đồng với chả cua, đậu hũ chiên, cà chua.
+- **Cơm Niêu Cá Kho Tộ** (135,000 VND)
+  - *Mo ta:* Cơm niêu đất nóng hổi ăn kèm cá kho tộ và canh rau.
+## DANH MUC: Món Chay
+- **Cơm Chiên Chay Thập Cẩm** (85,000 VND)
+  - *Mo ta:* Cơm chiên với đậu hũ, nấm, bắp, cà rốt và đậu que.
+- **Phở Chay Nấm** (80,000 VND)
+  - *Mo ta:* Phở chay nước dùng rau củ với nấm đông cô, đậu hũ và rau thơm.
+- **Bún Chay Huế** (85,000 VND)
+  - *Mo ta:* Bún chay kiểu Huế với nước dùng sả, nấm và chả chay.
+- **Đậu Hũ Chiên Sả Ớt** (70,000 VND)
+  - *Mo ta:* Đậu hũ chiên giòn xào sả ớt, thơm cay hấp dẫn.
+- **Nấm Xào Rau Củ** (75,000 VND)
+  - *Mo ta:* Nấm đùi gà, nấm bào ngư xào với bông cải, cà rốt.
+- **Canh Bí Đỏ Nấu Chay** (65,000 VND)
+  - *Mo ta:* Canh bí đỏ nấu nước dùng chay với đậu hũ non và rau ngót.
+- **Gỏi Cuốn Chay** (65,000 VND)
+  - *Mo ta:* Cuốn bánh tráng với đậu hũ chiên, bún, rau sống và nấm.
+- **Mì Xào Chay** (80,000 VND)
+  - *Mo ta:* Mì trứng xào với rau cải, nấm và đậu hũ chiên.
+- **Cà Ri Chay Rau Củ** (90,000 VND)
+  - *Mo ta:* Cà ri nước cốt dừa với khoai tây, cà rốt, đậu que và đậu hũ.
+- **Cơm Cuộn Rong Biển Chay** (95,000 VND)
+  - *Mo ta:* Cơm cuộn kiểu Nhật với bơ, dưa leo, cà rốt và đậu hũ.
+## DANH MUC: Tráng Miệng
+- **Chè Khúc Bạch** (55,000 VND)
+  - *Mo ta:* Chè khúc bạch mát lạnh với nhãn, vải và nước đường hoa nhài.
+- **Bánh Flan Caramel** (50,000 VND)
+  - *Mo ta:* Bánh flan mềm mịn với caramel đắng nhẹ và kem tươi.
+- **Kem Dừa Tươi** (75,000 VND)
+  - *Mo ta:* Kem dừa tươi Phú Quốc phục vụ trong trái dừa non.
+- **Bánh Chocolate Lava** (95,000 VND)
+  - *Mo ta:* Bánh chocolate nóng nhân chảy, ăn kèm kem vanilla.
+- **Trái Cây Tươi Theo Mùa** (85,000 VND)
+  - *Mo ta:* Đĩa trái cây tươi theo mùa: xoài, thanh long, dưa hấu, đu đủ.
+- **Chè Thái Sầu Riêng** (65,000 VND)
+  - *Mo ta:* Chè Thái với sầu riêng, mít, dừa non và nước cốt dừa.
+- **Tiramisu Cà Phê Việt** (90,000 VND)
+  - *Mo ta:* Tiramisu biến tấu với cà phê phin Việt Nam đậm đà.
+- **Sữa Chua Dầm Trái Cây** (60,000 VND)
+  - *Mo ta:* Sữa chua dầm với xoài, dâu, việt quất và granola.
+- **Bánh Chuối Nướng** (55,000 VND)
+  - *Mo ta:* Bánh chuối nướng nước cốt dừa, mặt vàng ruộm, thơm béo.
+- **Panna Cotta Xoài** (75,000 VND)
+  - *Mo ta:* Panna Cotta kem sữa với coulis xoài tươi Phú Quốc.
+## DANH MUC: Đồ Uống
+- **Cà Phê Sữa Đá** (45,000 VND)
+  - *Mo ta:* Cà phê phin truyền thống Việt Nam pha với sữa đặc, đá viên.
+- **Cà Phê Đen Đá** (40,000 VND)
+  - *Mo ta:* Cà phê đen đá đậm đà, nguyên chất không đường.
+- **Trà Sen Phúc Nguyên** (55,000 VND)
+  - *Mo ta:* Trà sen đặc biệt ướp hương sen tự nhiên, thưởng thức nóng hoặc đá.
+- **Sinh Tố Xoài** (65,000 VND)
+  - *Mo ta:* Sinh tố xoài Phú Quốc tươi nguyên, ngọt thanh mát lạnh.
+- **Nước Dừa Tươi** (50,000 VND)
+  - *Mo ta:* Nước dừa tươi xiêm lạnh mát, phục vụ nguyên trái.
+- **Nước Ép Cam Tươi** (55,000 VND)
+  - *Mo ta:* Nước ép cam tươi 100%, không đường, giàu vitamin C.
+- **Trà Đào Cam Sả** (60,000 VND)
+  - *Mo ta:* Trà đào cam sả mát lạnh, thơm hương trái cây tự nhiên.
+- **Mojito Việt Nam** (75,000 VND)
+  - *Mo ta:* Mocktail Mojito biến tấu với chanh, bạc hà, soda và đường mía.
+- **Bia Tươi Resort** (65,000 VND)
+  - *Mo ta:* Bia tươi craft brewing tại resort, vị nhẹ thanh mát.
+- **Cocktail Hoàng Hôn** (120,000 VND)
+  - *Mo ta:* Cocktail đặc biệt với rượu rum, nước cam, grenadine và đá xay.
+## DANH MUC: Món Trẻ Em
+- **Mì Ý Bò Bằm Cho Bé** (75,000 VND)
+  - *Mo ta:* Spaghetti sốt cà chua thịt bò bằm, phần nhỏ phù hợp trẻ em.
+- **Cơm Chiên Trứng** (65,000 VND)
+  - *Mo ta:* Cơm chiên trứng đơn giản, bổ dưỡng, phù hợp khẩu vị trẻ nhỏ.
+- **Gà Viên Chiên Giòn** (70,000 VND)
+  - *Mo ta:* Gà viên tẩm bột chiên giòn, ăn kèm sốt cà chua.
+- **Khoai Tây Chiên Phô Mai** (60,000 VND)
+  - *Mo ta:* Khoai tây chiên giòn rắc phô mai Parmesan thơm lừng.
+- **Sandwich Gà Cho Bé** (65,000 VND)
+  - *Mo ta:* Bánh mì sandwich nhân gà xé, rau xà lách và sốt mayonnaise.
+- **Súp Bí Đỏ Kem Sữa** (55,000 VND)
+  - *Mo ta:* Súp bí đỏ nấu kem sữa mịn màng, bổ dưỡng cho trẻ.
+- **Pancake Mật Ong** (70,000 VND)
+  - *Mo ta:* Bánh pancake mềm xốp phết bơ và mật ong, kèm trái cây tươi.
+- **Cháo Gà Hạt Sen** (60,000 VND)
+  - *Mo ta:* Cháo gà hạt sen nấu nhừ, bổ dưỡng và dễ tiêu hóa.
+- **Sinh Tố Chuối Sữa** (45,000 VND)
+  - *Mo ta:* Sinh tố chuối sữa mát lạnh, bổ sung năng lượng cho bé.
+- **Kem Ba Vị Cho Bé** (55,000 VND)
+  - *Mo ta:* Kem ba vị vanilla, chocolate, dâu phục vụ trong ly nhỏ.
+
