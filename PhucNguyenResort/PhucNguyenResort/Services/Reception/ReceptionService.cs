@@ -111,17 +111,32 @@ namespace PhucNguyenResort.Services.Reception
                     booking.BookingId
                 );
 
+                var availableRoomDtos = availableRooms.Select(r => new RoomDto
+                {
+                    Id = r.RoomId,
+                    RoomNumber = r.RoomNumber ?? string.Empty
+                }).ToList();
+
+                if (detail.RoomId.HasValue && !availableRoomDtos.Any(r => r.Id == detail.RoomId.Value))
+                {
+                    var currentRoom = await _context.Rooms.FindAsync(detail.RoomId.Value);
+                    if (currentRoom != null)
+                    {
+                        availableRoomDtos.Add(new RoomDto
+                        {
+                            Id = currentRoom.RoomId,
+                            RoomNumber = currentRoom.RoomNumber ?? string.Empty
+                        });
+                    }
+                }
+
                 roomAssignments.Add(new BookingDetailAssignmentViewModel
                 {
                     BookingDetailId = detail.BookingDetailId,
                     RoomCategoryId = detail.RoomCategoryId,
                     CategoryName = categoryName,
                     SelectedRoomId = detail.RoomId,
-                    AvailableRooms = availableRooms.Select(r => new RoomDto
-                    {
-                        Id = r.RoomId,
-                        RoomNumber = r.RoomNumber ?? string.Empty
-                    }).ToList()
+                    AvailableRooms = availableRoomDtos
                 });
             }
 
@@ -200,10 +215,15 @@ namespace PhucNguyenResort.Services.Reception
                     return (false, $"Phòng {room.RoomNumber} đang trong tình trạng bảo trì.");
                 }
 
-                    if (room.Status == RoomStatus.Occupied)
-                    {
-                        return (false, $"Phòng {room.RoomNumber} đang có khách lưu trú (chưa Check-out).");
-                    }
+                if (room.Status == RoomStatus.Occupied)
+                {
+                    return (false, $"Phòng {room.RoomNumber} đang có khách lưu trú (chưa Check-out).");
+                }
+
+                if (room.Status == RoomStatus.NeedsCleaning || room.Status == RoomStatus.CleaningInProgress)
+                {
+                    return (false, $"Phòng {room.RoomNumber} đang cần dọn dẹp hoặc đang được dọn dẹp.");
+                }
 
                 var isOverlapping = await _context.BookingDetails
                     .AnyAsync(bd => bd.RoomId == roomId
@@ -391,7 +411,7 @@ namespace PhucNguyenResort.Services.Reception
 
             if (checkIn.Date <= DateTime.Today)
             {
-                query = query.Where(r => r.Status != RoomStatus.Occupied);
+                query = query.Where(r => r.Status == RoomStatus.Available);
             }
 
             return await query.ToListAsync();
@@ -418,7 +438,7 @@ namespace PhucNguyenResort.Services.Reception
 
             if (checkIn.Date <= DateTime.Today)
             {
-                query = query.Where(r => r.Status != RoomStatus.Occupied);
+                query = query.Where(r => r.Status == RoomStatus.Available);
             }
 
             return await query.ToListAsync();
@@ -641,6 +661,22 @@ namespace PhucNguyenResort.Services.Reception
                     ErrorCode = "WKB-004",
                     ErrorMessage = "Một hoặc nhiều phòng vật lý được chọn không tồn tại."
                 };
+            }
+
+            if (model.InstantCheckIn)
+            {
+                foreach (var room in rooms)
+                {
+                    if (room.Status != RoomStatus.Available)
+                    {
+                        return new WalkInResult
+                        {
+                            Success = false,
+                            ErrorCode = "WKB-009",
+                            ErrorMessage = $"Phòng {room.RoomNumber} không ở trạng thái sẵn sàng (Available) để Check-in ngay."
+                        };
+                    }
+                }
             }
 
             // 6. Tính toán giá trị tiền đặt phòng
