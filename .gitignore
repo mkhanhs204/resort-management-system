@@ -45,6 +45,9 @@ ScaffoldingReadMe.txt
 *~
 CodeCoverage/
 
+# Local credentials; use appsettings.example.json as the template.
+/PhucNguyenResort/PhucNguyenResort/appsettings.json
+
 # MSBuild Binary and Structured Log
 *.binlog
 
